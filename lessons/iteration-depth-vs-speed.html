@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-L9JD3QE0J0"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-L9JD3QE0J0');</script>
+<title>Lesson 6: Iteration Depth vs. Speed — Jon Grayson</title>
+<meta name="description" content="15 variations of mediocre isn't progress. The AI Playbook by Jon Grayson.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231a1a1a'/%3E%3Crect x='0' y='0' width='2' height='32' fill='%23C4D600'/%3E%3Ctext x='6' y='23' font-family='Arial Black,sans-serif' font-weight='900' font-size='14' fill='%23C4D600'%3EJG%3C/text%3E%3C/svg%3E">
+<style>
+*,*::before,*::after { box-sizing:border-box;margin:0;padding:0; }
+:root {
+  --white:#ffffff;--off-white:#f5f5f7;--gray-200:#e8e8ed;--gray-400:#b0b0b5;
+  --gray-600:#6e6e73;--near-black:#1d1d1f;--black:#111113;
+  --lime:#C4D600;--lime-dark:#9fae00;--lime-hover:#d4e800;
+  --radius:14px;--radius-lg:22px;--radius-sm:6px;
+}
+html { font-size:16px;scroll-behavior:smooth; }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter','Helvetica Neue',Arial,sans-serif;
+  background:var(--white);color:var(--near-black);-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+h1,h2,h3 { font-weight:700;letter-spacing:-0.03em;line-height:1.1; }
+p { line-height:1.65; }
+a { text-decoration:none; }
+em { font-style:normal;color:var(--lime-dark); }
+
+/* NAV */
+nav {
+  position:fixed;top:0;left:0;right:0;z-index:900;height:48px;
+  background:rgba(255,255,255,0.8);backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--gray-200);
+}
+.nav-inner { max-width:980px;margin:0 auto;padding:0 22px;height:100%;display:flex;align-items:center;justify-content:space-between; }
+.nav-logo { font-size:0.95rem;font-weight:700;letter-spacing:-0.02em;color:var(--near-black); }
+.nav-logo span { display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--lime);margin-left:3px;vertical-align:middle;margin-bottom:2px; }
+.nav-links { display:flex;list-style:none;gap:0; }
+.nav-links a { font-size:0.75rem;color:var(--near-black);padding:0 13px;line-height:48px;display:block;transition:color 0.15s; }
+.nav-links a:hover { color:var(--lime-dark); }
+.nav-cta { font-size:0.75rem;font-weight:600;color:var(--lime-dark);transition:opacity 0.15s; }
+.nav-cta:hover { opacity:0.7; }
+@media(max-width:768px){ .nav-links,.nav-cta{display:none;} }
+
+/* HERO */
+.lesson-hero {
+  padding:9rem 22px 4rem;text-align:center;
+  background:var(--off-white);position:relative;overflow:hidden;
+}
+.lesson-hero::before {
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 50% -5%,rgba(196,214,0,0.07) 0%,transparent 65%);
+  pointer-events:none;
+}
+.lesson-eyebrow {
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-size:0.72rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  background:var(--lime);color:var(--near-black);
+  padding:0.3rem 0.9rem;border-radius:40px;margin-bottom:1.5rem;
+}
+.lesson-h1 {
+  font-size:clamp(2.5rem,6vw,4.5rem);font-weight:700;letter-spacing:-0.04em;line-height:0.97;
+  color:var(--near-black);max-width:700px;margin:0 auto 1rem;position:relative;z-index:2;
+}
+.lesson-subtitle {
+  font-size:clamp(1rem,2vw,1.25rem);color:var(--gray-600);max-width:520px;margin:0 auto;
+  position:relative;z-index:2;
+}
+
+/* PROBLEM CARD */
+.problem-section { max-width:700px;margin:0 auto;padding:3rem 22px; }
+.problem-card {
+  background:var(--off-white);border-radius:var(--radius-lg);padding:2.2rem 2.5rem;
+  border-left:4px solid var(--lime);
+}
+.problem-label {
+  font-size:0.7rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--lime-dark);margin-bottom:0.6rem;
+}
+.problem-text { font-size:1.05rem;color:var(--near-black);line-height:1.7; }
+
+/* FLOWCHART */
+.flow-section { max-width:600px;margin:0 auto;padding:3rem 22px 4rem; }
+.flow-section-title {
+  font-size:0.7rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--gray-400);text-align:center;margin-bottom:2.5rem;
+}
+.flow-step {
+  display:flex;gap:1.5rem;align-items:flex-start;
+  background:var(--white);border-radius:var(--radius-lg);
+  padding:1.8rem 2rem;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04),0 8px 30px rgba(0,0,0,0.04);
+  transition:transform 0.3s ease,box-shadow 0.3s ease;
+}
+.flow-step:hover {
+  transform:translateY(-2px);
+  box-shadow:0 2px 8px rgba(0,0,0,0.06),0 12px 40px rgba(0,0,0,0.06);
+}
+.flow-step-icon {
+  flex-shrink:0;width:48px;height:48px;border-radius:14px;
+  background:rgba(196,214,0,0.1);color:var(--lime-dark);
+  display:flex;align-items:center;justify-content:center;
+}
+.flow-step-content { flex:1; }
+.flow-step-num {
+  font-size:0.6rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--lime-dark);margin-bottom:0.2rem;
+}
+.flow-step-title { font-size:1.15rem;font-weight:700;color:var(--near-black);margin-bottom:0.3rem; }
+.flow-step-desc { font-size:0.9rem;color:var(--gray-600);line-height:1.6; }
+.flow-connector { display:flex;justify-content:center;padding:0.3rem 0; }
+
+/* WHY + SCENARIO */
+.insight-section { background:var(--off-white);padding:4rem 22px; }
+.insight-grid { max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem; }
+.insight-card {
+  background:var(--white);border-radius:var(--radius-lg);padding:2rem 2.2rem;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04),0 8px 30px rgba(0,0,0,0.04);
+}
+.insight-label {
+  font-size:0.68rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--lime-dark);margin-bottom:0.8rem;
+}
+.insight-text { font-size:0.92rem;color:var(--near-black);line-height:1.7; }
+@media(max-width:700px){ .insight-grid{grid-template-columns:1fr;} }
+
+/* WATCH FOR */
+.watch-section { max-width:600px;margin:0 auto;padding:3rem 22px 4rem; }
+.watch-title {
+  font-size:0.7rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--gray-400);text-align:center;margin-bottom:1.5rem;
+}
+.watch-item {
+  display:flex;align-items:flex-start;gap:0.8rem;
+  padding:1rem 1.4rem;margin-bottom:0.6rem;
+  background:var(--off-white);border-radius:var(--radius);
+  font-size:0.9rem;color:var(--near-black);line-height:1.5;
+}
+.watch-item svg { flex-shrink:0;color:#d4a017;margin-top:0.1rem; }
+
+/* LESSON NAV */
+.lesson-nav {
+  max-width:700px;margin:0 auto;padding:2rem 22px 4rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.lesson-nav-btn {
+  font-size:0.85rem;font-weight:600;color:var(--lime-dark);
+  padding:0.6rem 1.2rem;border-radius:40px;
+  background:rgba(196,214,0,0.08);transition:background 0.2s;
+}
+.lesson-nav-btn:hover { background:rgba(196,214,0,0.16); }
+
+/* LESSON DOTS */
+.lesson-dots {
+  display:flex;justify-content:center;gap:0.5rem;padding:0 22px 2rem;
+}
+.lesson-dot {
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.7rem;font-weight:600;color:var(--gray-400);
+  background:var(--off-white);transition:all 0.2s;
+}
+.lesson-dot:hover { background:rgba(196,214,0,0.12);color:var(--lime-dark); }
+.lesson-dot.active {
+  background:var(--lime);color:var(--near-black);
+}
+
+/* FOOTER */
+footer {
+  background:var(--off-white);border-top:1px solid var(--gray-200);
+  padding:1.8rem 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;
+}
+.foot-copy { font-size:0.72rem;color:var(--gray-600); }
+.foot-links { display:flex;gap:1.5rem; }
+.foot-links a { font-size:0.72rem;color:var(--gray-600);transition:color 0.15s; }
+.foot-links a:hover { color:var(--lime-dark); }
+
+/* SCROLL REVEAL */
+.reveal { opacity:0;transform:translateY(22px);transition:opacity 0.7s cubic-bezier(0.16,1,0.3,1),transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+.reveal.vis { opacity:1;transform:none; }
+.d1{transition-delay:0.07s;} .d2{transition-delay:0.14s;} .d3{transition-delay:0.21s;} .d4{transition-delay:0.28s;}
+
+/* NAV PLAYBOOK BUTTON */
+.nav-playbook {
+  font-size:0.7rem;font-weight:600;color:var(--near-black);
+  background:var(--lime);padding:0.3rem 0.85rem;border-radius:40px;
+  margin-right:1rem;letter-spacing:0.01em;
+  transition:background 0.2s,color 0.2s;
+}
+.nav-playbook:hover { background:var(--near-black);color:var(--white); }
+.ham { display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px; }
+.ham span { display:block;width:18px;height:1.5px;background:var(--near-black);border-radius:2px; }
+.mobile-menu { display:none;flex-direction:column;position:fixed;inset:48px 0 0 0;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);z-index:800;padding:1.5rem 22px; }
+.mobile-menu.open { display:flex; }
+.mobile-menu a { font-size:1.3rem;font-weight:500;color:var(--near-black);padding:1rem 0;border-bottom:1px solid var(--gray-200); }
+.mobile-menu a:hover { color:var(--lime-dark); }
+.mob-playbook {
+  display:inline-block;text-align:center;margin-top:0.5rem;
+  background:var(--lime);color:var(--near-black) !important;
+  padding:0.8rem 1.5rem;border-radius:40px;border-bottom:none !important;
+  font-weight:600;transition:background 0.2s,color 0.2s;
+}
+.mob-playbook:hover { background:var(--near-black);color:var(--white) !important; }
+@media(max-width:768px){ .nav-links,.nav-cta,.nav-playbook{display:none;} .ham{display:flex;} }
+</style>
+</head>
+<body>
+
+<nav id="site-nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo">Jon Grayson<span></span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html#capabilities">Capabilities</a></li>
+      <li><a href="../index.html#ai-consulting">AI Consulting</a></li>
+      <li><a href="../index.html#intelligence">Intelligence</a></li>
+      <li><a href="../index.html#expertise">Expertise</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <a href="index.html" class="nav-playbook">AI Playbook</a>
+    <a href="../index.html#contact" class="nav-cta">Get in touch &rarr;</a>
+    <button class="ham" id="hamBtn" onclick="toggleMob()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="../index.html#capabilities" onclick="closeMob()">Capabilities</a>
+  <a href="../index.html#ai-consulting" onclick="closeMob()">AI Consulting</a>
+  <a href="../index.html#intelligence" onclick="closeMob()">Intelligence</a>
+  <a href="../index.html#expertise" onclick="closeMob()">Expertise</a>
+  <a href="../index.html#contact" onclick="closeMob()">Contact</a>
+  <a href="index.html" onclick="closeMob()" class="mob-playbook">AI Playbook</a>
+</div>
+
+<section class="lesson-hero">
+  <div class="lesson-eyebrow reveal">The AI Playbook &middot; Lesson 6 of 8</div>
+  <h1 class="lesson-h1 reveal d1">Iteration Depth vs. Speed</h1>
+  <p class="lesson-subtitle reveal d2">15 variations of mediocre isn't progress</p>
+</section>
+
+<section class="problem-section">
+  <div class="problem-card reveal">
+    <div class="problem-label">The Problem</div>
+    <p class="problem-text">AI makes iteration fast, so you iterate many times. But speed doesn't equal depth. You end up with 15 variations of mediocre instead of 3 versions of excellent.</p>
+  </div>
+</section>
+
+<section class="flow-section">
+  <div class="flow-section-title">The Workflow</div>
+  
+        <div class="flow-step reveal">
+          <div class="flow-step-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg></div>
+          <div class="flow-step-content">
+            <div class="flow-step-num">Step 1</div>
+            <h3 class="flow-step-title">Define the Test</h3>
+            <p class="flow-step-desc">What are you actually testing? Voice? Structure? Approach?</p>
+          </div>
+        </div>
+        <div class="flow-connector"><svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0 L12 28 M6 22 L12 28 L18 22" stroke="#9fae00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="flow-step reveal d1">
+          <div class="flow-step-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+          <div class="flow-step-content">
+            <div class="flow-step-num">Step 2</div>
+            <h3 class="flow-step-title">2–3 Variations</h3>
+            <p class="flow-step-desc">Create variations with different strategic assumptions.</p>
+          </div>
+        </div>
+        <div class="flow-connector"><svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0 L12 28 M6 22 L12 28 L18 22" stroke="#9fae00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="flow-step reveal d2">
+          <div class="flow-step-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+          <div class="flow-step-content">
+            <div class="flow-step-num">Step 3</div>
+            <h3 class="flow-step-title">Evaluate vs. Goal</h3>
+            <p class="flow-step-desc">Judge against the goal, not 'which do I like more.'</p>
+          </div>
+        </div>
+        <div class="flow-connector"><svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0 L12 28 M6 22 L12 28 L18 22" stroke="#9fae00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="flow-step reveal d3">
+          <div class="flow-step-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="flow-step-content">
+            <div class="flow-step-num">Step 4</div>
+            <h3 class="flow-step-title">Pick One</h3>
+            <p class="flow-step-desc">Commit to a direction. Stop searching.</p>
+          </div>
+        </div>
+        <div class="flow-connector"><svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0 L12 28 M6 22 L12 28 L18 22" stroke="#9fae00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="flow-step reveal d4">
+          <div class="flow-step-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9l3-3 4 4-3 3"/><path d="M10 13l-6 6"/><path d="M8 15l2 2"/><path d="M17 6l1-1"/><path d="M13 10l-7 7"/></svg></div>
+          <div class="flow-step-content">
+            <div class="flow-step-num">Step 5</div>
+            <h3 class="flow-step-title">Iterate Depth</h3>
+            <p class="flow-step-desc">Now refine, detail, and strengthen the chosen direction.</p>
+          </div>
+        </div>
+        
+</section>
+
+<section class="insight-section">
+  <div class="insight-grid">
+    <div class="insight-card reveal">
+      <div class="insight-label">Why This Works</div>
+      <p class="insight-text">You're iterating toward something, not iterating to avoid deciding. AI's speed becomes a feature only when you're disciplined about why you're iterating.</p>
+    </div>
+    <div class="insight-card reveal d1">
+      <div class="insight-label">Real-World Scenario</div>
+      <p class="insight-text">Your team is choosing between centralized, federated, or hybrid approaches. AI can generate 20 variations of each — that's noise. Instead, generate one serious version that answers the strategic question. Evaluate against outcomes. Pick one. Then deepen with AI's help.</p>
+    </div>
+  </div>
+</section>
+
+<section class="watch-section">
+  <div class="watch-title">Watch For</div>
+  <div class="watch-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Using iteration speed to avoid upfront thinking</span></div>
+<div class="watch-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Treating 'more options' as 'better options'</span></div>
+<div class="watch-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Optimizing for quantity of variations instead of depth</span></div>
+
+</section>
+
+<div class="lesson-dots">
+  <a href="the-vetting-loop.html" class="lesson-dot" title="Lesson 1">1</a><a href="constraint-first-prompting.html" class="lesson-dot" title="Lesson 2">2</a><a href="research-synthesis-pattern.html" class="lesson-dot" title="Lesson 3">3</a><a href="asymmetric-skill-preservation.html" class="lesson-dot" title="Lesson 4">4</a><a href="the-quality-check.html" class="lesson-dot" title="Lesson 5">5</a><a href="iteration-depth-vs-speed.html" class="lesson-dot active" title="Lesson 6">6</a><a href="knowledge-hygiene-test.html" class="lesson-dot" title="Lesson 7">7</a><a href="workflow-augmentation.html" class="lesson-dot" title="Lesson 8">8</a>
+</div>
+
+<div class="lesson-nav">
+  <a href="the-quality-check.html" class="lesson-nav-btn">← The Quality Check</a>
+  <a href="knowledge-hygiene-test.html" class="lesson-nav-btn">The Knowledge Hygiene Test →</a>
+</div>
+
+<footer>
+  <span class="foot-copy">&copy; 2026 Jon Grayson &middot; The AI Playbook</span>
+  <div class="foot-links">
+    <a href="https://www.linkedin.com/in/jongrayson" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:0.4rem;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a>
+    <a href="../index.html">Home</a>
+  </div>
+</footer>
+
+<script>
+const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
