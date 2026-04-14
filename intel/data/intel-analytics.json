@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "topic": "General",
+      "suggestedQuery": "harbor",
+      "effectiveness": "mixed",
+      "thirdOrderEscalationAction": "escalate-third-order-review",
+      "thirdOrderEscalationAcceptCount": 0,
+      "lastThirdOrderEscalatedAt": null,
+      "lastThirdOrderAcceptedAt": null
+    },
+    {
+      "topic": "Ports",
+      "suggestedQuery": "container backlog",
+      "effectiveness": "weak",
+      "thirdOrderEscalationAction": "escalate-third-order-rework",
+      "thirdOrderEscalationAcceptCount": 0,
+      "lastThirdOrderEscalatedAt": null,
+      "lastThirdOrderAcceptedAt": null
+    }
+  ]
+}
