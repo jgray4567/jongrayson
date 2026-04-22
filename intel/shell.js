@@ -2837,7 +2837,7 @@ function renderCityCrimeMap(item = {}) {
   */
 
   if (item.locationName === 'Pittsburgh, PA USA') {
-    fetchJson('data/pittsburgh/daily_crimes.json').then((crimes) => {
+    fetchJson(`data/pittsburgh/daily_crimes.json?t=${new Date().getTime()}`).then((crimes) => {
       if (!crimes) return;
       crimes.forEach((crime) => {
         let color = '#757575'; // Other
