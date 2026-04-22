@@ -13,6 +13,91 @@ let currentTimelineViews = [];
 let currentBaselineMode = 'previous';
 let currentBaselineViewId = '';
 let autoRefreshTimer = null;
+let diagnosticsVisible = false;
+let currentPriorityItems = [];
+let globeAutoRotateEnabled = true;
+let currentGlobeBaseItems = [];
+let currentGlobePointsData = [];
+let cityMapInstance = null;
+let pittsburghZoneLayer = null;
+let pittsburghZoneGeojsonData = null;
+let pittsburghZoneStatsData = null;
+let pittsburghZonesVisible = true;
+let pittsburghSelectedYear = '2026';
+let mapHoverCard = null;
+let mapHoverHideTimer = null;
+let airLayerEnabled = false;
+let currentAirTrafficItems = [];
+const flightDetailCache = new Map();
+let selectedAirIcao24 = null;
+let hoveredCityLabel = null;
+let satelliteLayerEnabled = false;
+let currentSatelliteCatalog = [];
+let satelliteLayerTimer = null;
+const cityCrimeScans = {
+  'Los Angeles Port': {
+    center: [33.739, -118.262],
+    zoom: 12,
+    incidents: 68,
+    hotspots: 4,
+    points: [
+      { lat: 33.743, lng: -118.268, intensity: 0.92, zone: 'Berth 46 Corridor', totals: { theft: 18, assault: 7, vandalism: 5, weapons: 3 } },
+      { lat: 33.736, lng: -118.259, intensity: 0.81, zone: 'Harbor Gateway', totals: { theft: 12, assault: 6, trespass: 8, narcotics: 2 } },
+      { lat: 33.731, lng: -118.251, intensity: 0.74, zone: 'Dockside Freight Spine', totals: { burglary: 9, theft: 11, vehicle: 4, assault: 3 } },
+      { lat: 33.726, lng: -118.274, intensity: 0.64, zone: 'Outer Container Ring', totals: { theft: 8, trespass: 6, vandalism: 4, arson: 1 } },
+      { lat: 33.747, lng: -118.246, intensity: 0.58, zone: 'North Access Roads', totals: { theft: 6, vehicle: 5, assault: 2, burglary: 3 } }
+    ]
+  },
+  'NYC Datacenter': {
+    center: [40.7128, -74.006],
+    zoom: 12,
+    incidents: 41,
+    hotspots: 3,
+    points: [
+      { lat: 40.716, lng: -74.002, intensity: 0.78, zone: 'Canal Exchange', totals: { theft: 10, assault: 5, fraud: 4, burglary: 3 } },
+      { lat: 40.709, lng: -74.011, intensity: 0.72, zone: 'Battery Transit Edge', totals: { theft: 7, robbery: 4, assault: 3, vehicle: 2 } },
+      { lat: 40.721, lng: -73.998, intensity: 0.63, zone: 'Lower East Relay', totals: { burglary: 6, fraud: 5, theft: 4, assault: 2 } },
+      { lat: 40.705, lng: -74.016, intensity: 0.54, zone: 'West Financial Grid', totals: { theft: 5, fraud: 3, trespass: 2, assault: 1 } }
+    ]
+  },
+  'London HQ': {
+    center: [51.5074, -0.1278],
+    zoom: 12,
+    incidents: 52,
+    hotspots: 4,
+    points: [
+      { lat: 51.512, lng: -0.118, intensity: 0.84, zone: 'Covent Core', totals: { theft: 15, assault: 5, burglary: 4, narcotics: 2 } },
+      { lat: 51.503, lng: -0.132, intensity: 0.76, zone: 'Westminster Flow', totals: { theft: 10, vandalism: 4, assault: 4, robbery: 3 } },
+      { lat: 51.509, lng: -0.145, intensity: 0.68, zone: 'Mayfair Arc', totals: { theft: 8, burglary: 6, fraud: 3, assault: 2 } },
+      { lat: 51.497, lng: -0.124, intensity: 0.59, zone: 'South Bank Fringe', totals: { theft: 7, assault: 3, vandalism: 3, trespass: 2 } }
+    ]
+  },
+  'Tokyo AP-Northeast': {
+    center: [35.6762, 139.6503],
+    zoom: 12,
+    incidents: 27,
+    hotspots: 2,
+    points: [
+      { lat: 35.681, lng: 139.657, intensity: 0.62, zone: 'Shinjuku Exchange', totals: { theft: 7, assault: 2, fraud: 3, vandalism: 1 } },
+      { lat: 35.671, lng: 139.643, intensity: 0.55, zone: 'Yoyogi Drift', totals: { theft: 5, assault: 2, trespass: 2, fraud: 2 } },
+      { lat: 35.664, lng: 139.651, intensity: 0.48, zone: 'Shibuya Flow', totals: { theft: 4, vandalism: 2, assault: 1, fraud: 1 } }
+    ]
+  },
+  'Pittsburgh, PA USA': {
+    center: [40.4406, -79.9959],
+    zoom: 12,
+    incidents: 73,
+    hotspots: 6,
+    points: [
+      { lat: 40.456, lng: -80.015, intensity: 0.77, zone: 'Zone 1 North Side', totals: { theft: 12, assault: 6, robbery: 4, narcotics: 3 } },
+      { lat: 40.445, lng: -79.977, intensity: 0.69, zone: 'Zone 2 East End', totals: { theft: 10, burglary: 5, assault: 4, fraud: 3 } },
+      { lat: 40.435, lng: -79.98, intensity: 0.71, zone: 'Zone 3 South Side', totals: { assault: 7, theft: 8, robbery: 4, vehicle: 2 } },
+      { lat: 40.441, lng: -80.03, intensity: 0.63, zone: 'Zone 4 West End', totals: { theft: 7, burglary: 4, assault: 3, vandalism: 2 } },
+      { lat: 40.466, lng: -79.93, intensity: 0.66, zone: 'Zone 5 Highland Park', totals: { theft: 9, fraud: 4, burglary: 4, assault: 2 } },
+      { lat: 40.47, lng: -80.001, intensity: 0.58, zone: 'Zone 6 North Shore', totals: { theft: 6, assault: 3, vandalism: 2, trespass: 2 } }
+    ]
+  }
+};
 
 const dashboardCard = document.getElementById('third-order-escalation-dashboard-card');
 const taskContextAnalyticsCard = document.getElementById('task-context-analytics-card');
@@ -970,6 +1055,7 @@ async function loadIntel() {
     renderBaselineTrend(baselineTrend || {});
     renderBaselineHistoryHealth(baselineHistoryHealthSummary || {});
     await trackBaselineRecommendationImpressions(baselineRecommendations.items || []);
+    const globeSeed = await fetchJson('data/globe-demo-locations.json').catch(() => ({ items: [] }));
     const baselineRecommendationPrioritySummary = await fetchJson('api/baseline-recommendation-priority.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -985,7 +1071,16 @@ async function loadIntel() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items: baselineRecommendationPrioritySummary.items || [] })
     });
+    currentPriorityItems = baselineRecommendationPrioritySummary.items || [];
+    const globeItems = currentPriorityItems.some((item) => item.lat !== undefined && item.lng !== undefined)
+      ? currentPriorityItems
+      : (globeSeed.items || []);
+    currentGlobeBaseItems = globeItems;
+    await refreshAirTraffic();
+    await refreshSatelliteCatalog();
+    renderCommandBar(currentPriorityItems);
     renderBaselineRecommendations(baselineRecommendationPrioritySummary.visibleItems || baselineRecommendationPrioritySummary.items || []);
+    if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(globeItems);
     renderBaselineRecommendationPriority(baselineRecommendationPrioritySummary || {});
     renderBaselineRecommendationSuppressed(baselineRecommendationPrioritySummary.suppressedItems || []);
     renderBaselineRecommendationRevived(baselineRecommendationPrioritySummary.revivedItems || []);
@@ -1052,6 +1147,7 @@ async function loadIntel() {
       renderBaselineTrend(await fetchJson('api/baseline-performance-trend.php'));
       renderBaselineHistoryHealth(await fetchJson('api/baseline-history-health.php'));
       const refreshedRecommendations = (await fetchJson('api/baseline-recommendations.php')).items || [];
+      const refreshedGlobeSeed = await fetchJson('data/globe-demo-locations.json').catch(() => ({ items: [] }));
       const refreshedPrioritySummary = await fetchJson('api/baseline-recommendation-priority.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1067,7 +1163,16 @@ async function loadIntel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items: refreshedPrioritySummary.items || [] })
       });
+      currentPriorityItems = refreshedPrioritySummary.items || [];
+      const refreshedGlobeItems = currentPriorityItems.some((item) => item.lat !== undefined && item.lng !== undefined)
+        ? currentPriorityItems
+        : (refreshedGlobeSeed.items || []);
+      currentGlobeBaseItems = refreshedGlobeItems;
+      await refreshAirTraffic();
+      await refreshSatelliteCatalog();
+      renderCommandBar(currentPriorityItems);
       renderBaselineRecommendations(refreshedPrioritySummary.visibleItems || refreshedPrioritySummary.items || []);
+      if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(refreshedGlobeItems);
       renderBaselineRecommendationPriority(refreshedPrioritySummary || {});
       renderBaselineRecommendationSuppressed(refreshedPrioritySummary.suppressedItems || []);
       renderBaselineRecommendationRevived(refreshedPrioritySummary.revivedItems || []);
@@ -1328,6 +1433,7 @@ if (baselineRecommendationOutcomes) {
       body: JSON.stringify({ items: refreshedPrioritySummary.items || [] })
     });
     renderBaselineRecommendations(refreshedPrioritySummary.visibleItems || refreshedPrioritySummary.items || []);
+    if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(refreshedPrioritySummary.items || []);
     renderBaselineRecommendationPriority(refreshedPrioritySummary || {});
     renderBaselineRecommendationSuppressed(refreshedPrioritySummary.suppressedItems || []);
     renderBaselineRecommendationRevived(refreshedPrioritySummary.revivedItems || []);
@@ -1566,4 +1672,1542 @@ syncSeverityFilterButtons();
 syncFeedViewButtons();
 syncBaselineControls();
 renderBaselineHistory();
+initializeCommandSurface();
 loadIntel().then(() => startAutoRefresh());
+
+function getStructuralStateCounts(items = []) {
+  return items.reduce((acc, item) => {
+    const state = item.recoveryTrustDriverTransitionBalanceStructuralState || 'neutral';
+    acc[state] = (acc[state] || 0) + 1;
+    if (item.recoveryTrustDriverTransitionBalanceJustReversed || item.trustMomentumJustReversed) {
+      acc.reversals += 1;
+    }
+    return acc;
+  }, { terminal: 0, compromised: 0, weakening: 0, contested: 0, sound: 0, fortified: 0, neutral: 0, reversals: 0 });
+}
+
+function renderCommandBar(items = []) {
+  const counts = getStructuralStateCounts(items);
+  const posture = counts.terminal > 0
+    ? 'critical'
+    : counts.compromised > 0 || counts.weakening > 0
+      ? 'contested'
+      : counts.fortified > 0
+        ? 'stable'
+        : 'watch';
+
+  const postureEl = document.getElementById('global-posture');
+  const terminalEl = document.getElementById('terminal-count');
+  const fortifiedEl = document.getElementById('fortified-count');
+  const reversalEl = document.getElementById('reversal-count');
+  const statusPostureEl = document.getElementById('status-strip-posture');
+  const statusTerminalEl = document.getElementById('status-strip-terminal');
+  const statusFortifiedEl = document.getElementById('status-strip-fortified');
+
+  if (postureEl) postureEl.textContent = posture;
+  if (terminalEl) terminalEl.textContent = String(counts.terminal || 0);
+  if (fortifiedEl) fortifiedEl.textContent = String(counts.fortified || 0);
+  if (reversalEl) reversalEl.textContent = String(counts.reversals || 0);
+  if (statusPostureEl) {
+    statusPostureEl.textContent = posture;
+    statusPostureEl.dataset.tone = posture === 'critical' ? 'critical' : posture === 'stable' ? 'stable' : 'watch';
+  }
+  if (statusTerminalEl) {
+    statusTerminalEl.textContent = String(counts.terminal || 0);
+    statusTerminalEl.dataset.tone = counts.terminal > 0 ? 'critical' : 'neutral';
+  }
+  if (statusFortifiedEl) {
+    statusFortifiedEl.textContent = String(counts.fortified || 0);
+    statusFortifiedEl.dataset.tone = counts.fortified > 0 ? 'stable' : 'neutral';
+  }
+}
+
+function setDiagnosticsVisible(visible) {
+  diagnosticsVisible = visible;
+  const ids = [
+    'timeline-views-list',
+    'task-context-analytics-card',
+    'task-retention-analytics-card',
+    'task-signal-correlation-card',
+    'signal-action-analytics-card',
+    'signal-escalation-analytics-list',
+    'third-order-escalation-dashboard-card',
+    'third-order-escalation-recommendations-list',
+    'third-order-escalation-analytics-list',
+    'third-order-escalation-effectiveness-list',
+    'timeline-container',
+    'timeline-focus-status',
+    'feed-window-summary',
+    'timeline-comparison-summary',
+    'baseline-shift-summary',
+    'baseline-drift-history',
+    'baseline-performance-summary',
+    'baseline-trend-summary',
+    'baseline-history-health',
+    'baseline-recommendation-actions',
+    'baseline-recommendation-analytics',
+    'baseline-recommendation-effectiveness',
+    'baseline-recommendation-priority',
+    'baseline-recommendation-outcomes',
+    'baseline-recommendation-suppressed',
+    'baseline-recommendation-revived',
+    'baseline-recommendation-revival-analytics',
+    'baseline-recommendation-churn',
+    'baseline-recommendation-stable',
+    'baseline-recommendation-confidence',
+    'baseline-recommendation-confidence-trend',
+    'baseline-recommendation-confidence-volatility',
+    'baseline-recommendation-confidence-resilience',
+    'baseline-recommendation-confidence-adjustments',
+    'baseline-recommendation-trust-momentum',
+    'baseline-recommendation-playbook',
+    'baseline-maintenance-analytics',
+    'baseline-maintenance-effectiveness',
+    'signal-feed-list'
+  ];
+
+  ids.forEach((id) => {
+    const node = document.getElementById(id);
+    const card = node?.closest('.stage-card, .panel');
+    if (card) card.classList.toggle('diagnostic-hidden', !visible);
+  });
+
+  const toggleButton = document.getElementById('toggle-diagnostics');
+  if (toggleButton) toggleButton.textContent = visible ? 'Hide diagnostics' : 'Show diagnostics';
+}
+
+function closeIntelDrawer() {
+  const drawer = document.getElementById('intel-activation-panel');
+  if (!drawer) return;
+  drawer.classList.remove('visible');
+  drawer.setAttribute('aria-hidden', 'true');
+  setDrawerImage(null);
+}
+
+function openIntelDrawer(item = {}) {
+  const drawer = document.getElementById('intel-activation-panel');
+  if (!drawer) return;
+
+  const state = item.recoveryTrustDriverTransitionBalanceStructuralState || 'neutral';
+  const title = item.locationName || item.action || item.name || 'Activated point';
+  const summary = item.reason
+    || `${item.action || 'Recommendation'} is currently ${state} with ${item.trustMomentumBand || 'neutral'} momentum.`;
+  const crimeScan = cityCrimeScans[item.locationName] || null;
+
+  const titleEl = document.getElementById('intel-drawer-title');
+  const stateEl = document.getElementById('intel-drawer-state');
+  const summaryEl = document.getElementById('intel-drawer-summary');
+  const mapEl = document.getElementById('intel-drawer-map');
+  const metricsEl = document.getElementById('intel-drawer-metrics');
+  const deepEl = document.getElementById('intel-drawer-deep');
+  setDrawerImage(null);
+
+  if (item.kind === 'air') {
+    const aircraftTitle = item.callsign || 'Tracked aircraft';
+    if (titleEl) titleEl.textContent = aircraftTitle;
+    if (stateEl) {
+      stateEl.textContent = 'airborne';
+      stateEl.style.borderColor = '#d2ff54';
+      stateEl.style.color = '#d2ff54';
+    }
+    if (summaryEl) summaryEl.textContent = `${item.country || 'Public air traffic'} flight currently mapped in the live Air layer.`;
+    if (mapEl) {
+      mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Aircraft position and projected path are active on the globe stage.</div>`;
+    }
+    if (metricsEl) {
+      metricsEl.innerHTML = [
+        ['Flight', aircraftTitle],
+        ['Airline', 'Loading…'],
+        ['Departure', 'Loading…'],
+        ['Destination', 'Loading…'],
+        ['Departure time', 'Loading…'],
+        ['Arrival time', 'Loading…']
+      ].map(([label, value]) => `
+        <div class="intel-mini">
+          <div class="intel-mini-label">${label}</div>
+          <div class="intel-mini-value">${value}</div>
+        </div>
+      `).join('');
+    }
+    if (deepEl) {
+      deepEl.innerHTML = [
+        `altitude ${item.altitude ?? 'n/a'} m`,
+        `speed ${item.velocity != null ? `${item.velocity} m/s` : 'n/a'}`,
+        `heading ${item.heading != null ? `${item.heading}°` : 'n/a'}`,
+        `icao24 ${item.icao24 || 'n/a'}`,
+        `source OpenSky Network public states`
+      ].map((line) => `<div style="margin-bottom:8px; word-break:break-all;">${line}</div>`).join('');
+    }
+    if (selectedQuery) selectedQuery.textContent = aircraftTitle;
+    if (selectedMeta) selectedMeta.textContent = `${item.country || 'Public traffic'} · airborne`;
+    drawer.classList.add('visible');
+    drawer.setAttribute('aria-hidden', 'false');
+
+    fetchFlightDetail(item.callsign).then((detail) => {
+      if (!detail || titleEl?.textContent !== aircraftTitle) return;
+      if (summaryEl) {
+        summaryEl.textContent = `${detail.airline || item.country || 'Public air traffic'} ${detail.flightNumber || aircraftTitle} from ${detail.departure?.location || detail.departure?.iata || 'unknown departure'} to ${detail.destination?.location || detail.destination?.iata || 'unknown destination'}.`;
+      }
+      if (metricsEl) {
+        metricsEl.innerHTML = [
+          ['Flight', detail.flightNumber || aircraftTitle],
+          ['Airline', detail.airline || 'Unknown'],
+          ['Departure', [detail.departure?.iata, detail.departure?.location].filter(Boolean).join(' · ') || 'Unknown'],
+          ['Destination', [detail.destination?.iata, detail.destination?.location].filter(Boolean).join(' · ') || 'Unknown'],
+          ['Departure time', detail.times?.departureEstimated || detail.times?.departureScheduled || detail.times?.departureActual || 'Unknown'],
+          ['Arrival time', detail.times?.arrivalEstimated || detail.times?.arrivalScheduled || detail.times?.arrivalActual || 'Unknown']
+        ].map(([label, value]) => `
+          <div class="intel-mini">
+            <div class="intel-mini-label">${label}</div>
+            <div class="intel-mini-value">${value}</div>
+          </div>
+        `).join('');
+      }
+      if (deepEl) {
+        deepEl.innerHTML = [
+          `flight time ${detail.flightTime || 'Unknown'}`,
+          `aircraft ${detail.aircraftType || 'Unknown'}`,
+          `scheduled departure ${detail.times?.departureScheduled || 'Unknown'}`,
+          `scheduled arrival ${detail.times?.arrivalScheduled || 'Unknown'}`,
+          `actual departure ${detail.times?.departureActual || 'Unknown'}`,
+          `actual arrival ${detail.times?.arrivalActual || 'Unknown'}`
+        ].map((line) => `<div style="margin-bottom:8px; word-break:break-all;">${line}</div>`).join('');
+      }
+      if (selectedMeta) selectedMeta.textContent = `${detail.airline || item.country || 'Public traffic'} · ${detail.flightTime || 'time unknown'}`;
+    }).catch(() => {});
+    return;
+  }
+
+  if (item.kind === 'satellite') {
+    if (titleEl) titleEl.textContent = item.name || 'Satellite';
+    if (stateEl) {
+      stateEl.textContent = 'tracking';
+      stateEl.style.borderColor = '#ffd166';
+      stateEl.style.color = '#ffd166';
+    }
+    if (summaryEl) summaryEl.textContent = `${item.network || 'Public catalog'} satellite in ${item.orbitClass || 'tracked'} orbit.`;
+    setDrawerImage(getSatellitePreviewImage(item), `${item.name || 'Satellite'} preview`);
+    if (mapEl) {
+      mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Satellite position is live on the globe stage. Click-and-drag the globe to inspect surrounding orbital traffic.</div>`;
+    }
+    if (metricsEl) {
+      metricsEl.innerHTML = [
+        ['Name', item.name || 'Unknown'],
+        ['Network', item.network || 'Public catalog'],
+        ['Orbit', item.orbitClass || 'Tracked'],
+        ['Altitude', `${item.liveAltitudeKm ?? item.altitudeKm ?? 'n/a'} km`],
+        ['Inclination', `${item.inclination ?? 'n/a'}°`],
+        ['Period', `${item.periodMinutes ?? 'n/a'} min`]
+      ].map(([label, value]) => `
+        <div class="intel-mini">
+          <div class="intel-mini-label">${label}</div>
+          <div class="intel-mini-value">${value}</div>
+        </div>
+      `).join('');
+    }
+    if (deepEl) {
+      deepEl.innerHTML = [
+        `NORAD ${item.noradId || 'unknown'}`,
+        `TLE line 1 ${item.tle1 || 'n/a'}`,
+        `TLE line 2 ${item.tle2 || 'n/a'}`
+      ].map((line) => `<div style="margin-bottom:8px; word-break:break-all;">${line}</div>`).join('');
+    }
+    if (selectedQuery) selectedQuery.textContent = item.name || 'Satellite';
+    if (selectedMeta) selectedMeta.textContent = `${item.network || 'Public catalog'} · ${item.orbitClass || 'Tracked'} orbit`;
+    drawer.classList.add('visible');
+    drawer.setAttribute('aria-hidden', 'false');
+    return;
+  }
+
+  if (titleEl) titleEl.textContent = title;
+  if (stateEl) {
+    stateEl.textContent = state;
+    stateEl.style.borderColor = stateColors[state] || 'var(--border)';
+    stateEl.style.color = stateColors[state] || 'var(--text)';
+  }
+  if (summaryEl) summaryEl.textContent = summary;
+  if (mapEl) {
+    mapEl.innerHTML = typeof item.lat === 'number' && typeof item.lng === 'number'
+      ? `<div class="task-focus-meta" style="padding:16px;">City map view is now active in the main globe stage.${crimeScan ? ` Crime scan: ${crimeScan.incidents} incidents across ${crimeScan.hotspots} police zones.` : ''}</div>`
+      : '<div class="task-focus-meta" style="padding:16px;">Map view unavailable for this location.</div>';
+  }
+  if (metricsEl) {
+    metricsEl.innerHTML = [
+      ['Action', item.action || 'Unknown'],
+      ['Priority', item.priorityScore ?? 'n/a'],
+      ['Momentum', item.trustMomentumBand || 'neutral'],
+      ['Location', item.locationName || 'Unmapped'],
+      ['Police zones', crimeScan?.hotspots ?? 'n/a'],
+      ['Crime incidents', crimeScan?.incidents ?? 'n/a']
+    ].map(([label, value]) => `
+      <div class="intel-mini">
+        <div class="intel-mini-label">${label}</div>
+        <div class="intel-mini-value">${value}</div>
+      </div>
+    `).join('');
+  }
+  if (deepEl) {
+    deepEl.innerHTML = [
+      `confidence ${item.confidenceBand || 'unknown'}`,
+      `outcome ${item.outcomeScore ?? 0}`,
+      `upgrades ${item.upgradedCount || 0}`,
+      `downgrades ${item.downgradedCount || 0}`,
+      `transition balance ${item.recoveryTrustDriverTransitionBalanceBand || 'balanced'} ${item.recoveryTrustDriverTransitionBalanceScore || 0}`,
+      `structural adjustment ${item.recoveryTrustDriverTransitionBalanceStructuralAdjustment || 0}`
+    ].map((line) => `<div style="margin-bottom:8px;">${line}</div>`).join('');
+  }
+
+  if (selectedQuery) selectedQuery.textContent = title;
+  if (selectedMeta) selectedMeta.textContent = summary;
+
+  drawer.classList.add('visible');
+  drawer.setAttribute('aria-hidden', 'false');
+
+  if (typeof item.lat === 'number' && typeof item.lng === 'number') {
+    showMapStage(item);
+  }
+}
+
+function initializeLayerConfigurator() {
+  const currentLayerCard = document.getElementById('current-layer-card');
+  if (!currentLayerCard || currentLayerCard.dataset.layerConfigReady === '1') return;
+
+  const layerOptions = [...currentLayerCard.querySelectorAll('.plain-list li')].map((node) => node.textContent.trim()).filter(Boolean);
+  if (!layerOptions.length) return;
+
+  const storageKey = 'jk-intel-active-layers-v1';
+  const defaultLayers = [
+    'Geographic Intel Projection (Global mapping)',
+    'Recovery-trust driver transition balance structural state classification',
+    'Recommendation priority scoring',
+    'Recommendation confidence bands',
+    'Trust momentum reversal detection',
+    'Baseline shift scoring'
+  ].filter((label) => layerOptions.includes(label));
+
+  let activeLayers;
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(storageKey) || 'null');
+    activeLayers = Array.isArray(saved) && saved.length ? saved.filter((label) => layerOptions.includes(label)) : defaultLayers;
+  } catch {
+    activeLayers = defaultLayers;
+  }
+
+  currentLayerCard.innerHTML = `
+    <div class="panel-kicker">Systems Online</div>
+    <button id="systems-online-count" class="big-query systems-online-count">0</button>
+    <div class="muted" style="margin-top:12px;">Click the number to configure which systems read as active in the surface.</div>
+    <div id="active-layer-box" class="active-layer-box"></div>
+    <div class="layer-card-actions">
+      <button id="reset-layer-modal" class="ghost-btn">Reset defaults</button>
+    </div>
+  `;
+
+  const modal = document.createElement('div');
+  modal.id = 'layer-modal';
+  modal.className = 'intel-modal';
+  modal.innerHTML = `
+    <div class="intel-modal-card">
+      <div class="intel-drawer-head">
+        <div>
+          <div class="panel-kicker">Systems Online</div>
+          <div class="intel-drawer-title">Choose active systems</div>
+        </div>
+        <button id="close-layer-modal" class="ghost-btn">X</button>
+      </div>
+      <div class="muted" style="margin-top:12px;">This is a presentation lens. Toggle the tags you want surfaced in the active box.</div>
+      <div id="layer-modal-tags" class="layer-option-grid"></div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const activeLayerBox = document.getElementById('active-layer-box');
+  const modalTags = document.getElementById('layer-modal-tags');
+  const categoryOrder = ['Recommendations', 'Scoring', 'Tracking', 'Monitoring', 'Filtering', 'Timeline', 'Recovery', 'Analytics', 'Controls', 'Mapping', 'Operations'];
+
+  function categorizeLayer(label) {
+    if (/recommendation|playbook|promotion|suppression|revived|guidance/i.test(label)) return 'Recommendations';
+    if (/scor|grade|boost|penalt|priority/i.test(label)) return 'Scoring';
+    if (/track|history|trend|streak|drift|convergence|durability/i.test(label)) return 'Tracking';
+    if (/monitor|live|feed|alert|health|summary|online/i.test(label)) return 'Monitoring';
+    if (/filter|scope|selected|source|severity|comparison mode/i.test(label)) return 'Filtering';
+    if (/timeline|temporal|window|view|restore|shareable/i.test(label)) return 'Timeline';
+    if (/recovery|trust|resilience|maturity|recapture|entrenchment|structural state/i.test(label)) return 'Recovery';
+    if (/analytic|analytics|dashboard|correlation|motion/i.test(label)) return 'Analytics';
+    if (/action|execution|copy-link|save current|reset|cleanup/i.test(label)) return 'Controls';
+    if (/geographic|mapping|projection|globe/i.test(label)) return 'Mapping';
+    return 'Operations';
+  }
+
+  function persistLayers() {
+    window.localStorage.setItem(storageKey, JSON.stringify(activeLayers));
+  }
+
+  function renderLayerState() {
+    const countEl = document.getElementById('systems-online-count');
+    const statusSystemsEl = document.getElementById('status-strip-systems');
+    if (countEl) countEl.textContent = String(activeLayers.length);
+    if (statusSystemsEl) {
+      statusSystemsEl.textContent = String(activeLayers.length);
+      statusSystemsEl.dataset.tone = activeLayers.length > 0 ? 'online' : 'neutral';
+    }
+
+    if (activeLayerBox) {
+      activeLayerBox.innerHTML = activeLayers.map((label) => `
+        <button class="tag-chip active-layer-chip" data-active-layer="${label.replace(/"/g, '&quot;')}">
+          <span>${label}</span>
+          <span class="active-layer-remove">×</span>
+        </button>
+      `).join('') || '<div class="task-focus-meta">No active layers selected.</div>';
+    }
+
+    if (modalTags) {
+      const grouped = layerOptions.reduce((acc, label) => {
+        const category = categorizeLayer(label);
+        if (!acc[category]) acc[category] = [];
+        acc[category].push(label);
+        return acc;
+      }, {});
+
+      modalTags.innerHTML = categoryOrder
+        .filter((category) => Array.isArray(grouped[category]) && grouped[category].length)
+        .map((category) => `
+          <section class="layer-category">
+            <div class="panel-kicker">${category}</div>
+            <div class="layer-option-grid">
+              ${grouped[category].map((label) => `
+                <button class="tag-chip layer-option ${activeLayers.includes(label) ? 'active' : ''}" data-layer-option="${label.replace(/"/g, '&quot;')}">${label}</button>
+              `).join('')}
+            </div>
+          </section>
+        `).join('');
+    }
+  }
+
+  function openLayerModal() {
+    modal.classList.add('visible');
+  }
+
+  function closeLayerModal() {
+    modal.classList.remove('visible');
+  }
+
+  currentLayerCard.addEventListener('click', (event) => {
+    if (event.target.closest('#systems-online-count')) {
+      openLayerModal();
+      return;
+    }
+    if (event.target.closest('#reset-layer-modal')) {
+      activeLayers = [...defaultLayers];
+      persistLayers();
+      renderLayerState();
+      return;
+    }
+    const chip = event.target.closest('[data-active-layer]');
+    if (!chip) return;
+    activeLayers = activeLayers.filter((label) => label !== chip.dataset.activeLayer);
+    persistLayers();
+    renderLayerState();
+  });
+
+  modal.addEventListener('click', (event) => {
+    if (event.target === modal || event.target.closest('#close-layer-modal')) {
+      closeLayerModal();
+      return;
+    }
+    const option = event.target.closest('[data-layer-option]');
+    if (!option) return;
+    const label = option.dataset.layerOption;
+    if (activeLayers.includes(label)) {
+      activeLayers = activeLayers.filter((item) => item !== label);
+    } else {
+      activeLayers = [...activeLayers, label];
+    }
+    persistLayers();
+    renderLayerState();
+  });
+
+  renderLayerState();
+  currentLayerCard.dataset.layerConfigReady = '1';
+}
+
+function syncAirToggle() {
+  const button = document.getElementById('toggle-air-layer');
+  if (!button) return;
+  button.classList.toggle('active', airLayerEnabled);
+}
+
+function syncSatelliteToggle() {
+  const button = document.getElementById('toggle-satellite-layer');
+  if (!button) return;
+  button.classList.toggle('active', satelliteLayerEnabled);
+}
+
+async function refreshAirTraffic() {
+  if (!airLayerEnabled) {
+    currentAirTrafficItems = [];
+    return;
+  }
+  try {
+    currentAirTrafficItems = (await fetchJson('api/air-traffic.php')).items || [];
+  } catch {
+    currentAirTrafficItems = [];
+  }
+}
+
+async function fetchFlightDetail(callsign) {
+  const key = (callsign || '').trim().toUpperCase();
+  if (!key) return null;
+  if (flightDetailCache.has(key)) return flightDetailCache.get(key);
+  try {
+    const detail = await fetchJson(`api/flight-detail.php?callsign=${encodeURIComponent(key)}`);
+    flightDetailCache.set(key, detail);
+    return detail;
+  } catch {
+    return null;
+  }
+}
+
+function getAircraftAltitudeRatio(altitudeMeters = 0) {
+  return Math.max(0.004, Math.min(0.03, (altitudeMeters || 0) / 400000));
+}
+
+function projectPointFromBearing(lat, lng, bearingDeg, distanceKm) {
+  const earthRadiusKm = 6371;
+  const angularDistance = distanceKm / earthRadiusKm;
+  const bearing = (bearingDeg || 0) * (Math.PI / 180);
+  const lat1 = lat * (Math.PI / 180);
+  const lng1 = lng * (Math.PI / 180);
+
+  const lat2 = Math.asin(
+    Math.sin(lat1) * Math.cos(angularDistance) +
+    Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing)
+  );
+  const lng2 = lng1 + Math.atan2(
+    Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1),
+    Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2)
+  );
+
+  return {
+    lat: lat2 * (180 / Math.PI),
+    lng: ((lng2 * (180 / Math.PI) + 540) % 360) - 180
+  };
+}
+
+function buildPlaneSvg(heading = 0) {
+  return `
+    <svg viewBox="0 0 24 24" width="18" height="18" style="display:block; transform: rotate(${heading}deg); transform-origin: 50% 50%; transform-box: fill-box; filter: drop-shadow(0 0 6px rgba(210,255,84,0.45));">
+      <path d="M12 1.5 14.2 8.4 21 10.6 21 12.4 14.2 13.6 13.3 22.5 10.7 22.5 9.8 13.6 3 12.4 3 10.6 9.8 8.4Z" fill="rgba(255,255,255,0.97)" stroke="rgba(210,255,84,0.82)" stroke-width="0.55" stroke-linejoin="round"/>
+    </svg>
+  `;
+}
+
+function getAirTrafficGlobeElements() {
+  if (!airLayerEnabled) return [];
+  return currentAirTrafficItems.map((flight) => ({
+    kind: 'air',
+    lat: flight.lat,
+    lng: flight.lng,
+    altitude: getAircraftAltitudeRatio(flight.altitude || 0),
+    heading: flight.heading || 0,
+    opacity: selectedAirIcao24 && selectedAirIcao24 !== flight.icao24 ? 0.5 : 1,
+    label: `${flight.callsign || 'Unknown'} · ${flight.country || 'In flight'}`,
+    raw: {
+      ...flight,
+      kind: 'air'
+    }
+  }));
+}
+
+function getAirTrafficPaths() {
+  if (!airLayerEnabled) return [];
+  return currentAirTrafficItems.map((flight) => {
+    const distanceKm = Math.max(80, Math.min(260, ((flight.velocity || 220) * 900) / 1000));
+    const forwardPoint = projectPointFromBearing(flight.lat, flight.lng, flight.heading || 0, distanceKm * 0.55);
+    const trailingPoint = projectPointFromBearing(flight.lat, flight.lng, (flight.heading || 0) + 180, distanceKm * 0.45);
+    const alpha = selectedAirIcao24 && selectedAirIcao24 !== flight.icao24 ? 0.3 : 0.6;
+    const altitude = getAircraftAltitudeRatio(flight.altitude || 0);
+    return {
+      color: `rgba(210,255,84,${alpha})`,
+      points: [
+        { lat: trailingPoint.lat, lng: trailingPoint.lng, alt: altitude },
+        { lat: flight.lat, lng: flight.lng, alt: altitude },
+        { lat: forwardPoint.lat, lng: forwardPoint.lng, alt: altitude }
+      ]
+    };
+  });
+}
+
+async function refreshSatelliteCatalog() {
+  if (!satelliteLayerEnabled) {
+    currentSatelliteCatalog = [];
+    return;
+  }
+  try {
+    currentSatelliteCatalog = (await fetchJson('api/satellite-tracker.php')).items || [];
+  } catch {
+    currentSatelliteCatalog = [];
+  }
+}
+
+function getSatellitePreviewImage(satItem) {
+  const title = String(satItem?.name || 'Tracked satellite').replace(/[&<>]/g, '');
+  const subtitle = String(satItem?.network || satItem?.orbitClass || 'Orbital asset').replace(/[&<>]/g, '');
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+      <defs>
+        <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#03131a"/>
+          <stop offset="100%" stop-color="#071f2b"/>
+        </linearGradient>
+        <linearGradient id="panel" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.95"/>
+          <stop offset="100%" stop-color="#8ef7ff" stop-opacity="0.98"/>
+        </linearGradient>
+      </defs>
+      <rect width="640" height="640" rx="32" fill="url(#bg)"/>
+      <circle cx="480" cy="140" r="84" fill="#0f3340" opacity="0.58"/>
+      <circle cx="480" cy="140" r="52" fill="#00e5ff" opacity="0.24"/>
+      <g transform="translate(320 285)">
+        <rect x="-46" y="-46" width="92" height="92" rx="12" fill="url(#panel)"/>
+        <rect x="-190" y="-28" width="120" height="56" rx="8" fill="#0d5263" stroke="#8ef7ff" stroke-width="6"/>
+        <rect x="70" y="-28" width="120" height="56" rx="8" fill="#0d5263" stroke="#8ef7ff" stroke-width="6"/>
+        <path d="M0-120V-46M0 46v120M-70 0H-190M70 0H190" stroke="#dffcff" stroke-width="10" stroke-linecap="round"/>
+      </g>
+      <text x="48" y="548" fill="#e8ffff" font-size="34" font-family="Arial, sans-serif" font-weight="700">${title}</text>
+      <text x="48" y="590" fill="#8ef7ff" font-size="22" font-family="Arial, sans-serif">${subtitle}</text>
+    </svg>
+  `;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function setDrawerImage(imageUrl, altText = 'Preview image') {
+  const thumb = document.getElementById('intel-drawer-thumb');
+  const thumbImage = document.getElementById('intel-drawer-thumb-image');
+  if (!thumb || !thumbImage) return;
+  if (!imageUrl) {
+    thumb.style.display = 'none';
+    thumbImage.removeAttribute('src');
+    thumbImage.alt = altText;
+    return;
+  }
+  thumbImage.src = imageUrl;
+  thumbImage.alt = altText;
+  thumb.style.display = 'inline-flex';
+}
+
+function computeSatelliteLiveState(satItem, date = new Date()) {
+  try {
+    const satrec = window.satellite.twoline2satrec(satItem.tle1, satItem.tle2);
+    const propagated = window.satellite.propagate(satrec, date);
+    const position = propagated?.position;
+    if (!position) return null;
+    const gmst = window.satellite.gstime(date);
+    const geodetic = window.satellite.eciToGeodetic(position, gmst);
+    const lat = window.satellite.radiansToDegrees(geodetic.latitude);
+    const lng = window.satellite.radiansToDegrees(geodetic.longitude);
+    const altitudeKm = Math.max(0, geodetic.height || satItem.altitudeKm || 0);
+    return {
+      lat,
+      lng,
+      altitudeKm,
+      altitudeRatio: Math.min(0.18, 0.04 + (altitudeKm / 30000) * 0.12)
+    };
+  } catch {
+    return null;
+  }
+}
+
+function getSatelliteGlobeElements() {
+  if (!satelliteLayerEnabled || !currentSatelliteCatalog.length || !window.satellite) return [];
+  const now = new Date();
+  return currentSatelliteCatalog.map((satItem) => {
+    const live = computeSatelliteLiveState(satItem, now);
+    if (!live) return null;
+    return {
+      kind: 'satellite',
+      lat: live.lat,
+      lng: live.lng,
+      altitude: live.altitudeRatio,
+      label: `${satItem.name} · ${satItem.network}`,
+      raw: {
+        ...satItem,
+        lat: live.lat,
+        lng: live.lng,
+        liveAltitudeKm: Math.round(live.altitudeKm),
+        kind: 'satellite'
+      }
+    };
+  }).filter(Boolean);
+}
+
+function getSatelliteOrbitPaths() {
+  if (!satelliteLayerEnabled || !currentSatelliteCatalog.length || !window.satellite) return [];
+  const offsetsMinutes = [-30, -20, -10, 0, 10, 20, 30];
+  return currentSatelliteCatalog.map((satItem) => {
+    const points = offsetsMinutes.map((offsetMinutes) => {
+      const state = computeSatelliteLiveState(satItem, new Date(Date.now() + (offsetMinutes * 60000)));
+      if (!state) return null;
+      return { lat: state.lat, lng: state.lng, alt: state.altitudeRatio };
+    }).filter(Boolean);
+    if (points.length < 2) return null;
+    return {
+      color: 'rgba(0,229,255,0.18)',
+      points
+    };
+  }).filter(Boolean);
+}
+
+function syncSatelliteLayerTimer() {
+  if (satelliteLayerTimer) {
+    clearInterval(satelliteLayerTimer);
+    satelliteLayerTimer = null;
+  }
+  if (!satelliteLayerEnabled) return;
+  satelliteLayerTimer = window.setInterval(() => {
+    initOrUpdateGlobe(currentGlobeBaseItems || []);
+  }, 15000);
+}
+
+function initializeCommandSurface() {
+  setDiagnosticsVisible(false);
+  initializeLayerConfigurator();
+  syncAirToggle();
+  syncSatelliteToggle();
+
+  const toggleButton = document.getElementById('toggle-diagnostics');
+  if (toggleButton && !toggleButton.dataset.bound) {
+    toggleButton.addEventListener('click', () => setDiagnosticsVisible(!diagnosticsVisible));
+    toggleButton.dataset.bound = '1';
+  }
+
+  const closeButton = document.getElementById('intel-drawer-close');
+  if (closeButton && !closeButton.dataset.bound) {
+    closeButton.addEventListener('click', closeIntelDrawer);
+    closeButton.dataset.bound = '1';
+  }
+
+  const drawerThumb = document.getElementById('intel-drawer-thumb');
+  const drawerThumbImage = document.getElementById('intel-drawer-thumb-image');
+  const lightbox = document.getElementById('intel-image-lightbox');
+  const lightboxImage = document.getElementById('intel-image-lightbox-image');
+  const lightboxClose = document.getElementById('intel-image-lightbox-close');
+  if (drawerThumb && drawerThumbImage && lightbox && lightboxImage && !drawerThumb.dataset.bound) {
+    drawerThumb.addEventListener('click', () => {
+      if (!drawerThumbImage.src) return;
+      lightboxImage.src = drawerThumbImage.src;
+      lightboxImage.alt = drawerThumbImage.alt || 'Expanded preview';
+      lightbox.style.display = 'flex';
+      lightbox.setAttribute('aria-hidden', 'false');
+    });
+    drawerThumb.dataset.bound = '1';
+  }
+  if (lightbox && !lightbox.dataset.bound) {
+    lightbox.addEventListener('click', (event) => {
+      if (event.target === lightbox || event.target === lightboxClose) {
+        lightbox.style.display = 'none';
+        lightbox.setAttribute('aria-hidden', 'true');
+      }
+    });
+    lightbox.dataset.bound = '1';
+  }
+
+  const airButton = document.getElementById('toggle-air-layer');
+  if (airButton && !airButton.dataset.bound) {
+    airButton.addEventListener('click', async () => {
+      airLayerEnabled = !airLayerEnabled;
+      if (!airLayerEnabled) selectedAirIcao24 = null;
+      syncAirToggle();
+      await refreshAirTraffic();
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    });
+    airButton.dataset.bound = '1';
+  }
+
+  const satelliteButton = document.getElementById('toggle-satellite-layer');
+  if (satelliteButton && !satelliteButton.dataset.bound) {
+    satelliteButton.addEventListener('click', async () => {
+      satelliteLayerEnabled = !satelliteLayerEnabled;
+      syncSatelliteToggle();
+      await refreshSatelliteCatalog();
+      syncSatelliteLayerTimer();
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    });
+    satelliteButton.dataset.bound = '1';
+  }
+
+  const returnButton = document.getElementById('return-to-globe');
+  if (returnButton && !returnButton.dataset.bound) {
+    returnButton.addEventListener('click', showGlobeStage);
+    returnButton.dataset.bound = '1';
+  }
+
+  const zoneButton = document.getElementById('toggle-pittsburgh-zones');
+  if (zoneButton && !zoneButton.dataset.bound) {
+    zoneButton.addEventListener('click', togglePittsburghZones);
+    zoneButton.dataset.bound = '1';
+  }
+
+  const yearSelect = document.getElementById('pittsburgh-year-select');
+  if (yearSelect && !yearSelect.dataset.bound) {
+    yearSelect.addEventListener('change', () => {
+      pittsburghSelectedYear = yearSelect.value;
+      if (document.getElementById('intel-map-stage')?.style.display !== 'none') {
+        renderPittsburghZoneOverlay().catch(() => {});
+      }
+    });
+    yearSelect.dataset.bound = '1';
+  }
+
+  if (baselineRecommendationActions && !baselineRecommendationActions.dataset.drawerBound) {
+    baselineRecommendationActions.addEventListener('click', (event) => {
+      const chip = event.target.closest('[data-baseline-recommendation]');
+      if (!chip) return;
+      const item = currentPriorityItems.find((entry) => entry.action === chip.dataset.baselineRecommendation);
+      if (item) openIntelDrawer(item);
+    });
+    baselineRecommendationActions.dataset.drawerBound = '1';
+  }
+}
+
+function updatePrimaryStageHeight() {
+  const card = document.getElementById('global-operations-card');
+  const globe = document.getElementById('intel-globe');
+  const mapStage = document.getElementById('intel-map-stage');
+  if (!card || !globe || !mapStage) return;
+
+  const top = card.getBoundingClientRect().top;
+  const reservedBelow = document.body.classList.contains('intel-thin') ? 0 : 150;
+  const targetHeight = Math.max(360, window.innerHeight - top - reservedBelow);
+
+  card.style.height = `${targetHeight}px`;
+  globe.style.height = `${targetHeight}px`;
+  mapStage.style.height = `${targetHeight}px`;
+
+  if (intelGlobe?.height && intelGlobe?.width) {
+    intelGlobe.height(targetHeight);
+    intelGlobe.width(globe.clientWidth);
+  }
+}
+
+function getEventClientPoint(event) {
+  if (typeof event?.clientX === 'number' && typeof event?.clientY === 'number') {
+    return { clientX: event.clientX, clientY: event.clientY };
+  }
+  const touch = event?.touches?.[0] || event?.changedTouches?.[0];
+  if (touch && typeof touch.clientX === 'number' && typeof touch.clientY === 'number') {
+    return { clientX: touch.clientX, clientY: touch.clientY };
+  }
+  return null;
+}
+
+function isInsideGlobeHitArea(event, container) {
+  const point = getEventClientPoint(event);
+  if (!container || !point) return false;
+  const rect = container.getBoundingClientRect();
+  const centerX = rect.left + (rect.width / 2);
+  const centerY = rect.top + (rect.height / 2);
+  const radius = Math.min(rect.width, rect.height) * 0.38;
+  const dx = point.clientX - centerX;
+  const dy = point.clientY - centerY;
+  return (dx * dx) + (dy * dy) <= radius * radius;
+}
+
+function hasCoarsePointer() {
+  return (typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches) || (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0);
+}
+
+function getInteractionMode() {
+  return hasCoarsePointer() ? 'mobile' : 'desktop';
+}
+
+function applyInteractionMode() {
+  document.body?.setAttribute('data-interaction-mode', getInteractionMode());
+}
+
+function syncGlobeControls(container, enabled) {
+  if (!intelGlobe?.controls || !container) return;
+  const controls = intelGlobe.controls();
+  const allowControls = hasCoarsePointer() ? true : enabled;
+  controls.enableZoom = allowControls;
+  controls.enableRotate = allowControls;
+  if (!allowControls) container.style.cursor = 'default';
+}
+
+function setGlobeAutoRotate(enabled) {
+  globeAutoRotateEnabled = enabled;
+  if (intelGlobe?.controls) {
+    intelGlobe.controls().autoRotate = enabled;
+    intelGlobe.controls().autoRotateSpeed = 0.5;
+  }
+  const button = document.getElementById('toggle-globe-rotation');
+  if (button) {
+    button.style.display = enabled ? 'none' : 'inline-flex';
+    button.textContent = enabled ? 'Pause rotation' : 'Rotate';
+  }
+  setGlobeOverlayVisibility(enabled);
+}
+
+function setGlobeOverlayVisibility(visible) {
+  const title = document.getElementById('globe-floating-title');
+  if (title) title.style.opacity = visible ? '1' : '0';
+}
+
+function updateGlobeLabelVisibility() {
+  if (!intelGlobe?.labelsData) return;
+  intelGlobe.labelsData([]);
+}
+
+function buildMapEmbedUrl(lat, lng) {
+  const delta = 0.18;
+  const minLat = lat - delta;
+  const maxLat = lat + delta;
+  const minLng = lng - delta;
+  const maxLng = lng + delta;
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${minLng}%2C${minLat}%2C${maxLng}%2C${maxLat}&layer=mapnik&marker=${lat}%2C${lng}`;
+}
+
+function destroyCityMap() {
+  if (pittsburghZoneLayer && cityMapInstance) {
+    cityMapInstance.removeLayer(pittsburghZoneLayer);
+  }
+  pittsburghZoneLayer = null;
+  if (cityMapInstance?.remove) {
+    cityMapInstance.remove();
+  }
+  cityMapInstance = null;
+  mapHoverCard = null;
+  if (mapHoverHideTimer) {
+    clearTimeout(mapHoverHideTimer);
+    mapHoverHideTimer = null;
+  }
+}
+
+function zoneFillColor(zone) {
+  const shades = {
+    '1': '#d9d9d9',
+    '2': '#c8c8c8',
+    '3': '#b8b8b8',
+    '4': '#a8a8a8',
+    '5': '#989898',
+    '6': '#888888'
+  };
+  return shades[String(zone)] || '#b0b0b0';
+}
+
+function getZoneStyle(zone, visible = true) {
+  return {
+    color: 'rgba(220,220,220,0)',
+    weight: 0,
+    opacity: 0,
+    fillColor: zoneFillColor(zone),
+    fillOpacity: visible ? 0.5 : 0,
+    dashArray: null
+  };
+}
+
+function getPittsburghZoneStats(zone) {
+  const zoneEntry = pittsburghZoneStatsData?.zones?.[String(zone)];
+  if (!zoneEntry) return {};
+  return zoneEntry?.years?.[pittsburghSelectedYear] || zoneEntry?.all || {};
+}
+
+function syncPittsburghYearControl(eligible = false) {
+  const select = document.getElementById('pittsburgh-year-select');
+  if (!select) return;
+  if (!eligible || !pittsburghZoneStatsData?.years?.length) {
+    select.style.display = 'none';
+    select.innerHTML = '';
+    return;
+  }
+  if (!pittsburghSelectedYear || !pittsburghZoneStatsData.years.includes(pittsburghSelectedYear)) {
+    pittsburghSelectedYear = pittsburghZoneStatsData.years[pittsburghZoneStatsData.years.length - 1];
+  }
+  select.innerHTML = pittsburghZoneStatsData.years.map((year) => `<option value="${year}">${year}</option>`).join('');
+  select.value = pittsburghSelectedYear;
+  select.style.display = 'inline-flex';
+}
+
+function buildMapStagePointFromClient(clientX, clientY) {
+  const stage = document.getElementById('intel-map-stage');
+  const rect = stage?.getBoundingClientRect();
+  if (!rect) return null;
+  return {
+    x: clientX - rect.left,
+    y: clientY - rect.top
+  };
+}
+
+function updatePittsburghZoneLabelInteractivity() {
+  if (!pittsburghZoneLayer) return;
+  pittsburghZoneLayer.eachLayer((layer) => {
+    const zone = String(layer.feature?.properties?.zone || layer.feature?.properties?.Zone_T || '');
+    const tooltipEl = layer.getTooltip?.()?.getElement?.();
+    if (!tooltipEl) return;
+    if (!tooltipEl.dataset.bound) {
+      const showZoneLabelCard = (event) => {
+        if (pittsburghZonesVisible) return;
+        const point = buildMapStagePointFromClient(event.clientX, event.clientY);
+        setMapHoverCard(buildZonePopupHtml(zone, getPittsburghZoneStats(zone)), true, point);
+      };
+      tooltipEl.addEventListener('mouseenter', showZoneLabelCard);
+      tooltipEl.addEventListener('mousemove', showZoneLabelCard);
+      tooltipEl.addEventListener('mouseleave', () => {
+        if (!pittsburghZonesVisible) setMapHoverCard('', false);
+      });
+      tooltipEl.addEventListener('click', (event) => {
+        event.stopPropagation();
+        showZoneLabelCard(event);
+      });
+      tooltipEl.dataset.bound = '1';
+    }
+    tooltipEl.style.pointerEvents = pittsburghZonesVisible ? 'none' : 'auto';
+  });
+}
+
+function buildZonePopupHtml(zone, stats = {}) {
+  const offenseRows = (stats.topOffenseTypes || []).slice(0, 5).map(([name, total]) => `
+    <div style="display:flex; justify-content:space-between; gap:16px; margin-top:4px;">
+      <span>${name}</span>
+      <strong>${total}</strong>
+    </div>
+  `).join('') || '<div style="margin-top:6px;">No offense totals available.</div>';
+
+  return `
+    <div style="min-width:240px; color:#111;">
+      <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">Pittsburgh Police Zone</div>
+      <div style="font-size:1rem; font-weight:700; margin-top:6px;">Zone ${zone}</div>
+      <div style="margin-top:8px; font-size:0.86rem;">Total incidents <strong>${stats.incidentCount || 0}</strong></div>
+      <div style="margin-top:10px; border-top:1px solid rgba(0,0,0,0.12); padding-top:8px;">
+        ${offenseRows}
+      </div>
+    </div>
+  `;
+}
+
+async function renderPittsburghZoneOverlay() {
+  if (!cityMapInstance || typeof L === 'undefined') return;
+  if (!pittsburghZoneGeojsonData || !pittsburghZoneStatsData) {
+    const [geojson, stats] = await Promise.all([
+      fetchJson('data/pittsburgh/police_zones.geojson'),
+      fetchJson('data/pittsburgh/zone_crime_stats.json')
+    ]);
+    pittsburghZoneGeojsonData = geojson;
+    pittsburghZoneStatsData = stats;
+  }
+
+  syncPittsburghYearControl(true);
+
+  if (pittsburghZoneLayer) {
+    cityMapInstance.removeLayer(pittsburghZoneLayer);
+    pittsburghZoneLayer = null;
+  }
+
+  pittsburghZoneLayer = L.geoJSON(pittsburghZoneGeojsonData, {
+    interactive: false,
+    style: (feature) => {
+      const zone = String(feature?.properties?.zone || feature?.properties?.Zone_T || '');
+      return getZoneStyle(zone, pittsburghZonesVisible);
+    },
+    onEachFeature: (feature, layer) => {
+      const zone = String(feature?.properties?.zone || feature?.properties?.Zone_T || '');
+      layer.bindTooltip(`Zone ${zone}`, {
+        permanent: true,
+        direction: 'center',
+        className: 'pittsburgh-zone-label'
+      });
+    }
+  });
+
+  pittsburghZoneLayer.addTo(cityMapInstance);
+  pittsburghZoneLayer.bringToBack();
+  updatePittsburghZoneLabelInteractivity();
+}
+
+function syncPittsburghZoneToggle(visible, eligible = false) {
+  pittsburghZonesVisible = visible;
+  const button = document.getElementById('toggle-pittsburgh-zones');
+  if (button) {
+    button.style.display = eligible ? 'inline-flex' : 'none';
+    button.textContent = visible ? 'Zones On' : 'Zones Off';
+  }
+  syncPittsburghYearControl(eligible);
+  updatePittsburghZoneLabelInteractivity();
+}
+
+function togglePittsburghZones() {
+  if (!cityMapInstance || !pittsburghZoneLayer) return;
+  pittsburghZonesVisible = !pittsburghZonesVisible;
+  pittsburghZoneLayer.eachLayer((layer) => {
+    const zone = String(layer.feature?.properties?.zone || layer.feature?.properties?.Zone_T || '');
+    layer.setStyle(getZoneStyle(zone, pittsburghZonesVisible));
+  });
+  syncPittsburghZoneToggle(pittsburghZonesVisible, true);
+}
+
+function setMapHoverCard(content = '', visible = false, point = null) {
+  if (mapHoverHideTimer) {
+    clearTimeout(mapHoverHideTimer);
+    mapHoverHideTimer = null;
+  }
+  if (!mapHoverCard) return;
+  mapHoverCard.innerHTML = content;
+  mapHoverCard.style.display = visible ? 'block' : 'none';
+  if (!visible || !point) return;
+  const mapRect = mapHoverCard.parentElement?.getBoundingClientRect();
+  const cardRect = mapHoverCard.getBoundingClientRect();
+  if (!mapRect) return;
+  const cardWidth = cardRect.width || 260;
+  const cardHeight = cardRect.height || 120;
+  const offset = 16;
+  const left = Math.min(
+    Math.max(offset, point.x + offset),
+    Math.max(offset, mapRect.width - cardWidth - offset)
+  );
+  const top = Math.min(
+    Math.max(offset, point.y - cardHeight - offset),
+    Math.max(offset, mapRect.height - cardHeight - offset)
+  );
+  mapHoverCard.style.left = `${left}px`;
+  mapHoverCard.style.top = `${top}px`;
+  mapHoverCard.style.right = 'auto';
+}
+
+function scheduleHideMapHoverCard() {
+  if (mapHoverHideTimer) clearTimeout(mapHoverHideTimer);
+  mapHoverHideTimer = setTimeout(() => {
+    if (!mapHoverCard) return;
+    mapHoverCard.style.display = 'none';
+    mapHoverHideTimer = null;
+  }, 120);
+}
+
+function renderCityCrimeMap(item = {}) {
+  applyInteractionMode();
+  const mapStage = document.getElementById('intel-map-stage');
+  if (!mapStage || typeof item.lat !== 'number' || typeof item.lng !== 'number') return;
+
+  const crimeScan = cityCrimeScans[item.locationName] || {
+    center: [item.lat, item.lng],
+    zoom: 12,
+    incidents: 0,
+    hotspots: 0,
+    points: [{ lat: item.lat, lng: item.lng, intensity: 0.35, zone: item.locationName || 'Unknown zone', totals: { activity: 0 } }]
+  };
+
+  if (typeof L === 'undefined') {
+    mapStage.innerHTML = `<iframe title="${item.locationName || item.action || 'Location'} map view" src="${buildMapEmbedUrl(item.lat, item.lng)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+    return crimeScan;
+  }
+
+  mapStage.innerHTML = '<div id="intel-map-canvas"></div><div id="map-hover-card" class="map-hover-card" style="display:none;"></div>';
+  destroyCityMap();
+  mapHoverCard = document.getElementById('map-hover-card');
+  mapStage.onmouseleave = () => setMapHoverCard('', false);
+
+  cityMapInstance = L.map('intel-map-canvas', {
+    zoomControl: false,
+    attributionControl: false,
+    scrollWheelZoom: true
+  }).setView(crimeScan.center, crimeScan.zoom);
+
+  cityMapInstance.on('click', () => {
+    setMapHoverCard('', false);
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+  }).addTo(cityMapInstance);
+
+  /*
+  if (L.heatLayer) {
+    L.heatLayer(crimeScan.points.map((point) => [point.lat, point.lng, point.intensity]), {
+      radius: 34,
+      blur: 28,
+      maxZoom: 15,
+      minOpacity: 0.56,
+      gradient: {
+        0.18: 'rgba(255,184,77,0.46)',
+        0.45: 'rgba(255,107,107,0.72)',
+        0.72: 'rgba(198,40,40,0.88)',
+        0.92: 'rgba(123,0,0,0.96)'
+      }
+    }).addTo(cityMapInstance);
+  }
+  */
+
+  if (item.locationName === 'Pittsburgh, PA USA') {
+    fetchJson('data/pittsburgh/daily_crimes.json').then((crimes) => {
+      if (!crimes) return;
+      crimes.forEach((crime) => {
+        let color = '#757575'; // Other
+        if (crime.category === 'Violent') color = '#d32f2f'; // Red
+        else if (crime.category === 'Property') color = '#1976d2'; // Blue
+        else if (crime.category === 'Drug') color = '#388e3c'; // Green
+
+        const marker = L.circleMarker([crime.lat, crime.lng], {
+          radius: 5,
+          stroke: true,
+          color: '#fff',
+          weight: 1,
+          fillOpacity: 0.8,
+          fillColor: color
+        }).addTo(cityMapInstance).bindPopup(`
+          <div style="min-width:200px; color:#111;">
+            <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">${crime.category} Crime</div>
+            <div style="font-size:1rem; font-weight:700; margin-top:6px;">${crime.incident_type}</div>
+            <div style="margin-top:8px; font-size:0.85rem;">Zone: ${crime.zone}</div>
+            <div style="margin-top:4px; font-size:0.85rem;">Time: ${crime.time}</div>
+          </div>
+        `);
+        marker.on('click', (event) => {
+          if (event.originalEvent && typeof L !== 'undefined') {
+            L.DomEvent.stop(event.originalEvent);
+          }
+          marker.openPopup();
+        });
+      });
+    }).catch(console.error);
+  } else {
+    /*
+    crimeScan.points.forEach((point) => {
+      const totalHtml = Object.entries(point.totals || {}).map(([crime, total]) => `
+        <div style="display:flex; justify-content:space-between; gap:16px; margin-top:4px;">
+          <span style="text-transform:capitalize;">${crime}</span>
+          <strong>${total}</strong>
+        </div>
+      `).join('');
+
+      const hotspotMarker = L.circleMarker([point.lat, point.lng], {
+        radius: 4 + (point.intensity * 4),
+        stroke: false,
+        fillOpacity: 0.46,
+        fillColor: point.intensity > 0.7 ? '#7b0000' : point.intensity > 0.5 ? '#b71c1c' : '#d84315'
+      }).addTo(cityMapInstance).bindPopup(`
+        <div style="min-width:220px; color:#111;">
+          <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">Crime Scan</div>
+          <div style="font-size:1rem; font-weight:700; margin-top:6px;">${point.zone}</div>
+          <div style="margin-top:8px; font-size:0.85rem;">Intensity ${(point.intensity * 100).toFixed(0)}%</div>
+          <div style="margin-top:10px; border-top:1px solid rgba(0,0,0,0.12); padding-top:8px;">
+            ${totalHtml}
+          </div>
+        </div>
+      `);
+      hotspotMarker.on('click', (event) => {
+        if (event.originalEvent && typeof L !== 'undefined') {
+          L.DomEvent.stop(event.originalEvent);
+        }
+        hotspotMarker.openPopup();
+      });
+    });
+    */
+  }
+
+  if (item.locationName === 'Pittsburgh, PA USA') {
+    syncPittsburghZoneToggle(true, true);
+    renderPittsburghZoneOverlay().catch(() => {
+      syncPittsburghZoneToggle(false, false);
+    });
+  } else {
+    syncPittsburghZoneToggle(false, false);
+  }
+
+  return crimeScan;
+}
+
+function showMapStage(item = {}) {
+  const globe = document.getElementById('intel-globe');
+  const mapStage = document.getElementById('intel-map-stage');
+  const returnButton = document.getElementById('return-to-globe');
+  const rotationButton = document.getElementById('toggle-globe-rotation');
+  const airButton = document.getElementById('toggle-air-layer');
+  const satelliteButton = document.getElementById('toggle-satellite-layer');
+  const title = document.getElementById('globe-floating-title');
+  if (!globe || !mapStage || typeof item.lat !== 'number' || typeof item.lng !== 'number') return;
+
+  globe.style.display = 'none';
+  mapStage.style.display = 'block';
+  updatePrimaryStageHeight();
+  renderCityCrimeMap(item);
+  if (title) {
+    title.textContent = `Map View · ${item.locationName || item.action || 'Location'}`;
+    title.style.opacity = '1';
+    title.style.color = '#000';
+  }
+  if (returnButton) returnButton.style.display = 'inline-flex';
+  if (rotationButton) rotationButton.style.display = 'none';
+  if (airButton) airButton.style.display = 'none';
+  if (satelliteButton) satelliteButton.style.display = 'none';
+}
+
+function showGlobeStage() {
+  const globe = document.getElementById('intel-globe');
+  const mapStage = document.getElementById('intel-map-stage');
+  const returnButton = document.getElementById('return-to-globe');
+  const airButton = document.getElementById('toggle-air-layer');
+  const satelliteButton = document.getElementById('toggle-satellite-layer');
+  const title = document.getElementById('globe-floating-title');
+  if (!globe || !mapStage) return;
+
+  globe.style.display = 'block';
+  mapStage.style.display = 'none';
+  updatePrimaryStageHeight();
+  destroyCityMap();
+  mapStage.innerHTML = '';
+  syncPittsburghZoneToggle(true, false);
+  if (title) {
+    title.textContent = 'Global Operations Projection';
+    title.style.color = '';
+  }
+  if (returnButton) returnButton.style.display = 'none';
+  if (airButton) airButton.style.display = 'inline-flex';
+  if (satelliteButton) satelliteButton.style.display = 'inline-flex';
+  if (!globeAutoRotateEnabled) {
+    const rotationButton = document.getElementById('toggle-globe-rotation');
+    if (rotationButton) rotationButton.style.display = 'inline-flex';
+  }
+  setGlobeOverlayVisibility(globeAutoRotateEnabled);
+}
+
+function _initGlobeVars() {}
+let intelGlobe = null;
+const stateColors = {
+  'terminal': '#ff3366',
+  'compromised': '#ff9933',
+  'weakening': '#ffcc00',
+  'contested': '#cccccc',
+  'sound': '#33ccff',
+  'fortified': '#33ff33',
+  'neutral': '#666666'
+};
+
+function initOrUpdateGlobe(items = []) {
+  applyInteractionMode();
+  const globeContainer = document.getElementById('intel-globe');
+  if (!globeContainer || typeof Globe === 'undefined') return;
+
+  updatePrimaryStageHeight();
+
+  const validItems = items.filter(i => i.lat !== undefined && i.lng !== undefined);
+  const touchBoost = hasCoarsePointer() ? 0.35 : 0;
+  const cityPoints = validItems.map(i => {
+    const structuralState = i.recoveryTrustDriverTransitionBalanceStructuralState || 'neutral';
+    return {
+      kind: 'city',
+      lat: i.lat,
+      lng: i.lng,
+      size: Math.max(0.3, Math.min(1.95, ((i.priorityScore || 50) / 60) + touchBoost)),
+      color: stateColors[structuralState] || stateColors['neutral'],
+      ringColor: stateColors[structuralState] || stateColors['neutral'],
+      ringMaxRadius: 4.2,
+      ringPropagationSpeed: 1.2,
+      ringRepeatPeriod: 1400,
+      label: `<div><strong>${i.locationName || 'Unknown'}</strong></div><div>${i.action}</div><div>${structuralState}</div>`,
+      shortLabel: i.locationName || i.action,
+      raw: i
+    };
+  });
+  const airElements = getAirTrafficGlobeElements();
+  const airPaths = getAirTrafficPaths();
+  const satelliteElements = getSatelliteGlobeElements();
+  const satellitePaths = getSatelliteOrbitPaths();
+  const overlayElements = [...airElements, ...satelliteElements];
+  const overlayPaths = [...airPaths, ...satellitePaths];
+  const hoveredCityPoints = hoveredCityLabel ? cityPoints.filter((point) => point.shortLabel === hoveredCityLabel) : [];
+  const pointsData = [...cityPoints];
+
+  currentGlobePointsData = cityPoints;
+
+  if (!intelGlobe) {
+    intelGlobe = Globe()(globeContainer)
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
+      .backgroundColor('rgba(0,0,0,0)')
+      .pointLat('lat')
+      .pointLng('lng')
+      .pointColor('color')
+      .pointRadius('size')
+      .pointAltitude((point) => point.altitude ?? 0.01)
+      .pointLabel('label')
+      .ringsData(hoveredCityPoints)
+      .ringLat('lat')
+      .ringLng('lng')
+      .ringColor('ringColor')
+      .ringMaxRadius('ringMaxRadius')
+      .ringPropagationSpeed('ringPropagationSpeed')
+      .ringRepeatPeriod('ringRepeatPeriod')
+      .labelsData([])
+      .labelLat('lat')
+      .labelLng('lng')
+      .labelText('shortLabel')
+      .labelSize(1.3)
+      .labelAltitude(0.22)
+      .labelDotRadius(0.36)
+      .labelColor('color')
+      .htmlElementsData(overlayElements)
+      .htmlLat('lat')
+      .htmlLng('lng')
+      .htmlAltitude('altitude')
+      .htmlElement((item) => {
+        const el = document.createElement('div');
+        const coarsePointer = hasCoarsePointer();
+        el.style.pointerEvents = coarsePointer ? 'none' : 'auto';
+        el.style.cursor = coarsePointer ? 'default' : 'pointer';
+        el.style.width = coarsePointer ? '28px' : '18px';
+        el.style.height = coarsePointer ? '28px' : '18px';
+        el.style.display = 'grid';
+        el.style.placeItems = 'center';
+        if (item.kind === 'air') {
+          el.style.opacity = String(item.opacity ?? 1);
+          el.innerHTML = buildPlaneSvg(item.heading || 0);
+          el.title = item.label || 'Tracked aircraft';
+          if (!coarsePointer) {
+            el.addEventListener('mouseenter', () => {
+              el.style.opacity = '1';
+            });
+            el.addEventListener('mouseleave', () => {
+              el.style.opacity = String(item.opacity ?? 1);
+            });
+            el.addEventListener('click', (event) => {
+              event.stopPropagation();
+              selectedAirIcao24 = item.raw?.icao24 || null;
+              openIntelDrawer(item.raw || {});
+              initOrUpdateGlobe(currentGlobeBaseItems || []);
+            });
+          }
+          return el;
+        }
+        el.style.width = coarsePointer ? '18px' : '10px';
+        el.style.height = coarsePointer ? '18px' : '10px';
+        el.style.borderRadius = '999px';
+        el.style.background = 'rgba(0,229,255,0.98)';
+        el.style.boxShadow = coarsePointer ? '0 0 14px rgba(0,229,255,0.82)' : '0 0 10px rgba(0,229,255,0.68)';
+        el.title = item.label || 'Tracked satellite';
+        if (!coarsePointer) {
+          el.addEventListener('click', (event) => {
+            event.stopPropagation();
+            openIntelDrawer(item.raw || {});
+          });
+        }
+        return el;
+      })
+      .pathsData(overlayPaths)
+      .pathPoints('points')
+      .pathPointLat('lat')
+      .pathPointLng('lng')
+      .pathPointAlt('alt')
+      .pathColor('color')
+      .pathStroke(() => null)
+      .pathResolution(() => 2)
+      .onPointClick((point) => {
+        if (point?.kind === 'city' || point?.kind === 'satellite') {
+          openIntelDrawer(point.raw || {});
+        }
+      })
+      .onPointHover((point) => {
+        hoveredCityLabel = point?.kind === 'city' ? point.shortLabel : null;
+        globeContainer.style.cursor = point ? 'crosshair' : 'grab';
+        if (intelGlobe) {
+          intelGlobe.ringsData(hoveredCityLabel ? currentGlobePointsData.filter((entry) => entry.shortLabel === hoveredCityLabel) : []);
+        }
+      })
+      .pointsTransitionDuration(1500)
+      .width(globeContainer.clientWidth)
+      .height(globeContainer.clientHeight || 600);
+      
+      setGlobeAutoRotate(true);
+
+      window.addEventListener('resize', () => {
+        applyInteractionMode();
+        updatePrimaryStageHeight();
+      });
+  }
+
+  if (!globeContainer.dataset.hoverGuardBound) {
+    syncGlobeControls(globeContainer, false);
+
+    globeContainer.addEventListener('pointerdown', (event) => {
+      if (event.pointerType === 'touch') {
+        syncGlobeControls(globeContainer, true);
+        setGlobeAutoRotate(false);
+        setGlobeOverlayVisibility(false);
+      }
+    }, { passive: true, capture: true });
+
+    globeContainer.addEventListener('mousemove', (event) => {
+      syncGlobeControls(globeContainer, isInsideGlobeHitArea(event, globeContainer));
+      updateGlobeLabelVisibility();
+    });
+
+    globeContainer.addEventListener('mousedown', (event) => {
+      if (!isInsideGlobeHitArea(event, globeContainer)) {
+        event.preventDefault();
+        syncGlobeControls(globeContainer, false);
+        return;
+      }
+      syncGlobeControls(globeContainer, true);
+      setGlobeAutoRotate(false);
+      setGlobeOverlayVisibility(false);
+    });
+
+    globeContainer.addEventListener('wheel', (event) => {
+      const inside = isInsideGlobeHitArea(event, globeContainer);
+      syncGlobeControls(globeContainer, inside);
+      if (inside) {
+        setGlobeAutoRotate(false);
+        setGlobeOverlayVisibility(false);
+      }
+      updateGlobeLabelVisibility();
+    }, { passive: true });
+
+    globeContainer.addEventListener('touchstart', (event) => {
+      const inside = isInsideGlobeHitArea(event, globeContainer);
+      syncGlobeControls(globeContainer, inside);
+      if (inside) {
+        event.preventDefault();
+        setGlobeAutoRotate(false);
+        setGlobeOverlayVisibility(false);
+      }
+    }, { passive: false });
+
+    globeContainer.addEventListener('touchmove', (event) => {
+      const inside = isInsideGlobeHitArea(event, globeContainer);
+      syncGlobeControls(globeContainer, inside);
+      if (inside) {
+        event.preventDefault();
+        setGlobeAutoRotate(false);
+        setGlobeOverlayVisibility(false);
+      }
+      updateGlobeLabelVisibility();
+    }, { passive: false });
+
+    globeContainer.addEventListener('touchend', () => {
+      syncGlobeControls(globeContainer, false);
+    }, { passive: true });
+
+    globeContainer.addEventListener('mouseleave', () => {
+      syncGlobeControls(globeContainer, false);
+    });
+
+    const rotationButton = document.getElementById('toggle-globe-rotation');
+    if (rotationButton && !rotationButton.dataset.bound) {
+      rotationButton.addEventListener('click', () => setGlobeAutoRotate(true));
+      rotationButton.dataset.bound = '1';
+    }
+
+    globeContainer.dataset.hoverGuardBound = '1';
+  }
+  
+  intelGlobe.pointsData(pointsData);
+  intelGlobe.ringsData(hoveredCityPoints);
+  intelGlobe.labelsData([]);
+  intelGlobe.htmlElementsData(overlayElements);
+  intelGlobe.pathsData(overlayPaths);
+  updateGlobeLabelVisibility();
+
+  if (cityPoints.length && !globeContainer.dataset.initialViewLocked) {
+    const avgLat = cityPoints.reduce((sum, point) => sum + point.lat, 0) / cityPoints.length;
+    const avgLng = cityPoints.reduce((sum, point) => sum + point.lng, 0) / cityPoints.length;
+    intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 1.7 }, 1800);
+    globeContainer.dataset.initialViewLocked = '1';
+  }
+}
