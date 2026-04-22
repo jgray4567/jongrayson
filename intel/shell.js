@@ -2846,7 +2846,7 @@ function renderCityCrimeMap(item = {}) {
         else if (crime.category === 'Drug') color = '#388e3c'; // Green
 
         const marker = L.circleMarker([crime.lat, crime.lng], {
-          radius: 5,
+          radius: 8,
           stroke: true,
           color: '#fff',
           weight: 1,
