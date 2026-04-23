@@ -4,14 +4,15 @@ header('Cache-Control: no-store');
 
 $cachePath = dirname(__DIR__) . '/data/satellite-tracker-cache.json';
 $cacheTtlSeconds = 1800;
-$maxItems = 260;
+$maxItems = 400;
 $groups = [
     ['slug' => 'stations', 'network' => 'Crewed / Stations', 'limit' => 20],
-    ['slug' => 'starlink', 'network' => 'SpaceX Starlink', 'limit' => 80],
+    ['slug' => 'starlink', 'network' => 'SpaceX Starlink', 'limit' => 120],
     ['slug' => 'oneweb', 'network' => 'OneWeb', 'limit' => 50],
     ['slug' => 'gps-ops', 'network' => 'GPS', 'limit' => 35],
     ['slug' => 'galileo', 'network' => 'Galileo', 'limit' => 35],
-    ['slug' => 'iridium', 'network' => 'Iridium', 'limit' => 40]
+    ['slug' => 'iridium', 'network' => 'Iridium', 'limit' => 40],
+    ['slug' => 'geo', 'network' => 'GEO Comms', 'limit' => 40]
 ];
 
 $emit = function ($payload) {

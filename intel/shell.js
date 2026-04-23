@@ -38,6 +38,7 @@ let hoveredCityLabel = null;
 let satelliteLayerEnabled = false;
 let currentSatelliteCatalog = [];
 let satelliteLayerTimer = null;
+const visibleSatelliteOrbits = new Set(['LEO', 'MEO', 'GEO']);
 const cityCrimeScans = {
   'Los Angeles Port': {
     center: [33.739, -118.262],
@@ -2143,8 +2144,20 @@ function syncAirToggle() {
 
 function syncSatelliteToggle() {
   const button = document.getElementById('toggle-satellite-layer');
+  const filters = document.getElementById('sat-orbit-filters');
   if (!button) return;
   button.classList.toggle('active', satelliteLayerEnabled);
+  if (filters) {
+    filters.style.display = satelliteLayerEnabled ? 'inline-flex' : 'none';
+    ['LEO', 'MEO', 'GEO'].forEach(cls => {
+      const btn = filters.querySelector(`[data-orbit="${cls}"]`);
+      if (btn) {
+        const on = visibleSatelliteOrbits.has(cls);
+        btn.style.opacity = on ? '1' : '0.35';
+        btn.style.textDecoration = on ? 'none' : 'line-through';
+      }
+    });
+  }
 }
 
 async function refreshAirTraffic() {
@@ -2322,10 +2335,16 @@ function computeSatelliteLiveState(satItem, date = new Date()) {
   }
 }
 
+function satelliteOrbitColor(orbitClass, alpha) {
+  if (orbitClass === 'LEO') return `rgba(0,229,100,${alpha})`;
+  if (orbitClass === 'GEO') return `rgba(255,60,60,${alpha})`;
+  return `rgba(0,229,255,${alpha})`;
+}
+
 function getSatelliteGlobeElements() {
   if (!satelliteLayerEnabled || !currentSatelliteCatalog.length || !window.satellite) return [];
   const now = new Date();
-  return currentSatelliteCatalog.map((satItem) => {
+  return currentSatelliteCatalog.filter((satItem) => visibleSatelliteOrbits.has(satItem.orbitClass || 'LEO')).map((satItem) => {
     const live = computeSatelliteLiveState(satItem, now);
     if (!live) return null;
     return {
@@ -2333,7 +2352,8 @@ function getSatelliteGlobeElements() {
       lat: live.lat,
       lng: live.lng,
       altitude: live.altitudeRatio,
-      label: `${satItem.name} · ${satItem.network}`,
+      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', 0.01),
+      label: `${satItem.name} · ${satItem.network} · ${satItem.orbitClass || 'LEO'}`,
       raw: {
         ...satItem,
         lat: live.lat,
@@ -2348,7 +2368,7 @@ function getSatelliteGlobeElements() {
 function getSatelliteOrbitPaths() {
   if (!satelliteLayerEnabled || !currentSatelliteCatalog.length || !window.satellite) return [];
   const offsetsMinutes = [-30, -20, -10, 0, 10, 20, 30];
-  return currentSatelliteCatalog.map((satItem) => {
+  return currentSatelliteCatalog.filter((satItem) => visibleSatelliteOrbits.has(satItem.orbitClass || 'LEO')).map((satItem) => {
     const points = offsetsMinutes.map((offsetMinutes) => {
       const state = computeSatelliteLiveState(satItem, new Date(Date.now() + (offsetMinutes * 60000)));
       if (!state) return null;
@@ -2356,7 +2376,7 @@ function getSatelliteOrbitPaths() {
     }).filter(Boolean);
     if (points.length < 2) return null;
     return {
-      color: 'rgba(0,229,255,0.18)',
+      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', 0.18),
       points
     };
   }).filter(Boolean);
@@ -2439,6 +2459,18 @@ function initializeCommandSurface() {
     });
     satelliteButton.dataset.bound = '1';
   }
+
+  document.querySelectorAll('[data-orbit]').forEach(btn => {
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => {
+      const cls = btn.dataset.orbit;
+      if (visibleSatelliteOrbits.has(cls)) visibleSatelliteOrbits.delete(cls);
+      else visibleSatelliteOrbits.add(cls);
+      syncSatelliteToggle();
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    });
+  });
 
   const returnButton = document.getElementById('return-to-globe');
   if (returnButton && !returnButton.dataset.bound) {
@@ -3037,6 +3069,8 @@ function showMapStage(item = {}) {
   if (rotationButton) rotationButton.style.display = 'none';
   if (airButton) airButton.style.display = 'none';
   if (satelliteButton) satelliteButton.style.display = 'none';
+  const satOrbitFilters = document.getElementById('sat-orbit-filters');
+  if (satOrbitFilters) satOrbitFilters.style.display = 'none';
 }
 
 function showGlobeStage() {
@@ -3061,6 +3095,8 @@ function showGlobeStage() {
   if (returnButton) returnButton.style.display = 'none';
   if (airButton) airButton.style.display = 'inline-flex';
   if (satelliteButton) satelliteButton.style.display = 'inline-flex';
+  const satOrbitFilters = document.getElementById('sat-orbit-filters');
+  if (satOrbitFilters && satelliteLayerEnabled) satOrbitFilters.style.display = 'inline-flex';
   if (!globeAutoRotateEnabled) {
     const rotationButton = document.getElementById('toggle-globe-rotation');
     if (rotationButton) rotationButton.style.display = 'inline-flex';
@@ -3182,11 +3218,13 @@ function initOrUpdateGlobe(items = []) {
           }
           return el;
         }
+        const satOrbitClass = item.raw?.orbitClass || 'LEO';
+        const satDotColor = satOrbitClass === 'LEO' ? '0,229,100' : satOrbitClass === 'GEO' ? '255,60,60' : '0,229,255';
         el.style.width = coarsePointer ? '28px' : '10px';
         el.style.height = coarsePointer ? '28px' : '10px';
         el.style.borderRadius = '999px';
-        el.style.background = 'rgba(0,229,255,0.98)';
-        el.style.boxShadow = coarsePointer ? '0 0 14px rgba(0,229,255,0.82)' : '0 0 10px rgba(0,229,255,0.68)';
+        el.style.background = `rgba(${satDotColor},0.98)`;
+        el.style.boxShadow = coarsePointer ? `0 0 14px rgba(${satDotColor},0.82)` : `0 0 10px rgba(${satDotColor},0.68)`;
         el.title = item.label || 'Tracked satellite';
         el.addEventListener('click', (event) => {
           event.stopPropagation();
