@@ -28,6 +28,23 @@ let pittsburghCrimesData = [];
 let pittsburghCrimesLayer = null;
 let pittsburghSelectedMonth = null;
 let pittsburghVisibleCategories = new Set(['Violent', 'Property', 'Drug', 'Other']);
+
+function getAvailableYears(crimes) {
+  const years = new Set();
+  crimes.forEach((c) => {
+    const t = c.time || '';
+    const y = t.substring(0, 4);
+    if (y && y.length === 4) years.add(y);
+  });
+  return [...years].sort().reverse();
+}
+
+function filterCrimesByYearMonth(crimes, yearKey, monthKey) {
+  let filtered = crimes;
+  if (yearKey) filtered = filtered.filter((c) => (c.time || '').startsWith(yearKey));
+  if (monthKey && monthKey !== 'all') filtered = filtered.filter((c) => (c.time || '').startsWith(monthKey));
+  return filtered.filter((c) => pittsburghVisibleCategories.has(c.category));
+}
 let mapHoverCard = null;
 let mapHoverHideTimer = null;
 let airLayerEnabled = false;
@@ -2636,12 +2653,22 @@ function getAvailableMonths(crimes) {
   const months = new Set();
   crimes.forEach((c) => {
     const t = c.time || '';
-    // time format: "2026-03-05 22:51" or "2026-03"
-    const m = t.substring(0, 7); // "YYYY-MM"
+    const m = t.substring(0, 7);
     if (m && m.length === 7) months.add(m);
   });
-  const sorted = [...months].sort();
-  return sorted;
+  return [...months].sort();
+}
+
+function getMonthsForYear(crimes, year) {
+  const months = new Set();
+  crimes.forEach((c) => {
+    const t = c.time || '';
+    if (t.startsWith(year)) {
+      const m = t.substring(0, 7);
+      if (m && m.length === 7) months.add(m);
+    }
+  });
+  return [...months].sort();
 }
 
 function filterCrimesByMonth(crimes, monthKey) {
@@ -2688,39 +2715,46 @@ function renderCrimeMarkers(crimes) {
 }
 
 function syncPittsburghMonthControl(eligible = false) {
-  const select = document.getElementById('pittsburgh-month-select');
+  const yearSelect = document.getElementById('pittsburgh-year-select');
+  const monthSelect = document.getElementById('pittsburgh-month-select');
   const legend = document.getElementById('crime-legend');
-  if (!select) return;
+  if (!yearSelect || !monthSelect) return;
   if (!eligible || !pittsburghCrimesData.length) {
-    select.style.display = 'none';
+    yearSelect.style.display = 'none';
+    monthSelect.style.display = 'none';
     if (legend) legend.style.display = 'none';
     return;
   }
-  const months = getAvailableMonths(pittsburghCrimesData);
-  if (!months.length) {
-    select.style.display = 'none';
+  const years = getAvailableYears(pittsburghCrimesData);
+  if (!years.length) {
+    yearSelect.style.display = 'none';
+    monthSelect.style.display = 'none';
     if (legend) legend.style.display = 'none';
     return;
   }
-  // Default to current month
+  if (!pittsburghSelectedYear) pittsburghSelectedYear = years[0];
+
+  yearSelect.innerHTML = years.map((y) => `<option value="${y}">${y}</option>`).join('');
+  yearSelect.value = pittsburghSelectedYear;
+  yearSelect.style.display = 'inline-flex';
+
+  const months = getMonthsForYear(pittsburghCrimesData, pittsburghSelectedYear);
   const now = new Date();
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   if (!pittsburghSelectedMonth) {
-    pittsburghSelectedMonth = months.includes(currentMonth) ? currentMonth : months[months.length - 1];
+    pittsburghSelectedMonth = months.includes(currentMonth) ? currentMonth : (months.length ? months[months.length - 1] : 'all');
   }
-
   const monthNames = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  let optionsHtml = '<option value="all">2026 Total</option>';
+  let optionsHtml = `<option value="all">${pittsburghSelectedYear} Total</option>`;
   months.forEach((m) => {
     const [y, mm] = m.split('-');
     const label = `${monthNames[parseInt(mm) - 1]} ${y}`;
     optionsHtml += `<option value="${m}">${label}</option>`;
   });
-  select.innerHTML = optionsHtml;
-  select.value = pittsburghSelectedMonth;
-  select.style.display = 'inline-flex';
+  monthSelect.innerHTML = optionsHtml;
+  monthSelect.value = pittsburghSelectedMonth;
+  monthSelect.style.display = 'inline-flex';
 
-  // Show color legend - move it inside the map stage for proper positioning
   if (legend) {
     const mapStage = document.getElementById('intel-map-stage');
     if (mapStage && !mapStage.contains(legend)) {
@@ -2735,7 +2769,6 @@ function syncPittsburghMonthControl(eligible = false) {
     `;
     legend.style.display = 'block';
 
-    // Bind toggle clicks
     legend.querySelectorAll('.legend-toggle').forEach((item) => {
       item.addEventListener('click', () => {
         const cat = item.dataset.category;
@@ -2748,29 +2781,34 @@ function syncPittsburghMonthControl(eligible = false) {
           item.style.opacity = '1';
           item.style.textDecoration = 'none';
         }
-        const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth)
-          .filter((c) => pittsburghVisibleCategories.has(c.category));
+        const filtered = filterCrimesByYearMonth(pittsburghCrimesData, pittsburghSelectedYear, pittsburghSelectedMonth);
         renderCrimeMarkers(filtered);
       });
     });
   }
 
-  // Render filtered crimes
-  const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth)
-    .filter((c) => pittsburghVisibleCategories.has(c.category));
+  const filtered = filterCrimesByYearMonth(pittsburghCrimesData, pittsburghSelectedYear, pittsburghSelectedMonth);
   renderCrimeMarkers(filtered);
 }
 
 function bindMonthSelect() {
-  const select = document.getElementById('pittsburgh-month-select');
-  if (select && !select.dataset.bound) {
-    select.addEventListener('change', () => {
-      pittsburghSelectedMonth = select.value;
-      const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth)
-        .filter((c) => pittsburghVisibleCategories.has(c.category));
+  const yearSelect = document.getElementById('pittsburgh-year-select');
+  const monthSelect = document.getElementById('pittsburgh-month-select');
+  if (yearSelect && !yearSelect.dataset.bound) {
+    yearSelect.addEventListener('change', () => {
+      pittsburghSelectedYear = yearSelect.value;
+      pittsburghSelectedMonth = null;
+      syncPittsburghMonthControl(true);
+    });
+    yearSelect.dataset.bound = '1';
+  }
+  if (monthSelect && !monthSelect.dataset.bound) {
+    monthSelect.addEventListener('change', () => {
+      pittsburghSelectedMonth = monthSelect.value;
+      const filtered = filterCrimesByYearMonth(pittsburghCrimesData, pittsburghSelectedYear, pittsburghSelectedMonth);
       renderCrimeMarkers(filtered);
     });
-    select.dataset.bound = '1';
+    monthSelect.dataset.bound = '1';
   }
 }
 
