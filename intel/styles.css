@@ -410,6 +410,9 @@ body {
 .map-control-select {
   border-radius: 4px;
   padding: 8px 10px;
+  font-size: 0.82rem;
+  -webkit-appearance: none;
+  appearance: none;
 }
 .crime-legend {
   position: absolute;
