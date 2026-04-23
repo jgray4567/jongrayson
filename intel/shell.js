@@ -3182,7 +3182,7 @@ function initOrUpdateGlobe(items = []) {
   const overlayElements = [...airElements, ...satelliteElements];
   const overlayPaths = [...airPaths, ...satellitePaths];
   const hoveredCityPoints = hoveredCityLabel ? cityPoints.filter((point) => point.shortLabel === hoveredCityLabel) : [];
-  const pointsData = [...cityPoints];
+  const pointsData = [...cityPoints, ...airElements.map(a => ({ ...a, kind: 'air', raw: a.raw || a })), ...satelliteElements.map(s => ({ ...s, kind: 'satellite', raw: s.raw || s }))];
 
   currentGlobePointsData = cityPoints;
 
@@ -3192,8 +3192,8 @@ function initOrUpdateGlobe(items = []) {
       .backgroundColor('rgba(0,0,0,0)')
       .pointLat('lat')
       .pointLng('lng')
-      .pointColor('color')
-      .pointRadius('size')
+      .pointColor((point) => point.color || (point.kind === 'air' ? 'rgba(210,255,84,0.01)' : point.kind === 'satellite' ? 'rgba(0,229,255,0.01)' : '#00e5ff'))
+      .pointRadius((point) => point.size || (point.kind === 'air' || point.kind === 'satellite' ? 0.15 : 0.25))
       .pointAltitude((point) => point.altitude ?? 0.01)
       .pointLabel('label')
       .ringsData(hoveredCityPoints)
@@ -3273,7 +3273,13 @@ function initOrUpdateGlobe(items = []) {
       .pathResolution(() => 2)
       .onPointClick((point) => {
         if (point?.kind === 'city' || point?.kind === 'satellite' || point?.kind === 'air') {
+          if (point.kind === 'air') {
+            selectedAirIcao24 = point.raw?.icao24 || null;
+          }
           openIntelDrawer(point.raw || {});
+          if (point.kind === 'air') {
+            initOrUpdateGlobe(currentGlobeBaseItems || []);
+          }
         }
       })
       .onPointHover((point) => {
