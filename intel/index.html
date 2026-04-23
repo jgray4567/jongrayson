@@ -148,24 +148,18 @@
         <section id="global-operations-card" class="stage-card" style="grid-column: 1 / -1; padding: 0; overflow: hidden; position: relative; min-height: 0; border: none; background: transparent; box-shadow: none;">
           <div id="thin-intel-panel" class="thin-intel-panel">
             <a href="/" class="thin-intel-home" title="Home" aria-label="Home">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3v-6h4v6h3a1 1 0 001-1V10"/></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3v-6h4v6h3a1 1 0 001-1V10"/></svg>
             </a>
-            <div class="thin-intel-text">
-              <div class="thin-intel-title">Intelligence Layer</div>
-              <div class="thin-intel-version">Grayson version 0.007.1</div>
-            </div>
-          </div>
-          <div id="map-stage-controls" style="position: absolute; top: 80px; left: 18px; z-index: 500; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <span class="thin-intel-title">Intel</span>
+            <div class="thin-intel-divider"></div>
             <button id="toggle-air-layer" class="ghost-btn map-control-btn">Air</button>
             <button id="toggle-satellite-layer" class="ghost-btn map-control-btn">Sat</button>
             <button id="return-to-globe" class="ghost-btn map-control-btn" style="display: none;">Globe</button>
             <button id="toggle-pittsburgh-zones" class="ghost-btn map-control-btn" style="display: none;">Zones On</button>
-
             <select id="pittsburgh-month-select" class="map-control-select" style="display: none;"></select>
             <button id="toggle-globe-rotation" class="ghost-btn map-control-btn" style="display: none;">Rotate</button>
           </div>
-          <div id="crime-legend" class="crime-legend" style="display: none;"></div>
-          <div id="globe-floating-title" class="panel-kicker" style="display:none; position: absolute; top: 50px; left: 18px; z-index: 500; transition: opacity 0.2s ease;">Global Operations Projection</div>
+                    <div id="crime-legend" class="crime-legend" style="display: none;"></div>
           <div id="intel-globe" style="height: 60vh; width: 100%; cursor: grab;"></div>
           <div id="intel-map-stage" style="display:none; height:60vh; width:100%; position: relative;"></div>
         </section>

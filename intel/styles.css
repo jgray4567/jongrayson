@@ -57,14 +57,14 @@ body {
   top: 14px;
   left: 18px;
   z-index: 520;
-  padding: 8px 10px;
+  padding: 6px 10px;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.56);
   border: 1px solid rgba(255,255,255,0.18);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -72,8 +72,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   color: #c4d600;
   border: 1px solid rgba(255,255,255,0.18);
   border-radius: 4px;
@@ -88,25 +88,19 @@ body {
 .thin-intel-home:active {
   background: rgba(255,255,255,0.2);
 }
-.thin-intel-text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
 .thin-intel-title {
   color: #fff;
-  font-size: 1rem;
+  font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
-.thin-intel-version {
-  margin-top: 4px;
-  color: #c4d600;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.thin-intel-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255,255,255,0.25);
+  flex-shrink: 0;
 }
 .brand-block, .panel, .hero-card, .stage-card {
   border: 1px solid var(--border);
