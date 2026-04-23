@@ -2998,7 +2998,9 @@ function renderCityCrimeMap(item = {}) {
   cityMapInstance = L.map('intel-map-canvas', {
     zoomControl: false,
     attributionControl: false,
-    scrollWheelZoom: true
+    scrollWheelZoom: true,
+    touchZoom: true,
+    tap: true
   }).setView(crimeScan.center, crimeScan.zoom);
 
   cityMapInstance.on('click', () => {
