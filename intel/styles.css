@@ -74,16 +74,15 @@ body {
   justify-content: center;
   width: 28px;
   height: 28px;
-  color: #c4d600;
+  color: #fff;
   border: 1px solid rgba(255,255,255,0.18);
   border-radius: 4px;
   text-decoration: none;
   flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s;
 }
 .thin-intel-home:hover {
   background: rgba(255,255,255,0.12);
-  color: #fff;
 }
 .thin-intel-home:active {
   background: rgba(255,255,255,0.2);
