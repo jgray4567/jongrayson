@@ -221,6 +221,8 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: transform 0.24s ease, opacity 0.24s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 .intel-drawer.visible {
   transform: translateX(0);

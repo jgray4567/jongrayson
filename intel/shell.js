@@ -3218,17 +3218,24 @@ function initOrUpdateGlobe(items = []) {
       .htmlElement((item) => {
         const el = document.createElement('div');
         const coarsePointer = hasCoarsePointer();
-        el.style.pointerEvents = coarsePointer ? 'none' : 'auto';
-        el.style.cursor = coarsePointer ? 'default' : 'pointer';
-        el.style.width = coarsePointer ? '28px' : '18px';
-        el.style.height = coarsePointer ? '28px' : '18px';
+        el.style.pointerEvents = 'auto';
+        el.style.cursor = 'pointer';
         el.style.display = 'grid';
         el.style.placeItems = 'center';
         if (item.kind === 'air') {
+          el.style.width = coarsePointer ? '36px' : '18px';
+          el.style.height = coarsePointer ? '36px' : '18px';
           el.style.opacity = String(item.opacity ?? 1);
           el.innerHTML = buildPlaneSvg(item.heading || 0);
           el.title = item.label || 'Tracked aircraft';
-          if (!coarsePointer) {
+          if (coarsePointer) {
+            el.addEventListener('click', (event) => {
+              event.stopPropagation();
+              selectedAirIcao24 = item.raw?.icao24 || null;
+              openIntelDrawer(item.raw || {});
+              initOrUpdateGlobe(currentGlobeBaseItems || []);
+            });
+          } else {
             el.addEventListener('mouseenter', () => {
               el.style.opacity = '1';
             });
@@ -3244,18 +3251,16 @@ function initOrUpdateGlobe(items = []) {
           }
           return el;
         }
-        el.style.width = coarsePointer ? '18px' : '10px';
-        el.style.height = coarsePointer ? '18px' : '10px';
+        el.style.width = coarsePointer ? '28px' : '10px';
+        el.style.height = coarsePointer ? '28px' : '10px';
         el.style.borderRadius = '999px';
         el.style.background = 'rgba(0,229,255,0.98)';
         el.style.boxShadow = coarsePointer ? '0 0 14px rgba(0,229,255,0.82)' : '0 0 10px rgba(0,229,255,0.68)';
         el.title = item.label || 'Tracked satellite';
-        if (!coarsePointer) {
-          el.addEventListener('click', (event) => {
-            event.stopPropagation();
-            openIntelDrawer(item.raw || {});
-          });
-        }
+        el.addEventListener('click', (event) => {
+          event.stopPropagation();
+          openIntelDrawer(item.raw || {});
+        });
         return el;
       })
       .pathsData(overlayPaths)
@@ -3267,7 +3272,7 @@ function initOrUpdateGlobe(items = []) {
       .pathStroke(() => null)
       .pathResolution(() => 2)
       .onPointClick((point) => {
-        if (point?.kind === 'city' || point?.kind === 'satellite') {
+        if (point?.kind === 'city' || point?.kind === 'satellite' || point?.kind === 'air') {
           openIntelDrawer(point.raw || {});
         }
       })
