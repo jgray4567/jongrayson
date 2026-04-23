@@ -3,11 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Intel, Build 200 | Jon Grayson</title>
-  <meta name="description" content="Intel build 200, recovery-trust driver transition balance structural state classification, lifecycle grade collapse, and stronger adaptive decision trust control inside jongrayson.com.">
-  <link rel="stylesheet" href="styles.css">
+  <base href="/intel/">
+  <title>Intel, Build 201 | Jon Grayson</title>
+  <meta name="description" content="Intel build 201, Geographic Intel Projection, mapping structural states to global visualization inside jongrayson.com.">
+  <link rel="stylesheet" href="styles.css?v=0.007.1">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script src="https://unpkg.com/satellite.js@5.0.0/dist/satellite.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 </head>
-<body>
+<body class="intel-thin">
   <div class="app-shell">
     <aside class="rail left-rail">
       <div class="brand-block">
@@ -19,8 +25,8 @@
 
       <div class="panel">
         <div class="panel-kicker">Build</div>
-        <div class="panel-title">Build 200</div>
-        <div class="muted">Recovery-trust driver transition balance structural state classification</div>
+        <div class="panel-title">Build 201</div>
+        <div class="muted">Geographic Intel Projection & Structural State Globe</div>
       </div>
 
       <div class="panel">
@@ -70,23 +76,124 @@
     </aside>
 
     <main class="center-stage">
-      <div class="hero-card">
-        <div class="hero-kicker" id="overview-eyebrow">Intel Surface</div>
-        <h2 id="overview-headline">Build 200 is live inside jongrayson.com.</h2>
-        <p>
-          The intel route now collapses the entire transition balance lifecycle into a single grade. Build 200 introduces
-          structural state classification, so operators can easily distinguish terminal deterioration from durable recovery without tracking every raw streak.
-        </p>
+      <div class="hero-card status-hero">
+        <div class="status-strip">
+          <div class="status-stat">
+            <span class="status-label">Global posture</span>
+            <strong id="status-strip-posture">Scanning…</strong>
+          </div>
+          <div class="status-stat">
+            <span class="status-label">Terminal zones</span>
+            <strong id="status-strip-terminal">0</strong>
+          </div>
+          <div class="status-stat">
+            <span class="status-label">Fortified zones</span>
+            <strong id="status-strip-fortified">0</strong>
+          </div>
+          <div class="status-stat">
+            <span class="status-label">Systems online</span>
+            <strong id="status-strip-systems">0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="command-bar">
+        <div class="command-pill">
+          <span class="command-label">Global posture</span>
+          <strong id="global-posture">Scanning…</strong>
+        </div>
+        <div class="command-pill">
+          <span class="command-label">Terminal</span>
+          <strong id="terminal-count">0</strong>
+        </div>
+        <div class="command-pill">
+          <span class="command-label">Fortified</span>
+          <strong id="fortified-count">0</strong>
+        </div>
+        <div class="command-pill">
+          <span class="command-label">Reversals</span>
+          <strong id="reversal-count">0</strong>
+        </div>
+        <button id="toggle-diagnostics" class="ghost-btn">Show diagnostics</button>
+      </div>
+
+      <aside id="intel-activation-panel" class="intel-drawer" aria-hidden="true">
+        <div class="intel-drawer-head">
+          <div>
+            <div class="panel-kicker">Activated Focus</div>
+            <div id="intel-drawer-title" class="intel-drawer-title">Click a point on the globe</div>
+          </div>
+          <div class="intel-drawer-aside">
+            <button id="intel-drawer-close" class="ghost-btn">X</button>
+            <button id="intel-drawer-thumb" class="intel-drawer-thumb" type="button" style="display:none;" aria-label="Open image preview">
+              <img id="intel-drawer-thumb-image" alt="Satellite preview">
+            </button>
+          </div>
+        </div>
+        <div id="intel-drawer-state" class="intel-state-chip">Awaiting activation</div>
+        <div id="intel-drawer-summary" class="muted" style="margin-top:12px;">Hover for a quick read. Click a globe point to reveal the full location panel.</div>
+        <div id="intel-drawer-map" class="intel-map-preview"></div>
+        <div id="intel-drawer-metrics" class="intel-metrics"></div>
+        <details class="intel-deep-details">
+          <summary>Deep diagnostics</summary>
+          <div id="intel-drawer-deep" class="task-focus-meta" style="margin-top:12px;"></div>
+        </details>
+      </aside>
+      <div id="intel-image-lightbox" class="intel-image-lightbox" aria-hidden="true" style="display:none;">
+        <button id="intel-image-lightbox-close" class="ghost-btn" type="button">X</button>
+        <img id="intel-image-lightbox-image" alt="Expanded preview">
       </div>
 
       <div class="stage-grid">
+        <section id="global-operations-card" class="stage-card" style="grid-column: 1 / -1; padding: 0; overflow: hidden; position: relative; min-height: 0; border: none; background: transparent; box-shadow: none;">
+          <div id="thin-intel-panel" class="thin-intel-panel">
+            <div class="thin-intel-title">Intelligence Layer</div>
+            <div class="thin-intel-version">Grayson version 0.007.1</div>
+          </div>
+          <div id="map-stage-controls" style="position: absolute; top: 66px; left: 18px; z-index: 500; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button id="toggle-air-layer" class="ghost-btn map-control-btn">Air</button>
+            <button id="toggle-satellite-layer" class="ghost-btn map-control-btn">Sat</button>
+            <button id="return-to-globe" class="ghost-btn map-control-btn" style="display: none;">Globe</button>
+            <button id="toggle-pittsburgh-zones" class="ghost-btn map-control-btn" style="display: none;">Zones On</button>
+            <select id="pittsburgh-year-select" class="map-control-select" style="display: none;"></select>
+            <select id="pittsburgh-month-select" class="map-control-select" style="display: none;"></select>
+            <div id="crime-legend" class="crime-legend" style="display: none;"></div>
+            <button id="toggle-globe-rotation" class="ghost-btn map-control-btn" style="display: none;">Rotate</button>
+          </div>
+          <div id="globe-floating-title" class="panel-kicker" style="display:none; position: absolute; top: 50px; left: 18px; z-index: 500; transition: opacity 0.2s ease;">Global Operations Projection</div>
+          <div id="intel-globe" style="height: 60vh; width: 100%; cursor: grab;"></div>
+          <div id="intel-map-stage" style="display:none; height:60vh; width:100%;"></div>
+        </section>
+
+        <section class="stage-card" style="grid-column: 1 / -1;">
+          <div class="panel-kicker">Live Timeline</div>
+          <div id="timeline-container" style="margin-top:14px; position:relative; height:60px; background:var(--chip); border:1px solid var(--border); border-radius:8px;"></div>
+        </section>
+
+        <section class="stage-card">
+          <div class="panel-kicker">Timeline Focus</div>
+          <div id="timeline-focus-status" class="big-query" style="font-size:1.35rem; margin-top:12px;">Full feed window</div>
+          <div id="timeline-focus-summary" class="task-focus-meta" style="margin-top:10px;">Click a live marker to isolate a temporal investigation window, then widen or tighten it with the scope presets.</div>
+          <div class="filter-row" style="margin-top:14px; flex-wrap:wrap;">
+            <div class="signal-filters" id="timeline-window-buttons">
+              <button class="ghost-btn" data-window-minutes="30">30m</button>
+              <button class="ghost-btn active" data-window-minutes="60">1h</button>
+              <button class="ghost-btn" data-window-minutes="180">3h</button>
+              <button class="ghost-btn" data-window-minutes="360">6h</button>
+            </div>
+            <button id="save-timeline-view" class="ghost-btn">Save current scope</button>
+            <button id="copy-share-link" class="ghost-btn">Copy share link</button>
+            <button id="clear-timeline-filter" class="ghost-btn">Clear time scope</button>
+          </div>
+        </section>
+
         <section class="stage-card">
           <div class="panel-kicker">Selected Query</div>
           <div id="selected-query" class="big-query">harbor</div>
           <div id="selected-meta" class="muted">Use the chips on the left to focus a recommendation case.</div>
         </section>
 
-        <section class="stage-card">
+        <section class="stage-card" id="current-layer-card">
           <div class="panel-kicker">Current Layer</div>
           <ul class="plain-list">
             <li>Third-order escalation recommendations</li>
@@ -245,29 +352,8 @@
             <li>Recovery-trust driver transition balance entrenchment recapture detection</li>
             <li>Recovery-trust driver transition balance recapture streak tracking</li>
             <li>Recovery-trust driver transition balance structural state classification</li>
+            <li>Geographic Intel Projection (Global mapping)</li>
           </ul>
-        </section>
-
-        <section class="stage-card" style="grid-column: 1 / -1;">
-          <div class="panel-kicker">Live Timeline</div>
-          <div id="timeline-container" style="margin-top:14px; position:relative; height:60px; background:var(--chip); border:1px solid var(--border); border-radius:8px;"></div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Timeline Focus</div>
-          <div id="timeline-focus-status" class="big-query" style="font-size:1.35rem; margin-top:12px;">Full feed window</div>
-          <div id="timeline-focus-summary" class="task-focus-meta" style="margin-top:10px;">Click a live marker to isolate a temporal investigation window, then widen or tighten it with the scope presets.</div>
-          <div class="filter-row" style="margin-top:14px; flex-wrap:wrap;">
-            <div class="signal-filters" id="timeline-window-buttons">
-              <button class="ghost-btn" data-window-minutes="30">30m</button>
-              <button class="ghost-btn active" data-window-minutes="60">1h</button>
-              <button class="ghost-btn" data-window-minutes="180">3h</button>
-              <button class="ghost-btn" data-window-minutes="360">6h</button>
-            </div>
-            <button id="save-timeline-view" class="ghost-btn">Save current scope</button>
-            <button id="copy-share-link" class="ghost-btn">Copy share link</button>
-            <button id="clear-timeline-filter" class="ghost-btn">Clear time scope</button>
-          </div>
         </section>
 
         <section class="stage-card">
@@ -431,6 +517,6 @@
     </main>
   </div>
 
-  <script src="shell.js" type="module"></script>
+  <script src="shell.js?v=0.007.1" type="module"></script>
 </body>
 </html>

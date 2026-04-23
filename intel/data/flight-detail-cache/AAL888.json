@@ -1,0 +1,32 @@
+{
+    "fetchedAt": 1776178880,
+    "callsign": "AAL888",
+    "flightNumber": "AAL888",
+    "airline": "American Airlines",
+    "status": "",
+    "aircraftType": "Boeing 737 MAX 8 (twin-jet)",
+    "departure": {
+        "iata": "PHL",
+        "icao": "KPHL",
+        "name": "Philadelphia Intl",
+        "location": "Philadelphia, PA",
+        "terminal": null
+    },
+    "destination": {
+        "iata": "SEA",
+        "icao": "KSEA",
+        "name": "Seattle-Tacoma Intl",
+        "location": "Seattle, WA",
+        "terminal": null
+    },
+    "times": {
+        "departureScheduled": "Apr 16, 2026 12:25 PM UTC",
+        "departureEstimated": "Apr 16, 2026 12:25 PM UTC",
+        "departureActual": null,
+        "arrivalScheduled": "Apr 16, 2026 6:34 PM UTC",
+        "arrivalEstimated": "Apr 16, 2026 6:34 PM UTC",
+        "arrivalActual": null
+    },
+    "flightTime": "5h 49m",
+    "permalink": "/live/flight/AAL888/history/20260416/1235Z/KPHL/KSEA"
+}

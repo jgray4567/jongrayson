@@ -24,6 +24,9 @@ let pittsburghZoneGeojsonData = null;
 let pittsburghZoneStatsData = null;
 let pittsburghZonesVisible = true;
 let pittsburghSelectedYear = '2026';
+let pittsburghCrimesData = [];
+let pittsburghCrimesLayer = null;
+let pittsburghSelectedMonth = null;
 let mapHoverCard = null;
 let mapHoverHideTimer = null;
 let airLayerEnabled = false;
@@ -2628,6 +2631,123 @@ function syncPittsburghYearControl(eligible = false) {
   select.style.display = 'inline-flex';
 }
 
+function getAvailableMonths(crimes) {
+  const months = new Set();
+  crimes.forEach((c) => {
+    const t = c.time || '';
+    // time format: "2026-03-05 22:51" or "2026-03"
+    const m = t.substring(0, 7); // "YYYY-MM"
+    if (m && m.length === 7) months.add(m);
+  });
+  const sorted = [...months].sort();
+  return sorted;
+}
+
+function filterCrimesByMonth(crimes, monthKey) {
+  if (!monthKey || monthKey === 'all') return crimes;
+  return crimes.filter((c) => (c.time || '').startsWith(monthKey));
+}
+
+function renderCrimeMarkers(crimes) {
+  if (pittsburghCrimesLayer) {
+    cityMapInstance.removeLayer(pittsburghCrimesLayer);
+  }
+  pittsburghCrimesLayer = L.layerGroup();
+  crimes.forEach((crime) => {
+    let color = '#757575'; // Other
+    if (crime.category === 'Violent') color = '#d32f2f';
+    else if (crime.category === 'Property') color = '#1976d2';
+    else if (crime.category === 'Drug') color = '#388e3c';
+
+    const marker = L.circleMarker([crime.lat, crime.lng], {
+      radius: 8,
+      stroke: true,
+      color: '#fff',
+      weight: 1,
+      fillOpacity: 0.8,
+      fillColor: color
+    });
+    marker.bindPopup(`
+      <div style="min-width:200px; color:#111;">
+        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">${crime.category} Crime</div>
+        <div style="font-size:1rem; font-weight:700; margin-top:6px;">${crime.incident_type}</div>
+        <div style="margin-top:8px; font-size:0.85rem;">Zone: ${crime.zone}</div>
+        <div style="margin-top:4px; font-size:0.85rem;">Time: ${crime.time}</div>
+      </div>
+    `);
+    marker.on('click', (event) => {
+      if (event.originalEvent && typeof L !== 'undefined') {
+        L.DomEvent.stop(event.originalEvent);
+      }
+      marker.openPopup();
+    });
+    pittsburghCrimesLayer.addLayer(marker);
+  });
+  pittsburghCrimesLayer.addTo(cityMapInstance);
+}
+
+function syncPittsburghMonthControl(eligible = false) {
+  const select = document.getElementById('pittsburgh-month-select');
+  const legend = document.getElementById('crime-legend');
+  if (!select) return;
+  if (!eligible || !pittsburghCrimesData.length) {
+    select.style.display = 'none';
+    if (legend) legend.style.display = 'none';
+    return;
+  }
+  const months = getAvailableMonths(pittsburghCrimesData);
+  if (!months.length) {
+    select.style.display = 'none';
+    if (legend) legend.style.display = 'none';
+    return;
+  }
+  // Default to current month
+  const now = new Date();
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  if (!pittsburghSelectedMonth) {
+    pittsburghSelectedMonth = months.includes(currentMonth) ? currentMonth : months[months.length - 1];
+  }
+
+  const monthNames = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  let optionsHtml = '<option value="all">2026 Total</option>';
+  months.forEach((m) => {
+    const [y, mm] = m.split('-');
+    const label = `${monthNames[parseInt(mm) - 1]} ${y}`;
+    optionsHtml += `<option value="${m}">${label}</option>`;
+  });
+  select.innerHTML = optionsHtml;
+  select.value = pittsburghSelectedMonth;
+  select.style.display = 'inline-flex';
+
+  // Show color legend
+  if (legend) {
+    legend.innerHTML = `
+      <div class="legend-title">Crime Legend</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#d32f2f;"></span> Violent</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#1976d2;"></span> Property</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#388e3c;"></span> Drug</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#757575;"></span> Other</div>
+    `;
+    legend.style.display = 'block';
+  }
+
+  // Render filtered crimes
+  const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth);
+  renderCrimeMarkers(filtered);
+}
+
+function bindMonthSelect() {
+  const select = document.getElementById('pittsburgh-month-select');
+  if (select && !select.dataset.bound) {
+    select.addEventListener('change', () => {
+      pittsburghSelectedMonth = select.value;
+      const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth);
+      renderCrimeMarkers(filtered);
+    });
+    select.dataset.bound = '1';
+  }
+}
+
 function buildMapStagePointFromClient(clientX, clientY) {
   const stage = document.getElementById('intel-map-stage');
   const rect = stage?.getBoundingClientRect();
@@ -2732,6 +2852,12 @@ function syncPittsburghZoneToggle(visible, eligible = false) {
     button.textContent = visible ? 'Zones On' : 'Zones Off';
   }
   syncPittsburghYearControl(eligible);
+  if (!eligible) {
+    const ms = document.getElementById('pittsburgh-month-select');
+    const cl = document.getElementById('crime-legend');
+    if (ms) ms.style.display = 'none';
+    if (cl) cl.style.display = 'none';
+  }
   updatePittsburghZoneLabelInteractivity();
 }
 
@@ -2839,34 +2965,10 @@ function renderCityCrimeMap(item = {}) {
   if (item.locationName === 'Pittsburgh, PA USA') {
     fetchJson(`data/pittsburgh/daily_crimes.json?t=${new Date().getTime()}`).then((crimes) => {
       if (!crimes) return;
-      crimes.forEach((crime) => {
-        let color = '#757575'; // Other
-        if (crime.category === 'Violent') color = '#d32f2f'; // Red
-        else if (crime.category === 'Property') color = '#1976d2'; // Blue
-        else if (crime.category === 'Drug') color = '#388e3c'; // Green
-
-        const marker = L.circleMarker([crime.lat, crime.lng], {
-          radius: 8,
-          stroke: true,
-          color: '#fff',
-          weight: 1,
-          fillOpacity: 0.8,
-          fillColor: color
-        }).addTo(cityMapInstance).bindPopup(`
-          <div style="min-width:200px; color:#111;">
-            <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">${crime.category} Crime</div>
-            <div style="font-size:1rem; font-weight:700; margin-top:6px;">${crime.incident_type}</div>
-            <div style="margin-top:8px; font-size:0.85rem;">Zone: ${crime.zone}</div>
-            <div style="margin-top:4px; font-size:0.85rem;">Time: ${crime.time}</div>
-          </div>
-        `);
-        marker.on('click', (event) => {
-          if (event.originalEvent && typeof L !== 'undefined') {
-            L.DomEvent.stop(event.originalEvent);
-          }
-          marker.openPopup();
-        });
-      });
+      pittsburghCrimesData = crimes;
+      pittsburghSelectedMonth = null; // reset so default kicks in
+      syncPittsburghMonthControl(true);
+      bindMonthSelect();
     }).catch(console.error);
   } else {
     /*

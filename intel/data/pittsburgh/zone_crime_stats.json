@@ -1,0 +1,2440 @@
+{
+  "source": "WPRDC Monthly Criminal Activity (2024-2026)",
+  "years": [
+    "2024",
+    "2025",
+    "2026"
+  ],
+  "zones": {
+    "1": {
+      "zone": "1",
+      "all": {
+        "zone": "1",
+        "incidentCount": 15142,
+        "topOffenseTypes": [
+          [
+            "Not NIBRS Reportable",
+            2734
+          ],
+          [
+            "Simple Assault",
+            1376
+          ],
+          [
+            "Drug/Narcotic Violations",
+            1163
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            1101
+          ],
+          [
+            "Intimidation",
+            922
+          ],
+          [
+            "All other Offenses",
+            877
+          ]
+        ],
+        "topOffenseCategories": [
+          [
+            "Not NIBRS Reportable",
+            2734
+          ],
+          [
+            "Assault Offenses",
+            2733
+          ],
+          [
+            "All other Offenses",
+            2484
+          ],
+          [
+            "Larceny/Theft Offenses",
+            2185
+          ],
+          [
+            "Drug/Narcotic Offenses",
+            1772
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            1101
+          ]
+        ],
+        "topNeighborhoods": [
+          [
+            "East Allegheny",
+            2294
+          ],
+          [
+            "North Shore",
+            1286
+          ],
+          [
+            "Allentown",
+            1249
+          ],
+          [
+            "Perry South",
+            1114
+          ],
+          [
+            "Brighton Heights",
+            1039
+          ],
+          [
+            "Central Northside",
+            994
+          ]
+        ],
+        "crimeAgainst": [
+          [
+            "Group B",
+            5163
+          ],
+          [
+            "Property",
+            4840
+          ],
+          [
+            "Person",
+            2922
+          ],
+          [
+            "Society",
+            2195
+          ]
+        ]
+      },
+      "years": {
+        "2024": {
+          "zone": "1",
+          "incidentCount": 6423,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              1045
+            ],
+            [
+              "Simple Assault",
+              599
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              502
+            ],
+            [
+              "Drug/Narcotic Violations",
+              500
+            ],
+            [
+              "Intimidation",
+              408
+            ],
+            [
+              "Theft from Building",
+              337
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Assault Offenses",
+              1177
+            ],
+            [
+              "Larceny/Theft Offenses",
+              1098
+            ],
+            [
+              "Not NIBRS Reportable",
+              1045
+            ],
+            [
+              "All other Offenses",
+              949
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              700
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              502
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "East Allegheny",
+              883
+            ],
+            [
+              "Allentown",
+              643
+            ],
+            [
+              "North Shore",
+              568
+            ],
+            [
+              "Brighton Heights",
+              507
+            ],
+            [
+              "Central Northside",
+              436
+            ],
+            [
+              "Perry South",
+              417
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              2293
+            ],
+            [
+              "Group B",
+              1987
+            ],
+            [
+              "Person",
+              1250
+            ],
+            [
+              "Society",
+              879
+            ]
+          ]
+        },
+        "2025": {
+          "zone": "1",
+          "incidentCount": 7043,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              1296
+            ],
+            [
+              "Simple Assault",
+              619
+            ],
+            [
+              "Drug/Narcotic Violations",
+              537
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              504
+            ],
+            [
+              "All other Offenses",
+              477
+            ],
+            [
+              "Intimidation",
+              416
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Not NIBRS Reportable",
+              1296
+            ],
+            [
+              "Assault Offenses",
+              1244
+            ],
+            [
+              "All other Offenses",
+              1229
+            ],
+            [
+              "Larceny/Theft Offenses",
+              904
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              891
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              504
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "East Allegheny",
+              1177
+            ],
+            [
+              "Allentown",
+              606
+            ],
+            [
+              "North Shore",
+              545
+            ],
+            [
+              "Perry South",
+              525
+            ],
+            [
+              "Central Northside",
+              472
+            ],
+            [
+              "Brighton Heights",
+              411
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Group B",
+              2479
+            ],
+            [
+              "Property",
+              2141
+            ],
+            [
+              "Person",
+              1342
+            ],
+            [
+              "Society",
+              1073
+            ]
+          ]
+        },
+        "2026": {
+          "zone": "1",
+          "incidentCount": 1676,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              393
+            ],
+            [
+              "Simple Assault",
+              158
+            ],
+            [
+              "Drug/Narcotic Violations",
+              126
+            ],
+            [
+              "All other Offenses",
+              124
+            ],
+            [
+              "Intimidation",
+              98
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              95
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Not NIBRS Reportable",
+              393
+            ],
+            [
+              "Assault Offenses",
+              312
+            ],
+            [
+              "All other Offenses",
+              306
+            ],
+            [
+              "Larceny/Theft Offenses",
+              183
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              181
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              95
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "East Allegheny",
+              234
+            ],
+            [
+              "North Shore",
+              173
+            ],
+            [
+              "Perry South",
+              172
+            ],
+            [
+              "Marshall-Shadeland",
+              155
+            ],
+            [
+              "Brighton Heights",
+              121
+            ],
+            [
+              "Troy Hill",
+              112
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Group B",
+              697
+            ],
+            [
+              "Property",
+              406
+            ],
+            [
+              "Person",
+              330
+            ],
+            [
+              "Society",
+              243
+            ]
+          ]
+        }
+      }
+    },
+    "2": {
+      "zone": "2",
+      "all": {
+        "zone": "2",
+        "incidentCount": 19903,
+        "topOffenseTypes": [
+          [
+            "Not NIBRS Reportable",
+            3298
+          ],
+          [
+            "Simple Assault",
+            1554
+          ],
+          [
+            "Drug/Narcotic Violations",
+            1509
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            1316
+          ],
+          [
+            "Disorderly Conduct",
+            1262
+          ],
+          [
+            "All other Offenses",
+            1192
+          ]
+        ],
+        "topOffenseCategories": [
+          [
+            "All other Offenses",
+            3580
+          ],
+          [
+            "Larceny/Theft Offenses",
+            3487
+          ],
+          [
+            "Not NIBRS Reportable",
+            3298
+          ],
+          [
+            "Assault Offenses",
+            3108
+          ],
+          [
+            "Drug/Narcotic Offenses",
+            2686
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            1316
+          ]
+        ],
+        "topNeighborhoods": [
+          [
+            "Central Business District",
+            9108
+          ],
+          [
+            "Crawford-Roberts",
+            1274
+          ],
+          [
+            "Bluff",
+            1216
+          ],
+          [
+            "Marshall-Shadeland",
+            1049
+          ],
+          [
+            "Middle Hill",
+            1046
+          ],
+          [
+            "Strip District",
+            844
+          ]
+        ],
+        "crimeAgainst": [
+          [
+            "Group B",
+            6864
+          ],
+          [
+            "Property",
+            6734
+          ],
+          [
+            "Person",
+            3289
+          ],
+          [
+            "Society",
+            2992
+          ]
+        ]
+      },
+      "years": {
+        "2024": {
+          "zone": "2",
+          "incidentCount": 8257,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              1395
+            ],
+            [
+              "Drug/Narcotic Violations",
+              693
+            ],
+            [
+              "Simple Assault",
+              683
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              556
+            ],
+            [
+              "Disorderly Conduct",
+              512
+            ],
+            [
+              "Intimidation",
+              480
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Not NIBRS Reportable",
+              1395
+            ],
+            [
+              "Assault Offenses",
+              1363
+            ],
+            [
+              "All other Offenses",
+              1348
+            ],
+            [
+              "Larceny/Theft Offenses",
+              1341
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              1172
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              556
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "Central Business District",
+              3680
+            ],
+            [
+              "Marshall-Shadeland",
+              561
+            ],
+            [
+              "Crawford-Roberts",
+              518
+            ],
+            [
+              "Bluff",
+              482
+            ],
+            [
+              "Middle Hill",
+              420
+            ],
+            [
+              "Strip District",
+              365
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              2760
+            ],
+            [
+              "Group B",
+              2737
+            ],
+            [
+              "Person",
+              1440
+            ],
+            [
+              "Society",
+              1305
+            ]
+          ]
+        },
+        "2025": {
+          "zone": "2",
+          "incidentCount": 9433,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              1530
+            ],
+            [
+              "Simple Assault",
+              700
+            ],
+            [
+              "Drug/Narcotic Violations",
+              687
+            ],
+            [
+              "All other Offenses",
+              626
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              609
+            ],
+            [
+              "Shoplifting",
+              601
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Larceny/Theft Offenses",
+              1764
+            ],
+            [
+              "All other Offenses",
+              1739
+            ],
+            [
+              "Not NIBRS Reportable",
+              1530
+            ],
+            [
+              "Assault Offenses",
+              1415
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              1255
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              609
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "Central Business District",
+              4224
+            ],
+            [
+              "Crawford-Roberts",
+              644
+            ],
+            [
+              "Bluff",
+              572
+            ],
+            [
+              "Marshall-Shadeland",
+              488
+            ],
+            [
+              "Middle Hill",
+              483
+            ],
+            [
+              "Bedford Dwellings",
+              394
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              3267
+            ],
+            [
+              "Group B",
+              3262
+            ],
+            [
+              "Person",
+              1493
+            ],
+            [
+              "Society",
+              1406
+            ]
+          ]
+        },
+        "2026": {
+          "zone": "2",
+          "incidentCount": 2213,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              373
+            ],
+            [
+              "All other Offenses",
+              183
+            ],
+            [
+              "Disorderly Conduct",
+              174
+            ],
+            [
+              "Simple Assault",
+              171
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              151
+            ],
+            [
+              "Drug Equipment Violations",
+              130
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "All other Offenses",
+              493
+            ],
+            [
+              "Larceny/Theft Offenses",
+              382
+            ],
+            [
+              "Not NIBRS Reportable",
+              373
+            ],
+            [
+              "Assault Offenses",
+              330
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              259
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              151
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "Central Business District",
+              1204
+            ],
+            [
+              "Bluff",
+              162
+            ],
+            [
+              "Middle Hill",
+              143
+            ],
+            [
+              "Strip District",
+              116
+            ],
+            [
+              "Crawford-Roberts",
+              112
+            ],
+            [
+              "Central Lawrenceville",
+              102
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Group B",
+              865
+            ],
+            [
+              "Property",
+              707
+            ],
+            [
+              "Person",
+              356
+            ],
+            [
+              "Society",
+              281
+            ]
+          ]
+        }
+      }
+    },
+    "3": {
+      "zone": "3",
+      "all": {
+        "zone": "3",
+        "incidentCount": 17772,
+        "topOffenseTypes": [
+          [
+            "Not NIBRS Reportable",
+            3715
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            1368
+          ],
+          [
+            "Simple Assault",
+            1328
+          ],
+          [
+            "Drug/Narcotic Violations",
+            1077
+          ],
+          [
+            "Intimidation",
+            983
+          ],
+          [
+            "All other Offenses",
+            955
+          ]
+        ],
+        "topOffenseCategories": [
+          [
+            "Not NIBRS Reportable",
+            3715
+          ],
+          [
+            "Larceny/Theft Offenses",
+            2851
+          ],
+          [
+            "All other Offenses",
+            2771
+          ],
+          [
+            "Assault Offenses",
+            2709
+          ],
+          [
+            "Drug/Narcotic Offenses",
+            1531
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            1368
+          ]
+        ],
+        "topNeighborhoods": [
+          [
+            "South Side Flats",
+            5680
+          ],
+          [
+            "Carrick",
+            2814
+          ],
+          [
+            "Knoxville",
+            1772
+          ],
+          [
+            "Mount Washington",
+            1738
+          ],
+          [
+            "South Side Slopes",
+            1003
+          ],
+          [
+            "Beltzhoover",
+            541
+          ]
+        ],
+        "crimeAgainst": [
+          [
+            "Group B",
+            6472
+          ],
+          [
+            "Property",
+            6320
+          ],
+          [
+            "Person",
+            2878
+          ],
+          [
+            "Society",
+            2079
+          ]
+        ]
+      },
+      "years": {
+        "2024": {
+          "zone": "3",
+          "incidentCount": 7685,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              1636
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              594
+            ],
+            [
+              "Simple Assault",
+              588
+            ],
+            [
+              "Intimidation",
+              410
+            ],
+            [
+              "Drug/Narcotic Violations",
+              407
+            ],
+            [
+              "Disorderly Conduct",
+              351
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Not NIBRS Reportable",
+              1636
+            ],
+            [
+              "Larceny/Theft Offenses",
+              1294
+            ],
+            [
+              "Assault Offenses",
+              1174
+            ],
+            [
+              "All other Offenses",
+              1160
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              594
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              583
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "South Side Flats",
+              2473
+            ],
+            [
+              "Carrick",
+              1243
+            ],
+            [
+              "Mount Washington",
+              790
+            ],
+            [
+              "Knoxville",
+              786
+            ],
+            [
+              "South Side Slopes",
+              405
+            ],
+            [
+              "Beltzhoover",
+              235
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              2822
+            ],
+            [
+              "Group B",
+              2784
+            ],
+            [
+              "Person",
+              1252
+            ],
+            [
+              "Society",
+              814
+            ]
+          ]
+        },
+        "2025": {
+          "zone": "3",
+          "incidentCount": 7987,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              1692
+            ],
+            [
+              "Simple Assault",
+              592
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              578
+            ],
+            [
+              "Drug/Narcotic Violations",
+              508
+            ],
+            [
+              "Intimidation",
+              462
+            ],
+            [
+              "All other Offenses",
+              458
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Not NIBRS Reportable",
+              1692
+            ],
+            [
+              "All other Offenses",
+              1282
+            ],
+            [
+              "Assault Offenses",
+              1227
+            ],
+            [
+              "Larceny/Theft Offenses",
+              1219
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              753
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              578
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "South Side Flats",
+              2514
+            ],
+            [
+              "Carrick",
+              1241
+            ],
+            [
+              "Knoxville",
+              778
+            ],
+            [
+              "Mount Washington",
+              722
+            ],
+            [
+              "South Side Slopes",
+              475
+            ],
+            [
+              "Overbrook",
+              225
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Group B",
+              2973
+            ],
+            [
+              "Property",
+              2706
+            ],
+            [
+              "Person",
+              1300
+            ],
+            [
+              "Society",
+              1001
+            ]
+          ]
+        },
+        "2026": {
+          "zone": "3",
+          "incidentCount": 2100,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              387
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              196
+            ],
+            [
+              "Drug/Narcotic Violations",
+              162
+            ],
+            [
+              "All other Offenses",
+              149
+            ],
+            [
+              "Simple Assault",
+              148
+            ],
+            [
+              "Intimidation",
+              111
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Not NIBRS Reportable",
+              387
+            ],
+            [
+              "Larceny/Theft Offenses",
+              338
+            ],
+            [
+              "All other Offenses",
+              329
+            ],
+            [
+              "Assault Offenses",
+              308
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              196
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              195
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "South Side Flats",
+              693
+            ],
+            [
+              "Carrick",
+              330
+            ],
+            [
+              "Mount Washington",
+              226
+            ],
+            [
+              "Knoxville",
+              208
+            ],
+            [
+              "Allentown",
+              125
+            ],
+            [
+              "South Side Slopes",
+              123
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              792
+            ],
+            [
+              "Group B",
+              715
+            ],
+            [
+              "Person",
+              326
+            ],
+            [
+              "Society",
+              264
+            ]
+          ]
+        }
+      }
+    },
+    "4": {
+      "zone": "4",
+      "all": {
+        "zone": "4",
+        "incidentCount": 13716,
+        "topOffenseTypes": [
+          [
+            "Not NIBRS Reportable",
+            2615
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            1300
+          ],
+          [
+            "Shoplifting",
+            1256
+          ],
+          [
+            "Simple Assault",
+            835
+          ],
+          [
+            "All Other Larceny",
+            833
+          ],
+          [
+            "Intimidation",
+            815
+          ]
+        ],
+        "topOffenseCategories": [
+          [
+            "Larceny/Theft Offenses",
+            3581
+          ],
+          [
+            "Not NIBRS Reportable",
+            2615
+          ],
+          [
+            "All other Offenses",
+            2036
+          ],
+          [
+            "Assault Offenses",
+            1831
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            1300
+          ],
+          [
+            "Fraud Offenses",
+            1040
+          ]
+        ],
+        "topNeighborhoods": [
+          [
+            "Shadyside",
+            2383
+          ],
+          [
+            "Squirrel Hill South",
+            1609
+          ],
+          [
+            "Hazelwood",
+            1280
+          ],
+          [
+            "Central Oakland",
+            1021
+          ],
+          [
+            "North Oakland",
+            982
+          ],
+          [
+            "Greenfield",
+            895
+          ]
+        ],
+        "crimeAgainst": [
+          [
+            "Property",
+            6739
+          ],
+          [
+            "Group B",
+            4631
+          ],
+          [
+            "Person",
+            1979
+          ],
+          [
+            "Society",
+            351
+          ]
+        ]
+      },
+      "years": {
+        "2024": {
+          "zone": "4",
+          "incidentCount": 6110,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              1117
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              604
+            ],
+            [
+              "Shoplifting",
+              509
+            ],
+            [
+              "All Other Larceny",
+              391
+            ],
+            [
+              "Intimidation",
+              352
+            ],
+            [
+              "Theft from Building",
+              344
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Larceny/Theft Offenses",
+              1648
+            ],
+            [
+              "Not NIBRS Reportable",
+              1117
+            ],
+            [
+              "All other Offenses",
+              861
+            ],
+            [
+              "Assault Offenses",
+              771
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              604
+            ],
+            [
+              "Fraud Offenses",
+              535
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "Shadyside",
+              1045
+            ],
+            [
+              "Squirrel Hill South",
+              771
+            ],
+            [
+              "Hazelwood",
+              533
+            ],
+            [
+              "Central Oakland",
+              503
+            ],
+            [
+              "Greenfield",
+              409
+            ],
+            [
+              "North Oakland",
+              389
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              3170
+            ],
+            [
+              "Group B",
+              1964
+            ],
+            [
+              "Person",
+              832
+            ],
+            [
+              "Society",
+              134
+            ]
+          ]
+        },
+        "2026": {
+          "zone": "4",
+          "incidentCount": 1461,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              299
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              137
+            ],
+            [
+              "Shoplifting",
+              136
+            ],
+            [
+              "Simple Assault",
+              102
+            ],
+            [
+              "All other Offenses",
+              98
+            ],
+            [
+              "All Other Larceny",
+              94
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Larceny/Theft Offenses",
+              363
+            ],
+            [
+              "Not NIBRS Reportable",
+              299
+            ],
+            [
+              "All other Offenses",
+              241
+            ],
+            [
+              "Assault Offenses",
+              201
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              137
+            ],
+            [
+              "Fraud Offenses",
+              82
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "Shadyside",
+              260
+            ],
+            [
+              "Squirrel Hill South",
+              182
+            ],
+            [
+              "Hazelwood",
+              179
+            ],
+            [
+              "North Oakland",
+              147
+            ],
+            [
+              "Central Oakland",
+              108
+            ],
+            [
+              "West Oakland",
+              90
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              667
+            ],
+            [
+              "Group B",
+              539
+            ],
+            [
+              "Person",
+              221
+            ],
+            [
+              "Society",
+              33
+            ]
+          ]
+        },
+        "2025": {
+          "zone": "4",
+          "incidentCount": 6145,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              1199
+            ],
+            [
+              "Shoplifting",
+              611
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              559
+            ],
+            [
+              "Simple Assault",
+              389
+            ],
+            [
+              "Intimidation",
+              384
+            ],
+            [
+              "All Other Larceny",
+              348
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Larceny/Theft Offenses",
+              1570
+            ],
+            [
+              "Not NIBRS Reportable",
+              1199
+            ],
+            [
+              "All other Offenses",
+              934
+            ],
+            [
+              "Assault Offenses",
+              859
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              559
+            ],
+            [
+              "Fraud Offenses",
+              423
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "Shadyside",
+              1078
+            ],
+            [
+              "Squirrel Hill South",
+              656
+            ],
+            [
+              "Hazelwood",
+              568
+            ],
+            [
+              "North Oakland",
+              446
+            ],
+            [
+              "Central Oakland",
+              410
+            ],
+            [
+              "Greenfield",
+              397
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              2902
+            ],
+            [
+              "Group B",
+              2128
+            ],
+            [
+              "Person",
+              926
+            ],
+            [
+              "Society",
+              184
+            ]
+          ]
+        }
+      }
+    },
+    "5": {
+      "zone": "5",
+      "all": {
+        "zone": "5",
+        "incidentCount": 14620,
+        "topOffenseTypes": [
+          [
+            "Not NIBRS Reportable",
+            2556
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            1375
+          ],
+          [
+            "Simple Assault",
+            1075
+          ],
+          [
+            "Intimidation",
+            879
+          ],
+          [
+            "Shoplifting",
+            852
+          ],
+          [
+            "All other Offenses",
+            797
+          ]
+        ],
+        "topOffenseCategories": [
+          [
+            "Larceny/Theft Offenses",
+            2883
+          ],
+          [
+            "Not NIBRS Reportable",
+            2556
+          ],
+          [
+            "Assault Offenses",
+            2330
+          ],
+          [
+            "All other Offenses",
+            2020
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            1375
+          ],
+          [
+            "Drug/Narcotic Offenses",
+            1000
+          ]
+        ],
+        "topNeighborhoods": [
+          [
+            "East Liberty",
+            2425
+          ],
+          [
+            "Bloomfield",
+            1755
+          ],
+          [
+            "Homewood South",
+            1512
+          ],
+          [
+            "Homewood North",
+            1338
+          ],
+          [
+            "East Hills",
+            1072
+          ],
+          [
+            "Lincoln\u2013Lemington\u2013Belmar",
+            889
+          ]
+        ],
+        "crimeAgainst": [
+          [
+            "Property",
+            6130
+          ],
+          [
+            "Group B",
+            4561
+          ],
+          [
+            "Person",
+            2465
+          ],
+          [
+            "Society",
+            1441
+          ]
+        ]
+      },
+      "years": {
+        "2024": {
+          "zone": "5",
+          "incidentCount": 6520,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              1095
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              616
+            ],
+            [
+              "Simple Assault",
+              493
+            ],
+            [
+              "Intimidation",
+              409
+            ],
+            [
+              "Shoplifting",
+              369
+            ],
+            [
+              "All other Offenses",
+              350
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Larceny/Theft Offenses",
+              1355
+            ],
+            [
+              "Not NIBRS Reportable",
+              1095
+            ],
+            [
+              "Assault Offenses",
+              1076
+            ],
+            [
+              "All other Offenses",
+              885
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              616
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              350
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "East Liberty",
+              985
+            ],
+            [
+              "Bloomfield",
+              887
+            ],
+            [
+              "Homewood South",
+              716
+            ],
+            [
+              "Homewood North",
+              538
+            ],
+            [
+              "East Hills",
+              445
+            ],
+            [
+              "Lincoln\u2013Lemington\u2013Belmar",
+              420
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              2869
+            ],
+            [
+              "Group B",
+              1972
+            ],
+            [
+              "Person",
+              1139
+            ],
+            [
+              "Society",
+              529
+            ]
+          ]
+        },
+        "2025": {
+          "zone": "5",
+          "incidentCount": 6574,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              1168
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              611
+            ],
+            [
+              "Simple Assault",
+              478
+            ],
+            [
+              "Shoplifting",
+              394
+            ],
+            [
+              "Intimidation",
+              372
+            ],
+            [
+              "All other Offenses",
+              364
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Larceny/Theft Offenses",
+              1244
+            ],
+            [
+              "Not NIBRS Reportable",
+              1168
+            ],
+            [
+              "Assault Offenses",
+              1012
+            ],
+            [
+              "All other Offenses",
+              923
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              611
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              532
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "East Liberty",
+              1093
+            ],
+            [
+              "Bloomfield",
+              703
+            ],
+            [
+              "Homewood South",
+              651
+            ],
+            [
+              "Homewood North",
+              621
+            ],
+            [
+              "East Hills",
+              518
+            ],
+            [
+              "Lincoln\u2013Lemington\u2013Belmar",
+              469
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              2674
+            ],
+            [
+              "Group B",
+              2085
+            ],
+            [
+              "Person",
+              1074
+            ],
+            [
+              "Society",
+              735
+            ]
+          ]
+        },
+        "2026": {
+          "zone": "5",
+          "incidentCount": 1526,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              293
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              148
+            ],
+            [
+              "Simple Assault",
+              104
+            ],
+            [
+              "Intimidation",
+              98
+            ],
+            [
+              "Shoplifting",
+              89
+            ],
+            [
+              "All other Offenses",
+              83
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Not NIBRS Reportable",
+              293
+            ],
+            [
+              "Larceny/Theft Offenses",
+              284
+            ],
+            [
+              "Assault Offenses",
+              242
+            ],
+            [
+              "All other Offenses",
+              212
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              148
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              118
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "East Liberty",
+              347
+            ],
+            [
+              "Lincoln-Lemington-Belmar",
+              196
+            ],
+            [
+              "Homewood North",
+              179
+            ],
+            [
+              "Bloomfield",
+              165
+            ],
+            [
+              "Homewood South",
+              145
+            ],
+            [
+              "Larimer",
+              118
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              587
+            ],
+            [
+              "Group B",
+              504
+            ],
+            [
+              "Person",
+              252
+            ],
+            [
+              "Society",
+              177
+            ]
+          ]
+        }
+      }
+    },
+    "6": {
+      "zone": "6",
+      "all": {
+        "zone": "6",
+        "incidentCount": 7639,
+        "topOffenseTypes": [
+          [
+            "Not NIBRS Reportable",
+            1374
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            716
+          ],
+          [
+            "Simple Assault",
+            698
+          ],
+          [
+            "Intimidation",
+            630
+          ],
+          [
+            "All other Offenses",
+            433
+          ],
+          [
+            "Theft from Motor Vehicle",
+            338
+          ]
+        ],
+        "topOffenseCategories": [
+          [
+            "Assault Offenses",
+            1584
+          ],
+          [
+            "Not NIBRS Reportable",
+            1374
+          ],
+          [
+            "Larceny/Theft Offenses",
+            1204
+          ],
+          [
+            "All other Offenses",
+            1166
+          ],
+          [
+            "Destruction/Damage/Vandalism of Property",
+            716
+          ],
+          [
+            "Fraud Offenses",
+            507
+          ]
+        ],
+        "topNeighborhoods": [
+          [
+            "Brookline",
+            1608
+          ],
+          [
+            "Sheraden",
+            1230
+          ],
+          [
+            "Beechview",
+            977
+          ],
+          [
+            "Crafton Heights",
+            610
+          ],
+          [
+            "Elliott",
+            557
+          ],
+          [
+            "Banksville",
+            409
+          ]
+        ],
+        "crimeAgainst": [
+          [
+            "Property",
+            3049
+          ],
+          [
+            "Group B",
+            2527
+          ],
+          [
+            "Person",
+            1703
+          ],
+          [
+            "Society",
+            348
+          ]
+        ]
+      },
+      "years": {
+        "2024": {
+          "zone": "6",
+          "incidentCount": 3533,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              599
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              379
+            ],
+            [
+              "Simple Assault",
+              319
+            ],
+            [
+              "Intimidation",
+              265
+            ],
+            [
+              "All other Offenses",
+              189
+            ],
+            [
+              "Theft from Motor Vehicle",
+              187
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Assault Offenses",
+              721
+            ],
+            [
+              "Not NIBRS Reportable",
+              599
+            ],
+            [
+              "Larceny/Theft Offenses",
+              595
+            ],
+            [
+              "All other Offenses",
+              523
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              379
+            ],
+            [
+              "Fraud Offenses",
+              221
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "Brookline",
+              683
+            ],
+            [
+              "Sheraden",
+              617
+            ],
+            [
+              "Beechview",
+              430
+            ],
+            [
+              "Crafton Heights",
+              294
+            ],
+            [
+              "Elliott",
+              279
+            ],
+            [
+              "Banksville",
+              208
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              1496
+            ],
+            [
+              "Group B",
+              1118
+            ],
+            [
+              "Person",
+              776
+            ],
+            [
+              "Society",
+              134
+            ]
+          ]
+        },
+        "2025": {
+          "zone": "6",
+          "incidentCount": 3345,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              627
+            ],
+            [
+              "Simple Assault",
+              311
+            ],
+            [
+              "Intimidation",
+              305
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              273
+            ],
+            [
+              "All other Offenses",
+              193
+            ],
+            [
+              "All Other Larceny",
+              153
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "Assault Offenses",
+              719
+            ],
+            [
+              "Not NIBRS Reportable",
+              627
+            ],
+            [
+              "Larceny/Theft Offenses",
+              511
+            ],
+            [
+              "All other Offenses",
+              492
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              273
+            ],
+            [
+              "Fraud Offenses",
+              243
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "Brookline",
+              717
+            ],
+            [
+              "Sheraden",
+              481
+            ],
+            [
+              "Beechview",
+              429
+            ],
+            [
+              "Crafton Heights",
+              250
+            ],
+            [
+              "Elliott",
+              239
+            ],
+            [
+              "West End",
+              216
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Property",
+              1308
+            ],
+            [
+              "Group B",
+              1112
+            ],
+            [
+              "Person",
+              775
+            ],
+            [
+              "Society",
+              147
+            ]
+          ]
+        },
+        "2026": {
+          "zone": "6",
+          "incidentCount": 761,
+          "topOffenseTypes": [
+            [
+              "Not NIBRS Reportable",
+              148
+            ],
+            [
+              "Simple Assault",
+              68
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              64
+            ],
+            [
+              "Intimidation",
+              60
+            ],
+            [
+              "All other Offenses",
+              51
+            ],
+            [
+              "Disorderly Conduct",
+              42
+            ]
+          ],
+          "topOffenseCategories": [
+            [
+              "All other Offenses",
+              151
+            ],
+            [
+              "Not NIBRS Reportable",
+              148
+            ],
+            [
+              "Assault Offenses",
+              144
+            ],
+            [
+              "Larceny/Theft Offenses",
+              98
+            ],
+            [
+              "Destruction/Damage/Vandalism of Property",
+              64
+            ],
+            [
+              "Drug/Narcotic Offenses",
+              43
+            ]
+          ],
+          "topNeighborhoods": [
+            [
+              "Brookline",
+              208
+            ],
+            [
+              "Sheraden",
+              132
+            ],
+            [
+              "Beechview",
+              118
+            ],
+            [
+              "Crafton Heights",
+              66
+            ],
+            [
+              "West End",
+              55
+            ],
+            [
+              "Banksville",
+              43
+            ]
+          ],
+          "crimeAgainst": [
+            [
+              "Group B",
+              297
+            ],
+            [
+              "Property",
+              245
+            ],
+            [
+              "Person",
+              152
+            ],
+            [
+              "Society",
+              67
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

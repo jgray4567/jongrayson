@@ -1,0 +1,32 @@
+{
+    "fetchedAt": 1776179199,
+    "callsign": "N56KD",
+    "flightNumber": "N56KD",
+    "airline": null,
+    "status": "airborne",
+    "aircraftType": "Diamond Twin Star (twin-piston)",
+    "departure": {
+        "iata": "M21",
+        "icao": "M21",
+        "name": "Muhlenberg County",
+        "location": "Greenville, KY",
+        "terminal": null
+    },
+    "destination": {
+        "iata": "JWN",
+        "icao": "KJWN",
+        "name": "John C Tune",
+        "location": "Nashville, TN",
+        "terminal": null
+    },
+    "times": {
+        "departureScheduled": "Apr 14, 2026 2:50 PM UTC",
+        "departureEstimated": "Apr 14, 2026 2:48 PM UTC",
+        "departureActual": "Apr 14, 2026 2:48 PM UTC",
+        "arrivalScheduled": "Apr 14, 2026 3:22 PM UTC",
+        "arrivalEstimated": "Apr 14, 2026 3:20 PM UTC",
+        "arrivalActual": null
+    },
+    "flightTime": "32m",
+    "permalink": "/live/flight/N56KD/history/20260414/1450Z/M21/KJWN"
+}

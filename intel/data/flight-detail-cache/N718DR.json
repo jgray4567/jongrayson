@@ -1,0 +1,32 @@
+{
+    "fetchedAt": 1776179084,
+    "callsign": "N718DR",
+    "flightNumber": "N718DR",
+    "airline": null,
+    "status": "airborne",
+    "aircraftType": null,
+    "departure": {
+        "iata": null,
+        "icao": "38.67N/88.16W",
+        "name": "Olney-Noble, IL",
+        "location": "Olney-Noble, IL",
+        "terminal": null
+    },
+    "destination": {
+        "iata": null,
+        "icao": "",
+        "name": null,
+        "location": null,
+        "terminal": null
+    },
+    "times": {
+        "departureScheduled": null,
+        "departureEstimated": "Apr 14, 2026 1:33 PM UTC",
+        "departureActual": "Apr 14, 2026 1:33 PM UTC",
+        "arrivalScheduled": null,
+        "arrivalEstimated": null,
+        "arrivalActual": null
+    },
+    "flightTime": null,
+    "permalink": "/live/flight/N718DR/history/20260414/1333Z"
+}

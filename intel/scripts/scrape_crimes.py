@@ -9,8 +9,9 @@ def main():
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
 
-    # Use WPRDC API for 2024-2026 Monthly Criminal Activity Dataset
-    url = "https://data.wprdc.org/api/3/action/datastore_search?resource_id=bd41992a-987a-4cca-8798-fbe1cd946b07&sort=_id%20desc&limit=2000"
+    import urllib.parse
+    sql = "SELECT * from \"bd41992a-987a-4cca-8798-fbe1cd946b07\" WHERE \"ReportedDate\" >= '2026-01-01' ORDER BY \"ReportedDate\" DESC"
+    url = "https://data.wprdc.org/api/3/action/datastore_search_sql?sql=" + urllib.parse.quote(sql)
     
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     

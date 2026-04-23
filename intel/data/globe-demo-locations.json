@@ -1,0 +1,74 @@
+{
+  "items": [
+    {
+      "action": "Limit harbor access",
+      "locationName": "Los Angeles Port",
+      "lat": 33.7292,
+      "lng": -118.2620,
+      "adjustmentCount": 10,
+      "upgradedCount": 0,
+      "downgradedCount": 5,
+      "trustMomentumScore": -45,
+      "trustMomentumBand": "negative",
+      "recoveryTrustDriverTransitionBalanceEntrenchmentBand": "deterioration-entrenched",
+      "recoveryTrustDriverTransitionBalanceRecaptureStreak": 3,
+      "recoveryTrustDriverTransitionBalanceStructuralState": "terminal"
+    },
+    {
+      "action": "Rotate API keys",
+      "locationName": "NYC Datacenter",
+      "lat": 40.7128,
+      "lng": -74.0060,
+      "adjustmentCount": 12,
+      "upgradedCount": 8,
+      "downgradedCount": 1,
+      "trustMomentumScore": 85,
+      "trustMomentumBand": "positive",
+      "recoveryTrustDriverTransitionBalanceEntrenchmentBand": "recovery-entrenched",
+      "recoveryTrustDriverTransitionBalanceEscapedEntrenchmentDurably": true,
+      "recoveryTrustDriverTransitionBalanceEscapeDurabilityDirection": "positive",
+      "recoveryTrustDriverTransitionBalanceStructuralState": "fortified"
+    },
+    {
+      "action": "Disable public signups",
+      "locationName": "London HQ",
+      "lat": 51.5074,
+      "lng": -0.1278,
+      "adjustmentCount": 4,
+      "upgradedCount": 1,
+      "downgradedCount": 2,
+      "trustMomentumScore": -18,
+      "trustMomentumBand": "neutral",
+      "recoveryTrustDriverTransitionBalanceEntrenchmentBand": "deterioration-entrenched",
+      "recoveryTrustDriverTransitionBalanceRecaptureStreak": 1,
+      "recoveryTrustDriverTransitionBalanceStructuralState": "compromised"
+    },
+    {
+      "action": "Scale down idle instances",
+      "locationName": "Tokyo AP-Northeast",
+      "lat": 35.6762,
+      "lng": 139.6503,
+      "adjustmentCount": 6,
+      "upgradedCount": 3,
+      "downgradedCount": 0,
+      "trustMomentumScore": 36,
+      "trustMomentumBand": "positive",
+      "recoveryTrustDriverTransitionBalanceStabilityStreak": 3,
+      "recoveryTrustDriverTransitionBalanceStabilityPolarity": "recovery",
+      "recoveryTrustDriverTransitionBalanceStructuralState": "sound"
+    },
+    {
+      "action": "Stabilize downtown patrol coverage",
+      "locationName": "Pittsburgh, PA USA",
+      "lat": 40.4406,
+      "lng": -79.9959,
+      "adjustmentCount": 7,
+      "upgradedCount": 2,
+      "downgradedCount": 2,
+      "trustMomentumScore": -6,
+      "trustMomentumBand": "neutral",
+      "recoveryTrustDriverTransitionBalanceEntrenchmentBand": "none",
+      "recoveryTrustDriverTransitionBalanceStructuralState": "contested"
+    }
+  ]
+}

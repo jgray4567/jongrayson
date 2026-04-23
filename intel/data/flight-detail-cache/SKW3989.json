@@ -1,0 +1,32 @@
+{
+    "fetchedAt": 1776178849,
+    "callsign": "SKW3989",
+    "flightNumber": "SKW3989",
+    "airline": "SkyWest",
+    "status": "",
+    "aircraftType": "EMBRAER 175 (long wing) (twin-jet)",
+    "departure": {
+        "iata": "MSP",
+        "icao": "KMSP",
+        "name": "Minneapolis/St Paul Intl",
+        "location": "Minneapolis, MN",
+        "terminal": "1"
+    },
+    "destination": {
+        "iata": "MEM",
+        "icao": "KMEM",
+        "name": "Frederick W Smith Intl/Memphis",
+        "location": "Memphis, TN",
+        "terminal": null
+    },
+    "times": {
+        "departureScheduled": "Apr 16, 2026 2:22 PM UTC",
+        "departureEstimated": "Apr 16, 2026 2:22 PM UTC",
+        "departureActual": null,
+        "arrivalScheduled": "Apr 16, 2026 4:40 PM UTC",
+        "arrivalEstimated": "Apr 16, 2026 4:40 PM UTC",
+        "arrivalActual": null
+    },
+    "flightTime": "1h 58m",
+    "permalink": "/live/flight/SKW3989/history/20260416/1432Z/KMSP/KMEM"
+}

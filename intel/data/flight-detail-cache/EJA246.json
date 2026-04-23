@@ -1,0 +1,32 @@
+{
+    "fetchedAt": 1776179130,
+    "callsign": "EJA246",
+    "flightNumber": "EJA246",
+    "airline": "NetJets Aviation",
+    "status": "",
+    "aircraftType": "Canadair Challenger (twin-jet)",
+    "departure": {
+        "iata": "AVL",
+        "icao": "KAVL",
+        "name": "Asheville Rgnl",
+        "location": "Asheville, NC",
+        "terminal": null
+    },
+    "destination": {
+        "iata": "SNA",
+        "icao": "KSNA",
+        "name": "John Wayne",
+        "location": "Santa Ana, CA",
+        "terminal": null
+    },
+    "times": {
+        "departureScheduled": "Apr 14, 2026 5:00 PM UTC",
+        "departureEstimated": "Apr 14, 2026 5:00 PM UTC",
+        "departureActual": null,
+        "arrivalScheduled": "Apr 14, 2026 9:30 PM UTC",
+        "arrivalEstimated": "Apr 14, 2026 9:36 PM UTC",
+        "arrivalActual": null
+    },
+    "flightTime": "4h 30m",
+    "permalink": "/live/flight/EJA246/history/20260414/1700Z/KAVL/KSNA"
+}
