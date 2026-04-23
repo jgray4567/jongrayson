@@ -62,6 +62,36 @@ body {
   background: rgba(0, 0, 0, 0.56);
   border: 1px solid rgba(255,255,255,0.18);
   backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.thin-intel-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #c4d600;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 4px;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.thin-intel-home:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+.thin-intel-home:active {
+  background: rgba(255,255,255,0.2);
+}
+.thin-intel-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .thin-intel-title {
   color: #fff;
