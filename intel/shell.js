@@ -27,6 +27,7 @@ let pittsburghSelectedYear = '2026';
 let pittsburghCrimesData = [];
 let pittsburghCrimesLayer = null;
 let pittsburghSelectedMonth = null;
+let pittsburghVisibleCategories = new Set(['Violent', 'Property', 'Drug', 'Other']);
 let mapHoverCard = null;
 let mapHoverHideTimer = null;
 let airLayerEnabled = false;
@@ -2727,16 +2728,36 @@ function syncPittsburghMonthControl(eligible = false) {
     }
     legend.innerHTML = `
       <div class="legend-title">Crime Legend</div>
-      <div class="legend-item"><span class="legend-dot" style="background:#d32f2f;"></span> Violent</div>
-      <div class="legend-item"><span class="legend-dot" style="background:#1976d2;"></span> Property</div>
-      <div class="legend-item"><span class="legend-dot" style="background:#388e3c;"></span> Drug</div>
-      <div class="legend-item"><span class="legend-dot" style="background:#757575;"></span> Other</div>
+      <div class="legend-item legend-toggle" data-category="Violent" style="cursor:pointer;"><span class="legend-dot" style="background:#d32f2f;"></span> Violent</div>
+      <div class="legend-item legend-toggle" data-category="Property" style="cursor:pointer;"><span class="legend-dot" style="background:#1976d2;"></span> Property</div>
+      <div class="legend-item legend-toggle" data-category="Drug" style="cursor:pointer;"><span class="legend-dot" style="background:#388e3c;"></span> Drug</div>
+      <div class="legend-item legend-toggle" data-category="Other" style="cursor:pointer;"><span class="legend-dot" style="background:#757575;"></span> Other</div>
     `;
     legend.style.display = 'block';
+
+    // Bind toggle clicks
+    legend.querySelectorAll('.legend-toggle').forEach((item) => {
+      item.addEventListener('click', () => {
+        const cat = item.dataset.category;
+        if (pittsburghVisibleCategories.has(cat)) {
+          pittsburghVisibleCategories.delete(cat);
+          item.style.opacity = '0.35';
+          item.style.textDecoration = 'line-through';
+        } else {
+          pittsburghVisibleCategories.add(cat);
+          item.style.opacity = '1';
+          item.style.textDecoration = 'none';
+        }
+        const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth)
+          .filter((c) => pittsburghVisibleCategories.has(c.category));
+        renderCrimeMarkers(filtered);
+      });
+    });
   }
 
   // Render filtered crimes
-  const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth);
+  const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth)
+    .filter((c) => pittsburghVisibleCategories.has(c.category));
   renderCrimeMarkers(filtered);
 }
 
@@ -2745,7 +2766,8 @@ function bindMonthSelect() {
   if (select && !select.dataset.bound) {
     select.addEventListener('change', () => {
       pittsburghSelectedMonth = select.value;
-      const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth);
+      const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth)
+        .filter((c) => pittsburghVisibleCategories.has(c.category));
       renderCrimeMarkers(filtered);
     });
     select.dataset.bound = '1';
