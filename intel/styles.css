@@ -378,7 +378,8 @@ body {
 .crime-legend {
   position: absolute;
   bottom: 30px;
-  right: 10px;
+  right: auto;
+  left: 10px;
   z-index: 400;
   background: rgba(0, 0, 0, 0.72);
   backdrop-filter: blur(8px);
