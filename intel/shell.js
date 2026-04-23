@@ -2719,8 +2719,12 @@ function syncPittsburghMonthControl(eligible = false) {
   select.value = pittsburghSelectedMonth;
   select.style.display = 'inline-flex';
 
-  // Show color legend
+  // Show color legend - move it inside the map stage for proper positioning
   if (legend) {
+    const mapStage = document.getElementById('intel-map-stage');
+    if (mapStage && !mapStage.contains(legend)) {
+      mapStage.appendChild(legend);
+    }
     legend.innerHTML = `
       <div class="legend-title">Crime Legend</div>
       <div class="legend-item"><span class="legend-dot" style="background:#d32f2f;"></span> Violent</div>
