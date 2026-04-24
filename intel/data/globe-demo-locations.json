@@ -4,7 +4,7 @@
       "action": "Limit harbor access",
       "locationName": "Los Angeles Port",
       "lat": 33.7292,
-      "lng": -118.2620,
+      "lng": -118.262,
       "adjustmentCount": 10,
       "upgradedCount": 0,
       "downgradedCount": 5,
@@ -12,13 +12,13 @@
       "trustMomentumBand": "negative",
       "recoveryTrustDriverTransitionBalanceEntrenchmentBand": "deterioration-entrenched",
       "recoveryTrustDriverTransitionBalanceRecaptureStreak": 3,
-      "recoveryTrustDriverTransitionBalanceStructuralState": "terminal"
+      "recoveryTrustDriverTransitionBalanceStructuralState": "compromised"
     },
     {
       "action": "Rotate API keys",
       "locationName": "NYC Datacenter",
       "lat": 40.7128,
-      "lng": -74.0060,
+      "lng": -74.006,
       "adjustmentCount": 12,
       "upgradedCount": 8,
       "downgradedCount": 1,

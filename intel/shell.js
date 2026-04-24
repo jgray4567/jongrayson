@@ -3307,7 +3307,7 @@ function initOrUpdateGlobe(items = []) {
       .pointRadius((point) => point.size || (point.kind === 'air' || point.kind === 'satellite' ? 0.15 : 0.25))
       .pointAltitude((point) => point.altitude ?? 0.01)
       .pointLabel('label')
-      .ringsData(hoveredCityPoints)
+      .ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints)
       .ringLat('lat')
       .ringLng('lng')
       .ringColor('ringColor')
@@ -3420,7 +3420,9 @@ function initOrUpdateGlobe(items = []) {
         hoveredCityLabel = point?.kind === 'city' ? point.shortLabel : null;
         globeContainer.style.cursor = point ? 'crosshair' : 'grab';
         if (intelGlobe) {
-          intelGlobe.ringsData(hoveredCityLabel ? currentGlobePointsData.filter((entry) => entry.shortLabel === hoveredCityLabel) : []);
+          const hoveredRings = hoveredCityLabel ? currentGlobePointsData.filter((entry) => entry.shortLabel === hoveredCityLabel) : [];
+          const threatRings = threatLayerEnabled ? getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0) : [];
+          intelGlobe.ringsData([...hoveredRings, ...threatRings]);
         }
       })
       .pointsTransitionDuration(1500)
@@ -3511,7 +3513,7 @@ function initOrUpdateGlobe(items = []) {
   }
   
   intelGlobe.pointsData(pointsData);
-  intelGlobe.ringsData(hoveredCityPoints);
+  intelGlobe.ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints);
   intelGlobe.labelsData([]);
   intelGlobe.htmlElementsData(overlayElements);
   intelGlobe.arcsData(threatLayerEnabled ? getThreatArcElements() : []);
