@@ -50,14 +50,15 @@ body {
 }
 .intel-thin #intel-globe,
 .intel-thin #intel-map-stage {
-  height: 100vh !important;
+  height: 100dvh !important;
 }
 .thin-intel-panel {
   position: absolute;
-  top: 14px;
-  left: 18px;
+  top: calc(18px + env(safe-area-inset-top, 0px));
+  left: calc(18px + env(safe-area-inset-left, 0px));
+  right: calc(18px + env(safe-area-inset-right, 0px));
   z-index: 520;
-  padding: 6px 10px;
+  padding: 4px 10px;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.56);
   border: 1px solid rgba(255,255,255,0.18);
@@ -100,6 +101,20 @@ body {
   height: 18px;
   background: rgba(255,255,255,0.25);
   flex-shrink: 0;
+}
+.sat-orbit-row {
+  position: absolute;
+  top: calc(54px + env(safe-area-inset-top, 0px));
+  left: calc(18px + env(safe-area-inset-left, 0px));
+  z-index: 520;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.56);
+  border: 1px solid rgba(255,255,255,0.18);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .brand-block, .panel, .hero-card, .stage-card {
   border: 1px solid var(--border);
@@ -228,10 +243,10 @@ body {
 }
 .intel-drawer {
   position: fixed;
-  top: 24px;
-  right: 24px;
-  width: min(380px, calc(100vw - 48px));
-  max-height: calc(100vh - 48px);
+  top: calc(24px + env(safe-area-inset-top, 0px));
+  right: calc(24px + env(safe-area-inset-right, 0px));
+  width: min(380px, calc(100vw - 48px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+  max-height: calc(100vh - 48px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   overflow: auto;
   padding: 20px;
   border: 1px solid var(--border-strong);
@@ -351,8 +366,8 @@ body {
 }
 .map-hover-card {
   position: absolute;
-  top: 18px;
-  left: 18px;
+  top: calc(18px + env(safe-area-inset-top, 0px));
+  left: calc(18px + env(safe-area-inset-left, 0px));
   z-index: 900;
   width: min(280px, calc(100% - 36px));
   padding: 14px 16px;
@@ -390,8 +405,13 @@ body {
   color: #fff !important;
   border: 1px solid rgba(255,255,255,0.18) !important;
   backdrop-filter: blur(8px);
-  min-height: 36px;
+  height: 28px;
+  padding: 0 8px;
   font-size: 0.82rem;
+  line-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -409,7 +429,7 @@ body {
 }
 .crime-legend {
   position: absolute;
-  bottom: 30px;
+  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
   left: 18px;
   z-index: 400;
   background: rgba(0, 0, 0, 0.72);
@@ -737,16 +757,15 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   }
   .map-control-btn,
   .map-control-select {
-    min-height: 40px;
+    height: 40px;
+    line-height: 40px;
     font-size: 0.88rem;
     padding: 8px 14px;
   }
   .crime-legend {
-    bottom: auto;
-    top: auto;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     left: 8px;
     right: 8px;
-    bottom: 8px;
     padding: 8px 12px;
     font-size: 0.78rem;
     display: flex;
@@ -784,10 +803,51 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   }
   .intel-drawer {
     top: auto;
-    right: 12px;
-    left: 12px;
-    bottom: 12px;
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    left: calc(12px + env(safe-area-inset-left, 0px));
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     width: auto;
-    max-height: 72vh;
+    max-height: calc(72vh - env(safe-area-inset-bottom, 0px));
+  }
+  .thin-intel-panel {
+    top: calc(8px + env(safe-area-inset-top, 0px));
+    left: calc(8px + env(safe-area-inset-left, 0px));
+    right: calc(8px + env(safe-area-inset-right, 0px));
+    padding: 3px 6px;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .thin-intel-title {
+    font-size: 0.72rem;
+  }
+  .thin-intel-home {
+    width: 24px;
+    height: 24px;
+  }
+  .thin-intel-home svg {
+    width: 12px;
+    height: 12px;
+  }
+  .thin-intel-divider {
+    height: 14px;
+  }
+  .map-control-btn,
+  .map-control-select {
+    height: 28px;
+    line-height: 28px;
+    font-size: 0.72rem;
+    padding: 0 6px;
+  }
+  .sat-orbit-row {
+    top: calc(44px + env(safe-area-inset-top, 0px));
+    left: calc(8px + env(safe-area-inset-left, 0px));
+    padding: 3px 6px;
+    gap: 3px;
+  }
+  .sat-orbit-row .map-control-btn {
+    height: 26px;
+    line-height: 26px;
+    font-size: 0.68rem;
+    padding: 0 5px;
   }
 }

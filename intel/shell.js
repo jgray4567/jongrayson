@@ -2193,7 +2193,7 @@ function syncSatelliteToggle() {
   if (!button) return;
   button.classList.toggle('active', satelliteLayerEnabled);
   if (filters) {
-    filters.style.display = satelliteLayerEnabled ? 'inline-flex' : 'none';
+    filters.style.display = satelliteLayerEnabled ? 'flex' : 'none';
     ['LEO', 'MEO', 'GEO'].forEach(cls => {
       const btn = filters.querySelector(`[data-orbit="${cls}"]`);
       if (btn) {
@@ -3364,11 +3364,11 @@ function initOrUpdateGlobe(items = []) {
         }
         const satOrbitClass = item.raw?.orbitClass || 'LEO';
         const satDotColor = satOrbitClass === 'LEO' ? '0,229,100' : satOrbitClass === 'GEO' ? '255,60,60' : '0,229,255';
-        el.style.width = coarsePointer ? '28px' : '10px';
-        el.style.height = coarsePointer ? '28px' : '10px';
+        el.style.width = '10px';
+        el.style.height = '10px';
         el.style.borderRadius = '999px';
         el.style.background = `rgba(${satDotColor},0.98)`;
-        el.style.boxShadow = coarsePointer ? `0 0 14px rgba(${satDotColor},0.82)` : `0 0 10px rgba(${satDotColor},0.68)`;
+        el.style.boxShadow = `0 0 10px rgba(${satDotColor},0.68)`;
         el.title = item.label || 'Tracked satellite';
         el.addEventListener('click', (event) => {
           event.stopPropagation();
