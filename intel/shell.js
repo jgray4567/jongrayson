@@ -1927,6 +1927,43 @@ function openIntelDrawer(item = {}) {
     return;
   }
 
+  if (item.kind === 'threat') {
+    const threatType = item.type || 'Cyber Threat';
+    const threatCountry = item.country || 'Unknown';
+    const threatCount = item.count || 1;
+    if (titleEl) titleEl.textContent = threatCountry;
+    if (stateEl) {
+      stateEl.textContent = 'threat';
+      stateEl.style.borderColor = '#ff3333';
+      stateEl.style.color = '#ff3333';
+    }
+    if (summaryEl) summaryEl.textContent = `${threatCount} threat${threatCount > 1 ? 's' : ''} detected originating from ${threatCountry}.`;
+    setDrawerImage(null);
+    if (mapEl) {
+      mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Threat source is highlighted on the globe. Click-and-drag to inspect surrounding threat activity.</div>`;
+    }
+    if (metricsEl) {
+      metricsEl.innerHTML = [
+        ['Country', threatCountry],
+        ['Threats', threatCount],
+        ['Source', 'Honeypot Network'],
+        ['Status', 'Active monitoring'],
+        ['Risk Level', threatCount > 10 ? 'High' : threatCount > 5 ? 'Medium' : 'Low']
+      ].map(([label, value]) => `
+        <div class="intel-mini">
+          <div class="intel-mini-label">${label}</div>
+          <div class="intel-mini-value">${value}</div>
+        </div>
+      `).join('');
+    }
+    if (deepEl) deepEl.innerHTML = '';
+    if (selectedQuery) selectedQuery.textContent = threatCountry;
+    if (selectedMeta) selectedMeta.textContent = `${threatCount} threats · ${threatType}`;
+    drawer.classList.add('visible');
+    drawer.setAttribute('aria-hidden', 'false');
+    return;
+  }
+
   if (titleEl) titleEl.textContent = title;
   if (stateEl) {
     stateEl.textContent = state;
@@ -3304,22 +3341,21 @@ function initOrUpdateGlobe(items = []) {
       .arcEndLat('tgtLat')
       .arcEndLng('tgtLng')
       .arcColor(arc => {
-        const colors = [
-          ['#ff3333', '#ff6644'],   // SSH Brute Force - red/orange
-          ['#ff8833', '#ffaa33'],   // Port Scan - orange
-          ['#ff33ff', '#ff66cc'],   // Malware C2 - magenta
-          ['#ff3333', '#ff9933'],   // Web Exploit - red/orange
-          ['#ffcc00', '#ff6600'],   // DDoS - yellow/orange
-          ['#ff0066', '#ff3399'],   // Ransomware Probe - hot pink
-        ];
-        const typeIndex = ['SSH Brute Force','Port Scan','Malware C2','Web Exploit','DDoS','Ransomware Probe'].indexOf(arc.type);
-        return colors[typeIndex % colors.length];
+        const typeColors = {
+          'SSH Brute Force': '#ff4444',
+          'Port Scan': '#ff8833',
+          'Malware C2': '#ff33ff',
+          'Web Exploit': '#ff5544',
+          'DDoS': '#ffcc00',
+          'Ransomware Probe': '#ff0066'
+        };
+        return typeColors[arc.type] || '#ff3333';
       })
-      .arcStroke(threatLayerEnabled ? 0.8 : 0)
-      .arcAltitude(threatLayerEnabled ? 0.25 : 0)
-      .arcDashLength(threatLayerEnabled ? 0.4 : 0)
-      .arcDashGap(threatLayerEnabled ? 0.2 : 0)
-      .arcDashAnimateTime(threatLayerEnabled ? 2000 : 0)
+      .arcStroke(0.8)
+      .arcAltitude(0.25)
+      .arcDashLength(0.4)
+      .arcDashGap(0.2)
+      .arcDashAnimateTime(2000)
       .pathsData(overlayPaths)
       .pathPoints('points')
       .pathPointLat('lat')
