@@ -31,6 +31,11 @@ let threatLayerEnabled = false;
 let threatArcData = [];
 let threatHotspots = [];
 
+function isNightTime() {
+  const hour = new Date().getHours();
+  return hour >= 19 || hour < 6; // 7pm–6am
+}
+
 let mapHoverCard = null;
 let mapHoverHideTimer = null;
 let airLayerEnabled = false;
@@ -2233,21 +2238,47 @@ function getThreatArcElements() {
 }
 
 function getThreatHotspotPoints() {
-  if (!threatLayerEnabled || threatHotspots.length === 0) return [];
-  return threatHotspots.map(hs => ({
-    kind: 'threat',
-    lat: hs.lat,
-    lng: hs.lng,
-    size: Math.min(1.2, 0.3 + (hs.count * 0.15)),
-    color: '#ff3333',
-    ringColor: '#ff3333',
-    ringMaxRadius: 2 + hs.count * 0.5,
-    ringPropagationSpeed: 2,
-    ringRepeatPeriod: 800,
-    label: `<div style="text-align:center;color:#ff3333"><strong>${hs.name}</strong><br/>${hs.count} threats</div>`,
-    shortLabel: hs.name,
-    raw: { kind: 'threat', type: 'Hotspot', country: hs.name, count: hs.count }
-  }));
+  if (!threatLayerEnabled) return [];
+  const points = [];
+  // Pulsing rings for top hotspots
+  threatHotspots.forEach(hs => {
+    points.push({
+      kind: 'threat',
+      lat: hs.lat,
+      lng: hs.lng,
+      size: Math.min(1.2, 0.3 + (hs.count * 0.15)),
+      color: '#ff3333',
+      ringColor: '#ff3333',
+      ringMaxRadius: 2 + hs.count * 0.5,
+      ringPropagationSpeed: 2,
+      ringRepeatPeriod: 800,
+      label: `<div style="text-align:center;color:#ff3333"><strong>${hs.name}</strong><br/>${hs.count} threats</div>`,
+      shortLabel: hs.name,
+      raw: { kind: 'threat', type: 'Hotspot', country: hs.name, count: hs.count }
+    });
+  });
+  // Small steady dots at every unique arc origin so arcs always start from a visible point
+  const seen = new Set();
+  threatArcData.forEach(arc => {
+    const key = `${arc.srcLat},${arc.srcLng}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    points.push({
+      kind: 'threat',
+      lat: arc.srcLat,
+      lng: arc.srcLng,
+      size: 0.35,
+      color: '#ff6644',
+      ringColor: '#ff6644',
+      ringMaxRadius: 0,
+      ringPropagationSpeed: 0,
+      ringRepeatPeriod: 0,
+      label: `<div style="text-align:center;color:#ff6644"><strong>${arc.srcCountry}</strong><br/>${arc.type}</div>`,
+      shortLabel: arc.srcCountry,
+      raw: { kind: 'threat', type: arc.type, country: arc.srcCountry, count: 1 }
+    });
+  });
+  return points;
 }
 
 async function refreshAirTraffic() {
@@ -2675,6 +2706,16 @@ function setGlobeAutoRotate(enabled) {
   }
   setGlobeOverlayVisibility(enabled);
 }
+
+function updateGlobeTexture() {
+  if (!intelGlobe) return;
+  const nightUrl = '//unpkg.com/three-globe/example/img/earth-night.jpg';
+  const dayUrl = '//unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
+  intelGlobe.globeImageUrl(isNightTime() ? nightUrl : dayUrl);
+}
+
+// Swap globe texture on the hour to match day/night
+setInterval(updateGlobeTexture, 60 * 60 * 1000);
 
 function setGlobeOverlayVisibility(visible) {
   const title = document.getElementById('globe-floating-title');
@@ -3258,7 +3299,7 @@ function initOrUpdateGlobe(items = []) {
 
   if (!intelGlobe) {
     intelGlobe = Globe()(globeContainer)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
+      .globeImageUrl(isNightTime() ? '//unpkg.com/three-globe/example/img/earth-night.jpg' : '//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .backgroundColor('rgba(0,0,0,0)')
       .pointLat('lat')
       .pointLng('lng')
@@ -3351,7 +3392,7 @@ function initOrUpdateGlobe(items = []) {
         };
         return typeColors[arc.type] || '#ff3333';
       })
-      .arcStroke(0.8)
+      .arcStroke(0.15)
       .arcAltitude(0.25)
       .arcDashLength(0.4)
       .arcDashGap(0.2)
