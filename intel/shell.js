@@ -27,6 +27,9 @@ let pittsburghCrimesData = [];
 let pittsburghCrimesLayer = null;
 let pittsburghSelectedMonth = null;
 let pittsburghVisibleCategories = new Set(['Violent', 'Property', 'Drug', 'Other']);
+let threatLayerEnabled = false;
+let threatArcData = [];
+let threatHotspots = [];
 
 let mapHoverCard = null;
 let mapHoverHideTimer = null;
@@ -2160,6 +2163,56 @@ function syncSatelliteToggle() {
   }
 }
 
+async function refreshThreatFeed() {
+  if (!threatLayerEnabled) {
+    threatArcData = [];
+    threatHotspots = [];
+    return;
+  }
+  try {
+    const data = await fetchJson('api/threat-feed.php');
+    threatArcData = data.arcs || [];
+    threatHotspots = data.hotspots || [];
+  } catch {
+    threatArcData = [];
+    threatHotspots = [];
+  }
+}
+
+function getThreatArcElements() {
+  if (!threatLayerEnabled || threatArcData.length === 0) return [];
+  // Convert threat arcs into three-globe arc format
+  return threatArcData.map(arc => ({
+    kind: 'threat',
+    srcLat: arc.srcLat,
+    srcLng: arc.srcLng,
+    tgtLat: arc.tgtLat,
+    tgtLng: arc.tgtLng,
+    type: arc.type,
+    intensity: arc.intensity,
+    label: `<div style="text-align:center"><strong>${arc.type}</strong><br/>${arc.srcCountry} → ${arc.tgtName}</div>`,
+    raw: arc
+  }));
+}
+
+function getThreatHotspotPoints() {
+  if (!threatLayerEnabled || threatHotspots.length === 0) return [];
+  return threatHotspots.map(hs => ({
+    kind: 'threat',
+    lat: hs.lat,
+    lng: hs.lng,
+    size: Math.min(1.2, 0.3 + (hs.count * 0.15)),
+    color: '#ff3333',
+    ringColor: '#ff3333',
+    ringMaxRadius: 2 + hs.count * 0.5,
+    ringPropagationSpeed: 2,
+    ringRepeatPeriod: 800,
+    label: `<div style="text-align:center;color:#ff3333"><strong>${hs.name}</strong><br/>${hs.count} threats</div>`,
+    shortLabel: hs.name,
+    raw: { kind: 'threat', type: 'Hotspot', country: hs.name, count: hs.count }
+  }));
+}
+
 async function refreshAirTraffic() {
   if (!airLayerEnabled) {
     currentAirTrafficItems = [];
@@ -2458,6 +2511,19 @@ function initializeCommandSurface() {
       initOrUpdateGlobe(currentGlobeBaseItems || []);
     });
     satelliteButton.dataset.bound = '1';
+  }
+
+  const threatButton = document.getElementById('toggle-threat-layer');
+  if (threatButton && !threatButton.dataset.bound) {
+    threatButton.addEventListener('click', async () => {
+      threatLayerEnabled = !threatLayerEnabled;
+      threatButton.classList.toggle('active', threatLayerEnabled);
+      if (threatLayerEnabled && threatArcData.length === 0) {
+        await refreshThreatFeed();
+      }
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    });
+    threatButton.dataset.bound = '1';
   }
 
   document.querySelectorAll('[data-orbit]').forEach(btn => {
@@ -3149,7 +3215,7 @@ function initOrUpdateGlobe(items = []) {
   const overlayElements = [...airElements, ...satelliteElements];
   const overlayPaths = [...airPaths, ...satellitePaths];
   const hoveredCityPoints = hoveredCityLabel ? cityPoints.filter((point) => point.shortLabel === hoveredCityLabel) : [];
-  const pointsData = [...cityPoints, ...airElements.map(a => ({ ...a, kind: 'air', raw: a.raw || a })), ...satelliteElements.map(s => ({ ...s, kind: 'satellite', raw: s.raw || s }))];
+  const pointsData = [...cityPoints, ...airElements.map(a => ({ ...a, kind: 'air', raw: a.raw || a })), ...satelliteElements.map(s => ({ ...s, kind: 'satellite', raw: s.raw || s })), ...getThreatHotspotPoints()];
 
   currentGlobePointsData = cityPoints;
 
@@ -3232,6 +3298,28 @@ function initOrUpdateGlobe(items = []) {
         });
         return el;
       })
+      .arcsData(threatLayerEnabled ? getThreatArcElements() : [])
+      .arcStartLat('srcLat')
+      .arcStartLng('srcLng')
+      .arcEndLat('tgtLat')
+      .arcEndLng('tgtLng')
+      .arcColor(arc => {
+        const colors = [
+          ['#ff3333', '#ff6644'],   // SSH Brute Force - red/orange
+          ['#ff8833', '#ffaa33'],   // Port Scan - orange
+          ['#ff33ff', '#ff66cc'],   // Malware C2 - magenta
+          ['#ff3333', '#ff9933'],   // Web Exploit - red/orange
+          ['#ffcc00', '#ff6600'],   // DDoS - yellow/orange
+          ['#ff0066', '#ff3399'],   // Ransomware Probe - hot pink
+        ];
+        const typeIndex = ['SSH Brute Force','Port Scan','Malware C2','Web Exploit','DDoS','Ransomware Probe'].indexOf(arc.type);
+        return colors[typeIndex % colors.length];
+      })
+      .arcStroke(threatLayerEnabled ? 0.8 : 0)
+      .arcAltitude(threatLayerEnabled ? 0.25 : 0)
+      .arcDashLength(threatLayerEnabled ? 0.4 : 0)
+      .arcDashGap(threatLayerEnabled ? 0.2 : 0)
+      .arcDashAnimateTime(threatLayerEnabled ? 2000 : 0)
       .pathsData(overlayPaths)
       .pathPoints('points')
       .pathPointLat('lat')
@@ -3241,7 +3329,7 @@ function initOrUpdateGlobe(items = []) {
       .pathStroke(() => null)
       .pathResolution(() => 2)
       .onPointClick((point) => {
-        if (point?.kind === 'city' || point?.kind === 'satellite' || point?.kind === 'air') {
+        if (point?.kind === 'city' || point?.kind === 'satellite' || point?.kind === 'air' || point?.kind === 'threat') {
           if (point.kind === 'air') {
             selectedAirIcao24 = point.raw?.icao24 || null;
           }
@@ -3349,6 +3437,7 @@ function initOrUpdateGlobe(items = []) {
   intelGlobe.ringsData(hoveredCityPoints);
   intelGlobe.labelsData([]);
   intelGlobe.htmlElementsData(overlayElements);
+  intelGlobe.arcsData(threatLayerEnabled ? getThreatArcElements() : []);
   intelGlobe.pathsData(overlayPaths);
   updateGlobeLabelVisibility();
 

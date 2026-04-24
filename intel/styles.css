@@ -702,6 +702,17 @@ body {
   color: var(--bg);
   border-color: var(--lime);
 }
+#toggle-threat-layer.active {
+  background: rgba(255,51,51,0.85) !important;
+  border-color: #ff3333 !important;
+  color: #fff !important;
+  box-shadow: 0 0 12px rgba(255,51,51,0.5);
+  animation: threat-pulse 2s ease-in-out infinite;
+}
+@keyframes threat-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(255,51,51,0.4); }
+  50% { box-shadow: 0 0 18px rgba(255,51,51,0.7); }
+}
 @keyframes pulse {
   0% { opacity: 0.4; }
   50% { opacity: 1; }
