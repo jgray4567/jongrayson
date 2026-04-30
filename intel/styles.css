@@ -45,7 +45,7 @@ body {
 }
 .intel-thin #global-operations-card {
   width: 100vw;
-  height: 100vh !important;
+  height: 100dvh !important;
   border-radius: 0 !important;
 }
 .intel-thin #intel-globe,
@@ -273,6 +273,16 @@ body {
   justify-content: space-between;
   gap: 12px;
 }
+.intel-airline-logo {
+  height: 28px;
+  width: auto;
+  max-width: 72px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 4px;
+  background: #fff;
+  padding: 4px 6px;
+}
 .intel-drawer-aside {
   display: flex;
   flex-direction: column;
@@ -316,10 +326,11 @@ body {
   background: rgba(255,255,255,0.04);
 }
 .intel-drawer-title {
-  margin-top: 8px;
-  font-size: 1.6rem;
+  margin-top: 4px;
+  font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 .intel-state-chip {
   display: inline-flex;
@@ -340,13 +351,16 @@ body {
   border-radius: 8px;
   overflow: hidden;
   background: rgba(255,255,255,0.02);
-  min-height: 220px;
+  min-height: 0;
 }
 .intel-map-preview iframe {
   width: 100%;
-  height: 220px;
+  height: 160px;
   border: 0;
   display: block;
+}
+.intel-map-preview:empty {
+  display: none;
 }
 #intel-globe,
 #intel-globe canvas,
@@ -426,6 +440,12 @@ body {
   font-size: 0.82rem;
   -webkit-appearance: none;
   appearance: none;
+}
+#toggle-danger-zones.active {
+  background: rgba(255,23,68,0.85) !important;
+  border-color: #ff1744 !important;
+  color: #fff !important;
+  box-shadow: 0 0 10px rgba(255,23,68,0.4);
 }
 .crime-legend {
   position: absolute;
@@ -764,8 +784,9 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   }
   .crime-legend {
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-    left: 8px;
-    right: 8px;
+    left: calc(8px + env(safe-area-inset-left, 0px));
+    right: auto;
+    width: fit-content;
     padding: 8px 12px;
     font-size: 0.78rem;
     display: flex;
@@ -808,6 +829,31 @@ body[data-interaction-mode="mobile"] .map-hover-card {
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     width: auto;
     max-height: calc(72vh - env(safe-area-inset-bottom, 0px));
+    padding: 14px;
+  }
+  .intel-drawer-title {
+    font-size: 1.1rem;
+    margin-top: 2px;
+  }
+  .intel-state-chip {
+    margin-top: 8px;
+    padding: 4px 8px;
+    font-size: 0.68rem;
+  }
+  .intel-map-preview {
+    min-height: 0;
+  }
+  .intel-map-preview iframe {
+    height: 120px;
+  }
+  .intel-mini {
+    padding: 8px;
+  }
+  .intel-mini-label {
+    font-size: 0.68rem;
+  }
+  .intel-mini-value {
+    font-size: 0.82rem;
   }
   .thin-intel-panel {
     top: calc(8px + env(safe-area-inset-top, 0px));

@@ -14,7 +14,7 @@ header('Content-Type: application/json');
 header('X-Content-Type-Options: nosniff');
 
 // ── CONFIG ─────────────────────────────────────────────
-define('TO_EMAIL',    'jsguxd@gmail.com');
+define('TO_EMAIL',    'jon@jongrayson.com');
 // IMPORTANT: FROM must be an address on your DreamHost-hosted domain
 // This is what fixes silent delivery failure on shared hosting
 define('FROM_EMAIL',  'noreply@jongrayson.com');

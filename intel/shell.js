@@ -25,6 +25,8 @@ let pittsburghZoneStatsData = null;
 let pittsburghZonesVisible = true;
 let pittsburghCrimesData = [];
 let pittsburghCrimesLayer = null;
+let pittsburghDangerLayer = null;
+let pittsburghDangerVisible = false;
 let pittsburghSelectedMonth = null;
 let pittsburghVisibleCategories = new Set(['Violent', 'Property', 'Drug', 'Other']);
 let threatLayerEnabled = false;
@@ -1801,6 +1803,9 @@ function openIntelDrawer(item = {}) {
   const drawer = document.getElementById('intel-activation-panel');
   if (!drawer) return;
 
+  const airlineLogoEl = document.getElementById('intel-drawer-airline-logo');
+  if (airlineLogoEl) { airlineLogoEl.style.display = 'none'; airlineLogoEl.src = ''; }
+
   const state = item.recoveryTrustDriverTransitionBalanceStructuralState || 'neutral';
   const title = item.locationName || item.action || item.name || 'Activated point';
   const summary = item.reason
@@ -1858,6 +1863,27 @@ function openIntelDrawer(item = {}) {
 
     fetchFlightDetail(item.callsign).then((detail) => {
       if (!detail || titleEl?.textContent !== aircraftTitle) return;
+      // Fetch airline logo
+      if (airlineLogoEl && detail.airline) {
+        fetch(`api/airline-logos.php?callsign=${encodeURIComponent(item.callsign || '')}&airline=${encodeURIComponent(detail.airline)}&w=80&h=32`)
+          .then(r => r.json())
+          .then(logoData => {
+            if (logoData?.logoUrl) {
+              airlineLogoEl.src = logoData.logoUrl;
+              airlineLogoEl.style.display = 'block';
+              airlineLogoEl.onerror = () => {
+                // Try local SVG fallback if external logo 404s
+                const fallback = `airline-logos/${logoData.iata}.svg`;
+                if (airlineLogoEl.src !== fallback && logoData.iata) {
+                  airlineLogoEl.src = fallback;
+                } else {
+                  airlineLogoEl.style.display = 'none';
+                }
+              };
+            }
+          })
+          .catch(() => {});
+      }
       if (summaryEl) {
         summaryEl.textContent = `${detail.airline || item.country || 'Public air traffic'} ${detail.flightNumber || aircraftTitle} from ${detail.departure?.location || detail.departure?.iata || 'unknown departure'} to ${detail.destination?.location || detail.destination?.iata || 'unknown destination'}.`;
       }
@@ -2618,6 +2644,13 @@ function initializeCommandSurface() {
     zoneButton.dataset.bound = '1';
   }
 
+  const dangerBtn = document.getElementById('toggle-danger-zones');
+  const dangerRow = document.getElementById('crime-threat-row');
+  if (dangerBtn && !dangerBtn.dataset.bound) {
+    dangerBtn.addEventListener('click', toggleDangerZones);
+    dangerBtn.dataset.bound = '1';
+  }
+
   if (baselineRecommendationActions && !baselineRecommendationActions.dataset.drawerBound) {
     baselineRecommendationActions.addEventListener('click', (event) => {
       const chip = event.target.closest('[data-baseline-recommendation]');
@@ -2839,6 +2872,75 @@ function renderCrimeMarkers(crimes) {
   pittsburghCrimesLayer.addTo(cityMapInstance);
 }
 
+function renderDangerZones(predictions) {
+  if (pittsburghDangerLayer) {
+    cityMapInstance.removeLayer(pittsburghDangerLayer);
+  }
+  pittsburghDangerLayer = L.layerGroup();
+  predictions.forEach((pred) => {
+    const radius = pred.threatLevel === 'high' ? 22 : pred.threatLevel === 'medium' ? 16 : 10;
+    const fillColor = pred.threatLevel === 'high' ? '#ff1744' : pred.threatLevel === 'medium' ? '#ff9100' : '#ffea00';
+    const fillOpacity = pred.threatLevel === 'high' ? 0.45 : pred.threatLevel === 'medium' ? 0.35 : 0.25;
+    const pulse = pred.threatLevel === 'high' ? '<style>.danger-pulse{animation:dpulse 2s ease-in-out infinite}@keyframes dpulse{0%,100%{opacity:0.45}50%{opacity:0.7}}</style>' : '';
+    const marker = L.circleMarker([pred.lat, pred.lng], {
+      radius,
+      stroke: true,
+      color: fillColor,
+      weight: pred.threatLevel === 'high' ? 2 : 1,
+      fillOpacity,
+      fillColor,
+      className: pred.threatLevel === 'high' ? 'danger-pulse' : ''
+    });
+    marker.bindPopup(`
+      <div style="min-width:220px; color:#111;">
+        ${pulse}
+        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">Predicted Danger Zone</div>
+        <div style="font-size:1rem; font-weight:700; margin-top:6px; color:${fillColor};">${pred.threatLevel.toUpperCase()} RISK</div>
+        <div style="font-size:0.92rem; font-weight:600; margin-top:4px;">Danger Score: ${pred.dangerScore}/100</div>
+        <div style="margin-top:8px; font-size:0.85rem;">
+          <div>Active incidents: ${pred.incidentsNow} (${pred.violentNow} violent)</div>
+          <div>Today's total: ${pred.incidentsToday}</div>
+          <div>Peak hour: ${String(pred.peakHour).padStart(2, '0')}:00</div>
+          <div>Top category: ${pred.topCategory}</div>
+          <div>Window: ${pred.hourWindow || 'current'}</div>
+        </div>
+        <div style="margin-top:8px; font-size:0.75rem; opacity:0.6; border-top:1px solid rgba(0,0,0,0.1); padding-top:6px;">
+          Based on ${pred.dow} historical patterns ±2hrs
+        </div>
+      </div>
+    `);
+    marker.on('click', (event) => {
+      if (event.originalEvent && typeof L !== 'undefined') {
+        L.DomEvent.stop(event.originalEvent);
+      }
+      marker.openPopup();
+    });
+    pittsburghDangerLayer.addLayer(marker);
+  });
+  pittsburghDangerLayer.addTo(cityMapInstance);
+}
+
+function toggleDangerZones() {
+  if (!cityMapInstance) return;
+  if (pittsburghDangerVisible) {
+    if (pittsburghDangerLayer) cityMapInstance.removeLayer(pittsburghDangerLayer);
+    pittsburghDangerVisible = false;
+    const btn = document.getElementById('toggle-danger-zones');
+    if (btn) btn.classList.remove('active');
+    return;
+  }
+  fetchJson('api/crime-predict.php')
+    .then((data) => {
+      if (!data?.predictions?.length) return;
+      renderDangerZones(data.predictions);
+      pittsburghDangerVisible = true;
+      const btn = document.getElementById('toggle-danger-zones');
+      if (btn) btn.classList.add('active');
+    })
+    .catch(console.error);
+}
+
+
 function syncPittsburghMonthControl(eligible = false) {
   const monthSelect = document.getElementById('pittsburgh-month-select');
   const legend = document.getElementById('crime-legend');
@@ -3022,6 +3124,10 @@ function syncPittsburghZoneToggle(visible, eligible = false) {
     button.style.display = eligible ? 'inline-flex' : 'none';
     button.textContent = visible ? 'Zones On' : 'Zones Off';
   }
+  const dangerBtn = document.getElementById('toggle-danger-zones');
+  const dangerRow = document.getElementById('crime-threat-row');
+  if (dangerBtn) dangerBtn.style.display = eligible ? 'inline-flex' : 'none';
+  if (dangerRow) dangerRow.style.display = eligible ? 'flex' : 'none';
   syncPittsburghYearControl(eligible);
   if (!eligible) {
     const ms = document.getElementById('pittsburgh-month-select');
@@ -3230,6 +3336,8 @@ function showGlobeStage() {
   mapStage.style.display = 'none';
   updatePrimaryStageHeight();
   destroyCityMap();
+  if (pittsburghDangerLayer) { cityMapInstance?.removeLayer(pittsburghDangerLayer); pittsburghDangerLayer = null; }
+  pittsburghDangerVisible = false;
   mapStage.innerHTML = '';
   syncPittsburghZoneToggle(true, false);
   if (title) {
@@ -3304,7 +3412,11 @@ function initOrUpdateGlobe(items = []) {
       .pointLat('lat')
       .pointLng('lng')
       .pointColor((point) => point.color || (point.kind === 'air' ? 'rgba(210,255,84,0.01)' : point.kind === 'satellite' ? 'rgba(0,229,255,0.01)' : '#00e5ff'))
-      .pointRadius((point) => point.size || (point.kind === 'air' || point.kind === 'satellite' ? 0.15 : 0.25))
+      .pointRadius((point) => {
+        if (point.kind === 'air' || point.kind === 'satellite') return hasCoarsePointer() ? 0.6 : 0.15;
+        if (point.kind === 'threat') return point.size || 0.35;
+        return point.size || 0.25;
+      })
       .pointAltitude((point) => point.altitude ?? 0.01)
       .pointLabel('label')
       .ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints)
@@ -3334,8 +3446,8 @@ function initOrUpdateGlobe(items = []) {
         el.style.display = 'grid';
         el.style.placeItems = 'center';
         if (item.kind === 'air') {
-          el.style.width = coarsePointer ? '36px' : '18px';
-          el.style.height = coarsePointer ? '36px' : '18px';
+          el.style.width = coarsePointer ? '44px' : '18px';
+          el.style.height = coarsePointer ? '44px' : '18px';
           el.style.opacity = String(item.opacity ?? 1);
           el.innerHTML = buildPlaneSvg(item.heading || 0);
           el.title = item.label || 'Tracked aircraft';
@@ -3369,11 +3481,38 @@ function initOrUpdateGlobe(items = []) {
         el.style.borderRadius = '999px';
         el.style.background = `rgba(${satDotColor},0.98)`;
         el.style.boxShadow = `0 0 10px rgba(${satDotColor},0.68)`;
+        if (coarsePointer) {
+          // Keep visual dot at 10px, expand tap area to 44px
+          el.style.width = '44px';
+          el.style.height = '44px';
+          el.style.display = 'flex';
+          el.style.alignItems = 'center';
+          el.style.justifyContent = 'center';
+          el.style.background = 'transparent';
+          el.style.borderRadius = '999px';
+          el.style.boxShadow = 'none';
+          const innerDot = document.createElement('div');
+          innerDot.style.width = '10px';
+          innerDot.style.height = '10px';
+          innerDot.style.borderRadius = '999px';
+          innerDot.style.background = `rgba(${satDotColor},0.98)`;
+          innerDot.style.boxShadow = `0 0 10px rgba(${satDotColor},0.68)`;
+          innerDot.style.pointerEvents = 'none';
+          el.appendChild(innerDot);
+        }
         el.title = item.label || 'Tracked satellite';
         el.addEventListener('click', (event) => {
           event.stopPropagation();
+          event.preventDefault();
           openIntelDrawer(item.raw || {});
         });
+        if (hasCoarsePointer()) {
+          el.addEventListener('touchend', (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            openIntelDrawer(item.raw || {});
+          }, { passive: false });
+        }
         return el;
       })
       .arcsData(threatLayerEnabled ? getThreatArcElements() : [])
