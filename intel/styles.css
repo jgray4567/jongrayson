@@ -276,7 +276,7 @@ body {
 .intel-airline-logo {
   height: 42px;
   width: auto;
-  max-width: 100px;
+  max-width: 130px;
   object-fit: contain;
   flex-shrink: 0;
   border-radius: 4px;
