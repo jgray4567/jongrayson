@@ -1865,7 +1865,7 @@ function openIntelDrawer(item = {}) {
       if (!detail || titleEl?.textContent !== aircraftTitle) return;
       // Fetch airline logo
       if (airlineLogoEl && detail.airline) {
-        fetch(`api/airline-logos.php?callsign=${encodeURIComponent(item.callsign || '')}&airline=${encodeURIComponent(detail.airline)}&w=80&h=32`)
+        fetch(`api/airline-logos.php?callsign=${encodeURIComponent(item.callsign || '')}&airline=${encodeURIComponent(detail.airline)}&w=120&h=48`)
           .then(r => r.json())
           .then(logoData => {
             if (logoData?.logoUrl) {

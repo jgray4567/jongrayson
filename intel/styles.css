@@ -274,14 +274,14 @@ body {
   gap: 12px;
 }
 .intel-airline-logo {
-  height: 28px;
+  height: 42px;
   width: auto;
-  max-width: 72px;
+  max-width: 100px;
   object-fit: contain;
   flex-shrink: 0;
   border-radius: 4px;
   background: #fff;
-  padding: 4px 6px;
+  padding: 6px 8px;
 }
 .intel-drawer-aside {
   display: flex;
