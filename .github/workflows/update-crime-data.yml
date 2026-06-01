@@ -27,11 +27,11 @@ jobs:
           git add intel/data/pittsburgh/daily_crimes.json
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update daily crime data" && git push)
 
-      - name: Deploy JSON to DreamHost
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./intel/data/pittsburgh/
-          server-dir: ./jongrayson.com/intel/data/pittsburgh/
+      - name: Deploy JSON to DreamHost via SFTP (lftp)
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y lftp
+          lftp -c "set sftp:auto-confirm yes; open sftp://${FTP_USERNAME}:${FTP_PASSWORD}@${FTP_SERVER}; mirror -R ./intel/data/pittsburgh/ ./jongrayson.com/intel/data/pittsburgh/"
