@@ -2,6 +2,9 @@ name: Deploy Site to DreamHost
 
 on:
   workflow_dispatch: # Allows manual trigger
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -10,13 +13,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy to DreamHost via SFTP
-        uses: appleboy/scp-action@v0.1.7
+      - name: Deploy to DreamHost via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          host: ${{ secrets.FTP_SERVER }}
+          server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          source: "*"
-          target: "./jongrayson.com/"
-          rm: false
-          strip_components: 0
+          protocol: ftp
+          port: 21
+          local-dir: ./
+          server-dir: ./jongrayson.com/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .github/**
+            intel/data/**
