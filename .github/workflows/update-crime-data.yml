@@ -5,6 +5,9 @@ on:
     - cron: '0 8 * * *' # Runs daily at 8:00 AM UTC (4:00 AM EDT)
   workflow_dispatch: # Allows you to run it manually
 
+permissions:
+  contents: write
+
 jobs:
   scrape-and-update:
     runs-on: ubuntu-latest
