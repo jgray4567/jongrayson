@@ -78,7 +78,27 @@ if (empty($bootstrapMatch[1])) {
 $bootstrap = json_decode($bootstrapMatch[1], true);
 $flights = $bootstrap['flights'] ?? [];
 $firstBucket = is_array($flights) ? reset($flights) : null;
-$flight = $firstBucket['activityLog']['flights'][0] ?? null;
+$activityLog = $firstBucket['activityLog']['flights'] ?? [];
+
+$flight = null;
+foreach ($activityLog as $f) {
+    $status = strtolower($f['flightStatus'] ?? '');
+    if (strpos($status, 'airborne') !== false || strpos($status, 'en route') !== false || strpos($status, 'enroute') !== false) {
+        $flight = $f;
+        break;
+    }
+}
+if (!$flight) {
+    foreach ($activityLog as $f) {
+        if (!empty($f['takeoffTimes']['actual'])) {
+            $flight = $f;
+            break;
+        }
+    }
+}
+if (!$flight && !empty($activityLog)) {
+    $flight = $activityLog[0];
+}
 
 if (!is_array($flight)) {
     http_response_code(404);
