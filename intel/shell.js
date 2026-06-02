@@ -2645,7 +2645,6 @@ function initializeCommandSurface() {
   }
 
   const dangerBtn = document.getElementById('toggle-danger-zones');
-  const dangerRow = document.getElementById('crime-threat-row');
   if (dangerBtn && !dangerBtn.dataset.bound) {
     dangerBtn.addEventListener('click', toggleDangerZones);
     dangerBtn.dataset.bound = '1';
@@ -3144,9 +3143,7 @@ function syncPittsburghZoneToggle(visible, eligible = false) {
     button.textContent = visible ? 'Zones On' : 'Zones Off';
   }
   const dangerBtn = document.getElementById('toggle-danger-zones');
-  const dangerRow = document.getElementById('crime-threat-row');
   if (dangerBtn) dangerBtn.style.display = eligible ? 'inline-flex' : 'none';
-  if (dangerRow) dangerRow.style.display = eligible ? 'flex' : 'none';
   syncPittsburghYearControl(eligible);
   if (!eligible) {
     const ms = document.getElementById('pittsburgh-month-select');
