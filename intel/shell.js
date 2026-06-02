@@ -2751,6 +2751,7 @@ function updateGlobeTexture() {
 setInterval(updateGlobeTexture, 60 * 60 * 1000);
 
 function setGlobeOverlayVisibility(visible) {
+  const threatButton = document.getElementById('toggle-threat-layer');
   const title = document.getElementById('globe-floating-title');
   if (title) title.style.opacity = visible ? '1' : '0';
 }
@@ -3303,6 +3304,7 @@ function showMapStage(item = {}) {
   const rotationButton = document.getElementById('toggle-globe-rotation');
   const airButton = document.getElementById('toggle-air-layer');
   const satelliteButton = document.getElementById('toggle-satellite-layer');
+  const threatButton = document.getElementById('toggle-threat-layer');
   const title = document.getElementById('globe-floating-title');
   if (!globe || !mapStage || typeof item.lat !== 'number' || typeof item.lng !== 'number') return;
 
@@ -3319,6 +3321,7 @@ function showMapStage(item = {}) {
   if (rotationButton) rotationButton.style.display = 'none';
   if (airButton) airButton.style.display = 'none';
   if (satelliteButton) satelliteButton.style.display = 'none';
+  if (threatButton) threatButton.style.display = 'none';
   const satOrbitFilters = document.getElementById('sat-orbit-filters');
   if (satOrbitFilters) satOrbitFilters.style.display = 'none';
 }
@@ -3329,6 +3332,7 @@ function showGlobeStage() {
   const returnButton = document.getElementById('return-to-globe');
   const airButton = document.getElementById('toggle-air-layer');
   const satelliteButton = document.getElementById('toggle-satellite-layer');
+  const threatButton = document.getElementById('toggle-threat-layer');
   const title = document.getElementById('globe-floating-title');
   if (!globe || !mapStage) return;
 
@@ -3347,6 +3351,7 @@ function showGlobeStage() {
   if (returnButton) returnButton.style.display = 'none';
   if (airButton) airButton.style.display = 'inline-flex';
   if (satelliteButton) satelliteButton.style.display = 'inline-flex';
+  if (threatButton) threatButton.style.display = 'inline-flex';
   const satOrbitFilters = document.getElementById('sat-orbit-filters');
   if (satOrbitFilters && satelliteLayerEnabled) satOrbitFilters.style.display = 'inline-flex';
   if (!globeAutoRotateEnabled) {
