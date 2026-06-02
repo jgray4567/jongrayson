@@ -2979,14 +2979,32 @@ function syncPittsburghMonthControl(eligible = false) {
     if (mapStage && !mapStage.contains(legend)) {
       mapStage.appendChild(legend);
     }
+    const isExpanded = window.pittsburghLegendExpanded === true;
+    const getStyle = (cat) => pittsburghVisibleCategories.has(cat) ? 'opacity:1;text-decoration:none;' : 'opacity:0.35;text-decoration:line-through;';
+    
     legend.innerHTML = `
-      <div class="legend-title">Crime Legend</div>
-      <div class="legend-item legend-toggle" data-category="Violent" style="cursor:pointer;"><span class="legend-dot" style="background:#d32f2f;"></span> Violent</div>
-      <div class="legend-item legend-toggle" data-category="Property" style="cursor:pointer;"><span class="legend-dot" style="background:#1976d2;"></span> Property</div>
-      <div class="legend-item legend-toggle" data-category="Drug" style="cursor:pointer;"><span class="legend-dot" style="background:#388e3c;"></span> Drug</div>
-      <div class="legend-item legend-toggle" data-category="Other" style="cursor:pointer;"><span class="legend-dot" style="background:#757575;"></span> Other</div>
+      <div class="legend-header" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; font-size:0.72rem; opacity:0.9;">
+        <span>Crime Legend</span>
+        <svg class="legend-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; margin-left: 12px; transform: ${isExpanded ? 'rotate(0deg)' : 'rotate(180deg)'};"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="legend-content" style="display:${isExpanded ? 'flex' : 'none'}; flex-wrap: wrap; gap: 0 14px; margin-top:8px;">
+        <div class="legend-item legend-toggle" data-category="Violent" style="cursor:pointer; ${getStyle('Violent')}"><span class="legend-dot" style="background:#d32f2f;"></span> Violent</div>
+        <div class="legend-item legend-toggle" data-category="Property" style="cursor:pointer; ${getStyle('Property')}"><span class="legend-dot" style="background:#1976d2;"></span> Property</div>
+        <div class="legend-item legend-toggle" data-category="Drug" style="cursor:pointer; ${getStyle('Drug')}"><span class="legend-dot" style="background:#388e3c;"></span> Drug</div>
+        <div class="legend-item legend-toggle" data-category="Other" style="cursor:pointer; ${getStyle('Other')}"><span class="legend-dot" style="background:#757575;"></span> Other</div>
+      </div>
     `;
     legend.style.display = 'block';
+
+    const legendHeader = legend.querySelector('.legend-header');
+    const legendContent = legend.querySelector('.legend-content');
+    const chevron = legend.querySelector('.legend-chevron');
+    
+    legendHeader.addEventListener('click', () => {
+      window.pittsburghLegendExpanded = legendContent.style.display !== 'flex';
+      legendContent.style.display = window.pittsburghLegendExpanded ? 'flex' : 'none';
+      chevron.style.transform = window.pittsburghLegendExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+    });
 
     legend.querySelectorAll('.legend-toggle').forEach((item) => {
       item.addEventListener('click', () => {
