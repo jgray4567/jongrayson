@@ -21,7 +21,7 @@ The AI Playbook covers:
 
 Free. No email gate. No signup.
 
-30 years of strategy. The last few years of figuring out where AI actually helps — and where it quietly makes you worse at your job.
+25+ years of strategy. The last few years of figuring out where AI actually helps — and where it quietly makes you worse at your job.
 
 [Link to The AI Playbook]
 
@@ -60,7 +60,7 @@ That experience (and a dozen like it) pushed me to write down the workflows I ac
 
 The AI Playbook: 8 practical workflows for using AI without outsourcing your judgment.
 
-It's free, no gate, and built from 30+ years of designing for high-stakes environments where "close enough" isn't.
+It's free, no gate, and built from 25+ years of designing for high-stakes environments where "close enough" isn't.
 
 [Link to The AI Playbook]
 
