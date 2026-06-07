@@ -1604,6 +1604,12 @@ function closeIntelDrawer() {
   drawer.classList.remove('visible');
   drawer.setAttribute('aria-hidden', 'true');
   setDrawerImage(null);
+  
+  if (selectedAirIcao24) {
+      selectedAirIcao24 = null;
+      if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems || []);
+      if (typeof updateDataPanel === 'function') updateDataPanel();
+  }
 }
 
 function openIntelDrawer(item = {}) {
@@ -2179,7 +2185,7 @@ function getAirTrafficGlobeElements() {
     lng: flight.lng,
     altitude: getAircraftAltitudeRatio(flight.altitude || 0),
     heading: flight.heading || 0,
-    opacity: selectedAirRegion ? (flight.country === selectedAirRegion ? (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 1 : 0.05) : 1) : 0) : (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 1 : 0.05) : 1),
+    opacity: selectedAirRegion ? (flight.country === selectedAirRegion ? (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 1 : 0.5) : 1) : 0) : (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 1 : 0.5) : 1),
     label: `${flight.callsign || 'Unknown'} · ${flight.country || 'In flight'}`,
     raw: {
       ...flight,
@@ -2194,7 +2200,7 @@ function getAirTrafficPaths() {
     const distanceKm = Math.max(80, Math.min(260, ((flight.velocity || 220) * 900) / 1000));
     const forwardPoint = projectPointFromBearing(flight.lat, flight.lng, flight.heading || 0, distanceKm * 0.55);
     const trailingPoint = projectPointFromBearing(flight.lat, flight.lng, (flight.heading || 0) + 180, distanceKm * 0.45);
-    const alpha = selectedAirRegion ? (flight.country === selectedAirRegion ? (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 0.8 : 0.05) : 0.6) : 0) : (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 0.8 : 0.05) : 0.6);
+    const alpha = selectedAirRegion ? (flight.country === selectedAirRegion ? (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 0.8 : 0.2) : 0.6) : 0) : (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 0.8 : 0.2) : 0.6);
     const altitude = getAircraftAltitudeRatio(flight.altitude || 0);
     return {
       color: `rgba(210,255,84,${alpha})`,
