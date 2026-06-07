@@ -49,10 +49,6 @@ body {
   height: 100dvh !important;
   border-radius: 0 !important;
 }
-.intel-thin #intel-globe,
-.intel-thin #intel-map-stage {
-  height: 100dvh !important;
-}
 .thin-intel-panel {
   position: absolute;
   top: calc(18px + env(safe-area-inset-top, 0px));
