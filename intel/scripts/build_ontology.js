@@ -1,6 +1,7 @@
-const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
+const http = require('http');
 
 // Live Intelligence Feeds
 const FEEDS = [
@@ -8,33 +9,93 @@ const FEEDS = [
     "https://feeds.bbci.co.uk/news/world/rss.xml"
 ];
 
+function fetchUrl(url) {
+    return new Promise((resolve, reject) => {
+        https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => resolve(data));
+        }).on('error', reject);
+    });
+}
+
 async function fetchSignals() {
     const signals = [];
     for (const url of FEEDS) {
         try {
             console.log(`Fetching ${url}...`);
-            const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-            const xml = await response.text();
-            
-            // Very rudimentary regex extraction for <title> since Node doesn't have built-in XML DOM
+            const xml = await fetchUrl(url);
             const titleMatches = xml.match(/<title[^>]*>([\s\S]*?)<\/title>/gi) || [];
             
-            // Skip the first title (usually the channel title) and grab the next 5 items
             for (let i = 1; i < Math.min(titleMatches.length, 6); i++) {
                 let text = titleMatches[i].replace(/<\/?title[^>]*>/gi, '').trim();
-                text = text.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1'); // Remove CDATA
+                text = text.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1'); 
                 if (text && !text.includes('BBC News - World') && !text.includes('National Cyber Awareness System')) {
                     signals.push(text);
                 }
             }
         } catch (e) {
-            console.error(`Error fetching ${url}:`, e);
+            console.error(`Error fetching ${url}:`, e.message);
         }
     }
     return signals;
 }
 
+
 async function extractOntology(signals) {
+function callOpenClawApi(prompt) {
+    return new Promise((resolve, reject) => {
+        const fs = require('fs');
+        const os = require('os');
+        let token = '';
+        try {
+            const configPath = path.join(os.homedir(), '.openclaw', 'openclaw.json');
+            const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+            token = configData.gateway.auth.token;
+        } catch (e) {
+            token = process.env.OPENCLAW_GATEWAY_TOKEN || '';
+        }
+
+        const reqOpts = {
+            hostname: '127.0.0.1',
+            port: 18789,
+            path: '/v1/chat/completions',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+
+        const req = http.request(reqOpts, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                if (res.statusCode >= 400) {
+                    reject(new Error(`API Error: ${res.statusCode} ${data}`));
+                    return;
+                }
+                try {
+                    const parsed = JSON.parse(data);
+                    resolve(parsed.choices[0].message.content);
+                } catch (e) {
+                    reject(e);
+                }
+            });
+        });
+
+        req.on('error', reject);
+
+        req.write(JSON.stringify({
+            model: "openclaw",
+            messages: [
+                { role: "system", content: "OVERRIDE_MODEL: ollama/glm-5.1:cloud" },
+                { role: "user", content: prompt }
+            ]
+        }));
+        req.end();
+    });
+}
     const prompt = `You are the automated Intelligence Extraction Engine for jongrayson.com (powered by JerryKnows.ai). Your job is to convert the following live global threat signals into a Palantir-style node graph ontology.
 Return ONLY valid JSON. Format:
 {"nodes": [{"id": "id_string", "group": 0-4, "label": "Display Name", "size": 10}], "links": [{"source": "id1", "target": "id2", "value": 1}]}
@@ -45,25 +106,18 @@ Always ensure the JSON is perfectly valid and contains no markdown formatting.
 Signals:
 ${signals.join("\n")}`;
 
-    console.log("Pinging OpenClaw Infer...");
-    
-    // Write prompt to temp file to avoid shell escaping issues
-    const promptPath = path.join('/tmp', 'ontology_prompt.txt');
-    fs.writeFileSync(promptPath, prompt);
+    console.log("Pinging OpenClaw Local API...");
     
     try {
-        const output = execSync(`openclaw infer model run --model "ollama/glm-5.1:cloud" --prompt "$(cat ${promptPath})" --json`, { encoding: 'utf-8' });
-        
-        let jsonStr = output.trim();
-        // Strip markdown fences if present
+        let jsonStr = await callOpenClawApi(prompt);
+        jsonStr = jsonStr.trim();
         if (jsonStr.startsWith('```json')) jsonStr = jsonStr.substring(7);
         if (jsonStr.startsWith('```')) jsonStr = jsonStr.substring(3);
         if (jsonStr.endsWith('```')) jsonStr = jsonStr.substring(0, jsonStr.length - 3);
         
-        const data = JSON.parse(jsonStr.trim());
-        return data;
+        return JSON.parse(jsonStr.trim());
     } catch (e) {
-        console.error("OpenClaw Infer failed or returned invalid JSON:", e.message);
+        console.error("OpenClaw API failed:", e.message);
         console.log("Falling back to simulated tactical data...");
         return {
             "nodes": [
@@ -80,8 +134,6 @@ ${signals.join("\n")}`;
                 {"source": "intel_nexus", "target": "intel_feed", "value": 1}
             ]
         };
-    } finally {
-        if (fs.existsSync(promptPath)) fs.unlinkSync(promptPath);
     }
 }
 
