@@ -935,3 +935,30 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
+
+@media (max-width: 920px) {
+  .app-shell { 
+    display: flex; 
+    flex-direction: column; 
+  }
+  .left-rail {
+    order: 2; /* Put the sidebar under the globe on mobile */
+    min-height: auto;
+    border-right: none;
+    border-top: 1px solid var(--border);
+  }
+  .center-stage {
+    order: 1; /* Globe on top */
+    padding: 12px;
+  }
+  #intel-live-triage {
+    max-height: 400px;
+    height: auto;
+  }
+  #intel-globe, #intel-map-stage, #intel-graph-stage {
+    height: 50vh !important; /* Slightly shorter on mobile to fit the rail */
+  }
+  #global-operations-card {
+    height: auto !important;
+  }
+}
