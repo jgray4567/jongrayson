@@ -14,65 +14,36 @@
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <script src="https://unpkg.com/force-graph"></script>
 </head>
-<body class="intel-thin">
+<body>
   <div class="app-shell">
-    <aside class="rail left-rail">
+    <aside class="rail left-rail" style="display: flex; flex-direction: column;">
       <div class="brand-block">
         <div class="brand-kicker">jongrayson.com /intel</div>
-        <h1>Intel</h1>
-        <p class="muted">Site-side control surface for the escalation stack.</p>
-        <a class="home-link" href="/">← Back to home</a>
+        <h1 style="margin-bottom: 4px;">JerryKnows.ai</h1>
+        <div class="muted">Automated Intelligence Platform (AIP)</div>
+        <a class="home-link" href="/" style="display: block; margin-top: 12px; color: var(--lime); text-decoration: none;">← Return to base</a>
       </div>
-
+      
       <div class="panel">
-        <div class="panel-kicker">Build</div>
-        <div class="panel-title">Build 201</div>
-        <div class="muted">Geographic Intel Projection & Structural State Globe</div>
+        <div class="panel-kicker">Ontology Extraction</div>
+        <div class="intel-metrics">
+          <div><span class="muted">ENGINE:</span> <span style="color:var(--lime)">JERRY-GLM-5.1</span></div>
+          <div><span class="muted">STATUS:</span> <span style="color:#00e564">ONLINE / PARSING</span></div>
+        </div>
       </div>
-
-      <div class="panel">
-        <div class="panel-kicker">Saved Temporal Views</div>
-        <div id="timeline-views-list"></div>
+      
+      <div class="panel" style="margin-top: 24px; flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;">
+        <div class="panel-kicker">Live Triage Feed</div>
+        <div id="intel-live-triage" style="font-family: var(--font-mono); font-size: 11px; margin-top: 12px; flex-grow: 1; overflow-y: auto;">
+          <div class="muted">Loading live signals...</div>
+        </div>
       </div>
-
-      <div class="panel">
-        <div class="panel-kicker">Task Signal Correlation</div>
-        <div id="task-signal-correlation-card"></div>
-        <div class="panel-kicker">Task Retention Analytics</div>
-        <div id="task-retention-analytics-card"></div>
-        <div class="panel-kicker">Task Context Analytics</div>
-        <div id="task-context-analytics-card"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-kicker">Signal Action Analytics</div>
-        <div id="signal-action-analytics-card"></div>
-        <div id="signal-recovery-analytics-card" style="margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px;"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-kicker">Signal Escalation Analytics</div>
-        <div id="signal-escalation-analytics-list"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-kicker">Third-Order Escalation Dashboard</div>
-        <div id="third-order-escalation-dashboard-card"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-kicker">Third-Order Escalation Recommendations</div>
-        <div id="third-order-escalation-recommendations-list"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-kicker">Third-Order Escalation Analytics</div>
-        <div id="third-order-escalation-analytics-list"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-kicker">Third-Order Escalation Effectiveness</div>
-        <div id="third-order-escalation-effectiveness-list"></div>
+      
+      <div class="panel" style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <div class="panel-kicker">Command Line</div>
+        <div style="font-family: var(--font-mono); font-size: 12px; margin-top: 8px;">
+          <span style="color:var(--lime)">></span> <span class="muted" style="animation: blink 1s step-end infinite;">Awaiting input...</span>
+        </div>
       </div>
     </aside>
 
@@ -366,145 +337,6 @@
             <li>Recovery-trust driver transition balance structural state classification</li>
             <li>Geographic Intel Projection (Global mapping)</li>
           </ul>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Visible Feed Summary</div>
-          <div id="feed-window-summary" class="task-focus-meta">Live feed summary loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Comparative Window</div>
-          <div id="timeline-comparison-summary" class="task-focus-meta">Select a timeline window to compare it against the prior equivalent window.</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Baseline Shift</div>
-          <div class="filter-row" style="margin:12px 0; flex-wrap:wrap;">
-            <select id="baseline-mode-select" class="workspace-select">
-              <option value="previous">Previous Window</option>
-              <option value="saved">Saved View</option>
-            </select>
-            <select id="baseline-view-select" class="workspace-select">
-              <option value="">Choose saved view</option>
-            </select>
-          </div>
-          <div id="baseline-shift-summary" class="task-focus-meta">Baseline scoring will appear once a timeline window is selected.</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Baseline Drift History</div>
-          <div id="baseline-drift-history" class="task-focus-meta">Recent scored baseline comparisons will appear here.</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Baseline Performance</div>
-          <div id="baseline-performance-summary" class="task-focus-meta">Baseline performance analytics loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Performance Trend</div>
-          <div id="baseline-trend-summary" class="task-focus-meta">Baseline trend analytics loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">History Health</div>
-          <div id="baseline-history-health" class="task-focus-meta">Baseline history health loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Recommended Actions</div>
-          <div id="baseline-recommendation-actions" class="task-focus-meta">Baseline recommendation actions loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Recommendation Acceptance</div>
-          <div id="baseline-recommendation-analytics" class="task-focus-meta">Recommendation acceptance analytics loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Recommendation Effectiveness</div>
-          <div id="baseline-recommendation-effectiveness" class="task-focus-meta">Recommendation effectiveness loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Recommendation Priority</div>
-          <div id="baseline-recommendation-priority" class="task-focus-meta">Recommendation priority loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Recommendation Outcomes</div>
-          <div id="baseline-recommendation-outcomes" class="task-focus-meta">Recommendation outcomes loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Suppressed Recommendations</div>
-          <div id="baseline-recommendation-suppressed" class="task-focus-meta">Suppressed recommendations loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Revived Recommendations</div>
-          <div id="baseline-recommendation-revived" class="task-focus-meta">Revived recommendations loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Revival Stability</div>
-          <div id="baseline-recommendation-revival-analytics" class="task-focus-meta">Revival stability loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Recommendation Churn</div>
-          <div id="baseline-recommendation-churn" class="task-focus-meta">Recommendation churn loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Stable Recommendations</div>
-          <div id="baseline-recommendation-stable" class="task-focus-meta">Stable recommendations loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Recommendation Confidence</div>
-          <div id="baseline-recommendation-confidence" class="task-focus-meta">Recommendation confidence loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Confidence Trend</div>
-          <div id="baseline-recommendation-confidence-trend" class="task-focus-meta">Confidence trend loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Confidence Volatility</div>
-          <div id="baseline-recommendation-confidence-volatility" class="task-focus-meta">Confidence volatility loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Confidence Resilience</div>
-          <div id="baseline-recommendation-confidence-resilience" class="task-focus-meta">Confidence resilience loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Confidence Adjustments</div>
-          <div id="baseline-recommendation-confidence-adjustments" class="task-focus-meta">Confidence adjustments loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Trust Momentum</div>
-          <div id="baseline-recommendation-trust-momentum" class="task-focus-meta">Trust momentum loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Recommendation Playbook</div>
-          <div id="baseline-recommendation-playbook" class="task-focus-meta">Recommendation playbook loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Maintenance Outcomes</div>
-          <div id="baseline-maintenance-analytics" class="task-focus-meta">Maintenance outcome analytics loading…</div>
-        </section>
-
-        <section class="stage-card">
-          <div class="panel-kicker">Maintenance Effectiveness</div>
-          <div id="baseline-maintenance-effectiveness" class="task-focus-meta">Maintenance effectiveness loading…</div>
         </section>
 
         <section class="stage-card" style="grid-column: 1 / -1;">
