@@ -1,0 +1,56 @@
+{
+  "nodes": [
+    {
+      "id": "intel_nexus",
+      "group": 0,
+      "label": "J-01 (NEXUS)",
+      "size": 20
+    },
+    {
+      "id": "cisa_alert",
+      "group": 4,
+      "label": "CISA Alert",
+      "size": 12
+    },
+    {
+      "id": "threat_cyber",
+      "group": 2,
+      "label": "Cyber Campaign",
+      "size": 16
+    },
+    {
+      "id": "loc_dc",
+      "group": 3,
+      "label": "Washington D.C.",
+      "size": 14
+    },
+    {
+      "id": "intel_feed",
+      "group": 1,
+      "label": "Global News Feed",
+      "size": 12
+    }
+  ],
+  "links": [
+    {
+      "source": "intel_nexus",
+      "target": "cisa_alert",
+      "value": 2
+    },
+    {
+      "source": "cisa_alert",
+      "target": "threat_cyber",
+      "value": 3
+    },
+    {
+      "source": "threat_cyber",
+      "target": "loc_dc",
+      "value": 4
+    },
+    {
+      "source": "intel_nexus",
+      "target": "intel_feed",
+      "value": 1
+    }
+  ]
+}
