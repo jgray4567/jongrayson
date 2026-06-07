@@ -246,14 +246,14 @@ function buildFeedParams(overrides = {}) {
 }
 
 function setSelected(item) {
-  selectedQuery.textContent = item?.suggestedQuery || 'No query selected';
-  selectedMeta.textContent = item
+  if (selectedQuery) selectedQuery.textContent = item?.suggestedQuery || 'No query selected';
+  if (selectedMeta) selectedMeta.textContent = item
     ? `${item.topic} · ${item.thirdOrderEscalationAction || item.effectiveness || 'tracked'}`
     : 'Use the chips on the left to focus a recommendation case.';
 }
 
 function renderRecommendations(items = []) {
-  recommendationsList.innerHTML = items.map((item) => `
+  if (recommendationsList) recommendationsList.innerHTML = items.map((item) => `
     <div class="filter-row">
       <button class="tag-chip" data-third-order-focus='${JSON.stringify(item).replace(/'/g, '&apos;')}'>${item.topic} · ${item.thirdOrderEscalationAction}</button>
       <button class="ghost-btn" data-third-order-review='${JSON.stringify(item).replace(/'/g, '&apos;')}'>Review</button>
@@ -262,19 +262,19 @@ function renderRecommendations(items = []) {
 }
 
 function renderAnalytics(items = []) {
-  analyticsList.innerHTML = items.map((item) => `
+  if (analyticsList) analyticsList.innerHTML = items.map((item) => `
     <button class="tag-chip" data-third-order-analytics='${JSON.stringify(item).replace(/'/g, '&apos;')}'>${item.topic} · ${item.thirdOrderEscalationAcceptCount} accepts</button>
   `).join('') || '<div class="task-focus-meta">No third-order escalation accepts yet.</div>';
 }
 
 function renderEffectiveness(items = []) {
-  effectivenessList.innerHTML = items.map((item) => `
+  if (effectivenessList) effectivenessList.innerHTML = items.map((item) => `
     <button class="tag-chip" data-third-order-effectiveness='${JSON.stringify(item).replace(/'/g, '&apos;')}'>${item.topic} · ${item.effectiveness} · ${item.effectivenessScore}</button>
   `).join('') || '<div class="task-focus-meta">No third-order escalation effectiveness scores yet.</div>';
 }
 
 function renderDashboard(summary = {}) {
-  dashboardCard.innerHTML = `
+  if (dashboardCard) dashboardCard.innerHTML = `
     <div class="task-focus-meta">${summary.escalationCaseCount || 0} escalation cases · ${summary.totalAccepts || 0} accepts</div>
     <div class="task-focus-meta">${summary.effectiveCount || 0} effective · ${summary.mixedCount || 0} mixed · ${summary.weakCount || 0} weak</div>
   `;
@@ -282,7 +282,7 @@ function renderDashboard(summary = {}) {
 
 function renderTaskContextAnalytics(summary = {}) {
   const tagsHtml = (summary.tags || []).map(t => `<button class="tag-chip" data-task-tag='${t.tag}'>${t.tag} (${t.count})</button>`).join('');
-  taskContextAnalyticsCard.innerHTML = `
+  if (taskContextAnalyticsCard) taskContextAnalyticsCard.innerHTML = `
     <div class="task-focus-meta" style="margin-bottom:8px;">
       <span style="color:var(--text); font-weight:600;">${summary.activeTasks || 0}</span> active tasks
       · <span style="color:var(--text);">${summary.archivedTasks || 0}</span> archived
@@ -296,7 +296,7 @@ function renderTaskContextAnalytics(summary = {}) {
 
 function renderTaskRetentionAnalytics(summary = {}) {
   const itemsHtml = (summary.items || []).map(t => `<div class="task-focus-meta" style="margin-bottom:4px;">${t.tag}: ${t.name} (${t.lifespanDays}d)</div>`).join('');
-  taskRetentionAnalyticsCard.innerHTML = `
+  if (taskRetentionAnalyticsCard) taskRetentionAnalyticsCard.innerHTML = `
     <div class="task-focus-meta" style="margin-bottom:8px;">
       <span style="color:var(--text); font-weight:600;">${summary.averageLifespanDays || 0}</span> average days active
     </div>
@@ -308,7 +308,7 @@ function renderTaskSignalCorrelation(summary = {}) {
   const itemsHtml = (summary.items || []).map(t => `
     <button class="tag-chip" data-task-focus-id='${t.id}' data-task-name='${t.name}' title="${t.name}">${t.tag} · ${t.signalsAttached} signals</button>
   `).join('');
-  taskSignalCorrelationCard.innerHTML = `
+  if (taskSignalCorrelationCard) taskSignalCorrelationCard.innerHTML = `
     <div class="task-focus-meta" style="margin-bottom:8px;">
       <span style="color:var(--text); font-weight:600;">${summary.averageSignalsPerTask || 0}</span> average signals per active task
     </div>
@@ -319,7 +319,7 @@ function renderTaskSignalCorrelation(summary = {}) {
 }
 
 function renderSignalActionAnalytics(summary = {}) {
-  signalActionAnalyticsCard.innerHTML = `
+  if (signalActionAnalyticsCard) signalActionAnalyticsCard.innerHTML = `
     <div class="task-focus-meta" style="margin-bottom:8px;">
       <span style="color:var(--text); font-weight:600;">${summary.active || 0}</span> unread active signals
     </div>
@@ -339,7 +339,7 @@ function renderSignalRecoveryAnalytics(summary = {}) {
       ? 'Moderate restoration rate, review archive decisions for false dismissals.'
       : 'Low restoration rate, archive decisions look relatively stable.';
 
-  signalRecoveryAnalyticsCard.innerHTML = `
+  if (signalRecoveryAnalyticsCard) signalRecoveryAnalyticsCard.innerHTML = `
     <button class="tag-chip ${currentRecoveredFilter ? 'active' : ''}" data-signal-recovered="true" style="text-align:left; width:100%;">
       <span style="color:var(--text); font-weight:600;">${summary.recoveryRatePct || 0}%</span> recovery rate
       · <span style="color:var(--text);">${summary.recoveredSignals || 0}/${summary.archivedSignals || 0}</span> archived signals restored
@@ -349,7 +349,7 @@ function renderSignalRecoveryAnalytics(summary = {}) {
 }
 
 function renderSignalEscalationAnalytics(items = []) {
-  signalEscalationAnalyticsList.innerHTML = items.map(item => `
+  if (signalEscalationAnalyticsList) signalEscalationAnalyticsList.innerHTML = items.map(item => `
     <button class="tag-chip" data-signal-analytics='${item.source}'>${item.source} · Net ${item.netScore > 0 ? '+' : ''}${item.netScore} (${item.escalationCount})</button>
   `).join('') || '<div class="task-focus-meta">No signals escalated yet.</div>';
 }
@@ -401,7 +401,7 @@ function formatTimelineViewName(view) {
 
 function renderBaselineViewOptions(items = []) {
   if (!baselineViewSelect) return;
-  baselineViewSelect.innerHTML = ['<option value="">Choose saved view</option>', ...items.map((view) => `
+  if (baselineViewSelect) baselineViewSelect.innerHTML = ['<option value="">Choose saved view</option>', ...items.map((view) => `
     <option value="${view.id}">${formatTimelineViewName(view)}</option>
   `)].join('');
 
@@ -470,7 +470,7 @@ async function persistBaselineHistoryServer(entry) {
 
 function renderBaselineHistory(items = readBaselineHistory()) {
   if (!baselineDriftHistory) return;
-  baselineDriftHistory.innerHTML = items.map((item, index) => `
+  if (baselineDriftHistory) baselineDriftHistory.innerHTML = items.map((item, index) => `
     <button class="tag-chip" data-baseline-history-index="${index}" style="display:block; width:100%; text-align:left; margin-bottom:8px;">
       ${item.label} · ${item.score > 0 ? '+' : ''}${item.score}
       <div class="task-focus-meta" style="margin-top:6px; text-transform:none; letter-spacing:normal;">${item.baselineLabel} · ${formatClock(item.anchorTime)} · ${formatWindowLabel(item.windowMinutes)}</div>
@@ -480,7 +480,7 @@ function renderBaselineHistory(items = readBaselineHistory()) {
 
 function renderBaselinePerformance(summary = {}) {
   if (!baselinePerformanceSummary) return;
-  baselinePerformanceSummary.innerHTML = `
+  if (baselinePerformanceSummary) baselinePerformanceSummary.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.totalComparisons || 0}</span> server-side comparisons tracked</div>
     <div style="margin-top:8px;">Average score: <span style="color:var(--text); font-weight:600;">${summary.averageScore || 0}</span> · dominant state: <span style="color:var(--text); font-weight:600;">${summary.topBaselineLabel || 'n/a'}</span></div>
     <div style="margin-top:8px;">Escalating ${summary.escalatingCount || 0} · Steady ${summary.steadyCount || 0} · Cooling ${summary.coolingCount || 0}</div>
@@ -490,7 +490,7 @@ function renderBaselinePerformance(summary = {}) {
 
 function renderBaselineTrend(summary = {}) {
   if (!baselineTrendSummary) return;
-  baselineTrendSummary.innerHTML = `
+  if (baselineTrendSummary) baselineTrendSummary.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.trend || 'steady'}</span> performance trend</div>
     <div style="margin-top:8px;">Recent avg: <span style="color:var(--text); font-weight:600;">${summary.recentAverageScore || 0}</span> vs prior avg: <span style="color:var(--text); font-weight:600;">${summary.priorAverageScore || 0}</span></div>
     <div style="margin-top:8px;">Drift: <span style="color:var(--text); font-weight:600;">${summary.drift > 0 ? '+' : ''}${summary.drift || 0}</span> · latest label: ${summary.latestLabel || 'n/a'}</div>
@@ -507,7 +507,7 @@ function renderBaselineHistoryHealth(summary = {}) {
     </button>
   `).join('');
 
-  baselineHistoryHealth.innerHTML = `
+  if (baselineHistoryHealth) baselineHistoryHealth.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.totalEntries || 0}</span> entries · ${summary.steadyEntries || 0} steady · ${summary.savedBaselineEntries || 0} saved-baseline · ${summary.staleEntries || 0} stale</div>
     ${suggestions}
   `;
@@ -515,7 +515,7 @@ function renderBaselineHistoryHealth(summary = {}) {
 
 function renderBaselineRecommendations(items = []) {
   if (!baselineRecommendationActions) return;
-  baselineRecommendationActions.innerHTML = items.map((item) => `
+  if (baselineRecommendationActions) baselineRecommendationActions.innerHTML = items.map((item) => `
     <button class="tag-chip" data-baseline-recommendation="${item.action}" style="display:block; width:100%; text-align:left; margin-bottom:8px;">
       ${item.action}${item.promotion ? ` · ${item.promotion}` : ''}
       <div class="task-focus-meta" style="margin-top:6px; text-transform:none; letter-spacing:normal;">${item.reason}${item.priorityScore !== undefined ? ` · score ${item.priorityScore}` : ''}${item.confidenceBand ? ` · confidence ${item.confidenceBand}${item.baseConfidenceBand && item.baseConfidenceBand !== item.confidenceBand ? ` (from ${item.baseConfidenceBand})` : ''}` : ''}${item.resilienceBand ? ` · resilience ${item.resilienceBand} ${item.resilienceScore || 0}` : ''}${item.confidenceReason ? ` · why ${item.confidenceReason}` : ''}${item.outcomeScore !== undefined ? ` · outcome ${item.outcomeScore}` : ''}${item.playbookConfidence && item.playbookConfidence !== 'none' ? ` · playbook ${item.playbookConfidence}+${item.playbookBoost || 0}${item.freshness ? ` (${item.freshness})` : ''}` : ''}${item.revivalStatus ? ` · revival ${item.revivalStatus}${item.revivalBoost ? `${item.revivalBoost > 0 ? '+' : ''}${item.revivalBoost}` : ''}` : ''}${item.changeCount ? ` · churn ${item.changeCount}${item.churnPenalty ? ` (${item.churnPenalty})` : ''}` : ''}${item.stableBoost ? ` · stability ${item.stabilityState}+${item.stableBoost}` : ''}${item.volatilityPenalty || item.volatilityBoost ? ` · volatility ${item.volatilityState}${item.volatilityBoost ? `+${item.volatilityBoost}` : ''}${item.volatilityPenalty ? `${item.volatilityPenalty}` : ''}` : ''}${item.upgradeConfirmationBoost ? ` · upgrades ${item.upgradedCount || 0} (+${item.upgradeConfirmationBoost})` : ''}${item.upgradeDowngradePenalty ? ` · downgrades ${item.downgradedCount || 0} (${item.upgradeDowngradePenalty})` : ''}${item.trustMomentumAdjustment ? ` · momentum ${item.trustMomentumBand || 'neutral'} ${item.trustMomentumScore || 0} (${item.trustMomentumAdjustment > 0 ? '+' : ''}${item.trustMomentumAdjustment})` : ''}${item.trustMomentumJustReversed ? ` · reversal ${item.trustMomentumBand || 'neutral'}${item.trustMomentumReversalAdjustment ? ` (${item.trustMomentumReversalAdjustment > 0 ? '+' : ''}${item.trustMomentumReversalAdjustment})` : ''}` : ''}${item.trustMomentumReversalStreak ? ` · streak ${item.trustMomentumReversalStreak}${item.trustMomentumReversalStreakAdjustment ? ` (${item.trustMomentumReversalStreakAdjustment})` : ''}` : ''}${item.trustMomentumStabilityStreak ? ` · stable ${item.trustMomentumStabilityStreak}${item.trustMomentumStabilityBoost ? ` (+${item.trustMomentumStabilityBoost})` : ''}` : ''}${item.convergenceStreak ? ` · convergence ${item.convergenceStreak}${item.convergenceBoost ? ` (+${item.convergenceBoost})` : ''}` : ''}${item.justConverged ? ' · just converged' : ''}${item.dependencyStreak ? ` · dependent ${item.dependencyStreak}${item.dependencyPenalty ? ` (${item.dependencyPenalty})` : ''}` : ''}${item.justBecameDependent ? ' · just dependent' : ''}${item.dependencyRecoveryStreak ? ` · recovery ${item.dependencyRecoveryStreak}${item.dependencyRecoveryBoost ? ` (+${item.dependencyRecoveryBoost})` : ''}` : ''}${item.justRecoveredFromDependency ? ' · just recovered' : ''}${item.dependencyRecoveryDurability && item.dependencyRecoveryDurability !== 'fragile' ? ` · recovery ${item.dependencyRecoveryDurability}${item.dependencyRecoveryDurabilityBoost ? ` (+${item.dependencyRecoveryDurabilityBoost})` : ''}` : ''}${item.justBecameDurableRecovery ? ' · just durable' : ''}${item.justRelapsedFromDurableRecovery ? ` · relapse (${item.durableRecoveryRelapsePenalty || 0})` : ''}${item.relapseResilienceBand && item.relapseResilienceBand !== 'neutral' ? ` · relapse ${item.relapseResilienceBand} ${item.relapseResilienceScore || 0} (${item.relapseResilienceAdjustment > 0 ? '+' : ''}${item.relapseResilienceAdjustment || 0})` : ''}${item.recoveryMaturityBand && item.recoveryMaturityBand !== 'early' ? ` · recovery ${item.recoveryMaturityBand} ${item.recoveryMaturityScore || 0} (${item.recoveryMaturityAdjustment > 0 ? '+' : ''}${item.recoveryMaturityAdjustment || 0})` : ''}${item.recoveryMaturityDrift && item.recoveryMaturityDrift !== 'steady' ? ` · maturity ${item.recoveryMaturityDrift}${item.recoveryMaturityDelta ? ` (${item.recoveryMaturityDelta > 0 ? '+' : ''}${item.recoveryMaturityDelta})` : ''}${item.recoveryMaturityDriftAdjustment ? ` (${item.recoveryMaturityDriftAdjustment > 0 ? '+' : ''}${item.recoveryMaturityDriftAdjustment})` : ''}` : ''}${item.recoveryMaturityJustReversed ? ` · reversal ${item.recoveryMaturityDrift}${item.recoveryMaturityReversalAdjustment ? ` (${item.recoveryMaturityReversalAdjustment})` : ''}` : ''}${item.recoveryMaturityReversalStreak ? ` · whipsaw ${item.recoveryMaturityReversalStreak}${item.recoveryMaturityReversalStreakAdjustment ? ` (${item.recoveryMaturityReversalStreakAdjustment})` : ''}` : ''}${item.recoveryMaturityStabilityStreak ? ` · stable ${item.recoveryMaturityStabilityStreak}${item.recoveryMaturityStabilityBoost ? ` (+${item.recoveryMaturityStabilityBoost})` : ''}` : ''}${item.recoveryMaturityBreakdownRiskBand && item.recoveryMaturityBreakdownRiskBand !== 'low' ? ` · risk ${item.recoveryMaturityBreakdownRiskBand} ${item.recoveryMaturityBreakdownRiskScore || 0} (${item.recoveryMaturityBreakdownRiskAdjustment || 0})` : ''}${item.recoveryTrustHealthBand ? ` · health ${item.recoveryTrustHealthBand} ${item.recoveryTrustHealthScore || 0} (${item.recoveryTrustHealthAdjustment > 0 ? '+' : ''}${item.recoveryTrustHealthAdjustment || 0})` : ''}${item.recoveryTrustHealthTrend && item.recoveryTrustHealthTrend !== 'steady' ? ` · health ${item.recoveryTrustHealthTrend}${item.recoveryTrustHealthDelta ? ` (${item.recoveryTrustHealthDelta > 0 ? '+' : ''}${item.recoveryTrustHealthDelta})` : ''}${item.recoveryTrustHealthTrendAdjustment ? ` (${item.recoveryTrustHealthTrendAdjustment > 0 ? '+' : ''}${item.recoveryTrustHealthTrendAdjustment})` : ''}` : ''}${item.recoveryTrustHealthJustReversed ? ` · health reversal ${item.recoveryTrustHealthTrend}${item.recoveryTrustHealthReversalAdjustment ? ` (${item.recoveryTrustHealthReversalAdjustment})` : ''}` : ''}${item.recoveryTrustHealthReversalStreak ? ` · health whipsaw ${item.recoveryTrustHealthReversalStreak}${item.recoveryTrustHealthReversalStreakAdjustment ? ` (${item.recoveryTrustHealthReversalStreakAdjustment})` : ''}` : ''}${item.recoveryTrustAdjustmentSummary ? ` · recovery stack ${item.recoveryTrustAdjustmentSummary}${item.recoveryTrustNetAdjustment ? ` · net ${item.recoveryTrustNetAdjustment > 0 ? '+' : ''}${item.recoveryTrustNetAdjustment}` : ''}` : ''}${item.recoveryTrustDriverJustShifted ? ` · driver shift ${item.previousRecoveryTrustTopDriver || 'none'} → ${item.recoveryTrustTopDriver || 'none'}${item.recoveryTrustDriverShiftAdjustment ? ` (${item.recoveryTrustDriverShiftAdjustment})` : ''}${item.recoveryTrustDriverTransitionSeverityBand && item.recoveryTrustDriverTransitionSeverityBand !== 'neutral' ? ` · ${item.recoveryTrustDriverTransitionSeverityBand}${item.recoveryTrustDriverTransitionAdjustment ? ` (${item.recoveryTrustDriverTransitionAdjustment > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionAdjustment})` : ''}` : ''}` : ''}${item.recoveryTrustDriverShiftStreak ? ` · driver churn ${item.recoveryTrustDriverShiftStreak}${item.recoveryTrustDriverShiftStreakAdjustment ? ` (${item.recoveryTrustDriverShiftStreakAdjustment})` : ''}` : ''}${item.recoveryTrustDriverNegativeTransitionStreak ? ` · deterioration streak ${item.recoveryTrustDriverNegativeTransitionStreak}${item.recoveryTrustDriverNegativeTransitionStreakAdjustment ? ` (${item.recoveryTrustDriverNegativeTransitionStreakAdjustment})` : ''}` : ''}${item.recoveryTrustDriverPositiveTransitionStreak ? ` · recovery streak ${item.recoveryTrustDriverPositiveTransitionStreak}${item.recoveryTrustDriverPositiveTransitionStreakBoost ? ` (+${item.recoveryTrustDriverPositiveTransitionStreakBoost})` : ''}` : ''}${item.recoveryTrustDriverTransitionBalanceScore ? ` · transition balance ${item.recoveryTrustDriverTransitionBalanceBand || 'balanced'} ${item.recoveryTrustDriverTransitionBalanceScore > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionBalanceScore}${item.recoveryTrustDriverTransitionBalanceAdjustment ? ` (${item.recoveryTrustDriverTransitionBalanceAdjustment > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionBalanceAdjustment})` : ''}` : ''}${item.recoveryTrustDriverTransitionBalanceJustReversed ? ` · balance reversal ${item.previousRecoveryTrustDriverTransitionBalanceBand || 'balanced'} → ${item.recoveryTrustDriverTransitionBalanceBand || 'balanced'}${item.recoveryTrustDriverTransitionBalanceReversalAdjustment ? ` (${item.recoveryTrustDriverTransitionBalanceReversalAdjustment > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionBalanceReversalAdjustment})` : ''}` : ''}${item.recoveryTrustDriverTransitionBalanceReversalStreak ? ` · balance whipsaw ${item.recoveryTrustDriverTransitionBalanceReversalStreak}${item.recoveryTrustDriverTransitionBalanceReversalStreakAdjustment ? ` (${item.recoveryTrustDriverTransitionBalanceReversalStreakAdjustment})` : ''}` : ''}${item.recoveryTrustDriverTransitionBalanceStabilityStreak ? ` · balance stable ${item.recoveryTrustDriverTransitionBalanceStabilityPolarity || 'neutral'} ${item.recoveryTrustDriverTransitionBalanceStabilityStreak}${item.recoveryTrustDriverTransitionBalanceStabilityAdjustment ? ` (${item.recoveryTrustDriverTransitionBalanceStabilityAdjustment > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionBalanceStabilityAdjustment})` : ''}` : ''}${item.recoveryTrustDriverTransitionBalanceEntrenchmentBand && item.recoveryTrustDriverTransitionBalanceEntrenchmentBand !== 'none' ? ` · entrenchment ${item.recoveryTrustDriverTransitionBalanceEntrenchmentBand}${item.recoveryTrustDriverTransitionBalanceEntrenchmentAdjustment ? ` (${item.recoveryTrustDriverTransitionBalanceEntrenchmentAdjustment > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionBalanceEntrenchmentAdjustment})` : ''}` : ''}${item.recoveryTrustDriverTransitionBalanceEscapedEntrenchment ? ` · entrenchment escape ${item.recoveryTrustDriverTransitionBalanceEntrenchmentEscapeDirection}${item.recoveryTrustDriverTransitionBalanceEntrenchmentEscapeAdjustment ? ` (${item.recoveryTrustDriverTransitionBalanceEntrenchmentEscapeAdjustment > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionBalanceEntrenchmentEscapeAdjustment})` : ''}` : ''}${item.recoveryTrustDriverTransitionBalanceEscapedEntrenchmentDurably ? ` · escape durable ${item.recoveryTrustDriverTransitionBalanceEscapeDurabilityDirection} ${item.recoveryTrustDriverTransitionBalanceEscapeDurabilityStreak}${item.recoveryTrustDriverTransitionBalanceEscapeDurabilityAdjustment ? ` (${item.recoveryTrustDriverTransitionBalanceEscapeDurabilityAdjustment > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionBalanceEscapeDurabilityAdjustment})` : ''}` : ''}${item.recoveryTrustDriverTransitionBalanceRecapturedEntrenchment ? ` · recaptured ${item.recoveryTrustDriverTransitionBalanceRecaptureDirection}${item.recoveryTrustDriverTransitionBalanceRecaptureAdjustment ? ` (${item.recoveryTrustDriverTransitionBalanceRecaptureAdjustment > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionBalanceRecaptureAdjustment})` : ''}` : ''}${item.recoveryTrustDriverTransitionBalanceRecaptureStreak ? ` · recapture streak ${item.recoveryTrustDriverTransitionBalanceRecaptureStreak}${item.recoveryTrustDriverTransitionBalanceRecaptureStreakAdjustment ? ` (${item.recoveryTrustDriverTransitionBalanceRecaptureStreakAdjustment > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionBalanceRecaptureStreakAdjustment})` : ''}` : ''}${item.recoveryTrustDriverTransitionBalanceStructuralState && item.recoveryTrustDriverTransitionBalanceStructuralState !== 'neutral' ? ` · structural state ${item.recoveryTrustDriverTransitionBalanceStructuralState}${item.recoveryTrustDriverTransitionBalanceStructuralAdjustment ? ` (${item.recoveryTrustDriverTransitionBalanceStructuralAdjustment > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionBalanceStructuralAdjustment})` : ''}` : ''}</div>
@@ -525,7 +525,7 @@ function renderBaselineRecommendations(items = []) {
 
 function renderBaselineRecommendationAnalytics(items = []) {
   if (!baselineRecommendationAnalytics) return;
-  baselineRecommendationAnalytics.innerHTML = items.map((item) => `
+  if (baselineRecommendationAnalytics) baselineRecommendationAnalytics.innerHTML = items.map((item) => `
     <div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.acceptedCount || 0} accepts · ${item.surfacedCount || 0} surfaced</div>
   `).join('') || 'No recommendation accepts yet.';
 }
@@ -533,7 +533,7 @@ function renderBaselineRecommendationAnalytics(items = []) {
 function renderBaselineRecommendationEffectiveness(summary = {}) {
   if (!baselineRecommendationEffectiveness) return;
   const items = summary.items || [];
-  baselineRecommendationEffectiveness.innerHTML = `
+  if (baselineRecommendationEffectiveness) baselineRecommendationEffectiveness.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.totalAccepted || 0}</span> accepts across <span style="color:var(--text); font-weight:600;">${summary.totalSurfaced || 0}</span> surfaces</div>
     <div style="margin-top:8px;">Overall acceptance rate: <span style="color:var(--text); font-weight:600;">${summary.overallAcceptanceRate || 0}</span></div>
     ${items.map((item) => `<div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.effectiveness} · rate ${item.acceptanceRate || 0}</div>`).join('') || '<div style="margin-top:8px;">No recommendation effectiveness data yet.</div>'}
@@ -542,7 +542,7 @@ function renderBaselineRecommendationEffectiveness(summary = {}) {
 
 function renderBaselineRecommendationPriority(summary = {}) {
   if (!baselineRecommendationPriority) return;
-  baselineRecommendationPriority.innerHTML = summary.topAction
+  if (baselineRecommendationPriority) baselineRecommendationPriority.innerHTML = summary.topAction
     ? `<div><span style="color:var(--text); font-weight:600;">${summary.topAction}</span> · ${summary.topPromotion || 'default'} · score ${summary.topPriorityScore || 0}${summary.topConfidenceBand ? ` · confidence ${summary.topConfidenceBand}` : ''}${summary.topResilienceBand ? ` · resilience ${summary.topResilienceBand} ${summary.topResilienceScore || 0}` : ''}${summary.topConfidenceTrend ? ` · trend ${summary.topConfidenceTrend}${summary.topConfidenceDelta ? ` (${summary.topConfidenceDelta > 0 ? '+' : ''}${summary.topConfidenceDelta})` : ''}` : ''}${summary.topConfidenceReason ? ` · why ${summary.topConfidenceReason}` : ''}${summary.topOutcomeScore !== undefined ? ` · outcome ${summary.topOutcomeScore}` : ''}${summary.topPlaybookConfidence && summary.topPlaybookConfidence !== 'none' ? ` · playbook ${summary.topPlaybookConfidence}+${summary.topPlaybookBoost || 0}` : ''}${summary.topRevivalStatus ? ` · revival ${summary.topRevivalStatus}${summary.topRevivalBoost ? `${summary.topRevivalBoost > 0 ? '+' : ''}${summary.topRevivalBoost}` : ''}` : ''}${summary.topChangeCount ? ` · churn ${summary.topChangeCount}${summary.topChurnPenalty ? ` (${summary.topChurnPenalty})` : ''}` : ''}${summary.topStableBoost ? ` · stability ${summary.topStabilityState}+${summary.topStableBoost}` : ''}${summary.topVolatilityPenalty || summary.topVolatilityBoost ? ` · volatility ${summary.topVolatilityState}${summary.topVolatilityBoost ? `+${summary.topVolatilityBoost}` : ''}${summary.topVolatilityPenalty ? `${summary.topVolatilityPenalty}` : ''}` : ''}${summary.topUpgradeConfirmationBoost ? ` · upgrades ${summary.topUpgradedCount || 0} (+${summary.topUpgradeConfirmationBoost})` : ''}${summary.topUpgradeDowngradePenalty ? ` · downgrades ${summary.topDowngradedCount || 0} (${summary.topUpgradeDowngradePenalty})` : ''}${summary.topTrustMomentumAdjustment ? ` · momentum ${summary.topTrustMomentumBand || 'neutral'} ${summary.topTrustMomentumScore || 0} (${summary.topTrustMomentumAdjustment > 0 ? '+' : ''}${summary.topTrustMomentumAdjustment})` : ''}${summary.topTrustMomentumJustReversed ? ` · reversal ${summary.topTrustMomentumBand || 'neutral'}${summary.topTrustMomentumReversalAdjustment ? ` (${summary.topTrustMomentumReversalAdjustment > 0 ? '+' : ''}${summary.topTrustMomentumReversalAdjustment})` : ''}` : ''}${summary.topTrustMomentumReversalStreak ? ` · streak ${summary.topTrustMomentumReversalStreak}${summary.topTrustMomentumReversalStreakAdjustment ? ` (${summary.topTrustMomentumReversalStreakAdjustment})` : ''}` : ''}${summary.topTrustMomentumStabilityStreak ? ` · stable ${summary.topTrustMomentumStabilityStreak}${summary.topTrustMomentumStabilityBoost ? ` (+${summary.topTrustMomentumStabilityBoost})` : ''}` : ''}${summary.topConvergenceStreak ? ` · convergence ${summary.topConvergenceStreak}${summary.topConvergenceBoost ? ` (+${summary.topConvergenceBoost})` : ''}` : ''}${summary.topJustConverged ? ' · just converged' : ''}${summary.topDependencyStreak ? ` · dependent ${summary.topDependencyStreak}${summary.topDependencyPenalty ? ` (${summary.topDependencyPenalty})` : ''}` : ''}${summary.topJustBecameDependent ? ' · just dependent' : ''}${summary.topDependencyRecoveryStreak ? ` · recovery ${summary.topDependencyRecoveryStreak}${summary.topDependencyRecoveryBoost ? ` (+${summary.topDependencyRecoveryBoost})` : ''}` : ''}${summary.topJustRecoveredFromDependency ? ' · just recovered' : ''}${summary.topDependencyRecoveryDurability && summary.topDependencyRecoveryDurability !== 'fragile' ? ` · recovery ${summary.topDependencyRecoveryDurability}${summary.topDependencyRecoveryDurabilityBoost ? ` (+${summary.topDependencyRecoveryDurabilityBoost})` : ''}` : ''}${summary.topJustBecameDurableRecovery ? ' · just durable' : ''}${summary.topJustRelapsedFromDurableRecovery ? ` · relapse (${summary.topDurableRecoveryRelapsePenalty || 0})` : ''}${summary.topRelapseResilienceBand && summary.topRelapseResilienceBand !== 'neutral' ? ` · relapse ${summary.topRelapseResilienceBand} ${summary.topRelapseResilienceScore || 0} (${summary.topRelapseResilienceAdjustment > 0 ? '+' : ''}${summary.topRelapseResilienceAdjustment || 0})` : ''}${summary.topRecoveryMaturityBand && summary.topRecoveryMaturityBand !== 'early' ? ` · recovery ${summary.topRecoveryMaturityBand} ${summary.topRecoveryMaturityScore || 0} (${summary.topRecoveryMaturityAdjustment > 0 ? '+' : ''}${summary.topRecoveryMaturityAdjustment || 0})` : ''}${summary.topRecoveryMaturityDrift && summary.topRecoveryMaturityDrift !== 'steady' ? ` · maturity ${summary.topRecoveryMaturityDrift}${summary.topRecoveryMaturityDelta ? ` (${summary.topRecoveryMaturityDelta > 0 ? '+' : ''}${summary.topRecoveryMaturityDelta})` : ''}${summary.topRecoveryMaturityDriftAdjustment ? ` (${summary.topRecoveryMaturityDriftAdjustment > 0 ? '+' : ''}${summary.topRecoveryMaturityDriftAdjustment})` : ''}` : ''}${summary.topRecoveryMaturityJustReversed ? ` · reversal ${summary.topRecoveryMaturityDrift}${summary.topRecoveryMaturityReversalAdjustment ? ` (${summary.topRecoveryMaturityReversalAdjustment})` : ''}` : ''}${summary.topRecoveryMaturityReversalStreak ? ` · whipsaw ${summary.topRecoveryMaturityReversalStreak}${summary.topRecoveryMaturityReversalStreakAdjustment ? ` (${summary.topRecoveryMaturityReversalStreakAdjustment})` : ''}` : ''}${summary.topRecoveryMaturityStabilityStreak ? ` · stable ${summary.topRecoveryMaturityStabilityStreak}${summary.topRecoveryMaturityStabilityBoost ? ` (+${summary.topRecoveryMaturityStabilityBoost})` : ''}` : ''}${summary.topRecoveryMaturityBreakdownRiskBand && summary.topRecoveryMaturityBreakdownRiskBand !== 'low' ? ` · risk ${summary.topRecoveryMaturityBreakdownRiskBand} ${summary.topRecoveryMaturityBreakdownRiskScore || 0} (${summary.topRecoveryMaturityBreakdownRiskAdjustment || 0})` : ''}${summary.topRecoveryTrustHealthBand ? ` · health ${summary.topRecoveryTrustHealthBand} ${summary.topRecoveryTrustHealthScore || 0} (${summary.topRecoveryTrustHealthAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustHealthAdjustment || 0})` : ''}${summary.topRecoveryTrustHealthTrend && summary.topRecoveryTrustHealthTrend !== 'steady' ? ` · health ${summary.topRecoveryTrustHealthTrend}${summary.topRecoveryTrustHealthDelta ? ` (${summary.topRecoveryTrustHealthDelta > 0 ? '+' : ''}${summary.topRecoveryTrustHealthDelta})` : ''}${summary.topRecoveryTrustHealthTrendAdjustment ? ` (${summary.topRecoveryTrustHealthTrendAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustHealthTrendAdjustment})` : ''}` : ''}${summary.topRecoveryTrustHealthJustReversed ? ` · health reversal ${summary.topRecoveryTrustHealthTrend}${summary.topRecoveryTrustHealthReversalAdjustment ? ` (${summary.topRecoveryTrustHealthReversalAdjustment})` : ''}` : ''}${summary.topRecoveryTrustHealthReversalStreak ? ` · health whipsaw ${summary.topRecoveryTrustHealthReversalStreak}${summary.topRecoveryTrustHealthReversalStreakAdjustment ? ` (${summary.topRecoveryTrustHealthReversalStreakAdjustment})` : ''}` : ''}${summary.topRecoveryTrustAdjustmentSummary ? ` · recovery stack ${summary.topRecoveryTrustAdjustmentSummary}${summary.topRecoveryTrustNetAdjustment ? ` · net ${summary.topRecoveryTrustNetAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustNetAdjustment}` : ''}` : ''}${summary.topRecoveryTrustDriverJustShifted ? ` · driver shift ${summary.topPreviousRecoveryTrustTopDriver || 'none'} → ${summary.topRecoveryTrustTopDriver || 'none'}${summary.topRecoveryTrustDriverShiftAdjustment ? ` (${summary.topRecoveryTrustDriverShiftAdjustment})` : ''}${summary.topRecoveryTrustDriverTransitionSeverityBand && summary.topRecoveryTrustDriverTransitionSeverityBand !== 'neutral' ? ` · ${summary.topRecoveryTrustDriverTransitionSeverityBand}${summary.topRecoveryTrustDriverTransitionAdjustment ? ` (${summary.topRecoveryTrustDriverTransitionAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustDriverTransitionAdjustment})` : ''}` : ''}` : ''}${summary.topRecoveryTrustDriverShiftStreak ? ` · driver churn ${summary.topRecoveryTrustDriverShiftStreak}${summary.topRecoveryTrustDriverShiftStreakAdjustment ? ` (${summary.topRecoveryTrustDriverShiftStreakAdjustment})` : ''}` : ''}${summary.topRecoveryTrustDriverNegativeTransitionStreak ? ` · deterioration streak ${summary.topRecoveryTrustDriverNegativeTransitionStreak}${summary.topRecoveryTrustDriverNegativeTransitionStreakAdjustment ? ` (${summary.topRecoveryTrustDriverNegativeTransitionStreakAdjustment})` : ''}` : ''}${summary.topRecoveryTrustDriverPositiveTransitionStreak ? ` · recovery streak ${summary.topRecoveryTrustDriverPositiveTransitionStreak}${summary.topRecoveryTrustDriverPositiveTransitionStreakBoost ? ` (+${summary.topRecoveryTrustDriverPositiveTransitionStreakBoost})` : ''}` : ''}${summary.topRecoveryTrustDriverTransitionBalanceScore ? ` · transition balance ${summary.topRecoveryTrustDriverTransitionBalanceBand || 'balanced'} ${summary.topRecoveryTrustDriverTransitionBalanceScore > 0 ? '+' : ''}${summary.topRecoveryTrustDriverTransitionBalanceScore}${summary.topRecoveryTrustDriverTransitionBalanceAdjustment ? ` (${summary.topRecoveryTrustDriverTransitionBalanceAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustDriverTransitionBalanceAdjustment})` : ''}` : ''}${summary.topRecoveryTrustDriverTransitionBalanceJustReversed ? ` · balance reversal ${summary.topPreviousRecoveryTrustDriverTransitionBalanceBand || 'balanced'} → ${summary.topRecoveryTrustDriverTransitionBalanceBand || 'balanced'}${summary.topRecoveryTrustDriverTransitionBalanceReversalAdjustment ? ` (${summary.topRecoveryTrustDriverTransitionBalanceReversalAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustDriverTransitionBalanceReversalAdjustment})` : ''}` : ''}${summary.topRecoveryTrustDriverTransitionBalanceReversalStreak ? ` · balance whipsaw ${summary.topRecoveryTrustDriverTransitionBalanceReversalStreak}${summary.topRecoveryTrustDriverTransitionBalanceReversalStreakAdjustment ? ` (${summary.topRecoveryTrustDriverTransitionBalanceReversalStreakAdjustment})` : ''}` : ''}${summary.topRecoveryTrustDriverTransitionBalanceStabilityStreak ? ` · balance stable ${summary.topRecoveryTrustDriverTransitionBalanceStabilityPolarity || 'neutral'} ${summary.topRecoveryTrustDriverTransitionBalanceStabilityStreak}${summary.topRecoveryTrustDriverTransitionBalanceStabilityAdjustment ? ` (${summary.topRecoveryTrustDriverTransitionBalanceStabilityAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustDriverTransitionBalanceStabilityAdjustment})` : ''}` : ''}${summary.topRecoveryTrustDriverTransitionBalanceEntrenchmentBand && summary.topRecoveryTrustDriverTransitionBalanceEntrenchmentBand !== 'none' ? ` · entrenchment ${summary.topRecoveryTrustDriverTransitionBalanceEntrenchmentBand}${summary.topRecoveryTrustDriverTransitionBalanceEntrenchmentAdjustment ? ` (${summary.topRecoveryTrustDriverTransitionBalanceEntrenchmentAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustDriverTransitionBalanceEntrenchmentAdjustment})` : ''}` : ''}${summary.topRecoveryTrustDriverTransitionBalanceEscapedEntrenchment ? ` · entrenchment escape ${summary.topRecoveryTrustDriverTransitionBalanceEntrenchmentEscapeDirection}${summary.topRecoveryTrustDriverTransitionBalanceEntrenchmentEscapeAdjustment ? ` (${summary.topRecoveryTrustDriverTransitionBalanceEntrenchmentEscapeAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustDriverTransitionBalanceEntrenchmentEscapeAdjustment})` : ''}` : ''}${summary.topRecoveryTrustDriverTransitionBalanceEscapedEntrenchmentDurably ? ` · escape durable ${summary.topRecoveryTrustDriverTransitionBalanceEscapeDurabilityDirection} ${summary.topRecoveryTrustDriverTransitionBalanceEscapeDurabilityStreak}${summary.topRecoveryTrustDriverTransitionBalanceEscapeDurabilityAdjustment ? ` (${summary.topRecoveryTrustDriverTransitionBalanceEscapeDurabilityAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustDriverTransitionBalanceEscapeDurabilityAdjustment})` : ''}` : ''}${summary.topRecoveryTrustDriverTransitionBalanceRecapturedEntrenchment ? ` · recaptured ${summary.topRecoveryTrustDriverTransitionBalanceRecaptureDirection}${summary.topRecoveryTrustDriverTransitionBalanceRecaptureAdjustment ? ` (${summary.topRecoveryTrustDriverTransitionBalanceRecaptureAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustDriverTransitionBalanceRecaptureAdjustment})` : ''}` : ''}${summary.topRecoveryTrustDriverTransitionBalanceRecaptureStreak ? ` · recapture streak ${summary.topRecoveryTrustDriverTransitionBalanceRecaptureStreak}${summary.topRecoveryTrustDriverTransitionBalanceRecaptureStreakAdjustment ? ` (${summary.topRecoveryTrustDriverTransitionBalanceRecaptureStreakAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustDriverTransitionBalanceRecaptureStreakAdjustment})` : ''}` : ''}${summary.topRecoveryTrustDriverTransitionBalanceStructuralState && summary.topRecoveryTrustDriverTransitionBalanceStructuralState !== 'neutral' ? ` · structural state ${summary.topRecoveryTrustDriverTransitionBalanceStructuralState}${summary.topRecoveryTrustDriverTransitionBalanceStructuralAdjustment ? ` (${summary.topRecoveryTrustDriverTransitionBalanceStructuralAdjustment > 0 ? '+' : ''}${summary.topRecoveryTrustDriverTransitionBalanceStructuralAdjustment})` : ''}` : ''}</div>`
     : 'No recommendation priority data yet.';
 }
@@ -550,7 +550,7 @@ function renderBaselineRecommendationPriority(summary = {}) {
 function renderBaselineRecommendationOutcomes(summary = {}) {
   if (!baselineRecommendationOutcomes) return;
   const items = summary.items || [];
-  baselineRecommendationOutcomes.innerHTML = `
+  if (baselineRecommendationOutcomes) baselineRecommendationOutcomes.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.totalPositive || 0}</span> positive · ${summary.totalNeutral || 0} neutral · ${summary.totalNegative || 0} negative</div>
     ${items.map((item) => `
       <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--line);">
@@ -568,14 +568,14 @@ function renderBaselineRecommendationOutcomes(summary = {}) {
 
 function renderBaselineRecommendationSuppressed(items = []) {
   if (!baselineRecommendationSuppressed) return;
-  baselineRecommendationSuppressed.innerHTML = items.map((item) => `
+  if (baselineRecommendationSuppressed) baselineRecommendationSuppressed.innerHTML = items.map((item) => `
     <div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.promotion} · outcome ${item.outcomeScore || 0} · negatives ${item.negativeCount || 0}</div>
   `).join('') || 'No suppressed recommendations right now.';
 }
 
 function renderBaselineRecommendationRevived(items = []) {
   if (!baselineRecommendationRevived) return;
-  baselineRecommendationRevived.innerHTML = items.map((item) => `
+  if (baselineRecommendationRevived) baselineRecommendationRevived.innerHTML = items.map((item) => `
     <div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · revived · outcome ${item.outcomeScore || 0}${item.playbookConfidence && item.playbookConfidence !== 'none' ? ` · playbook ${item.playbookConfidence}` : ''}${item.revivalStatus ? ` · ${item.revivalStatus}${item.revivalBoost ? `${item.revivalBoost > 0 ? '+' : ''}${item.revivalBoost}` : ''}` : ''}</div>
   `).join('') || 'No revived recommendations right now.';
 }
@@ -583,7 +583,7 @@ function renderBaselineRecommendationRevived(items = []) {
 function renderBaselineRecommendationRevivalAnalytics(summary = {}) {
   if (!baselineRecommendationRevivalAnalytics) return;
   const items = summary.items || [];
-  baselineRecommendationRevivalAnalytics.innerHTML = `
+  if (baselineRecommendationRevivalAnalytics) baselineRecommendationRevivalAnalytics.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.activeCount || 0}</span> active · ${summary.stickingCount || 0} sticking · ${summary.failedCount || 0} failed</div>
     ${items.map((item) => `<div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.status || 'unknown'}</div>`).join('') || '<div style="margin-top:8px;">No revival history yet.</div>'}
   `;
@@ -592,7 +592,7 @@ function renderBaselineRecommendationRevivalAnalytics(summary = {}) {
 function renderBaselineRecommendationChurn(summary = {}) {
   if (!baselineRecommendationChurn) return;
   const items = summary.items || [];
-  baselineRecommendationChurn.innerHTML = `
+  if (baselineRecommendationChurn) baselineRecommendationChurn.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.highChurnCount || 0}</span> high-churn · ${summary.totalTracked || 0} tracked</div>
     ${items.map((item) => `<div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.changeCount || 0} changes · ${item.previousState || 'start'} → ${item.currentState || 'unknown'}</div>`).join('') || '<div style="margin-top:8px;">No recommendation churn yet.</div>'}
   `;
@@ -600,14 +600,14 @@ function renderBaselineRecommendationChurn(summary = {}) {
 
 function renderBaselineRecommendationStable(items = []) {
   if (!baselineRecommendationStable) return;
-  baselineRecommendationStable.innerHTML = items.map((item) => `
+  if (baselineRecommendationStable) baselineRecommendationStable.innerHTML = items.map((item) => `
     <div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.stabilityState || 'stable'} +${item.stableBoost || 0} · ${item.stabilityAgeHours || 0}h steady</div>
   `).join('') || 'No stable recommendations right now.';
 }
 
 function renderBaselineRecommendationConfidence(items = []) {
   if (!baselineRecommendationConfidence) return;
-  baselineRecommendationConfidence.innerHTML = items.map((item) => `
+  if (baselineRecommendationConfidence) baselineRecommendationConfidence.innerHTML = items.map((item) => `
     <div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.confidenceBand || 'low'} confidence${item.baseConfidenceBand && item.baseConfidenceBand !== item.confidenceBand ? ` (from ${item.baseConfidenceBand})` : ''} · ${item.confidenceTrend || 'steady'}${item.confidenceDelta ? ` (${item.confidenceDelta > 0 ? '+' : ''}${item.confidenceDelta})` : ''} · score ${item.priorityScore || 0}<div class="task-focus-meta" style="margin-top:4px; text-transform:none; letter-spacing:normal;">${item.confidenceReason || 'No confidence explanation yet.'}</div></div>
   `).join('') || 'No recommendation confidence data yet.';
 }
@@ -615,7 +615,7 @@ function renderBaselineRecommendationConfidence(items = []) {
 function renderBaselineRecommendationConfidenceTrend(summary = {}) {
   if (!baselineRecommendationConfidenceTrend) return;
   const items = summary.items || [];
-  baselineRecommendationConfidenceTrend.innerHTML = `
+  if (baselineRecommendationConfidenceTrend) baselineRecommendationConfidenceTrend.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.risingCount || 0}</span> rising · ${summary.fallingCount || 0} falling · ${summary.steadyCount || 0} steady</div>
     ${items.map((item) => `<div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.trend || 'steady'} · ${item.previousBand || 'new'} → ${item.currentBand || 'low'} · Δ ${item.delta || 0}</div>`).join('') || '<div style="margin-top:8px;">No confidence trend data yet.</div>'}
   `;
@@ -624,7 +624,7 @@ function renderBaselineRecommendationConfidenceTrend(summary = {}) {
 function renderBaselineRecommendationConfidenceVolatility(summary = {}) {
   if (!baselineRecommendationConfidenceVolatility) return;
   const items = summary.items || [];
-  baselineRecommendationConfidenceVolatility.innerHTML = `
+  if (baselineRecommendationConfidenceVolatility) baselineRecommendationConfidenceVolatility.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.highVolatilityCount || 0}</span> high · ${summary.mediumVolatilityCount || 0} medium · ${summary.lowVolatilityCount || 0} low</div>
     ${items.map((item) => `<div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.volatilityState || 'low'} volatility · shifts ${item.trendShiftCount || 0}</div>`).join('') || '<div style="margin-top:8px;">No confidence volatility data yet.</div>'}
   `;
@@ -632,7 +632,7 @@ function renderBaselineRecommendationConfidenceVolatility(summary = {}) {
 
 function renderBaselineRecommendationConfidenceResilience(items = []) {
   if (!baselineRecommendationConfidenceResilience) return;
-  baselineRecommendationConfidenceResilience.innerHTML = items.map((item) => `
+  if (baselineRecommendationConfidenceResilience) baselineRecommendationConfidenceResilience.innerHTML = items.map((item) => `
     <div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.resilienceBand || 'fragile'} resilience · score ${item.resilienceScore || 0}</div>
   `).join('') || 'No confidence resilience data yet.';
 }
@@ -640,7 +640,7 @@ function renderBaselineRecommendationConfidenceResilience(items = []) {
 function renderBaselineRecommendationConfidenceAdjustments(summary = {}) {
   if (!baselineRecommendationConfidenceAdjustments) return;
   const items = summary.items || [];
-  baselineRecommendationConfidenceAdjustments.innerHTML = `
+  if (baselineRecommendationConfidenceAdjustments) baselineRecommendationConfidenceAdjustments.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.upgradedCount || 0}</span> upgraded · ${summary.downgradedCount || 0} downgraded · ${summary.adjustedCount || 0} adjusted · ${summary.convergedCount || 0} converged · ${summary.justConvergedCount || 0} just converged · ${summary.dependentCount || 0} dependent · ${summary.justBecameDependentCount || 0} just dependent · ${summary.recoveredCount || 0} recovered · ${summary.justRecoveredCount || 0} just recovered · ${summary.durableRecoveredCount || 0} durable · ${summary.justDurableRecoveredCount || 0} just durable · ${summary.relapsedCount || 0} relapsed · ${summary.justRelapsedCount || 0} just relapsed · ${summary.resilientRecoveryCount || 0} resilient · ${summary.fragileRecoveryCount || 0} fragile · ${summary.matureRecoveryCount || 0} mature · ${summary.developingRecoveryCount || 0} developing · ${summary.risingRecoveryCount || 0} rising · ${summary.fallingRecoveryCount || 0} falling · ${summary.recoveryMaturityReversalCount || 0} reversed · ${summary.justReversedRecoveryCount || 0} just reversed · ${summary.reversalStreakRecoveryCount || 0} whipsawing · ${summary.stableRecoveryCount || 0} stable · ${summary.highBreakdownRiskCount || 0} high risk · ${summary.watchBreakdownRiskCount || 0} watch · ${summary.strongRecoveryHealthCount || 0} strong · ${summary.stableRecoveryHealthCount || 0} healthy · ${summary.fragileRecoveryHealthCount || 0} fragile health · ${summary.improvingRecoveryHealthCount || 0} improving · ${summary.decayingRecoveryHealthCount || 0} decaying · ${summary.reversedRecoveryHealthCount || 0} health reversed · ${summary.justReversedRecoveryHealthCount || 0} health just reversed · ${summary.reversalStreakRecoveryHealthCount || 0} health whipsawing · ${summary.positiveRecoveryTrustNetCount || 0} net positive · ${summary.negativeRecoveryTrustNetCount || 0} net negative · ${summary.healthDrivenRecoveryCount || 0} health-led · ${summary.maturityDrivenRecoveryCount || 0} maturity-led · ${summary.riskDrivenRecoveryCount || 0} risk-led · ${summary.driverShiftRecoveryCount || 0} shifted · ${summary.justShiftedRecoveryCount || 0} just shifted · ${summary.driverShiftStreakRecoveryCount || 0} driver churn · ${summary.positiveDriverTransitionCount || 0} positive transitions · ${summary.negativeDriverTransitionCount || 0} negative transitions · ${summary.deterioratingDriverTransitionCount || 0} deteriorating · ${summary.negativeDriverTransitionStreakCount || 0} deterioration streaks · ${summary.positiveDriverTransitionStreakCount || 0} recovery streaks · ${summary.positiveDriverTransitionBalanceCount || 0} recovery-led balance · ${summary.negativeDriverTransitionBalanceCount || 0} deterioration-led balance · ${summary.balancedDriverTransitionBalanceCount || 0} balanced · ${summary.reversedDriverTransitionBalanceCount || 0} reversed · ${summary.positiveReversedDriverTransitionBalanceCount || 0} positive reversals · ${summary.negativeReversedDriverTransitionBalanceCount || 0} negative reversals · ${summary.reversalStreakDriverTransitionBalanceCount || 0} balance whipsaws · ${summary.stableDriverTransitionBalanceCount || 0} balance stable · ${summary.stableRecoveryLedDriverTransitionBalanceCount || 0} stable recovery-led · ${summary.stableDeteriorationLedDriverTransitionBalanceCount || 0} stable deterioration-led · ${summary.entrenchedDriverTransitionBalanceCount || 0} entrenched · ${summary.recoveryEntrenchedDriverTransitionBalanceCount || 0} recovery entrenched · ${summary.deteriorationEntrenchedDriverTransitionBalanceCount || 0} deterioration entrenched · ${summary.justEntrenchedDriverTransitionBalanceCount || 0} just entrenched · ${summary.escapedEntrenchedDriverTransitionBalanceCount || 0} escaped entrenchment · ${summary.positiveEscapedEntrenchedDriverTransitionBalanceCount || 0} positive escapes · ${summary.negativeEscapedEntrenchedDriverTransitionBalanceCount || 0} negative escapes · ${summary.durableEscapedEntrenchedDriverTransitionBalanceCount || 0} durable escapes · ${summary.durablePositiveEscapedEntrenchedDriverTransitionBalanceCount || 0} durable positive escapes · ${summary.durableNegativeEscapedEntrenchedDriverTransitionBalanceCount || 0} durable negative escapes · ${summary.recapturedEntrenchedDriverTransitionBalanceCount || 0} recaptured · ${summary.positiveRecapturedEntrenchedDriverTransitionBalanceCount || 0} positive recaptures · ${summary.negativeRecapturedEntrenchedDriverTransitionBalanceCount || 0} negative recaptures · ${summary.recaptureStreakDriverTransitionBalanceCount || 0} recapture whipsaws · ${summary.terminalStructuralStateCount || 0} terminal · ${summary.compromisedStructuralStateCount || 0} compromised · ${summary.weakeningStructuralStateCount || 0} weakening · ${summary.contestedStructuralStateCount || 0} contested · ${summary.soundStructuralStateCount || 0} sound · ${summary.fortifiedStructuralStateCount || 0} fortified</div>
     ${items.map((item) => `<div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.adjustmentDirection || 'none'} · ${item.adjustmentCount || 0} adjustments · up ${item.upgradedCount || 0} / down ${item.downgradedCount || 0}${item.convergenceStreak ? ` · convergence ${item.convergenceStreak}` : ''}${item.justConverged ? ' · just converged' : ''}${item.dependencyStreak ? ` · dependent ${item.dependencyStreak}` : ''}${item.justBecameDependent ? ' · just dependent' : ''}${item.dependencyRecoveryStreak ? ` · recovery ${item.dependencyRecoveryStreak}` : ''}${item.justRecoveredFromDependency ? ' · just recovered' : ''}${item.dependencyRecoveryDurability && item.dependencyRecoveryDurability !== 'fragile' ? ` · recovery ${item.dependencyRecoveryDurability}` : ''}${item.justBecameDurableRecovery ? ' · just durable' : ''}${item.justRelapsedFromDurableRecovery ? ' · just relapsed' : ''}${item.relapseResilienceBand && item.relapseResilienceBand !== 'neutral' ? ` · relapse ${item.relapseResilienceBand} ${item.relapseResilienceScore}` : ''}${item.recoveryMaturityBand && item.recoveryMaturityBand !== 'early' ? ` · recovery ${item.recoveryMaturityBand} ${item.recoveryMaturityScore}` : ''}${item.recoveryMaturityDrift && item.recoveryMaturityDrift !== 'steady' ? ` · maturity ${item.recoveryMaturityDrift} ${item.recoveryMaturityDelta > 0 ? '+' : ''}${item.recoveryMaturityDelta}` : ''}${item.recoveryMaturityJustReversed ? ` · just reversed ${item.recoveryMaturityDrift}` : ''}${item.recoveryMaturityReversalStreak ? ` · whipsaw ${item.recoveryMaturityReversalStreak}` : ''}${item.recoveryMaturityStabilityStreak ? ` · stable ${item.recoveryMaturityStabilityStreak}` : ''}${item.recoveryMaturityBreakdownRiskBand && item.recoveryMaturityBreakdownRiskBand !== 'low' ? ` · risk ${item.recoveryMaturityBreakdownRiskBand} ${item.recoveryMaturityBreakdownRiskScore}` : ''}${item.recoveryTrustHealthBand ? ` · health ${item.recoveryTrustHealthBand} ${item.recoveryTrustHealthScore}` : ''}${item.recoveryTrustHealthTrend && item.recoveryTrustHealthTrend !== 'steady' ? ` · health ${item.recoveryTrustHealthTrend} ${item.recoveryTrustHealthDelta > 0 ? '+' : ''}${item.recoveryTrustHealthDelta}` : ''}${item.recoveryTrustHealthJustReversed ? ` · health just reversed ${item.recoveryTrustHealthTrend}` : ''}${item.recoveryTrustHealthReversalStreak ? ` · health whipsaw ${item.recoveryTrustHealthReversalStreak}` : ''}${item.recoveryTrustAdjustmentSummary ? ` · stack ${item.recoveryTrustAdjustmentSummary}${item.recoveryTrustNetAdjustment ? ` · net ${item.recoveryTrustNetAdjustment > 0 ? '+' : ''}${item.recoveryTrustNetAdjustment}` : ''}${item.recoveryTrustTopDriver ? ` · driver ${item.recoveryTrustTopDriver}${item.recoveryTrustTopDriverAdjustment ? ` (${item.recoveryTrustTopDriverAdjustment > 0 ? '+' : ''}${item.recoveryTrustTopDriverAdjustment})` : ''}` : ''}` : ''}${item.recoveryTrustDriverJustShifted ? ` · shifted ${item.previousRecoveryTrustTopDriver || 'none'} → ${item.recoveryTrustTopDriver || 'none'}${item.recoveryTrustDriverTransitionSeverityBand && item.recoveryTrustDriverTransitionSeverityBand !== 'neutral' ? ` · ${item.recoveryTrustDriverTransitionSeverityBand} ${item.recoveryTrustDriverTransitionSeverityScore > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionSeverityScore}` : ''}` : ''}${item.recoveryTrustDriverShiftStreak ? ` · driver churn ${item.recoveryTrustDriverShiftStreak}` : ''}${item.recoveryTrustDriverNegativeTransitionStreak ? ` · deterioration streak ${item.recoveryTrustDriverNegativeTransitionStreak}` : ''}${item.recoveryTrustDriverPositiveTransitionStreak ? ` · recovery streak ${item.recoveryTrustDriverPositiveTransitionStreak}` : ''}${item.recoveryTrustDriverTransitionBalanceScore ? ` · balance ${item.recoveryTrustDriverTransitionBalanceBand || 'balanced'} ${item.recoveryTrustDriverTransitionBalanceScore > 0 ? '+' : ''}${item.recoveryTrustDriverTransitionBalanceScore}` : ''}${item.recoveryTrustDriverTransitionBalanceJustReversed ? ` · reversed ${item.previousRecoveryTrustDriverTransitionBalanceBand || 'balanced'} → ${item.recoveryTrustDriverTransitionBalanceBand || 'balanced'}` : ''}${item.recoveryTrustDriverTransitionBalanceReversalStreak ? ` · whipsaw ${item.recoveryTrustDriverTransitionBalanceReversalStreak}` : ''}${item.recoveryTrustDriverTransitionBalanceStabilityStreak ? ` · stable ${item.recoveryTrustDriverTransitionBalanceStabilityPolarity || 'neutral'} ${item.recoveryTrustDriverTransitionBalanceStabilityStreak}` : ''}${item.recoveryTrustDriverTransitionBalanceEntrenchmentBand && item.recoveryTrustDriverTransitionBalanceEntrenchmentBand !== 'none' ? ` · entrenched ${item.recoveryTrustDriverTransitionBalanceEntrenchmentBand}` : ''}${item.recoveryTrustDriverTransitionBalanceEscapedEntrenchment ? ` · escape ${item.recoveryTrustDriverTransitionBalanceEntrenchmentEscapeDirection}` : ''}${item.recoveryTrustDriverTransitionBalanceEscapedEntrenchmentDurably ? ` · durable escape ${item.recoveryTrustDriverTransitionBalanceEscapeDurabilityDirection} ${item.recoveryTrustDriverTransitionBalanceEscapeDurabilityStreak}` : ''}${item.recoveryTrustDriverTransitionBalanceRecapturedEntrenchment ? ` · recaptured ${item.recoveryTrustDriverTransitionBalanceRecaptureDirection}` : ''}${item.recoveryTrustDriverTransitionBalanceRecaptureStreak ? ` · recapture streak ${item.recoveryTrustDriverTransitionBalanceRecaptureStreak}` : ''}${item.recoveryTrustDriverTransitionBalanceStructuralState && item.recoveryTrustDriverTransitionBalanceStructuralState !== 'neutral' ? ` · structural state ${item.recoveryTrustDriverTransitionBalanceStructuralState}` : ''}</div>`).join('') || '<div style="margin-top:8px;">No confidence adjustments yet.</div>'}
   `;
@@ -649,7 +649,7 @@ function renderBaselineRecommendationConfidenceAdjustments(summary = {}) {
 function renderBaselineRecommendationTrustMomentum(summary = {}) {
   if (!baselineRecommendationTrustMomentum) return;
   const items = summary.items || [];
-  baselineRecommendationTrustMomentum.innerHTML = `
+  if (baselineRecommendationTrustMomentum) baselineRecommendationTrustMomentum.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.positiveCount || 0}</span> positive · ${summary.negativeCount || 0} negative · ${summary.neutralCount || 0} neutral · ${summary.justReversedCount || 0} just reversed · ${summary.streakingCount || 0} streaking · ${summary.stableCount || 0} stable</div>
     ${items.map((item) => `<div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.trustMomentumBand || 'neutral'} · score ${item.trustMomentumScore || 0}${item.trustMomentumJustReversed ? ' · just reversed' : ''}${item.trustMomentumReversalCount ? ` · reversals ${item.trustMomentumReversalCount}` : ''}${item.trustMomentumReversalStreak ? ` · streak ${item.trustMomentumReversalStreak}` : ''}${item.trustMomentumStabilityStreak ? ` · stable ${item.trustMomentumStabilityStreak}` : ''}</div>`).join('') || '<div style="margin-top:8px;">No trust momentum data yet.</div>'}
   `;
@@ -658,7 +658,7 @@ function renderBaselineRecommendationTrustMomentum(summary = {}) {
 function renderBaselineRecommendationPlaybook(summary = {}) {
   if (!baselineRecommendationPlaybook) return;
   const items = summary.items || [];
-  baselineRecommendationPlaybook.innerHTML = `
+  if (baselineRecommendationPlaybook) baselineRecommendationPlaybook.innerHTML = `
     ${summary.topAction ? `<div><span style="color:var(--text); font-weight:600;">${summary.topAction}</span> · ${summary.topConfidence || 'emerging'} · score ${summary.topScore || 0}</div>` : '<div>No learned playbook entries yet.</div>'}
     ${items.map((item) => `<div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.confidence} · playbook ${item.playbookScore || 0}${item.freshness ? ` · ${item.freshness}` : ''}</div>`).join('')}
   `;
@@ -679,7 +679,7 @@ async function trackBaselineRecommendationImpressions(items = []) {
 function renderBaselineMaintenanceAnalytics(summary = {}) {
   if (!baselineMaintenanceAnalytics) return;
   const items = summary.items || [];
-  baselineMaintenanceAnalytics.innerHTML = `
+  if (baselineMaintenanceAnalytics) baselineMaintenanceAnalytics.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.totalRuns || 0}</span> maintenance runs tracked</div>
     ${items.map((item) => `<div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.count || 0} runs</div>`).join('') || '<div style="margin-top:8px;">No maintenance runs yet.</div>'}
   `;
@@ -688,7 +688,7 @@ function renderBaselineMaintenanceAnalytics(summary = {}) {
 function renderBaselineMaintenanceEffectiveness(summary = {}) {
   if (!baselineMaintenanceEffectiveness) return;
   const items = summary.items || [];
-  baselineMaintenanceEffectiveness.innerHTML = `
+  if (baselineMaintenanceEffectiveness) baselineMaintenanceEffectiveness.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${summary.totalRemoved || 0}</span> entries removed across <span style="color:var(--text); font-weight:600;">${summary.totalRuns || 0}</span> runs</div>
     <div style="margin-top:8px;">Effective ${summary.effectiveCount || 0} · Mixed ${summary.mixedCount || 0} · Weak ${summary.weakCount || 0}</div>
     ${items.map((item) => `<div style="margin-top:8px;"><span style="color:var(--text); font-weight:600;">${item.action}</span> · ${item.effectiveness} · avg removed ${item.avgRemoved || 0}</div>`).join('') || '<div style="margin-top:8px;">No maintenance effectiveness data yet.</div>'}
@@ -756,7 +756,7 @@ function renderTimelineViews(items = []) {
   currentTimelineViews = items;
   if (!timelineViewsList) return;
 
-  timelineViewsList.innerHTML = items.map((view) => {
+  if (timelineViewsList) timelineViewsList.innerHTML = items.map((view) => {
     const isActive = String(view.anchorTime || '') === String(currentTimelineFilter || '')
       && Number(view.windowMinutes || 60) === Number(currentTimelineWindowMinutes)
       && String(view.feedView || 'active') === String(currentFeedView || 'active')
@@ -777,7 +777,7 @@ function renderTimelineViews(items = []) {
 function renderFeedWindowSummary(items = []) {
   if (!feedWindowSummary) return;
   if (items.length === 0) {
-    feedWindowSummary.innerHTML = currentTimelineFilter
+    if (feedWindowSummary) feedWindowSummary.innerHTML = currentTimelineFilter
       ? `No signals in the current ${formatWindowLabel(currentTimelineWindowMinutes)}.`
       : 'No signals in the current view.';
     return;
@@ -801,7 +801,7 @@ function renderFeedWindowSummary(items = []) {
     .join(' · ');
   const scopePrefix = currentTimelineFilter ? `${formatWindowLabel(currentTimelineWindowMinutes)} · ` : '';
 
-  feedWindowSummary.innerHTML = `
+  if (feedWindowSummary) feedWindowSummary.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${items.length}</span> visible signals · ${severityCounts.high || 0} high · ${severityCounts.medium || 0} medium · ${severityCounts.low || 0} low</div>
     <div style="margin-top:8px;">${scopePrefix}Window: ${formatClock(earliest.timestamp)} to ${formatClock(latest.timestamp)} · Top sources: ${topSources || 'n/a'}</div>
   `;
@@ -811,12 +811,12 @@ function renderTimelineComparison(currentItems = [], previousItems = [], baselin
   if (!timelineComparisonSummary) return;
 
   if (!currentTimelineFilter) {
-    timelineComparisonSummary.innerHTML = 'Select a timeline window to compare it against the prior equivalent window.';
+    if (timelineComparisonSummary) timelineComparisonSummary.innerHTML = 'Select a timeline window to compare it against the prior equivalent window.';
     return;
   }
 
   if (currentBaselineMode === 'saved' && !currentBaselineViewId) {
-    timelineComparisonSummary.innerHTML = 'Choose a saved temporal view to use as the comparison baseline.';
+    if (timelineComparisonSummary) timelineComparisonSummary.innerHTML = 'Choose a saved temporal view to use as the comparison baseline.';
     return;
   }
 
@@ -851,7 +851,7 @@ function renderTimelineComparison(currentItems = [], previousItems = [], baselin
     .map(([source, value]) => `<button class="tag-chip" data-compare-source="${source}">${source} ${value > 0 ? '+' : ''}${value}</button>`)
     .join('');
 
-  timelineComparisonSummary.innerHTML = `
+  if (timelineComparisonSummary) timelineComparisonSummary.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${currentCount}</span> current vs <span style="color:var(--text); font-weight:600;">${previousCount}</span> previous · delta <span style="color:var(--text); font-weight:600;">${deltaLabel}</span></div>
     <div style="margin-top:8px;">Baseline: <span style="color:var(--text); font-weight:600;">${baselineLabel}</span></div>
     <div style="margin-top:8px;">Window looks <span style="color:var(--text); font-weight:600;">${direction}</span> than the selected baseline slice.</div>
@@ -865,19 +865,19 @@ function renderBaselineShift(currentItems = [], previousItems = [], baselineLabe
   if (!baselineShiftSummary) return;
 
   if (!currentTimelineFilter) {
-    baselineShiftSummary.innerHTML = 'Baseline scoring will appear once a timeline window is selected.';
+    if (baselineShiftSummary) baselineShiftSummary.innerHTML = 'Baseline scoring will appear once a timeline window is selected.';
     return null;
   }
 
   if (currentBaselineMode === 'saved' && !currentBaselineViewId) {
-    baselineShiftSummary.innerHTML = 'Select a saved temporal view to score the current window against it.';
+    if (baselineShiftSummary) baselineShiftSummary.innerHTML = 'Select a saved temporal view to score the current window against it.';
     return null;
   }
 
   const stats = computeBaselineShiftStats(currentItems, previousItems);
   const { delta, highDelta, score, label } = stats;
 
-  baselineShiftSummary.innerHTML = `
+  if (baselineShiftSummary) baselineShiftSummary.innerHTML = `
     <div><span style="color:var(--text); font-weight:600;">${label}</span> baseline shift</div>
     <div style="margin-top:8px;">Against: ${baselineLabel}</div>
     <div style="margin-top:8px;">Score: <span style="color:var(--text); font-weight:600;">${score > 0 ? '+' : ''}${score}</span> from signal volume and high-severity movement.</div>
@@ -891,8 +891,8 @@ function renderTimelineFocus(items = []) {
   if (!timelineFocusStatus || !timelineFocusSummary) return;
 
   if (!items.length) {
-    timelineFocusStatus.textContent = currentTimelineFilter ? 'Empty time scope' : 'Full feed window';
-    timelineFocusSummary.innerHTML = currentTimelineFilter
+    if (timelineFocusStatus) timelineFocusStatus.textContent = currentTimelineFilter ? 'Empty time scope' : 'Full feed window';
+    if (timelineFocusSummary) timelineFocusSummary.innerHTML = currentTimelineFilter
       ? `No signals fall inside the selected ${formatWindowLabel(currentTimelineWindowMinutes)}.`
       : 'Click a live marker to isolate a temporal investigation window.';
     if (clearTimelineFilterButton) clearTimelineFilterButton.classList.toggle('active', Boolean(currentTimelineFilter));
@@ -927,8 +927,8 @@ function renderTimelineFocus(items = []) {
     const windowRadiusMs = Number(currentTimelineWindowMinutes) * 60 * 1000;
     const windowStart = new Date(selectedTime - windowRadiusMs);
     const windowEnd = new Date(selectedTime + windowRadiusMs);
-    timelineFocusStatus.textContent = `${formatClock(windowStart)} to ${formatClock(windowEnd)}`;
-    timelineFocusSummary.innerHTML = `
+    if (timelineFocusStatus) timelineFocusStatus.textContent = `${formatClock(windowStart)} to ${formatClock(windowEnd)}`;
+    if (timelineFocusSummary) timelineFocusSummary.innerHTML = `
       <div><span style="color:var(--text); font-weight:600;">${items.length}</span> signals inside the active ${formatWindowLabel(currentTimelineWindowMinutes)}.</div>
       <div style="margin-top:8px;">Severity mix: ${severityCounts.high || 0} high · ${severityCounts.medium || 0} medium · ${severityCounts.low || 0} low</div>
       <div class="filter-row" style="flex-wrap:wrap; margin-top:12px;">${sourceHtml || '<span class="task-focus-meta">No source breakdown available.</span>'}</div>
@@ -936,8 +936,8 @@ function renderTimelineFocus(items = []) {
     `;
   } else {
     const sorted = [...items].sort((a, b) => strcmpSafe(a.timestamp, b.timestamp));
-    timelineFocusStatus.textContent = `${formatClock(sorted[0].timestamp)} to ${formatClock(sorted[sorted.length - 1].timestamp)}`;
-    timelineFocusSummary.innerHTML = `
+    if (timelineFocusStatus) timelineFocusStatus.textContent = `${formatClock(sorted[0].timestamp)} to ${formatClock(sorted[sorted.length - 1].timestamp)}`;
+    if (timelineFocusSummary) timelineFocusSummary.innerHTML = `
       <div><span style="color:var(--text); font-weight:600;">${items.length}</span> signals are currently visible. Click a timeline marker to pivot into a tighter time scope.</div>
       <div style="margin-top:8px;">Severity mix: ${severityCounts.high || 0} high · ${severityCounts.medium || 0} medium · ${severityCounts.low || 0} low</div>
       <div class="filter-row" style="flex-wrap:wrap; margin-top:12px;">${sourceHtml || '<span class="task-focus-meta">No source breakdown available.</span>'}</div>
@@ -953,7 +953,7 @@ function strcmpSafe(a, b) {
 }
 
 function renderSignalFeed(items = []) {
-  signalFeedList.innerHTML = items.map(item => {
+  if (signalFeedList) signalFeedList.innerHTML = items.map(item => {
     const archiveBadge = currentFeedView === 'archived' ? `<span class="muted" style="text-transform:uppercase; font-size:0.7rem; border:1px solid var(--border); padding:2px 6px; border-radius:4px;">${item.status}</span>` : '';
     
     let actionsHtml = '';
@@ -997,7 +997,7 @@ function renderSignalFeed(items = []) {
 
 function renderTimeline(items = []) {
   if (items.length === 0) {
-    timelineContainer.innerHTML = '<div style="padding:18px; color:var(--muted); font-size:0.8rem; text-align:center;">No signals to plot</div>';
+    if (timelineContainer) timelineContainer.innerHTML = '<div style="padding:18px; color:var(--muted); font-size:0.8rem; text-align:center;">No signals to plot</div>';
     return;
   }
 
@@ -1034,202 +1034,9 @@ function renderTimeline(items = []) {
     return `<div data-timeline-time="${t}" title="${item.title}" style="position:absolute; left:${pct}%; top:50%; transform:translate(-50%, -50%); width:10px; height:${height}px; background:${color}; border-radius:999px; cursor:pointer; box-shadow:${glow}; border:${inActiveWindow ? '1px solid var(--lime)' : 'none'};"></div>`;
   }).join('');
 
-  timelineContainer.innerHTML = axisHtml + activeWindowHtml + plotsHtml;
+  if (timelineContainer) timelineContainer.innerHTML = axisHtml + activeWindowHtml + plotsHtml;
 }
 
-async function loadIntel() {
-  try {
-    syncUrlState();
-    const params = buildFeedParams();
-
-    const [recommendations, analytics, effectiveness, dashboard, taskAnalytics, taskRetention, taskSignal, signalActionAnalytics, signalRecoveryAnalytics, signalAnalytics, timelineViews, baselinePerformance, baselineTrend, baselineHistoryHealthSummary, baselineRecommendations, baselineMaintenanceSummary, baselineMaintenanceEffectivenessSummary, serverBaselineHistory, signals] = await Promise.all([
-      fetchJson('api/third-order-escalation-recommendations.php'),
-      fetchJson('api/third-order-escalation-analytics.php'),
-      fetchJson('api/third-order-escalation-effectiveness.php'),
-      fetchJson('api/third-order-escalation-dashboard.php'),
-      fetchJson('api/task-context-analytics.php'),
-      fetchJson('api/task-retention-analytics.php'),
-      fetchJson('api/task-signal-correlation.php'),
-      fetchJson('api/signal-action-analytics.php'),
-      fetchJson('api/signal-recovery-analytics.php'),
-      fetchJson('api/signal-escalation-analytics.php'),
-      fetchJson('api/timeline-views.php'),
-      fetchJson('api/baseline-performance.php'),
-      fetchJson('api/baseline-performance-trend.php'),
-      fetchJson('api/baseline-history-health.php'),
-      fetchJson('api/baseline-recommendations.php'),
-      fetchJson('api/baseline-maintenance-analytics.php'),
-      fetchJson('api/baseline-maintenance-effectiveness.php'),
-      fetchServerBaselineHistory(),
-      fetchJson(`api/signal-feed.php?${params.toString()}`)
-    ]);
-
-    renderTimelineViews(timelineViews.items || []);
-    renderBaselineViewOptions(timelineViews.items || []);
-    renderBaselinePerformance(baselinePerformance || {});
-    renderBaselineTrend(baselineTrend || {});
-    renderBaselineHistoryHealth(baselineHistoryHealthSummary || {});
-    await trackBaselineRecommendationImpressions(baselineRecommendations.items || []);
-    const globeSeed = await fetchJson('data/globe-demo-locations.json').catch(() => ({ items: [] }));
-    const baselineRecommendationPrioritySummary = await fetchJson('api/baseline-recommendation-priority.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: baselineRecommendations.items || [] })
-    });
-    await fetchJson('api/baseline-recommendation-churn-track.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: baselineRecommendationPrioritySummary.items || [] })
-    });
-    await fetchJson('api/baseline-recommendation-confidence-track.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: baselineRecommendationPrioritySummary.items || [] })
-    });
-    currentPriorityItems = baselineRecommendationPrioritySummary.items || [];
-    const globeItems = currentPriorityItems.some((item) => item.lat !== undefined && item.lng !== undefined)
-      ? currentPriorityItems
-      : (globeSeed.items || []);
-    currentGlobeBaseItems = globeItems;
-    await refreshAirTraffic();
-    await refreshSatelliteCatalog();
-    renderCommandBar(currentPriorityItems);
-    renderBaselineRecommendations(baselineRecommendationPrioritySummary.visibleItems || baselineRecommendationPrioritySummary.items || []);
-    if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(globeItems);
-    renderBaselineRecommendationPriority(baselineRecommendationPrioritySummary || {});
-    renderBaselineRecommendationSuppressed(baselineRecommendationPrioritySummary.suppressedItems || []);
-    renderBaselineRecommendationRevived(baselineRecommendationPrioritySummary.revivedItems || []);
-    renderBaselineRecommendationStable(baselineRecommendationPrioritySummary.stableItems || []);
-    renderBaselineRecommendationConfidence(baselineRecommendationPrioritySummary.visibleItems || baselineRecommendationPrioritySummary.items || []);
-    renderBaselineRecommendationConfidenceTrend(await fetchJson('api/baseline-recommendation-confidence-trend.php'));
-    renderBaselineRecommendationConfidenceVolatility(await fetchJson('api/baseline-recommendation-confidence-volatility.php'));
-    renderBaselineRecommendationConfidenceResilience(baselineRecommendationPrioritySummary.visibleItems || baselineRecommendationPrioritySummary.items || []);
-    renderBaselineRecommendationConfidenceAdjustments(await fetchJson('api/baseline-recommendation-confidence-adjustments.php'));
-    renderBaselineRecommendationTrustMomentum(await fetchJson('api/baseline-recommendation-trust-momentum.php'));
-    renderBaselineRecommendationRevivalAnalytics(await fetchJson('api/baseline-recommendation-revival-analytics.php'));
-    renderBaselineRecommendationChurn(await fetchJson('api/baseline-recommendation-churn.php'));
-    renderBaselineRecommendationPlaybook(await fetchJson('api/baseline-recommendation-playbook.php'));
-    renderBaselineRecommendationAnalytics((await fetchJson('api/baseline-recommendation-analytics.php')).items || []);
-    renderBaselineRecommendationEffectiveness(await fetchJson('api/baseline-recommendation-effectiveness.php'));
-    renderBaselineRecommendationOutcomes(await fetchJson('api/baseline-recommendation-outcomes.php'));
-    renderBaselineMaintenanceAnalytics(baselineMaintenanceSummary || {});
-    renderBaselineMaintenanceEffectiveness(baselineMaintenanceEffectivenessSummary || {});
-    if (Array.isArray(serverBaselineHistory)) {
-      writeBaselineHistory(serverBaselineHistory);
-      renderBaselineHistory(serverBaselineHistory);
-    } else {
-      renderBaselineHistory();
-    }
-
-    let baselineLabel = 'prior equivalent window';
-    let previousSignals = { items: [] };
-
-    if (currentTimelineFilter) {
-      if (currentBaselineMode === 'saved') {
-        const baselineView = (timelineViews.items || []).find((item) => item.id === currentBaselineViewId);
-        if (baselineView?.anchorTime) {
-          baselineLabel = `saved view · ${formatTimelineViewName(baselineView)}`;
-          previousSignals = await fetchJson(`api/signal-feed.php?${buildFeedParams({
-            time: baselineView.anchorTime,
-            windowMinutes: baselineView.windowMinutes || currentTimelineWindowMinutes
-          }).toString()}`);
-        } else {
-          baselineLabel = 'select a saved view';
-        }
-      } else {
-        const previousAnchor = String(Number(currentTimelineFilter) - (Number(currentTimelineWindowMinutes) * 60 * 1000 * 2));
-        previousSignals = await fetchJson(`api/signal-feed.php?${buildFeedParams({ time: previousAnchor }).toString()}`);
-      }
-    }
-
-    renderRecommendations(recommendations.items || []);
-    renderAnalytics(analytics.items || []);
-    renderEffectiveness(effectiveness.items || []);
-    renderDashboard(dashboard || {});
-    renderTaskContextAnalytics(taskAnalytics || {});
-    renderTaskRetentionAnalytics(taskRetention || {});
-    renderTaskSignalCorrelation(taskSignal || {});
-    renderSignalActionAnalytics(signalActionAnalytics || {});
-    renderSignalRecoveryAnalytics(signalRecoveryAnalytics || {});
-    renderSignalEscalationAnalytics(signalAnalytics.items || []);
-    renderSignalFeed(signals.items || []);
-    renderFeedWindowSummary(signals.items || []);
-    renderTimelineComparison(signals.items || [], previousSignals.items || [], baselineLabel);
-    const baselineStats = renderBaselineShift(signals.items || [], previousSignals.items || [], baselineLabel);
-    await updateBaselineHistory(baselineStats, baselineLabel);
-    try {
-      renderBaselinePerformance(await fetchJson('api/baseline-performance.php'));
-      renderBaselineTrend(await fetchJson('api/baseline-performance-trend.php'));
-      renderBaselineHistoryHealth(await fetchJson('api/baseline-history-health.php'));
-      const refreshedRecommendations = (await fetchJson('api/baseline-recommendations.php')).items || [];
-      const refreshedGlobeSeed = await fetchJson('data/globe-demo-locations.json').catch(() => ({ items: [] }));
-      const refreshedPrioritySummary = await fetchJson('api/baseline-recommendation-priority.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: refreshedRecommendations })
-      });
-      await fetchJson('api/baseline-recommendation-churn-track.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: refreshedPrioritySummary.items || [] })
-      });
-      await fetchJson('api/baseline-recommendation-confidence-track.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: refreshedPrioritySummary.items || [] })
-      });
-      currentPriorityItems = refreshedPrioritySummary.items || [];
-      const refreshedGlobeItems = currentPriorityItems.some((item) => item.lat !== undefined && item.lng !== undefined)
-        ? currentPriorityItems
-        : (refreshedGlobeSeed.items || []);
-      currentGlobeBaseItems = refreshedGlobeItems;
-      await refreshAirTraffic();
-      await refreshSatelliteCatalog();
-      renderCommandBar(currentPriorityItems);
-      renderBaselineRecommendations(refreshedPrioritySummary.visibleItems || refreshedPrioritySummary.items || []);
-      if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(refreshedGlobeItems);
-      renderBaselineRecommendationPriority(refreshedPrioritySummary || {});
-      renderBaselineRecommendationSuppressed(refreshedPrioritySummary.suppressedItems || []);
-      renderBaselineRecommendationRevived(refreshedPrioritySummary.revivedItems || []);
-      renderBaselineRecommendationStable(refreshedPrioritySummary.stableItems || []);
-      renderBaselineRecommendationConfidence(refreshedPrioritySummary.visibleItems || refreshedPrioritySummary.items || []);
-      renderBaselineRecommendationConfidenceTrend(await fetchJson('api/baseline-recommendation-confidence-trend.php'));
-      renderBaselineRecommendationConfidenceVolatility(await fetchJson('api/baseline-recommendation-confidence-volatility.php'));
-      renderBaselineRecommendationConfidenceResilience(refreshedPrioritySummary.visibleItems || refreshedPrioritySummary.items || []);
-      renderBaselineRecommendationConfidenceAdjustments(await fetchJson('api/baseline-recommendation-confidence-adjustments.php'));
-      renderBaselineRecommendationTrustMomentum(await fetchJson('api/baseline-recommendation-trust-momentum.php'));
-      renderBaselineRecommendationRevivalAnalytics(await fetchJson('api/baseline-recommendation-revival-analytics.php'));
-      renderBaselineRecommendationChurn(await fetchJson('api/baseline-recommendation-churn.php'));
-      renderBaselineRecommendationPlaybook(await fetchJson('api/baseline-recommendation-playbook.php'));
-      renderBaselineRecommendationAnalytics((await fetchJson('api/baseline-recommendation-analytics.php')).items || []);
-      renderBaselineRecommendationEffectiveness(await fetchJson('api/baseline-recommendation-effectiveness.php'));
-      renderBaselineRecommendationOutcomes(await fetchJson('api/baseline-recommendation-outcomes.php'));
-      renderBaselineMaintenanceAnalytics(await fetchJson('api/baseline-maintenance-analytics.php'));
-      renderBaselineMaintenanceEffectiveness(await fetchJson('api/baseline-maintenance-effectiveness.php'));
-    } catch {
-      // keep the earlier analytics snapshot if refresh fails
-    }
-    renderTimelineFocus(signals.items || []);
-    renderTimeline(signals.items || []);
-    syncTimelineWindowButtons();
-    syncSeverityFilterButtons();
-    syncFeedViewButtons();
-    syncBaselineControls();
-    
-    if (feedStatus) {
-      feedStatus.innerHTML = '<span class="live-dot">●</span> Live';
-    }
-
-    if (selectedQuery.textContent === 'No query selected' || selectedQuery.textContent === 'harbor') {
-      const focusItem = (recommendations.items || [])[0] || (effectiveness.items || [])[0] || (analytics.items || [])[0] || null;
-      if (focusItem) setSelected(focusItem);
-    }
-  } catch (error) {
-    console.error(error);
-    overviewHeadline.textContent = 'Intel shell is up, but one or more intel endpoints failed to load.';
-    if (feedStatus) feedStatus.textContent = 'Disconnected';
-  }
-}
 
 function startAutoRefresh() {
   if (autoRefreshTimer) clearInterval(autoRefreshTimer);
@@ -1255,7 +1062,7 @@ if (timelineContainer) {
     if (!plot) {
       if (currentTimelineFilter) {
         currentTimelineFilter = null;
-        overviewHeadline.textContent = 'Cleared timeline filter.';
+  if (overviewHeadline) overviewHeadline.textContent = 'Cleared timeline filter.';
         await loadIntel();
       }
       return;
@@ -1263,7 +1070,7 @@ if (timelineContainer) {
     const t = plot.dataset.timelineTime;
     currentTimelineFilter = t;
     setSelected({ suggestedQuery: 'Time Scope', topic: 'Temporal Filter', thirdOrderEscalationAction: `filtering by ${formatWindowLabel(currentTimelineWindowMinutes)}` });
-    overviewHeadline.textContent = `Live feed scoped to selected ${formatWindowLabel(currentTimelineWindowMinutes)}.`;
+  if (overviewHeadline) overviewHeadline.textContent = `Live feed scoped to selected ${formatWindowLabel(currentTimelineWindowMinutes)}.`;
     await loadIntel();
   });
 }
@@ -1280,7 +1087,7 @@ if (timelineWindowButtons) {
     syncTimelineWindowButtons();
 
     if (currentTimelineFilter) {
-      overviewHeadline.textContent = `Timeline scope updated to ${formatWindowLabel(currentTimelineWindowMinutes)}.`;
+  if (overviewHeadline) overviewHeadline.textContent = `Timeline scope updated to ${formatWindowLabel(currentTimelineWindowMinutes)}.`;
     }
 
     await loadIntel();
@@ -1291,7 +1098,7 @@ if (clearTimelineFilterButton) {
   clearTimelineFilterButton.addEventListener('click', async () => {
     if (!currentTimelineFilter) return;
     currentTimelineFilter = null;
-    overviewHeadline.textContent = 'Cleared timeline filter.';
+  if (overviewHeadline) overviewHeadline.textContent = 'Cleared timeline filter.';
     await loadIntel();
   });
 }
@@ -1310,7 +1117,7 @@ if (signalViewFilters) {
 if (saveTimelineViewButton) {
   saveTimelineViewButton.addEventListener('click', async () => {
     if (!currentTimelineFilter) {
-      overviewHeadline.textContent = 'Pick a timeline window before saving a temporal view.';
+  if (overviewHeadline) overviewHeadline.textContent = 'Pick a timeline window before saving a temporal view.';
       return;
     }
 
@@ -1331,8 +1138,7 @@ if (saveTimelineViewButton) {
         feedView: currentFeedView
       })
     });
-
-    overviewHeadline.textContent = `Saved temporal view: ${name}`;
+  if (overviewHeadline) overviewHeadline.textContent = `Saved temporal view: ${name}`;
     await loadIntel();
   });
 }
@@ -1343,7 +1149,7 @@ if (copyShareLinkButton) {
     try {
       if (navigator?.clipboard?.writeText) {
         await navigator.clipboard.writeText(url);
-        overviewHeadline.textContent = 'Copied intel share link to clipboard.';
+  if (overviewHeadline) overviewHeadline.textContent = 'Copied intel share link to clipboard.';
         return;
       }
     } catch (error) {
@@ -1358,7 +1164,7 @@ if (baselineModeSelect) {
   baselineModeSelect.addEventListener('change', async () => {
     currentBaselineMode = baselineModeSelect.value || 'previous';
     syncBaselineControls();
-    overviewHeadline.textContent = currentBaselineMode === 'saved'
+  if (overviewHeadline) overviewHeadline.textContent = currentBaselineMode === 'saved'
       ? 'Baseline mode set to saved temporal view.'
       : 'Baseline mode set to previous window.';
     await loadIntel();
@@ -1370,7 +1176,7 @@ if (baselineViewSelect) {
     currentBaselineViewId = baselineViewSelect.value || '';
     syncBaselineControls();
     if (currentBaselineMode === 'saved') {
-      overviewHeadline.textContent = currentBaselineViewId
+  if (overviewHeadline) overviewHeadline.textContent = currentBaselineViewId
         ? 'Saved baseline selected.'
         : 'Choose a saved view for baseline comparison.';
       await loadIntel();
@@ -1398,7 +1204,7 @@ if (baselineDriftHistory) {
     syncSeverityFilterButtons();
     syncFeedViewButtons();
     syncBaselineControls();
-    overviewHeadline.textContent = `Restored baseline history snapshot: ${entry.label}`;
+  if (overviewHeadline) overviewHeadline.textContent = `Restored baseline history snapshot: ${entry.label}`;
     await loadIntel();
   });
 }
@@ -1414,7 +1220,7 @@ if (baselineRecommendationActions) {
       body: JSON.stringify({ action })
     });
     setSelected({ suggestedQuery: action, topic: 'Baseline Recommendation', thirdOrderEscalationAction: 'recommended next step' });
-    overviewHeadline.textContent = `Recommended baseline action: ${action}`;
+  if (overviewHeadline) overviewHeadline.textContent = `Recommended baseline action: ${action}`;
     await loadIntel();
   });
 }
@@ -1430,7 +1236,7 @@ if (baselineRecommendationOutcomes) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action, outcome })
     });
-    overviewHeadline.textContent = `Recorded recommendation outcome: ${action} · ${outcome}`;
+  if (overviewHeadline) overviewHeadline.textContent = `Recorded recommendation outcome: ${action} · ${outcome}`;
     const refreshedRecommendations = (await fetchJson('api/baseline-recommendations.php')).items || [];
     const refreshedPrioritySummary = await fetchJson('api/baseline-recommendation-priority.php', {
       method: 'POST',
@@ -1481,13 +1287,13 @@ if (baselineHistoryHealth) {
       if (Array.isArray(result.items)) {
         writeBaselineHistory(result.items);
       }
-      overviewHeadline.textContent = `Executed history maintenance: ${action}`;
+  if (overviewHeadline) overviewHeadline.textContent = `Executed history maintenance: ${action}`;
       await loadIntel();
       return;
     }
 
     setSelected({ suggestedQuery: action, topic: 'History Health', thirdOrderEscalationAction: 'health guidance' });
-    overviewHeadline.textContent = `History health suggestion: ${action}`;
+  if (overviewHeadline) overviewHeadline.textContent = `History health suggestion: ${action}`;
   });
 }
 
@@ -1498,7 +1304,7 @@ if (timelineViewsList) {
       await fetchJson(`api/timeline-views.php?id=${encodeURIComponent(deleteButton.dataset.deleteTimelineViewId)}`, {
         method: 'DELETE'
       });
-      overviewHeadline.textContent = 'Deleted saved temporal view.';
+  if (overviewHeadline) overviewHeadline.textContent = 'Deleted saved temporal view.';
       await loadIntel();
       return;
     }
@@ -1519,7 +1325,7 @@ if (timelineViewsList) {
     syncSeverityFilterButtons();
     syncFeedViewButtons();
     setSelected({ suggestedQuery: formatTimelineViewName(view), topic: 'Saved Temporal View', thirdOrderEscalationAction: 'restored saved scope' });
-    overviewHeadline.textContent = `Restored temporal view: ${formatTimelineViewName(view)}`;
+  if (overviewHeadline) overviewHeadline.textContent = `Restored temporal view: ${formatTimelineViewName(view)}`;
     await loadIntel();
   });
 }
@@ -1529,7 +1335,7 @@ signalRecoveryAnalyticsCard.addEventListener('click', async (event) => {
   if (!btn) {
     if (currentRecoveredFilter) {
       currentRecoveredFilter = false;
-      overviewHeadline.textContent = 'Showing all signals.';
+  if (overviewHeadline) overviewHeadline.textContent = 'Showing all signals.';
       await loadIntel();
     }
     return;
@@ -1537,7 +1343,7 @@ signalRecoveryAnalyticsCard.addEventListener('click', async (event) => {
   currentRecoveredFilter = true;
   currentTimelineFilter = null;
   setSelected({ suggestedQuery: 'Recovered Signals', topic: 'Analytics', thirdOrderEscalationAction: 'filtering feed by recovery' });
-  overviewHeadline.textContent = `Live feed isolated to recovered signals`;
+  if (overviewHeadline) overviewHeadline.textContent = `Live feed isolated to recovered signals`;
   await loadIntel();
 });
 
@@ -1547,7 +1353,7 @@ taskContextAnalyticsCard.addEventListener('click', async (event) => {
     if (currentTagFilter !== null || currentTaskIdFilter !== null) {
       currentTagFilter = null;
       currentTaskIdFilter = null;
-      overviewHeadline.textContent = 'Showing all task contexts.';
+  if (overviewHeadline) overviewHeadline.textContent = 'Showing all task contexts.';
       await loadIntel();
     }
     return;
@@ -1556,7 +1362,7 @@ taskContextAnalyticsCard.addEventListener('click', async (event) => {
   currentTagFilter = tag;
   currentTaskIdFilter = null;
   setSelected({ suggestedQuery: `Tag: ${tag}`, topic: 'Mission Focus', thirdOrderEscalationAction: 'filtering feed by task' });
-  overviewHeadline.textContent = `Live feed filtered to ${tag} operations`;
+  if (overviewHeadline) overviewHeadline.textContent = `Live feed filtered to ${tag} operations`;
   await loadIntel();
 });
 
@@ -1566,7 +1372,7 @@ taskSignalCorrelationCard.addEventListener('click', async (event) => {
     if (currentTagFilter !== null || currentTaskIdFilter !== null) {
       currentTagFilter = null;
       currentTaskIdFilter = null;
-      overviewHeadline.textContent = 'Showing all task contexts.';
+  if (overviewHeadline) overviewHeadline.textContent = 'Showing all task contexts.';
       await loadIntel();
     }
     return;
@@ -1577,7 +1383,7 @@ taskSignalCorrelationCard.addEventListener('click', async (event) => {
   currentTagFilter = null;
   currentTimelineFilter = null;
   setSelected({ suggestedQuery: `Task: ${taskId}`, topic: 'Task Signal Flow', thirdOrderEscalationAction: `monitoring ${taskName}` });
-  overviewHeadline.textContent = `Live feed isolated to: ${taskName}`;
+  if (overviewHeadline) overviewHeadline.textContent = `Live feed isolated to: ${taskName}`;
   await loadIntel();
 });
 
@@ -1586,7 +1392,7 @@ signalEscalationAnalyticsList.addEventListener('click', async (event) => {
   if (!chip) {
     if (currentSourceFilter !== null) {
       currentSourceFilter = null;
-      overviewHeadline.textContent = 'Showing all signal sources.';
+  if (overviewHeadline) overviewHeadline.textContent = 'Showing all signal sources.';
       await loadIntel();
     }
     return;
@@ -1595,7 +1401,7 @@ signalEscalationAnalyticsList.addEventListener('click', async (event) => {
   currentSourceFilter = source;
   currentTimelineFilter = null;
   setSelected({ suggestedQuery: `Source: ${source}`, topic: 'Analytics', thirdOrderEscalationAction: 'filtering feed' });
-  overviewHeadline.textContent = `Live feed filtered to ${source}`;
+  if (overviewHeadline) overviewHeadline.textContent = `Live feed filtered to ${source}`;
   await loadIntel();
 });
 
@@ -1604,7 +1410,7 @@ if (timelineComparisonSummary) {
     const chip = event.target.closest('[data-compare-source]');
     if (!chip) return;
     currentSourceFilter = chip.dataset.compareSource;
-    overviewHeadline.textContent = `Comparison scoped to source: ${currentSourceFilter}`;
+  if (overviewHeadline) overviewHeadline.textContent = `Comparison scoped to source: ${currentSourceFilter}`;
     await loadIntel();
   });
 }
@@ -1635,7 +1441,7 @@ signalFeedList.addEventListener('click', async (event) => {
     const title = itemEl.querySelector('.signal-title').textContent;
     const source = itemEl.querySelector('.muted').textContent;
     setSelected({ suggestedQuery: `Signal: ${id}`, topic: source, thirdOrderEscalationAction: 'escalated to focus' });
-    overviewHeadline.textContent = title;
+  if (overviewHeadline) overviewHeadline.textContent = title;
   }
   
   await fetchJson('api/signal-action.php', {
@@ -1724,15 +1530,15 @@ function renderCommandBar(items = []) {
   if (fortifiedEl) fortifiedEl.textContent = String(counts.fortified || 0);
   if (reversalEl) reversalEl.textContent = String(counts.reversals || 0);
   if (statusPostureEl) {
-    statusPostureEl.textContent = posture;
+  if (statusPostureEl) statusPostureEl.textContent = posture;
     statusPostureEl.dataset.tone = posture === 'critical' ? 'critical' : posture === 'stable' ? 'stable' : 'watch';
   }
   if (statusTerminalEl) {
-    statusTerminalEl.textContent = String(counts.terminal || 0);
+  if (statusTerminalEl) statusTerminalEl.textContent = String(counts.terminal || 0);
     statusTerminalEl.dataset.tone = counts.terminal > 0 ? 'critical' : 'neutral';
   }
   if (statusFortifiedEl) {
-    statusFortifiedEl.textContent = String(counts.fortified || 0);
+  if (statusFortifiedEl) statusFortifiedEl.textContent = String(counts.fortified || 0);
     statusFortifiedEl.dataset.tone = counts.fortified > 0 ? 'stable' : 'neutral';
   }
 }
@@ -1824,16 +1630,16 @@ function openIntelDrawer(item = {}) {
     const aircraftTitle = item.callsign || 'Tracked aircraft';
     if (titleEl) titleEl.textContent = aircraftTitle;
     if (stateEl) {
-      stateEl.textContent = 'airborne';
+  if (stateEl) stateEl.textContent = 'airborne';
       stateEl.style.borderColor = '#d2ff54';
       stateEl.style.color = '#d2ff54';
     }
     if (summaryEl) summaryEl.textContent = `${item.country || 'Public air traffic'} flight currently mapped in the live Air layer.`;
     if (mapEl) {
-      mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Aircraft position and projected path are active on the globe stage.</div>`;
+  if (mapEl) mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Aircraft position and projected path are active on the globe stage.</div>`;
     }
     if (metricsEl) {
-      metricsEl.innerHTML = [
+  if (metricsEl) metricsEl.innerHTML = [
         ['Flight', aircraftTitle],
         ['Airline', 'Loading…'],
         ['Departure', 'Loading…'],
@@ -1848,7 +1654,7 @@ function openIntelDrawer(item = {}) {
       `).join('');
     }
     if (deepEl) {
-      deepEl.innerHTML = [
+  if (deepEl) deepEl.innerHTML = [
         `altitude ${item.altitude ?? 'n/a'} m`,
         `speed ${item.velocity != null ? `${item.velocity} m/s` : 'n/a'}`,
         `heading ${item.heading != null ? `${item.heading}°` : 'n/a'}`,
@@ -1856,7 +1662,7 @@ function openIntelDrawer(item = {}) {
         `source OpenSky Network public states`
       ].map((line) => `<div style="margin-bottom:8px; word-break:break-all;">${line}</div>`).join('');
     }
-    if (selectedQuery) selectedQuery.textContent = aircraftTitle;
+    if (selectedQuery) if (selectedQuery) selectedQuery.textContent = aircraftTitle;
     if (selectedMeta) selectedMeta.textContent = `${item.country || 'Public traffic'} · airborne`;
     drawer.classList.add('visible');
     drawer.setAttribute('aria-hidden', 'false');
@@ -1885,10 +1691,10 @@ function openIntelDrawer(item = {}) {
           .catch(() => {});
       }
       if (summaryEl) {
-        summaryEl.textContent = `${detail.airline || item.country || 'Public air traffic'} ${detail.flightNumber || aircraftTitle} from ${detail.departure?.location || detail.departure?.iata || 'unknown departure'} to ${detail.destination?.location || detail.destination?.iata || 'unknown destination'}.`;
+  if (summaryEl) summaryEl.textContent = `${detail.airline || item.country || 'Public air traffic'} ${detail.flightNumber || aircraftTitle} from ${detail.departure?.location || detail.departure?.iata || 'unknown departure'} to ${detail.destination?.location || detail.destination?.iata || 'unknown destination'}.`;
       }
       if (metricsEl) {
-        metricsEl.innerHTML = [
+  if (metricsEl) metricsEl.innerHTML = [
           ['Flight', detail.flightNumber || aircraftTitle],
           ['Airline', detail.airline || 'Unknown'],
           ['Departure', [detail.departure?.iata, detail.departure?.location].filter(Boolean).join(' · ') || 'Unknown'],
@@ -1903,7 +1709,7 @@ function openIntelDrawer(item = {}) {
         `).join('');
       }
       if (deepEl) {
-        deepEl.innerHTML = [
+  if (deepEl) deepEl.innerHTML = [
           `flight time ${detail.flightTime || 'Unknown'}`,
           `aircraft ${detail.aircraftType || 'Unknown'}`,
           `scheduled departure ${detail.times?.departureScheduled || 'Unknown'}`,
@@ -1920,17 +1726,17 @@ function openIntelDrawer(item = {}) {
   if (item.kind === 'satellite') {
     if (titleEl) titleEl.textContent = item.name || 'Satellite';
     if (stateEl) {
-      stateEl.textContent = 'tracking';
+  if (stateEl) stateEl.textContent = 'tracking';
       stateEl.style.borderColor = '#ffd166';
       stateEl.style.color = '#ffd166';
     }
     if (summaryEl) summaryEl.textContent = `${item.network || 'Public catalog'} satellite in ${item.orbitClass || 'tracked'} orbit.`;
     setDrawerImage(getSatellitePreviewImage(item), `${item.name || 'Satellite'} preview`);
     if (mapEl) {
-      mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Satellite position is live on the globe stage. Click-and-drag the globe to inspect surrounding orbital traffic.</div>`;
+  if (mapEl) mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Satellite position is live on the globe stage. Click-and-drag the globe to inspect surrounding orbital traffic.</div>`;
     }
     if (metricsEl) {
-      metricsEl.innerHTML = [
+  if (metricsEl) metricsEl.innerHTML = [
         ['Name', item.name || 'Unknown'],
         ['Network', item.network || 'Public catalog'],
         ['Orbit', item.orbitClass || 'Tracked'],
@@ -1945,13 +1751,13 @@ function openIntelDrawer(item = {}) {
       `).join('');
     }
     if (deepEl) {
-      deepEl.innerHTML = [
+  if (deepEl) deepEl.innerHTML = [
         `NORAD ${item.noradId || 'unknown'}`,
         `TLE line 1 ${item.tle1 || 'n/a'}`,
         `TLE line 2 ${item.tle2 || 'n/a'}`
       ].map((line) => `<div style="margin-bottom:8px; word-break:break-all;">${line}</div>`).join('');
     }
-    if (selectedQuery) selectedQuery.textContent = item.name || 'Satellite';
+    if (selectedQuery) if (selectedQuery) selectedQuery.textContent = item.name || 'Satellite';
     if (selectedMeta) selectedMeta.textContent = `${item.network || 'Public catalog'} · ${item.orbitClass || 'Tracked'} orbit`;
     drawer.classList.add('visible');
     drawer.setAttribute('aria-hidden', 'false');
@@ -1964,17 +1770,17 @@ function openIntelDrawer(item = {}) {
     const threatCount = item.count || 1;
     if (titleEl) titleEl.textContent = threatCountry;
     if (stateEl) {
-      stateEl.textContent = 'threat';
+  if (stateEl) stateEl.textContent = 'threat';
       stateEl.style.borderColor = '#ff3333';
       stateEl.style.color = '#ff3333';
     }
     if (summaryEl) summaryEl.textContent = `${threatCount} threat${threatCount > 1 ? 's' : ''} detected originating from ${threatCountry}.`;
     setDrawerImage(null);
     if (mapEl) {
-      mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Threat source is highlighted on the globe. Click-and-drag to inspect surrounding threat activity.</div>`;
+  if (mapEl) mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Threat source is highlighted on the globe. Click-and-drag to inspect surrounding threat activity.</div>`;
     }
     if (metricsEl) {
-      metricsEl.innerHTML = [
+  if (metricsEl) metricsEl.innerHTML = [
         ['Country', threatCountry],
         ['Threats', threatCount],
         ['Source', 'Honeypot Network'],
@@ -1988,7 +1794,7 @@ function openIntelDrawer(item = {}) {
       `).join('');
     }
     if (deepEl) deepEl.innerHTML = '';
-    if (selectedQuery) selectedQuery.textContent = threatCountry;
+    if (selectedQuery) if (selectedQuery) selectedQuery.textContent = threatCountry;
     if (selectedMeta) selectedMeta.textContent = `${threatCount} threats · ${threatType}`;
     drawer.classList.add('visible');
     drawer.setAttribute('aria-hidden', 'false');
@@ -1997,18 +1803,18 @@ function openIntelDrawer(item = {}) {
 
   if (titleEl) titleEl.textContent = title;
   if (stateEl) {
-    stateEl.textContent = state;
+  if (stateEl) stateEl.textContent = state;
     stateEl.style.borderColor = stateColors[state] || 'var(--border)';
     stateEl.style.color = stateColors[state] || 'var(--text)';
   }
   if (summaryEl) summaryEl.textContent = summary;
   if (mapEl) {
-    mapEl.innerHTML = typeof item.lat === 'number' && typeof item.lng === 'number'
+  if (mapEl) mapEl.innerHTML = typeof item.lat === 'number' && typeof item.lng === 'number'
       ? `<div class="task-focus-meta" style="padding:16px;">City map view is now active in the main globe stage.${crimeScan ? ` Crime scan: ${crimeScan.incidents} incidents across ${crimeScan.hotspots} police zones.` : ''}</div>`
       : '<div class="task-focus-meta" style="padding:16px;">Map view unavailable for this location.</div>';
   }
   if (metricsEl) {
-    metricsEl.innerHTML = [
+  if (metricsEl) metricsEl.innerHTML = [
       ['Action', item.action || 'Unknown'],
       ['Priority', item.priorityScore ?? 'n/a'],
       ['Momentum', item.trustMomentumBand || 'neutral'],
@@ -2023,7 +1829,7 @@ function openIntelDrawer(item = {}) {
     `).join('');
   }
   if (deepEl) {
-    deepEl.innerHTML = [
+  if (deepEl) deepEl.innerHTML = [
       `confidence ${item.confidenceBand || 'unknown'}`,
       `outcome ${item.outcomeScore ?? 0}`,
       `upgrades ${item.upgradedCount || 0}`,
@@ -2033,7 +1839,7 @@ function openIntelDrawer(item = {}) {
     ].map((line) => `<div style="margin-bottom:8px;">${line}</div>`).join('');
   }
 
-  if (selectedQuery) selectedQuery.textContent = title;
+  if (selectedQuery) if (selectedQuery) selectedQuery.textContent = title;
   if (selectedMeta) selectedMeta.textContent = summary;
 
   drawer.classList.add('visible');
@@ -2068,8 +1874,7 @@ function initializeLayerConfigurator() {
   } catch {
     activeLayers = defaultLayers;
   }
-
-  currentLayerCard.innerHTML = `
+  if (currentLayerCard) currentLayerCard.innerHTML = `
     <div class="panel-kicker">Systems Online</div>
     <button id="systems-online-count" class="big-query systems-online-count">0</button>
     <div class="muted" style="margin-top:12px;">Click the number to configure which systems read as active in the surface.</div>
@@ -2124,12 +1929,12 @@ function initializeLayerConfigurator() {
     const statusSystemsEl = document.getElementById('status-strip-systems');
     if (countEl) countEl.textContent = String(activeLayers.length);
     if (statusSystemsEl) {
-      statusSystemsEl.textContent = String(activeLayers.length);
+  if (statusSystemsEl) statusSystemsEl.textContent = String(activeLayers.length);
       statusSystemsEl.dataset.tone = activeLayers.length > 0 ? 'online' : 'neutral';
     }
 
     if (activeLayerBox) {
-      activeLayerBox.innerHTML = activeLayers.map((label) => `
+  if (activeLayerBox) activeLayerBox.innerHTML = activeLayers.map((label) => `
         <button class="tag-chip active-layer-chip" data-active-layer="${label.replace(/"/g, '&quot;')}">
           <span>${label}</span>
           <span class="active-layer-remove">×</span>
@@ -2144,8 +1949,7 @@ function initializeLayerConfigurator() {
         acc[category].push(label);
         return acc;
       }, {});
-
-      modalTags.innerHTML = categoryOrder
+  if (modalTags) modalTags.innerHTML = categoryOrder
         .filter((category) => Array.isArray(grouped[category]) && grouped[category].length)
         .map((category) => `
           <section class="layer-category">
@@ -2636,6 +2440,11 @@ function initializeCommandSurface() {
   if (returnButton && !returnButton.dataset.bound) {
     returnButton.addEventListener('click', showGlobeStage);
     returnButton.dataset.bound = '1';
+  const ontologyBtn = document.getElementById('toggle-ontology-graph');
+  if (ontologyBtn && !ontologyBtn.dataset.bound) {
+    ontologyBtn.addEventListener('click', showGraphStage);
+    ontologyBtn.dataset.bound = '1';
+  }
   }
 
   const zoneButton = document.getElementById('toggle-pittsburgh-zones');
@@ -2715,7 +2524,7 @@ function setGlobeAutoRotate(enabled) {
   const button = document.getElementById('toggle-globe-rotation');
   if (button) {
     button.style.display = enabled ? 'none' : 'inline-flex';
-    button.textContent = enabled ? 'Pause rotation' : 'Rotate';
+  if (button) button.textContent = enabled ? 'Pause rotation' : 'Rotate';
   }
   setGlobeOverlayVisibility(enabled);
 }
@@ -2950,7 +2759,7 @@ function syncPittsburghMonthControl(eligible = false) {
     const label = `${monthNames[parseInt(mm) - 1]} ${y}`;
     optionsHtml += `<option value="${m}">${label}</option>`;
   });
-  monthSelect.innerHTML = optionsHtml;
+  if (monthSelect) monthSelect.innerHTML = optionsHtml;
   monthSelect.value = pittsburghSelectedMonth;
   monthSelect.style.display = 'inline-flex';
 
@@ -2961,8 +2770,7 @@ function syncPittsburghMonthControl(eligible = false) {
     }
     const isExpanded = window.pittsburghLegendExpanded === true;
     const getStyle = (cat) => pittsburghVisibleCategories.has(cat) ? 'opacity:1;text-decoration:none;' : 'opacity:0.35;text-decoration:line-through;';
-    
-    legend.innerHTML = `
+  if (legend) legend.innerHTML = `
       <div class="legend-header" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; font-size:0.72rem; opacity:0.9;">
         <span>Crime Legend</span>
         <svg class="legend-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; margin-left: 12px; transform: ${isExpanded ? 'rotate(0deg)' : 'rotate(180deg)'};"><path d="M6 9l6 6 6-6"/></svg>
@@ -3121,7 +2929,7 @@ function syncPittsburghZoneToggle(visible, eligible = false) {
   const button = document.getElementById('toggle-pittsburgh-zones');
   if (button) {
     button.style.display = eligible ? 'inline-flex' : 'none';
-    button.textContent = visible ? 'Zones On' : 'Zones Off';
+  if (button) button.textContent = visible ? 'Zones On' : 'Zones Off';
   }
   const dangerBtn = document.getElementById('toggle-danger-zones');
   if (dangerBtn) dangerBtn.style.display = eligible ? 'inline-flex' : 'none';
@@ -3196,11 +3004,10 @@ function renderCityCrimeMap(item = {}) {
   };
 
   if (typeof L === 'undefined') {
-    mapStage.innerHTML = `<iframe title="${item.locationName || item.action || 'Location'} map view" src="${buildMapEmbedUrl(item.lat, item.lng)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+  if (mapStage) mapStage.innerHTML = `<iframe title="${item.locationName || item.action || 'Location'} map view" src="${buildMapEmbedUrl(item.lat, item.lng)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
     return crimeScan;
   }
-
-  mapStage.innerHTML = '<div id="intel-map-canvas"></div><div id="map-hover-card" class="map-hover-card" style="display:none;"></div>';
+  if (mapStage) mapStage.innerHTML = '<div id="intel-map-canvas"></div><div id="map-hover-card" class="map-hover-card" style="display:none;"></div>';
   destroyCityMap();
   mapHoverCard = document.getElementById('map-hover-card');
   mapStage.onmouseleave = () => setMapHoverCard('', false);
@@ -3309,7 +3116,7 @@ function showMapStage(item = {}) {
   updatePrimaryStageHeight();
   renderCityCrimeMap(item);
   if (title) {
-    title.textContent = `Map View · ${item.locationName || item.action || 'Location'}`;
+  if (title) title.textContent = `Map View · ${item.locationName || item.action || 'Location'}`;
     title.style.opacity = '1';
     title.style.color = '#000';
   }
@@ -3342,10 +3149,10 @@ function showGlobeStage() {
   destroyCityMap();
   if (pittsburghDangerLayer) { cityMapInstance?.removeLayer(pittsburghDangerLayer); pittsburghDangerLayer = null; }
   pittsburghDangerVisible = false;
-  mapStage.innerHTML = '';
+  if (mapStage) mapStage.innerHTML = '';
   syncPittsburghZoneToggle(true, false);
   if (title) {
-    title.textContent = 'Global Operations Projection';
+  if (title) title.textContent = 'Global Operations Projection';
     title.style.color = '';
   }
   if (returnButton) returnButton.style.display = 'none';
@@ -3672,6 +3479,22 @@ function initOrUpdateGlobe(items = []) {
   }
 }
 function showGraphStage() {
+  const globe = document.getElementById('intel-globe');
+  const mapStage = document.getElementById('intel-map-stage');
+  const graphStage = document.getElementById('intel-graph-stage');
+  const returnButton = document.getElementById('return-to-globe');
+  const graphButton = document.getElementById('toggle-ontology-graph');
+  
+  if (globe) globe.style.display = 'none';
+  if (mapStage) mapStage.style.display = 'none';
+  if (graphStage) graphStage.style.display = 'block';
+  if (returnButton) returnButton.style.display = 'inline-flex';
+  if (graphButton) graphButton.style.display = 'none';
+  
+  updatePrimaryStageHeight();
+  if (typeof renderOntologyGraph === 'function') renderOntologyGraph();
+}
+
 function updatePrimaryStageHeight() {
   const card = document.getElementById('global-operations-card');
   const globe = document.getElementById('intel-globe');
@@ -3693,34 +3516,16 @@ function updatePrimaryStageHeight() {
   mapStage.style.height = `${targetHeight}px`;
   if (graphStage) graphStage.style.height = `${targetHeight}px`;
 
-  if (intelGlobe && intelGlobe.height && intelGlobe.width) {
+  if (typeof intelGlobe !== 'undefined' && intelGlobe && intelGlobe.height && intelGlobe.width) {
     intelGlobe.height(targetHeight);
     intelGlobe.width(globe.clientWidth || window.innerWidth - 24);
   }
 }
-  const globe = document.getElementById('intel-globe');
-  const mapStage = document.getElementById('intel-map-stage');
-  const graphStage = document.getElementById('intel-graph-stage');
-  const returnButton = document.getElementById('return-to-globe');
-  const graphButton = document.getElementById('toggle-ontology-graph');
-  
-  // Hide others
-  if (globe) globe.style.display = 'none';
-  if (mapStage) mapStage.style.display = 'none';
-  
-  // Show graph
-  if (graphStage) graphStage.style.display = 'block';
-  if (returnButton) returnButton.style.display = 'inline-flex';
-  if (graphButton) graphButton.style.display = 'none';
-  
-  updatePrimaryStageHeight();
-  renderOntologyGraph();
-}
+  if (!container) return;
 let graphInstance = null;
 
 function renderOntologyGraph() {
   const container = document.getElementById('intel-graph-stage');
-  if (!container) return;
   
   if (!graphInstance) {
     fetch('data/ontology.json')
@@ -3765,6 +3570,49 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 function populateTriageFeed() {
+async function loadIntel() {
+  try {
+    syncUrlState();
+    const params = buildFeedParams();
+
+    const [signals, timelineViews] = await Promise.all([
+      fetchJson(`api/signal-feed.php?${params.toString()}`).catch(() => ({ items: [] })),
+      fetchJson('api/timeline-views.php').catch(() => ({ items: [] }))
+    ]);
+
+    renderTimelineViews(timelineViews.items || []);
+    const globeSeed = await fetchJson('data/globe-demo-locations.json').catch(() => ({ items: [] }));
+    
+    currentPriorityItems = globeSeed.items || [];
+    currentGlobeBaseItems = currentPriorityItems;
+    
+    await refreshAirTraffic();
+    await refreshSatelliteCatalog();
+    renderCommandBar(currentPriorityItems);
+    
+    if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems);
+    
+    renderTimelineFocus(signals.items || []);
+    renderTimeline(signals.items || []);
+    syncTimelineWindowButtons();
+    syncSeverityFilterButtons();
+    syncFeedViewButtons();
+    
+    const feedStatus = document.getElementById('feed-status');
+    if (feedStatus) {
+      feedStatus.innerHTML = '<span class="live-dot">●</span> Live';
+    }
+
+    const overviewHeadline = document.getElementById('overview-headline');
+    if (overviewHeadline) {
+      overviewHeadline.textContent = 'Intel shell loaded.';
+    }
+  } catch (error) {
+    console.error(error);
+    const feedStatus = document.getElementById('feed-status');
+    if (feedStatus) feedStatus.textContent = 'Disconnected';
+  }
+}
   const container = document.getElementById('intel-live-triage');
   if (!container) return;
   
@@ -3790,9 +3638,10 @@ function populateTriageFeed() {
       if (html === '') {
          html = '<div class="muted">No active threats detected.</div>';
       }
-      container.innerHTML = html;
+  if (container) container.innerHTML = html;
     })
     .catch(err => {
-      container.innerHTML = '<div style="color:#ff3c3c">[ERR] Ontology unavailable</div>';
+  if (container) container.innerHTML = '<div style="color:#ff3c3c">[ERR] Ontology unavailable</div>';
     });
 }
+populateTriageFeed();
