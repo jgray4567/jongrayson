@@ -2162,10 +2162,10 @@ function projectPointFromBearing(lat, lng, bearingDeg, distanceKm) {
   };
 }
 
-function buildPlaneSvg(heading = 0) {
+function buildPlaneSvg(heading = 0, isSelected = false) {
   return `
     <svg viewBox="0 0 24 24" width="18" height="18" style="display:block; transform: rotate(${heading}deg); transform-origin: 50% 50%; transform-box: fill-box; filter: drop-shadow(0 0 6px rgba(210,255,84,0.45));">
-      <path d="M12 1.5 14.2 8.4 21 10.6 21 12.4 14.2 13.6 13.3 22.5 10.7 22.5 9.8 13.6 3 12.4 3 10.6 9.8 8.4Z" fill="rgba(255,255,255,0.97)" stroke="rgba(210,255,84,0.82)" stroke-width="0.55" stroke-linejoin="round"/>
+      <path d="M12 1.5 14.2 8.4 21 10.6 21 12.4 14.2 13.6 13.3 22.5 10.7 22.5 9.8 13.6 3 12.4 3 10.6 9.8 8.4Z" fill="${isSelected ? '#D2FF54' : 'rgba(255,255,255,0.97)'}" stroke="rgba(210,255,84,0.82)" stroke-width="0.55" stroke-linejoin="round"/>
     </svg>
   `;
 }
@@ -2178,7 +2178,7 @@ function getAirTrafficGlobeElements() {
     lng: flight.lng,
     altitude: getAircraftAltitudeRatio(flight.altitude || 0),
     heading: flight.heading || 0,
-    opacity: selectedAirIcao24 && selectedAirIcao24 !== flight.icao24 ? 0.5 : 1,
+    opacity: selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 1 : 0.05) : 1,
     label: `${flight.callsign || 'Unknown'} · ${flight.country || 'In flight'}`,
     raw: {
       ...flight,
@@ -2193,7 +2193,7 @@ function getAirTrafficPaths() {
     const distanceKm = Math.max(80, Math.min(260, ((flight.velocity || 220) * 900) / 1000));
     const forwardPoint = projectPointFromBearing(flight.lat, flight.lng, flight.heading || 0, distanceKm * 0.55);
     const trailingPoint = projectPointFromBearing(flight.lat, flight.lng, (flight.heading || 0) + 180, distanceKm * 0.45);
-    const alpha = selectedAirIcao24 && selectedAirIcao24 !== flight.icao24 ? 0.3 : 0.6;
+    const alpha = selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 0.8 : 0.05) : 0.6;
     const altitude = getAircraftAltitudeRatio(flight.altitude || 0);
     return {
       color: `rgba(210,255,84,${alpha})`,
@@ -3261,7 +3261,7 @@ function initOrUpdateGlobe(items = []) {
           el.style.width = coarsePointer ? '44px' : '18px';
           el.style.height = coarsePointer ? '44px' : '18px';
           el.style.opacity = String(item.opacity ?? 1);
-          el.innerHTML = buildPlaneSvg(item.heading || 0);
+          el.innerHTML = buildPlaneSvg(item.heading || 0, selectedAirIcao24 === item.raw?.icao24);
           el.title = item.label || 'Tracked aircraft';
           if (coarsePointer) {
             el.addEventListener('click', (event) => {
@@ -3402,6 +3402,7 @@ function initOrUpdateGlobe(items = []) {
     globeContainer.addEventListener('mousemove', (event) => {
       syncGlobeControls(globeContainer, isInsideGlobeHitArea(event, globeContainer));
       updateGlobeLabelVisibility();
+  if (typeof updateDataPanel === 'function') updateDataPanel();
     });
 
     globeContainer.addEventListener('mousedown', (event) => {
@@ -3423,6 +3424,7 @@ function initOrUpdateGlobe(items = []) {
         setGlobeOverlayVisibility(false);
       }
       updateGlobeLabelVisibility();
+  if (typeof updateDataPanel === 'function') updateDataPanel();
     }, { passive: true });
 
     globeContainer.addEventListener('touchstart', (event) => {
@@ -3444,6 +3446,7 @@ function initOrUpdateGlobe(items = []) {
         setGlobeOverlayVisibility(false);
       }
       updateGlobeLabelVisibility();
+  if (typeof updateDataPanel === 'function') updateDataPanel();
     }, { passive: false });
 
     globeContainer.addEventListener('touchend', () => {
@@ -3470,6 +3473,7 @@ function initOrUpdateGlobe(items = []) {
   intelGlobe.arcsData(threatLayerEnabled ? getThreatArcElements() : []);
   intelGlobe.pathsData(overlayPaths);
   updateGlobeLabelVisibility();
+  if (typeof updateDataPanel === 'function') updateDataPanel();
 
   intelGlobe.pointsData(pointsData);
   intelGlobe.ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints);
@@ -3478,6 +3482,7 @@ function initOrUpdateGlobe(items = []) {
   intelGlobe.arcsData(threatLayerEnabled ? getThreatArcElements() : []);
   intelGlobe.pathsData(overlayPaths);
   updateGlobeLabelVisibility();
+  if (typeof updateDataPanel === 'function') updateDataPanel();
 
   if (!globeContainer.dataset.initialViewLocked) {
     if (cityPoints.length > 0) {
@@ -3602,6 +3607,7 @@ async function loadIntel() {
     renderCommandBar(currentPriorityItems);
     
     if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems);
+    if (typeof updateDataPanel === 'function') updateDataPanel();
     
     renderTimelineFocus(signals.items || []);
     renderTimeline(signals.items || []);
@@ -3625,36 +3631,100 @@ async function loadIntel() {
   }
 }
 
-function populateTriageFeed() {
+
+function updateDataPanel() {
   const container = document.getElementById('intel-live-triage');
-  if (!container) return;
-  
-  // We'll fetch the ontology data to get the list of threats
-  fetch('data/ontology.json')
-    .then(res => res.json())
-    .then(gData => {
-      let html = '';
-      const threats = gData.nodes.filter(n => n.group === 2 || n.group === 4);
-      
-      threats.forEach(t => {
-        const severityColor = t.group === 2 ? '#ff3c3c' : '#ffb878';
-        const label = t.group === 2 ? 'THREAT' : 'ALERT';
+  const title = document.getElementById('dynamic-panel-title');
+  if (!container || !title) return;
+
+  if (airLayerEnabled && currentAirTrafficItems && currentAirTrafficItems.length > 0) {
+    title.textContent = 'Data Target: GLOBAL AIR TRAFFIC';
+    const total = currentAirTrafficItems.length;
+    let commercial = 0;
+    let privateMil = 0;
+    const countries = {};
+
+    currentAirTrafficItems.forEach(f => {
+      // Rough heuristic: 3 letters + digits is usually commercial
+      if (f.callsign && /^[A-Z]{3}[A-Z0-9]{1,5}$/i.test(f.callsign.trim())) {
+        commercial++;
+      } else {
+        privateMil++;
+      }
+      const c = f.country || 'Unknown';
+      countries[c] = (countries[c] || 0) + 1;
+    });
+
+    const topCountries = Object.entries(countries)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    let html = `
+      <div style="display:flex; justify-content:space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div>
+          <div style="color:var(--lime); font-size:16px; font-weight:600;">${total}</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase;">Airborne Total</div>
+        </div>
+        <div>
+          <div style="color:#fff; font-size:16px; font-weight:600;">${commercial}</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase;">Commercial</div>
+        </div>
+        <div>
+          <div style="color:#ffb878; font-size:16px; font-weight:600;">${privateMil}</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase;">Private/Military</div>
+        </div>
+      </div>
+      <div style="margin-bottom: 8px; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Top 5 Regions of Origin</div>
+    `;
+
+    topCountries.forEach(([country, count], i) => {
+      html += `
+        <div style="display:flex; justify-content:space-between; padding: 4px 0; font-size: 11px;">
+          <span style="color:#ccc;">${i+1}. ${country}</span>
+          <span style="color:var(--lime); font-family:var(--font-mono);">${count}</span>
+        </div>
+      `;
+    });
+
+    if (selectedAirIcao24) {
+      const selectedFlight = currentAirTrafficItems.find(f => f.icao24 === selectedAirIcao24);
+      if (selectedFlight) {
         html += `
-          <div style="border-left: 2px solid ${severityColor}; padding: 6px 8px; margin-bottom: 8px; background: rgba(255,255,255,0.02);">
-            <div style="color: ${severityColor}; margin-bottom: 4px;">[${label}]</div>
-            <div style="color: #fff;">${t.label}</div>
-            <div class="muted" style="font-size: 9px; margin-top: 4px;">${new Date().toISOString().substring(11, 19)}Z</div>
+          <div style="margin-top: 16px; padding: 8px; background: rgba(210,255,84,0.1); border-left: 2px solid var(--lime);">
+            <div style="color:var(--lime); font-size:10px; text-transform:uppercase; margin-bottom:4px;">Selected Aircraft</div>
+            <div style="color:#fff; font-size:12px; font-weight:bold;">${selectedFlight.callsign || 'N/A'}</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-top:6px; font-size:10px;">
+              <div><span class="muted">Alt:</span> ${Math.round((selectedFlight.altitude || 0)*3.28084)} ft</div>
+              <div><span class="muted">Spd:</span> ${Math.round((selectedFlight.velocity || 0)*1.94384)} kts</div>
+              <div style="grid-column: 1/-1;"><span class="muted">Orig:</span> ${selectedFlight.country || 'Unknown'}</div>
+            </div>
           </div>
         `;
-      });
-      
-      if (html === '') {
-         html = '<div class="muted">No active threats detected.</div>';
       }
-  if (container) container.innerHTML = html;
-    })
-    .catch(err => {
-  if (container) container.innerHTML = '<div style="color:#ff3c3c">[ERR] Ontology unavailable</div>';
+    }
+
+    container.innerHTML = html;
+  } else if (satelliteLayerEnabled && currentSatelliteCatalog && currentSatelliteCatalog.length > 0) {
+    title.textContent = 'Data Target: SATELLITE ORBITS';
+    container.innerHTML = `<div style="color:var(--cyan); font-size:14px; margin-bottom:8px;">${currentSatelliteCatalog.length} Objects Tracked</div><div class="muted">Active satellite mapping engaged. Select an object for details.</div>`;
+  } else {
+    title.textContent = 'Data Target: GLOBAL ZONES';
+    let html = '';
+    const threats = currentPriorityItems.slice(0, 5);
+    threats.forEach(t => {
+      const severityColor = t.recoveryTrustDriverTransitionBalanceStructuralState === 'terminal' ? '#ff3c3c' : (t.recoveryTrustDriverTransitionBalanceStructuralState === 'fortified' ? 'var(--lime)' : '#ffb878');
+      html += `
+        <div style="border-left: 2px solid ${severityColor}; padding: 6px 8px; margin-bottom: 8px; background: rgba(255,255,255,0.02);">
+          <div style="color: ${severityColor}; margin-bottom: 4px;">[${t.recoveryTrustDriverTransitionBalanceStructuralState ? t.recoveryTrustDriverTransitionBalanceStructuralState.toUpperCase() : 'ALERT'}]</div>
+          <div style="color: #fff;">${t.action || t.locationName || 'Zone Alert'}</div>
+          <div class="muted" style="font-size: 9px; margin-top: 4px;">${new Date().toISOString().substring(11, 19)}Z</div>
+        </div>
+      `;
     });
+    if (html === '') {
+       html = '<div class="muted">No active zones detected.</div>';
+    }
+    container.innerHTML = html;
+  }
 }
-populateTriageFeed();
+

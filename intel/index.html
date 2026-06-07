@@ -40,18 +40,40 @@
         <a class="home-link" href="/" style="display: block; margin-top: 12px; color: var(--lime); text-decoration: none;">← Return to base</a>
       </div>
       
-      <div class="panel">
-        <div class="panel-kicker">Ontology Extraction</div>
-        <div class="intel-metrics">
-          <div><span class="muted">ENGINE:</span> <span style="color:var(--lime)">JERRY-GLM-5.1</span></div>
-          <div><span class="muted">STATUS:</span> <span style="color:#00e564">ONLINE / PARSING</span></div>
+      
+      <div class="panel" style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div style="grid-column: 1 / -1;">
+          <div class="panel-kicker">Global Posture</div>
+          <strong id="global-posture" style="font-size: 18px; color: var(--lime); text-transform: uppercase;">Scanning…</strong>
         </div>
+        <div>
+          <div class="panel-kicker">Terminal</div>
+          <strong id="terminal-count" style="font-size: 16px;">0</strong>
+        </div>
+        <div>
+          <div class="panel-kicker">Fortified</div>
+          <strong id="fortified-count" style="font-size: 16px;">0</strong>
+        </div>
+        <div>
+          <div class="panel-kicker">Reversals</div>
+          <strong id="reversal-count" style="font-size: 16px;">0</strong>
+        </div>
+        <div>
+          <div class="panel-kicker">Systems Online</div>
+          <strong id="status-strip-systems" style="font-size: 16px;">0</strong>
+        </div>
+        <div style="grid-column: 1 / -1; margin-top: 8px;">
+            <button id="toggle-diagnostics" class="ghost-btn" style="width: 100%; justify-content: center;">Show diagnostics</button>
+        </div>
+      </div>
+
       </div>
       
       <div class="panel" style="margin-top: 24px; flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;">
-        <div class="panel-kicker">Live Triage Feed</div>
+        <div class="panel-kicker" id="dynamic-panel-title">Data Target: GLOBAL ZONES</div>
         <div id="intel-live-triage" style="font-family: var(--font-mono); font-size: 11px; margin-top: 12px; flex-grow: 1; overflow-y: auto;">
-          <div class="muted">Loading live signals...</div>
+          <div class="muted">Loading global signals...</div>
+        </div>
         </div>
       </div>
       
@@ -64,32 +86,10 @@
     </aside>
 
     <main class="center-stage">
-      <div class="hero-card status-hero">
-        <div class="status-strip">
-          <div class="status-stat">
-            <span class="status-label">Global posture</span>
-            <strong id="status-strip-posture">Scanning…</strong>
-          </div>
-          <div class="status-stat">
-            <span class="status-label">Terminal zones</span>
-            <strong id="status-strip-terminal">0</strong>
-          </div>
-          <div class="status-stat">
-            <span class="status-label">Fortified zones</span>
-            <strong id="status-strip-fortified">0</strong>
-          </div>
-          <div class="status-stat">
-            <span class="status-label">Systems online</span>
-            <strong id="status-strip-systems">0</strong>
-          </div>
-        </div>
+      
       </div>
 
-      <div class="command-bar">
-        <div class="command-pill">
-          <span class="command-label">Global posture</span>
-          <strong id="global-posture">Scanning…</strong>
-        </div>
+      
         <div class="command-pill">
           <span class="command-label">Terminal</span>
           <strong id="terminal-count">0</strong>
