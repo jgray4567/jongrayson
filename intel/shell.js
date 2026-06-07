@@ -2674,6 +2674,8 @@ function updatePrimaryStageHeight() {
   card.style.height = `${targetHeight}px`;
   globe.style.height = `${targetHeight}px`;
   mapStage.style.height = `${targetHeight}px`;
+  const graphStage = document.getElementById('intel-graph-stage');
+  if (graphStage) graphStage.style.height = `${targetHeight}px`;
 
   if (intelGlobe?.height && intelGlobe?.width) {
     intelGlobe.height(targetHeight);
@@ -3353,6 +3355,10 @@ function showGlobeStage() {
 
   globe.style.display = 'block';
   mapStage.style.display = 'none';
+  const graphStage = document.getElementById('intel-graph-stage');
+  if (graphStage) graphStage.style.display = 'none';
+  const graphBtn = document.getElementById('toggle-ontology-graph');
+  if (graphBtn) graphBtn.style.display = 'inline-flex';
   updatePrimaryStageHeight();
   destroyCityMap();
   if (pittsburghDangerLayer) { cityMapInstance?.removeLayer(pittsburghDangerLayer); pittsburghDangerLayer = null; }
@@ -3684,5 +3690,80 @@ function initOrUpdateGlobe(items = []) {
     const avgLng = cityPoints.reduce((sum, point) => sum + point.lng, 0) / cityPoints.length;
     intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 1.7 }, 1800);
     globeContainer.dataset.initialViewLocked = '1';
+  }
+}
+function showGraphStage() {
+  const globe = document.getElementById('intel-globe');
+  const mapStage = document.getElementById('intel-map-stage');
+  const graphStage = document.getElementById('intel-graph-stage');
+  const returnButton = document.getElementById('return-to-globe');
+  const graphButton = document.getElementById('toggle-ontology-graph');
+  
+  // Hide others
+  if (globe) globe.style.display = 'none';
+  if (mapStage) mapStage.style.display = 'none';
+  
+  // Show graph
+  if (graphStage) graphStage.style.display = 'block';
+  if (returnButton) returnButton.style.display = 'inline-flex';
+  if (graphButton) graphButton.style.display = 'none';
+  
+  updatePrimaryStageHeight();
+  renderOntologyGraph();
+}
+let graphInstance = null;
+
+let graphInstance = null;
+
+function renderOntologyGraph() {
+  const container = document.getElementById('intel-graph-stage');
+  if (!container) return;
+  
+  if (!graphInstance) {
+    const gData = {
+      nodes: [
+        { id: "intel_nexus", group: 0, label: "J-01 (NEXUS)", size: 20 },
+        { id: "asset_alpha", group: 1, label: "Asset Alpha", size: 12 },
+        { id: "asset_beta", group: 1, label: "Asset Beta", size: 12 },
+        { id: "threat_1", group: 2, label: "Threat: 7x Vehicle Theft", size: 16 },
+        { id: "loc_arlington", group: 3, label: "Arlington, VA", size: 14 },
+        { id: "loc_pittsburgh", group: 3, label: "Pittsburgh Sector", size: 14 },
+        { id: "alert_099", group: 4, label: "Alert: Cyber Event", size: 10 },
+      ],
+      links: [
+        { source: "intel_nexus", target: "asset_alpha", value: 2 },
+        { source: "intel_nexus", target: "asset_beta", value: 2 },
+        { source: "intel_nexus", target: "threat_1", value: 4 },
+        { source: "asset_alpha", target: "loc_arlington", value: 1 },
+        { source: "threat_1", target: "loc_arlington", value: 5 },
+        { source: "asset_beta", target: "loc_pittsburgh", value: 3 },
+        { source: "loc_pittsburgh", target: "alert_099", value: 2 },
+      ]
+    };
+
+    graphInstance = ForceGraph()(container)
+      .graphData(gData)
+      .backgroundColor('#050505')
+      .nodeRelSize(4)
+      .nodeVal(node => node.size)
+      .nodeLabel(node => `<div style="color: #fff; font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.8); padding: 4px; border: 1px solid #333;">${node.label}</div>`)
+      .nodeColor(node => {
+        if(node.group === 0) return '#00e5ff';
+        if(node.group === 1) return '#ffffff';
+        if(node.group === 2) return '#ff3c3c';
+        if(node.group === 3) return '#ffb878';
+        return '#00e564';
+      })
+      .linkColor(() => 'rgba(255,255,255,0.2)')
+      .linkWidth(link => link.value)
+      .linkDirectionalParticles(2)
+      .linkDirectionalParticleWidth(1.5)
+      .onNodeClick(node => {
+        graphInstance.centerAt(node.x, node.y, 1000);
+        graphInstance.zoom(2, 2000);
+      });
+      
+    // Configure forces
+    graphInstance.d3Force('charge').strength(-200);
   }
 }

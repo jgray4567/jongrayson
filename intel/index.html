@@ -12,6 +12,7 @@
   <script src="https://unpkg.com/satellite.js@5.0.0/dist/satellite.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+  <script src="https://unpkg.com/force-graph"></script>
 </head>
 <body class="intel-thin">
   <div class="app-shell">
@@ -159,6 +160,7 @@
             <button id="toggle-satellite-layer" class="ghost-btn map-control-btn">Sat</button>
             <button id="toggle-threat-layer" class="ghost-btn map-control-btn">Cyber Attacks</button>
             <button id="return-to-globe" class="ghost-btn map-control-btn" style="display: none;">Globe</button>
+            <button id="toggle-ontology-graph" class="ghost-btn map-control-btn">Link Graph</button>
             <button id="toggle-pittsburgh-zones" class="ghost-btn map-control-btn" style="display: none;">Zones On</button>
             <button id="toggle-danger-zones" class="ghost-btn map-control-btn" style="display: none;">Threat Areas</button>
             <select id="pittsburgh-month-select" class="map-control-select" style="display: none;"></select>
@@ -172,6 +174,7 @@
           <div id="crime-legend" class="crime-legend" style="display: none;"></div>
           <div id="intel-globe" style="height: 60vh; width: 100%; cursor: grab;"></div>
           <div id="intel-map-stage" style="display:none; height:60vh; width:100%; position: relative;"></div>
+          <div id="intel-graph-stage" style="display:none; height:60vh; width:100%; position: relative; background: var(--surface);"></div>
         </section>
 
         <section class="stage-card" style="grid-column: 1 / -1;">

@@ -1,21 +1,22 @@
 :root {
-  --bg: #0c0f0c;
-  --panel: #131813;
-  --panel-2: #171d17;
-  --border: rgba(196,214,0,0.18);
-  --border-strong: rgba(196,214,0,0.34);
-  --lime: #c4d600;
-  --lime-dim: rgba(196,214,0,0.08);
-  --text: #eef2e8;
-  --muted: rgba(238,242,232,0.72);
-  --chip: rgba(255,255,255,0.04);
+  --bg: #030404;
+  --panel: #0a0c0e;
+  --panel-2: #0f1216;
+  --border: rgba(0, 229, 255, 0.18);
+  --border-strong: rgba(0, 229, 255, 0.35);
+  --lime: #00e5ff;
+  --lime-dim: rgba(0, 229, 255, 0.1);
+  --text: #e8f4f8;
+  --muted: rgba(232, 244, 248, 0.65);
+  --chip: rgba(255, 255, 255, 0.03);
+  --font-mono: 'JetBrains Mono', 'Roboto Mono', Menlo, Consolas, monospace;
 }
 html { font-size: 80%; }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, Arial, sans-serif;
-  background: radial-gradient(circle at top, rgba(196,214,0,0.08), transparent 35%), var(--bg);
+  background: radial-gradient(circle at top, rgba(0, 229, 255, 0.05), transparent 45%), var(--bg);
   color: var(--text);
 }
 .app-shell {
@@ -901,4 +902,31 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   background-position: right 8px center;
   background-size: 10px auto;
   padding-right: 24px !important;
+}
+
+/* Palantir-style monospacing and typographic updates */
+.panel-kicker, .brand-kicker, .intel-metrics, .task-focus-meta, .event-time, .event-coord, .mono-data {
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.intel-state-chip {
+  font-family: var(--font-mono);
+  background: rgba(0, 229, 255, 0.1) !important;
+  border-color: rgba(0, 229, 255, 0.4) !important;
+  color: #00e5ff !important;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
+}
+
+.map-control-btn, .ghost-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+
+.stage-card {
+  border-radius: 4px;
 }
