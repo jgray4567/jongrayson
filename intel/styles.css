@@ -956,10 +956,10 @@ body[data-interaction-mode="mobile"] .map-hover-card {
     height: auto;
   }
   #intel-globe, #intel-map-stage, #intel-graph-stage {
-    height: 50vh !important; /* Slightly shorter on mobile to fit the rail */
+    height: 50vh; /* Slightly shorter on mobile to fit the rail */
   }
   #global-operations-card {
-    height: auto !important;
+    height: auto;
   }
 }
 .panel {

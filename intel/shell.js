@@ -2661,27 +2661,6 @@ function initializeCommandSurface() {
   }
 }
 
-function updatePrimaryStageHeight() {
-  const card = document.getElementById('global-operations-card');
-  const globe = document.getElementById('intel-globe');
-  const mapStage = document.getElementById('intel-map-stage');
-  if (!card || !globe || !mapStage) return;
-
-  const top = card.getBoundingClientRect().top;
-  const reservedBelow = document.body.classList.contains('intel-thin') ? 0 : 150;
-  const targetHeight = Math.max(360, window.innerHeight - top - reservedBelow);
-
-  card.style.height = `${targetHeight}px`;
-  globe.style.height = `${targetHeight}px`;
-  mapStage.style.height = `${targetHeight}px`;
-  const graphStage = document.getElementById('intel-graph-stage');
-  if (graphStage) graphStage.style.height = `${targetHeight}px`;
-
-  if (intelGlobe?.height && intelGlobe?.width) {
-    intelGlobe.height(targetHeight);
-    intelGlobe.width(globe.clientWidth);
-  }
-}
 
 function getEventClientPoint(event) {
   if (typeof event?.clientX === 'number' && typeof event?.clientY === 'number') {
@@ -3693,6 +3672,32 @@ function initOrUpdateGlobe(items = []) {
   }
 }
 function showGraphStage() {
+function updatePrimaryStageHeight() {
+  const card = document.getElementById('global-operations-card');
+  const globe = document.getElementById('intel-globe');
+  const mapStage = document.getElementById('intel-map-stage');
+  const graphStage = document.getElementById('intel-graph-stage');
+  if (!card || !globe || !mapStage) return;
+
+  let targetHeight;
+  if (window.innerWidth <= 920) {
+    targetHeight = Math.max(300, window.innerHeight * 0.5);
+  } else {
+    const top = card.getBoundingClientRect().top;
+    const reservedBelow = 150;
+    targetHeight = Math.max(360, window.innerHeight - top - reservedBelow);
+  }
+
+  card.style.height = `${targetHeight}px`;
+  globe.style.height = `${targetHeight}px`;
+  mapStage.style.height = `${targetHeight}px`;
+  if (graphStage) graphStage.style.height = `${targetHeight}px`;
+
+  if (intelGlobe && intelGlobe.height && intelGlobe.width) {
+    intelGlobe.height(targetHeight);
+    intelGlobe.width(globe.clientWidth || window.innerWidth - 24);
+  }
+}
   const globe = document.getElementById('intel-globe');
   const mapStage = document.getElementById('intel-map-stage');
   const graphStage = document.getElementById('intel-graph-stage');
