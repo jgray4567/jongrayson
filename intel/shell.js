@@ -3471,10 +3471,22 @@ function initOrUpdateGlobe(items = []) {
   intelGlobe.pathsData(overlayPaths);
   updateGlobeLabelVisibility();
 
-  if (cityPoints.length && !globeContainer.dataset.initialViewLocked) {
-    const avgLat = cityPoints.reduce((sum, point) => sum + point.lat, 0) / cityPoints.length;
-    const avgLng = cityPoints.reduce((sum, point) => sum + point.lng, 0) / cityPoints.length;
-    intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 1.7 }, 1800);
+  intelGlobe.pointsData(pointsData);
+  intelGlobe.ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints);
+  intelGlobe.labelsData([]);
+  intelGlobe.htmlElementsData(overlayElements);
+  intelGlobe.arcsData(threatLayerEnabled ? getThreatArcElements() : []);
+  intelGlobe.pathsData(overlayPaths);
+  updateGlobeLabelVisibility();
+
+  if (!globeContainer.dataset.initialViewLocked) {
+    if (cityPoints.length > 0) {
+      const avgLat = cityPoints.reduce((sum, point) => sum + point.lat, 0) / cityPoints.length;
+      const avgLng = cityPoints.reduce((sum, point) => sum + point.lng, 0) / cityPoints.length;
+      intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 1.7 }, 1800);
+    } else {
+      intelGlobe.pointOfView({ lat: 39.0, lng: -98.0, altitude: 1.7 }, 1800);
+    }
     globeContainer.dataset.initialViewLocked = '1';
   }
 }
