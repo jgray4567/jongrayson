@@ -3581,7 +3581,7 @@ style.innerHTML = `
 }
 `;
 document.head.appendChild(style);
-function populateTriageFeed() {
+
 async function loadIntel() {
   try {
     syncUrlState();
@@ -3625,6 +3625,8 @@ async function loadIntel() {
     if (feedStatus) feedStatus.textContent = 'Disconnected';
   }
 }
+
+function populateTriageFeed() {
   const container = document.getElementById('intel-live-triage');
   if (!container) return;
   
