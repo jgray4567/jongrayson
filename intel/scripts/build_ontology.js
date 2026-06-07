@@ -52,7 +52,7 @@ ${signals.join("\n")}`;
     fs.writeFileSync(promptPath, prompt);
     
     try {
-        const output = execSync(`openclaw infer model run --model "brainwave/auto" --prompt "$(cat ${promptPath})" --json`, { encoding: 'utf-8' });
+        const output = execSync(`openclaw infer model run --model "ollama/glm-5.1:cloud" --prompt "$(cat ${promptPath})" --json`, { encoding: 'utf-8' });
         
         let jsonStr = output.trim();
         // Strip markdown fences if present
