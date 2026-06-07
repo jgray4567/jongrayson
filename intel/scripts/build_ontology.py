@@ -31,11 +31,11 @@ def extract_ontology(signals):
     JERRY_API_URL = "http://192.168.1.100:1234/v1/chat/completions"
     
     prompt = (
-        "You are a Palantir-style intelligence extraction engine. Convert the following threat signals into a node graph ontology.\n"
+        "You are the automated Intelligence Extraction Engine for jongrayson.com (powered by JerryKnows.ai). Your job is to convert the following live global threat signals into a Palantir-style node graph ontology.\n"
         "Return ONLY valid JSON. Format:\n"
         "{\"nodes\": [{\"id\": \"id_string\", \"group\": 0-4, \"label\": \"Display Name\", \"size\": 10}], \"links\": [{\"source\": \"id1\", \"target\": \"id2\", \"value\": 1}]}\n"
         "Groups: 0=Nexus, 1=Org/Asset, 2=Threat/Event, 3=Location, 4=Misc.\n"
-        "Include an 'intel_nexus' node (group 0) and link the most important events to it.\n\n"
+        "Include an 'intel_nexus' node (group 0) with the label 'JerryKnows.ai - Global Nexus' and link the most important extracted events, organizations, and locations to it.\n\n"
         "Signals:\n" + "\n".join(signals)
     )
     
