@@ -3748,3 +3748,81 @@ function renderOntologyGraph() {
       .catch(err => console.error("Intel Graph Error:", err));
   }
 }
+// --- Sidebar Injection ---
+function renderSidebars() {
+  const leftRail = document.querySelector('.left-rail');
+  if (!leftRail) return;
+  
+  // Wipe out the old HTML
+  leftRail.innerHTML = `
+    <div class="brand-block">
+      <div class="brand-kicker">jongrayson.com /intel</div>
+      <h1>JerryKnows.ai</h1>
+      <div class="muted">Automated Intelligence Platform (AIP)</div>
+    </div>
+    
+    <div class="panel">
+      <div class="panel-kicker">Ontology Extraction</div>
+      <div class="intel-metrics">
+        <div><span class="muted">ENGINE:</span> <span style="color:#00e5ff">JERRY-QWEN-235B</span></div>
+        <div><span class="muted">STATUS:</span> <span style="color:#00e564">ONLINE / PARSING</span></div>
+      </div>
+    </div>
+    
+    <div class="panel" style="margin-top: 24px;">
+      <div class="panel-kicker">Live Triage Feed</div>
+      <div id="intel-live-triage" style="font-family: var(--font-mono); font-size: 11px; margin-top: 12px; height: 300px; overflow-y: auto;">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+    
+    <div class="panel" style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px;">
+      <div class="panel-kicker">Command Line</div>
+      <div style="font-family: var(--font-mono); font-size: 12px; margin-top: 8px;">
+        <span style="color:#00e5ff">></span> <span class="muted" style="animation: blink 1s step-end infinite;">Awaiting input...</span>
+      </div>
+    </div>
+  `;
+}
+
+// Add blinking animation for the cursor
+const style = document.createElement('style');
+style.innerHTML = `
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+`;
+document.head.appendChild(style);
+function populateTriageFeed() {
+  const container = document.getElementById('intel-live-triage');
+  if (!container) return;
+  
+  // We'll fetch the ontology data to get the list of threats
+  fetch('data/ontology.json')
+    .then(res => res.json())
+    .then(gData => {
+      let html = '';
+      const threats = gData.nodes.filter(n => n.group === 2 || n.group === 4);
+      
+      threats.forEach(t => {
+        const severityColor = t.group === 2 ? '#ff3c3c' : '#ffb878';
+        const label = t.group === 2 ? 'THREAT' : 'ALERT';
+        html += `
+          <div style="border-left: 2px solid ${severityColor}; padding: 6px 8px; margin-bottom: 8px; background: rgba(255,255,255,0.02);">
+            <div style="color: ${severityColor}; margin-bottom: 4px;">[${label}]</div>
+            <div style="color: #fff;">${t.label}</div>
+            <div class="muted" style="font-size: 9px; margin-top: 4px;">${new Date().toISOString().substring(11, 19)}Z</div>
+          </div>
+        `;
+      });
+      
+      if (html === '') {
+         html = '<div class="muted">No active threats detected.</div>';
+      }
+      container.innerHTML = html;
+    })
+    .catch(err => {
+      container.innerHTML = '<div style="color:#ff3c3c">[ERR] Ontology unavailable</div>';
+    });
+}
