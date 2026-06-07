@@ -3377,7 +3377,7 @@ function initOrUpdateGlobe(items = []) {
         }
       })
       .pointsTransitionDuration(1500)
-      .width(globeContainer.clientWidth)
+      .width(globeContainer.clientWidth || window.innerWidth - 24)
       .height(globeContainer.clientHeight || 600);
       
       setGlobeAutoRotate(true);
