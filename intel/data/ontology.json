@@ -1,55 +1,66 @@
 {
   "nodes": [
     {
+      "id": "bbc_news",
+      "group": 1,
+      "label": "BBC News",
+      "size": 10
+    },
+    {
+      "id": "ukr_drones_st_petersburg",
+      "group": 2,
+      "label": "Ukrainian drones target St Petersburg",
+      "size": 10
+    },
+    {
+      "id": "us_iran_gulf_strikes",
+      "group": 2,
+      "label": "US and Iran exchange strikes in Gulf",
+      "size": 10
+    },
+    {
+      "id": "hegseth_europe_beach_invasion",
+      "group": 3,
+      "label": "Hegseth attacks Europe over migration",
+      "size": 10
+    },
+    {
+      "id": "baby_funeral_israeli_troops",
+      "group": 3,
+      "label": "Funeral for baby shot dead by Israeli troops",
+      "size": 10
+    },
+    {
       "id": "intel_nexus",
       "group": 0,
-      "label": "J-01 (NEXUS)",
-      "size": 20
-    },
-    {
-      "id": "cisa_alert",
-      "group": 4,
-      "label": "CISA Alert",
-      "size": 12
-    },
-    {
-      "id": "threat_cyber",
-      "group": 2,
-      "label": "Cyber Campaign",
-      "size": 16
-    },
-    {
-      "id": "loc_dc",
-      "group": 3,
-      "label": "Washington D.C.",
-      "size": 14
-    },
-    {
-      "id": "intel_feed",
-      "group": 1,
-      "label": "Global News Feed",
-      "size": 12
+      "label": "JerryKnows.ai - Global Nexus",
+      "size": 10
     }
   ],
   "links": [
     {
-      "source": "intel_nexus",
-      "target": "cisa_alert",
-      "value": 2
+      "source": "bbc_news",
+      "target": "intel_nexus",
+      "value": 1
     },
     {
-      "source": "cisa_alert",
-      "target": "threat_cyber",
-      "value": 3
+      "source": "ukr_drones_st_petersburg",
+      "target": "intel_nexus",
+      "value": 1
     },
     {
-      "source": "threat_cyber",
-      "target": "loc_dc",
-      "value": 4
+      "source": "us_iran_gulf_strikes",
+      "target": "intel_nexus",
+      "value": 1
     },
     {
-      "source": "intel_nexus",
-      "target": "intel_feed",
+      "source": "hegseth_europe_beach_invasion",
+      "target": "intel_nexus",
+      "value": 1
+    },
+    {
+      "source": "baby_funeral_israeli_troops",
+      "target": "intel_nexus",
       "value": 1
     }
   ]

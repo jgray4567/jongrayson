@@ -3533,7 +3533,6 @@ function updatePrimaryStageHeight() {
     intelGlobe.width(globe.clientWidth || window.innerWidth - 24);
   }
 }
-  if (!container) return;
 let graphInstance = null;
 
 function renderOntologyGraph() {
