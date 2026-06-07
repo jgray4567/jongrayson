@@ -962,3 +962,51 @@ body[data-interaction-mode="mobile"] .map-hover-card {
     height: auto !important;
   }
 }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.intel-metrics {
+  background: var(--panel-2);
+  border-radius: 6px;
+  padding: 12px;
+}
+.brand-block h1 {
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  margin-top: 8px;
+}
+.intel-drawer {
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.stage-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+}
+.ghost-btn, .map-control-btn {
+  background: var(--chip);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+.ghost-btn:hover, .map-control-btn:hover {
+  background: var(--lime-dim);
+  border-color: var(--lime);
+  color: var(--lime);
+}
+.signal-filters .active {
+  background: var(--lime-dim);
+  border-color: var(--lime);
+  color: var(--lime);
+}
