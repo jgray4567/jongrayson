@@ -6,7 +6,7 @@
   <base href="/intel/">
   <title>Intel, Build 201 | Jon Grayson</title>
   <meta name="description" content="Intel build 201, Geographic Intel Projection, mapping structural states to global visualization inside jongrayson.com.">
-  <link rel="stylesheet" href="styles.css?v=0.008.3">
+  <link rel="stylesheet" href="styles.css?v=0.008.5">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://unpkg.com/satellite.js@5.0.0/dist/satellite.min.js"></script>
@@ -15,22 +15,6 @@
   <script src="https://unpkg.com/force-graph"></script>
 </head>
 <body>
-
-<script>
-  window.addEventListener('error', function(e) {
-    var err = document.createElement('div');
-    err.style.cssText = 'position:fixed;top:0;left:0;right:0;background:red;color:white;z-index:99999;padding:10px;font-family:monospace;white-space:pre-wrap;';
-    err.textContent = 'JS Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno;
-    document.body.appendChild(err);
-  });
-  window.addEventListener('unhandledrejection', function(e) {
-    var err = document.createElement('div');
-    err.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:orange;color:black;z-index:99999;padding:10px;font-family:monospace;white-space:pre-wrap;';
-    err.textContent = 'Promise Rejection: ' + (e.reason && e.reason.message ? e.reason.message : e.reason);
-    document.body.appendChild(err);
-  });
-</script>
-
   <div class="app-shell">
     <aside class="rail left-rail" style="display: flex; flex-direction: column;">
       <div class="brand-block">
@@ -66,14 +50,11 @@
             <button id="toggle-diagnostics" class="ghost-btn" style="width: 100%; justify-content: center;">Show diagnostics</button>
         </div>
       </div>
-
-      </div>
       
       <div class="panel" style="margin-top: 24px; flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;">
         <div class="panel-kicker" id="dynamic-panel-title">Data Target: GLOBAL ZONES</div>
         <div id="intel-live-triage" style="font-family: var(--font-mono); font-size: 11px; margin-top: 12px; flex-grow: 1; overflow-y: auto;">
           <div class="muted">Loading global signals...</div>
-        </div>
         </div>
       </div>
       
@@ -87,23 +68,8 @@
 
     <main class="center-stage">
       
-      </div>
 
       
-        <div class="command-pill">
-          <span class="command-label">Terminal</span>
-          <strong id="terminal-count">0</strong>
-        </div>
-        <div class="command-pill">
-          <span class="command-label">Fortified</span>
-          <strong id="fortified-count">0</strong>
-        </div>
-        <div class="command-pill">
-          <span class="command-label">Reversals</span>
-          <strong id="reversal-count">0</strong>
-        </div>
-        <button id="toggle-diagnostics" class="ghost-btn">Show diagnostics</button>
-      </div>
 
       <aside id="intel-activation-panel" class="intel-drawer" aria-hidden="true">
         <div class="intel-drawer-head">
@@ -215,6 +181,6 @@
     </main>
   </div>
 
-  <script src="shell.js?v=0.008.3" type="module"></script>
+  <script src="shell.js?v=0.008.5" type="module"></script>
 </body>
 </html>
