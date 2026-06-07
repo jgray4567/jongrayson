@@ -2185,7 +2185,7 @@ function getAirTrafficGlobeElements() {
       ...flight,
       kind: 'air'
     }
-  }));
+  })).filter(f => f.opacity > 0);
 }
 
 function getAirTrafficPaths() {
@@ -3241,7 +3241,7 @@ function initOrUpdateGlobe(items = []) {
   const overlayElements = [...airElements, ...satelliteElements];
   const overlayPaths = [...airPaths, ...satellitePaths];
   const hoveredCityPoints = hoveredCityLabel ? cityPoints.filter((point) => point.shortLabel === hoveredCityLabel) : [];
-  const pointsData = [...cityPoints, ...airElements.map(a => ({ ...a, kind: 'air', raw: a.raw || a })), ...satelliteElements.map(s => ({ ...s, kind: 'satellite', raw: s.raw || s })), ...getThreatHotspotPoints()];
+  const pointsData = [...cityPoints, ...airElements.filter(a => a.opacity > 0).map(a => ({ ...a, kind: 'air', raw: a.raw || a })), ...satelliteElements.map(s => ({ ...s, kind: 'satellite', raw: s.raw || s })), ...getThreatHotspotPoints()];
 
   currentGlobePointsData = cityPoints;
 
@@ -3289,6 +3289,7 @@ function initOrUpdateGlobe(items = []) {
           el.style.width = coarsePointer ? '44px' : '18px';
           el.style.height = coarsePointer ? '44px' : '18px';
           el.style.opacity = String(item.opacity ?? 1);
+          if ((item.opacity ?? 1) <= 0) el.style.display = 'none';
           el.innerHTML = buildPlaneSvg(item.heading || 0, selectedAirIcao24 === item.raw?.icao24);
           el.title = item.label || 'Tracked aircraft';
           if (coarsePointer) {
@@ -3304,6 +3305,7 @@ function initOrUpdateGlobe(items = []) {
             });
             el.addEventListener('mouseleave', () => {
               el.style.opacity = String(item.opacity ?? 1);
+          if ((item.opacity ?? 1) <= 0) el.style.display = 'none';
             });
             el.addEventListener('click', (event) => {
               event.stopPropagation();
