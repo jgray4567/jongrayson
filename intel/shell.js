@@ -2179,7 +2179,7 @@ function getAirTrafficGlobeElements() {
     lng: flight.lng,
     altitude: getAircraftAltitudeRatio(flight.altitude || 0),
     heading: flight.heading || 0,
-    opacity: selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 1 : 0.05) : 1,
+    opacity: selectedAirRegion ? (flight.country === selectedAirRegion ? (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 1 : 0.05) : 1) : 0) : (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 1 : 0.05) : 1),
     label: `${flight.callsign || 'Unknown'} · ${flight.country || 'In flight'}`,
     raw: {
       ...flight,
@@ -2194,7 +2194,7 @@ function getAirTrafficPaths() {
     const distanceKm = Math.max(80, Math.min(260, ((flight.velocity || 220) * 900) / 1000));
     const forwardPoint = projectPointFromBearing(flight.lat, flight.lng, flight.heading || 0, distanceKm * 0.55);
     const trailingPoint = projectPointFromBearing(flight.lat, flight.lng, (flight.heading || 0) + 180, distanceKm * 0.45);
-    const alpha = selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 0.8 : 0.05) : 0.6;
+    const alpha = selectedAirRegion ? (flight.country === selectedAirRegion ? (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 0.8 : 0.05) : 0.6) : 0) : (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 0.8 : 0.05) : 0.6);
     const altitude = getAircraftAltitudeRatio(flight.altitude || 0);
     return {
       color: `rgba(210,255,84,${alpha})`,
@@ -2347,6 +2347,33 @@ function syncSatelliteLayerTimer() {
 
 function initializeCommandSurface() {
   setDiagnosticsVisible(false);
+
+  const triageContainer = document.getElementById('intel-live-triage');
+  if (triageContainer && !triageContainer.dataset.boundClicks) {
+    triageContainer.addEventListener('click', (event) => {
+      const regionBtn = event.target.closest('[data-air-region]');
+      if (regionBtn) {
+        const region = regionBtn.dataset.airRegion;
+        if (selectedAirRegion === region) {
+          selectedAirRegion = null;
+          if (typeof intelGlobe !== 'undefined' && intelGlobe) intelGlobe.pointOfView({ altitude: 1.7 }, 1800);
+        } else {
+          selectedAirRegion = region;
+          const regionalFlights = currentAirTrafficItems.filter(f => f.country === region);
+          if (typeof intelGlobe !== 'undefined' && intelGlobe && regionalFlights.length > 0) {
+             const avgLat = regionalFlights.reduce((sum, f) => sum + f.lat, 0) / regionalFlights.length;
+             const avgLng = regionalFlights.reduce((sum, f) => sum + f.lng, 0) / regionalFlights.length;
+             intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 0.6 }, 1800);
+          }
+        }
+        
+        if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems || []);
+        if (typeof updateDataPanel === "function") updateDataPanel();
+      }
+    });
+    triageContainer.dataset.boundClicks = '1';
+  }
+
   initializeLayerConfigurator();
   syncAirToggle();
   syncSatelliteToggle();
