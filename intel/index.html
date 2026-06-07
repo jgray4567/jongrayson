@@ -6,7 +6,7 @@
   <base href="/intel/">
   <title>Intel, Build 201 | Jon Grayson</title>
   <meta name="description" content="Intel build 201, Geographic Intel Projection, mapping structural states to global visualization inside jongrayson.com.">
-  <link rel="stylesheet" href="styles.css?v=0.008.2">
+  <link rel="stylesheet" href="styles.css?v=0.008.3">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://unpkg.com/satellite.js@5.0.0/dist/satellite.min.js"></script>
@@ -15,6 +15,22 @@
   <script src="https://unpkg.com/force-graph"></script>
 </head>
 <body>
+
+<script>
+  window.addEventListener('error', function(e) {
+    var err = document.createElement('div');
+    err.style.cssText = 'position:fixed;top:0;left:0;right:0;background:red;color:white;z-index:99999;padding:10px;font-family:monospace;white-space:pre-wrap;';
+    err.textContent = 'JS Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno;
+    document.body.appendChild(err);
+  });
+  window.addEventListener('unhandledrejection', function(e) {
+    var err = document.createElement('div');
+    err.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:orange;color:black;z-index:99999;padding:10px;font-family:monospace;white-space:pre-wrap;';
+    err.textContent = 'Promise Rejection: ' + (e.reason && e.reason.message ? e.reason.message : e.reason);
+    document.body.appendChild(err);
+  });
+</script>
+
   <div class="app-shell">
     <aside class="rail left-rail" style="display: flex; flex-direction: column;">
       <div class="brand-block">
@@ -199,6 +215,6 @@
     </main>
   </div>
 
-  <script src="shell.js?v=0.008.2" type="module"></script>
+  <script src="shell.js?v=0.008.3" type="module"></script>
 </body>
 </html>

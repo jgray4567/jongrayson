@@ -1045,7 +1045,7 @@ function startAutoRefresh() {
   }, 5000);
 }
 
-signalSeverityFilters.addEventListener('click', async (event) => {
+signalSeverityFilters?.addEventListener('click', async (event) => {
   const btn = event.target.closest('[data-severity]');
   if (!btn) return;
 
@@ -1330,7 +1330,7 @@ if (timelineViewsList) {
   });
 }
 
-signalRecoveryAnalyticsCard.addEventListener('click', async (event) => {
+signalRecoveryAnalyticsCard?.addEventListener('click', async (event) => {
   const btn = event.target.closest('[data-signal-recovered]');
   if (!btn) {
     if (currentRecoveredFilter) {
@@ -1347,7 +1347,7 @@ signalRecoveryAnalyticsCard.addEventListener('click', async (event) => {
   await loadIntel();
 });
 
-taskContextAnalyticsCard.addEventListener('click', async (event) => {
+taskContextAnalyticsCard?.addEventListener('click', async (event) => {
   const btn = event.target.closest('[data-task-tag]');
   if (!btn) {
     if (currentTagFilter !== null || currentTaskIdFilter !== null) {
@@ -1366,7 +1366,7 @@ taskContextAnalyticsCard.addEventListener('click', async (event) => {
   await loadIntel();
 });
 
-taskSignalCorrelationCard.addEventListener('click', async (event) => {
+taskSignalCorrelationCard?.addEventListener('click', async (event) => {
   const btn = event.target.closest('[data-task-focus-id]');
   if (!btn) {
     if (currentTagFilter !== null || currentTaskIdFilter !== null) {
@@ -1387,7 +1387,7 @@ taskSignalCorrelationCard.addEventListener('click', async (event) => {
   await loadIntel();
 });
 
-signalEscalationAnalyticsList.addEventListener('click', async (event) => {
+signalEscalationAnalyticsList?.addEventListener('click', async (event) => {
   const chip = event.target.closest('[data-signal-analytics]');
   if (!chip) {
     if (currentSourceFilter !== null) {
@@ -1415,7 +1415,7 @@ if (timelineComparisonSummary) {
   });
 }
 
-signalFeedList.addEventListener('click', async (event) => {
+signalFeedList?.addEventListener('click', async (event) => {
   const scoreBtn = event.target.closest('[data-signal-score]');
   if (scoreBtn) {
     const id = scoreBtn.dataset.signalId;
@@ -1453,7 +1453,7 @@ signalFeedList.addEventListener('click', async (event) => {
   await loadIntel();
 });
 
-recommendationsList.addEventListener('click', async (event) => {
+recommendationsList?.addEventListener('click', async (event) => {
   const reviewButton = event.target.closest('[data-third-order-review]');
   if (reviewButton) {
     const item = JSON.parse(reviewButton.dataset.thirdOrderReview.replace(/&apos;/g, "'"));
@@ -1473,14 +1473,14 @@ recommendationsList.addEventListener('click', async (event) => {
   setSelected(item);
 });
 
-analyticsList.addEventListener('click', async (event) => {
+analyticsList?.addEventListener('click', async (event) => {
   const chip = event.target.closest('[data-third-order-analytics]');
   if (!chip) return;
   const item = JSON.parse(chip.dataset.thirdOrderAnalytics.replace(/&apos;/g, "'"));
   setSelected(item);
 });
 
-effectivenessList.addEventListener('click', async (event) => {
+effectivenessList?.addEventListener('click', async (event) => {
   const chip = event.target.closest('[data-third-order-effectiveness]');
   if (!chip) return;
   const item = JSON.parse(chip.dataset.thirdOrderEffectiveness.replace(/&apos;/g, "'"));
