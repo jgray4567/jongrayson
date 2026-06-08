@@ -261,6 +261,20 @@ body {
 .live-dot { color: var(--stable); animation: pulse 2s infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 
+/* Expandable cards */
+.stage-card { cursor: pointer; }
+.stage-card .card-expand { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.stage-card.expanded .card-expand { display: block; animation: fadeUp .25s ease; }
+.stage-card .expand-hint { font-size: 0.6rem; color: var(--muted); font-family: var(--font-mono); margin-left: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
+.stage-card.expanded .expand-hint { display: none; }
+.card-expand .detail-row { display: flex; gap: 8px; align-items: baseline; margin-bottom: 6px; font-size: 0.75rem; }
+.card-expand .detail-label { color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.65rem; min-width: 70px; }
+.card-expand .detail-value { color: var(--text); font-size: 0.78rem; }
+.card-expand .detail-value a { color: var(--lime); text-decoration: none; }
+.card-expand .detail-value a:hover { text-decoration: underline; }
+.card-expand .mem-link { color: var(--lime); font-family: var(--font-mono); font-size: 0.72rem; cursor: pointer; }
+.card-expand .mem-link:hover { text-decoration: underline; }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
@@ -519,25 +533,26 @@ function renderStats(){
 }
 
 function renderActiveProjects(){
-  document.getElementById('active-projects').innerHTML=PROJECTS.filter(p=>p.tag==='active'||p.tag==='dev').slice(0,8).map(p=>`
-    <div class="stage-card">
-      <h3><span style="color:var(--lime)">▸</span> ${p.name}</h3>
-      <p>${p.desc}</p>
-      <span class="intel-state-chip ${chipClass(p.tag)}">${p.tag.toUpperCase()}</span>
+  document.getElementById('active-projects').innerHTML=PROJECTS.filter(p=>p.tag==='active'||p.tag==='dev').slice(0,8).map(p=>projectCard(p)).join('');
+}
+
+function projectCard(p){
+  return `<div class="stage-card" data-project="${p.id}" tabindex="0" role="button" aria-label="Expand ${p.name}">
+    <h3>${p.name} <span class="intel-state-chip ${chipClass(p.tag)}" style="font-size:0.58rem;margin-left:4px">${p.tag.toUpperCase()}</span><span class="expand-hint">tap to expand</span></h3>
+    <p>${p.desc}</p>
+    <div class="card-expand">
+      <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${p.tag==='active'?'🟢 Active':p.tag==='dev'?'🟡 In Development':'⏸ Archived'}</span></div>
+      <div class="detail-row"><span class="detail-label">Memory</span><span class="detail-value"><span class="mem-link" data-type="project" data-name="${p.file}">projects/${p.file}</span></span></div>
+      <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" style="font-family:var(--font-monospace)">${p.id}</span></div>
     </div>
-  `).join('');
+  </div>`;
 }
 
 function renderAllProjects(filter=''){
   const f=filter.toLowerCase();
   const filtered=PROJECTS.filter(p=>!f||p.name.toLowerCase().includes(f)||p.desc.toLowerCase().includes(f)||p.tag.includes(f));
-  document.getElementById('all-projects').innerHTML=filtered.map(p=>`
-    <div class="stage-card">
-      <h3>${p.name}</h3>
-      <p>${p.desc}</p>
-      <span class="intel-state-chip ${chipClass(p.tag)}">${p.tag.toUpperCase()}</span>
-    </div>
-  `).join('');
+  document.getElementById('all-projects').innerHTML=filtered.map(p=>projectCard(p)).join('');
+  bindProjectCards();
 }
 
 function renderMemoryTopics(){
@@ -637,7 +652,7 @@ function updateClock(){
 setInterval(updateClock,1000);updateClock();
 
 // ─── INIT ───────────────────────────────────────────────────────────
-renderStats();renderActiveProjects();renderAllProjects();renderMemoryTopics();renderKarpathy();renderCron();renderRecentActivity();
+renderStats();renderActiveProjects();renderAllProjects();renderMemoryTopics();renderKarpathy();renderCron();renderRecentActivity();bindProjectCards();
 
 // ─── MODAL ─────────────────────────────────────────────────────────
 const MEMORY_GH='https://raw.githubusercontent.com/jgray4567/jongrayson/main/memory/';
@@ -662,6 +677,28 @@ function closeModal(){overlay.classList.remove('open');document.body.style.overf
 document.getElementById('modal-close').addEventListener('click',closeModal);
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+// Expand project cards on click
+function bindProjectCards(){
+  document.querySelectorAll('.stage-card[data-project]').forEach(card=>{
+    card.addEventListener('click',e=>{
+      // If clicking a mem-link inside expanded card, open modal instead
+      if(e.target.closest('.mem-link')){
+        const ml=e.target.closest('.mem-link');
+        const name=ml.dataset.name;
+        const proj=PROJECTS.find(p=>p.file===name);
+        openModal(proj?proj.name:name,'projects/'+name);
+        return;
+      }
+      // Toggle expand
+      const wasExpanded=card.classList.contains('expanded');
+      // Collapse all others in same container
+      card.parentElement.querySelectorAll('.stage-card.expanded').forEach(c=>{if(c!==card)c.classList.remove('expanded')});
+      card.classList.toggle('expanded');
+    });
+    card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();card.click()}});
+  });
+}
 
 document.addEventListener('click',e=>{
   const row=e.target.closest('.mem-clickable');if(!row)return;
