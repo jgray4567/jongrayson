@@ -616,7 +616,9 @@ function renderAllProjects(filter=''){
 let RAW_COUNT=0;
 function renderMemoryTopics(){
   document.getElementById('wiki-files').innerHTML=WIKI_FILES.map(f=>`
-    <div class="mem-file"><span class="name">wiki/${f.name}</span><span class="desc">${f.desc}</span><span class="meta">${f.lines} lines</span></div>
+    <div class="mem-file mem-clickable" data-type="wiki" data-name="${f.name}" tabindex="0" role="button" aria-label="Open wiki/${f.name}">
+      <span class="name">wiki/${f.name}</span><span class="desc">${f.desc}</span><span class="meta">${f.lines} lines</span>
+    </div>
   `).join('');
   document.getElementById('project-memories').innerHTML=PROJECTS.map(p=>`
     <div class="mem-file mem-clickable" data-type="project" data-name="${p.file}" tabindex="0" role="button" aria-label="Open ${p.name}">
@@ -797,7 +799,9 @@ document.addEventListener('click',e=>{
   const row=e.target.closest('.mem-clickable');if(!row)return;
   const name=row.dataset.name;const type=row.dataset.type;
   let title,path;
-  if(type==='session'){title='Session: '+name;path=name}else{const proj=PROJECTS.find(p=>p.file===name);title=proj?proj.name:name;path='projects/'+name}
+  if(type==='session'){title='Session: '+name;path=name}
+  else if(type==='wiki'){title='wiki/'+name;path='wiki/'+name}
+  else{const proj=PROJECTS.find(p=>p.file===name);title=proj?proj.name:name;path='projects/'+name}
   openModal(title,path);
 });
 </script>
