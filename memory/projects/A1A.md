@@ -2,7 +2,8 @@
 
 **Status:** Active
 **Type:** Client Website (SaaS Platform + Storefront)
-**Domains:** `a1a.com` (main platform), `a1asells.com` (storefront/marketing)
+**Main URL:** https://a1asells.com
+**Platform:** https://a1a.com (AI-powered real estate automation)
 **Legacy domain:** `exita1a.com` → redirects to `a1a.com`
 **GitHub repos:**
 - `jgray4567/exita1a-landing` — main site (a1a.com)

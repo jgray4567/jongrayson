@@ -488,7 +488,13 @@ async function fetchAllData(){
         const desc=extractDesc(text);
         const file=f.path.split('/').pop();
         const id=file.replace('.md','');
-        return{id,name,tag,desc,file};
+        // Extract Main URL or first URL
+        let url='';
+        const mainUrl=(text.match(/\*\*Main URL:\*\*\s*(https?:\/\/[^\s]+)/m)||[])[1];
+        const domainUrl=(text.match(/\*\*Domains?:\*\*\s*`?(https?:\/\/[^`\s,]+)`?/m)||[])[1];
+        const plainUrl=(text.match(/https?:\/\/[^\s)"']+/m)||[])[0];
+        url=mainUrl||domainUrl||plainUrl||'';
+        return{id,name,tag,desc,file,url};
       }catch(e){console.warn('[JK] Project fetch failed:',f.path,e);return null}
     });
     
@@ -599,11 +605,13 @@ function renderActiveProjects(){
 }
 
 function projectCard(p){
+  const urlRow=p.url?`<div class="detail-row"><span class="detail-label">URL</span><span class="detail-value"><a href="${p.url}" target="_blank" style="color:var(--lime);font-family:var(--font-mono);font-size:.72rem;text-decoration:none">${p.url.replace('https://','')}</a></span></div>`:'';
   return `<div class="stage-card" data-project="${p.id}" tabindex="0" role="button" aria-label="Expand ${p.name}">
-    <h3>${p.name} <span class="intel-state-chip ${chipClass(p.tag)}" style="font-size:0.58rem;margin-left:4px">${p.tag.toUpperCase()}</span><span class="expand-hint">tap to expand</span></h3>
+    <h3>${p.name} <span class="intel-state-chip ${chipClass(p.tag)}" style="font-size:0.58rem;margin-left:4px">${p.tag.toUpperCase()}</span>${p.url?`<a href="${p.url}" target="_blank" style="color:var(--lime);font-size:.7rem;margin-left:6px;font-family:var(--font-mono)" onclick="event.stopPropagation()">↗</a>`:''}<span class="expand-hint">tap to expand</span></h3>
     <p>${p.desc}</p>
     <div class="card-expand">
       <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${p.tag==='active'?'🟢 Active':p.tag==='dev'?'🟡 In Development':'⏸ Archived'}</span></div>
+      ${urlRow}
       <div class="detail-row"><span class="detail-label">Memory</span><span class="detail-value"><span class="mem-link" data-type="project" data-name="${p.file}">projects/${p.file}</span></span></div>
       <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" style="font-family:var(--font-mono)">${p.id}</span></div>
     </div>
