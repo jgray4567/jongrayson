@@ -2170,10 +2170,13 @@ function projectPointFromBearing(lat, lng, bearingDeg, distanceKm) {
   };
 }
 
-function buildPlaneSvg(heading = 0, isSelected = false) {
+function buildPlaneSvg(heading = 0, isSelected = false, isCommercial = true) {
+  const fillColor = isCommercial ? (isSelected ? '#D2FF54' : 'rgba(255,255,255,0.97)') : (isSelected ? '#ff3c3c' : 'rgba(255,60,60,0.8)');
+  const strokeColor = isCommercial ? 'rgba(210,255,84,0.82)' : 'rgba(255,60,60,0.82)';
+  const shadowColor = isCommercial ? 'rgba(210,255,84,0.45)' : 'rgba(255,60,60,0.45)';
   return `
-    <svg viewBox="0 0 24 24" width="18" height="18" style="display:block; transform: rotate(${heading}deg); transform-origin: 50% 50%; transform-box: fill-box; filter: drop-shadow(0 0 6px rgba(210,255,84,0.45));">
-      <path d="M12 1.5 14.2 8.4 21 10.6 21 12.4 14.2 13.6 13.3 22.5 10.7 22.5 9.8 13.6 3 12.4 3 10.6 9.8 8.4Z" fill="${isSelected ? '#D2FF54' : 'rgba(255,255,255,0.97)'}" stroke="rgba(210,255,84,0.82)" stroke-width="0.55" stroke-linejoin="round"/>
+    <svg viewBox="0 0 24 24" width="18" height="18" style="display:block; transform: rotate(${heading}deg); transform-origin: 50% 50%; transform-box: fill-box; filter: drop-shadow(0 0 6px ${shadowColor});">
+      <path d="M12 1.5 14.2 8.4 21 10.6 21 12.4 14.2 13.6 13.3 22.5 10.7 22.5 9.8 13.6 3 12.4 3 10.6 9.8 8.4Z" fill="${fillColor}" stroke="${strokeColor}" stroke-width="0.55" stroke-linejoin="round"/>
     </svg>
   `;
 }
@@ -3337,7 +3340,8 @@ function initOrUpdateGlobe(items = []) {
           el.style.height = coarsePointer ? '44px' : '18px';
           el.style.opacity = String(item.opacity ?? 1);
           if ((item.opacity ?? 1) <= 0) el.style.display = 'none';
-          el.innerHTML = buildPlaneSvg(item.heading || 0, selectedAirIcao24 === item.raw?.icao24);
+          const isCommercial = item.raw?.callsign && /^[A-Z]{3}[A-Z0-9]{1,5}$/i.test(item.raw.callsign.trim());
+          el.innerHTML = buildPlaneSvg(item.heading || 0, selectedAirIcao24 === item.raw?.icao24, isCommercial);
           el.title = item.label || 'Tracked aircraft';
           if (coarsePointer) {
             el.addEventListener('click', (event) => {
@@ -3745,8 +3749,8 @@ function updateDataPanel() {
           <div style="color:#fff; font-size:16px; font-weight:600;">${commercial}</div>
           <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedAirCategory === 'commercial' ? '#fff' : ''}">Commercial</div>
         </div>
-        <div data-air-category="private" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedAirCategory === 'private' ? 'rgba(210,255,84,0.15)' : 'transparent'};">
-          <div style="color:#ffb878; font-size:16px; font-weight:600;">${privateMil}</div>
+        <div data-air-category="private" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedAirCategory === 'private' ? 'rgba(255,60,60,0.15)' : 'transparent'};">
+          <div style="color:#ff3c3c; font-size:16px; font-weight:600;">${privateMil}</div>
           <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedAirCategory === 'private' ? '#fff' : ''}">Private/Military</div>
         </div>
       </div>
@@ -3813,7 +3817,7 @@ function updateDataPanel() {
                </div>
                <div style="background:rgba(0,0,0,0.2); padding: 4px; border-radius: 4px;">
                  <div class="muted" style="font-size:9px;">Private / Mil</div>
-                 <div style="color:#ffb878; font-size:12px;">${rPriv}</div>
+                 <div style="color:#ff3c3c; font-size:12px;">${rPriv}</div>
                </div>
              </div>
 
