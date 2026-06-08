@@ -23,10 +23,11 @@ if ($region === 'mexico') {
     $flags = ['Panama', 'Liberia', 'Marshall Islands', 'Hong Kong', 'Singapore', 'Malta', 'Bahamas', 'Saudi Arabia', 'Iran', 'UAE'];
     $count = rand(45, 65);
     $paths = [
-        [24.8, 57.8, 26.0, 56.5], // Gulf of Oman inbound
-        [26.0, 56.5, 26.5, 55.5], // Straight of Hormuz bottleneck
-        [26.5, 55.5, 25.5, 54.0], // Towards UAE
-        [26.5, 55.5, 27.5, 52.0]  // Up into Persian Gulf
+        [24.8, 57.8, 26.2, 56.5], // Gulf of Oman inbound
+        [26.2, 56.5, 26.6, 56.2], // Strait of Hormuz bottleneck
+        [26.6, 56.2, 26.2, 55.2], // Curving south around Qeshm/Iranian coast
+        [26.2, 55.2, 25.5, 54.0], // Towards UAE ports
+        [26.2, 55.2, 26.5, 52.0]  // Up into deep Persian Gulf
     ];
 }
 
@@ -38,8 +39,8 @@ for ($i = 0; $i < $count; $i++) {
     $lng = $path[1] + ($path[3] - $path[1]) * $progress;
     
     // Add jitter so they aren't in a perfect single-file line (0.1 deg is approx 11km)
-    $lat += (lcg_value() - 0.5) * 0.08;
-    $lng += (lcg_value() - 0.5) * 0.08;
+    $lat += (lcg_value() - 0.5) * 0.04;
+    $lng += (lcg_value() - 0.5) * 0.04;
     
     // Calculate realistic heading based on path
     // We add some random drift
