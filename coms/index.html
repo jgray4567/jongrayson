@@ -598,7 +598,7 @@ function projectCard(p){
     <div class="card-expand">
       <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${p.tag==='active'?'🟢 Active':p.tag==='dev'?'🟡 In Development':'⏸ Archived'}</span></div>
       <div class="detail-row"><span class="detail-label">Memory</span><span class="detail-value"><span class="mem-link" data-type="project" data-name="${p.file}">projects/${p.file}</span></span></div>
-      <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" style="font-family:var(--font-monospace)">${p.id}</span></div>
+      <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" style="font-family:var(--font-mono)">${p.id}</span></div>
     </div>
   </div>`;
 }
@@ -606,6 +606,10 @@ function projectCard(p){
 function renderAllProjects(filter=''){
   const f=filter.toLowerCase();
   const filtered=PROJECTS.filter(p=>!f||p.name.toLowerCase().includes(f)||p.desc.toLowerCase().includes(f)||p.tag.includes(f));
+  console.log('[JK] renderAllProjects:',filtered.length,'of',PROJECTS.length,'projects');
+  if(!filtered.length){
+    document.getElementById('all-projects').innerHTML='<div style="color:var(--muted);padding:20px;font-family:var(--font-mono);font-size:0.8rem">No projects found</div>';return;
+  }
   document.getElementById('all-projects').innerHTML=filtered.map(p=>projectCard(p)).join('');
 }
 
@@ -686,7 +690,11 @@ document.querySelectorAll('.command-pill').forEach(btn=>{
     document.querySelectorAll('.command-pill').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    const tab=btn.dataset.tab;
+    document.getElementById('tab-'+tab).classList.add('active');
+    // Re-render tab content when switching
+    if(tab==='projects')renderAllProjects(document.getElementById('project-search')?.value||'');
+    if(tab==='memory')renderMemoryTopics();
   });
 });
 
