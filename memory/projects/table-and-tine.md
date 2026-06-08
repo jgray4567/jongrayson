@@ -1,0 +1,3 @@
+- **Table & Tine Memberships:** Will use App Store Connect Offer Codes (100% discount / 1 Year Free) for courtesy access for family and contributors on the live app, rather than paying Apple's cut or writing custom bypass code. TestFlight handles this for free automatically in the sandbox.
+
+- **Backend Server Hardware (API/Parser):** The comfortable sweet spot for the production server is a standard Mac Mini (M2/M3/M4) with **16GB or 24GB of RAM** and a 256GB/512GB SSD. This is plenty of power to run the web API and an efficient 8B parameter local LLM for recipe parsing, without overpaying for an M-series Max/Ultra chip.
