@@ -3,7 +3,7 @@
     {
       "id": "intel_nexus",
       "group": 0,
-      "label": "JerryKnows.ai - Global Nexus",
+      "label": "JerryKnows",
       "size": 24
     },
     {
@@ -189,10 +189,10 @@
     {
       "id": "sig_15",
       "group": 2,
-      "label": "Oil prices edge higher after strikes on Israel test ceasefire",
+      "label": "Tech stocks plunge in Asia after record rally and renewed Middle East attacks ",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/c78yd5g9qx0o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/ee5b/live/63d172f0-62cb-11f1-a348-eb4b18b9dd98.jpg"
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/bfa4/live/426f4c70-62e1-11f1-9a4b-dd5933001427.jpg"
     },
     {
       "id": "sig_16",
@@ -405,7 +405,7 @@
     {
       "id": "sig_42",
       "group": 2,
-      "label": "Powerful quake strikes Philippines, triggering tsunami alerts across Asia",
+      "label": "Powerful earthquake hits Philippines, triggering tsunami alerts across Asia",
       "size": 12,
       "url": "https://www.aljazeera.com/news/2026/6/8/tsunami-warnings-issued-after-8-2-magnitude-earthquake-off-philippines?traffic_source=rss",
       "image": ""
@@ -647,18 +647,23 @@
       "value": 2
     },
     {
-      "source": "sig_3",
-      "target": "theme_geo",
+      "source": "sig_2",
+      "target": "sig_1",
       "value": 1
     },
     {
       "source": "sig_3",
-      "target": "sig_2",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_4",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_4",
+      "target": "sig_3",
       "value": 1
     },
     {
@@ -674,6 +679,11 @@
     {
       "source": "sig_6",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_6",
+      "target": "sig_5",
       "value": 1
     },
     {
@@ -697,13 +707,13 @@
       "value": 1
     },
     {
-      "source": "sig_8",
-      "target": "sig_7",
+      "source": "sig_9",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_9",
-      "target": "theme_geo",
+      "target": "sig_8",
       "value": 1
     },
     {
@@ -742,6 +752,11 @@
       "value": 1
     },
     {
+      "source": "sig_13",
+      "target": "sig_12",
+      "value": 1
+    },
+    {
       "source": "sig_14",
       "target": "reg_me",
       "value": 1
@@ -752,23 +767,23 @@
       "value": 1
     },
     {
-      "source": "sig_15",
-      "target": "reg_me",
+      "source": "sig_14",
+      "target": "sig_13",
       "value": 1
     },
     {
       "source": "sig_15",
-      "target": "theme_econ",
-      "value": 1
-    },
-    {
-      "source": "sig_15",
-      "target": "sig_14",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_16",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_16",
+      "target": "sig_15",
       "value": 1
     },
     {
@@ -792,6 +807,11 @@
       "value": 1
     },
     {
+      "source": "sig_19",
+      "target": "sig_18",
+      "value": 1
+    },
+    {
       "source": "sig_20",
       "target": "reg_me",
       "value": 1
@@ -804,11 +824,6 @@
     {
       "source": "sig_22",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_22",
-      "target": "sig_21",
       "value": 1
     },
     {
@@ -847,6 +862,11 @@
       "value": 1
     },
     {
+      "source": "sig_26",
+      "target": "sig_25",
+      "value": 1
+    },
+    {
       "source": "sig_27",
       "target": "reg_me",
       "value": 1
@@ -862,6 +882,11 @@
       "value": 1
     },
     {
+      "source": "sig_28",
+      "target": "sig_27",
+      "value": 1
+    },
+    {
       "source": "sig_29",
       "target": "theme_geo",
       "value": 1
@@ -874,11 +899,6 @@
     {
       "source": "sig_30",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_30",
-      "target": "sig_29",
       "value": 1
     },
     {
@@ -912,11 +932,6 @@
       "value": 1
     },
     {
-      "source": "sig_33",
-      "target": "sig_32",
-      "value": 1
-    },
-    {
       "source": "sig_34",
       "target": "reg_na",
       "value": 1
@@ -937,18 +952,8 @@
       "value": 1
     },
     {
-      "source": "sig_35",
-      "target": "sig_34",
-      "value": 1
-    },
-    {
       "source": "sig_36",
       "target": "reg_asia",
-      "value": 1
-    },
-    {
-      "source": "sig_36",
-      "target": "sig_35",
       "value": 1
     },
     {
@@ -959,6 +964,11 @@
     {
       "source": "sig_38",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_38",
+      "target": "sig_37",
       "value": 1
     },
     {
@@ -982,6 +992,11 @@
       "value": 1
     },
     {
+      "source": "sig_41",
+      "target": "sig_40",
+      "value": 1
+    },
+    {
       "source": "sig_42",
       "target": "theme_geo",
       "value": 1
@@ -999,11 +1014,6 @@
     {
       "source": "sig_44",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_44",
-      "target": "sig_43",
       "value": 1
     },
     {
@@ -1032,13 +1042,13 @@
       "value": 1
     },
     {
-      "source": "sig_48",
-      "target": "reg_me",
+      "source": "sig_47",
+      "target": "sig_46",
       "value": 1
     },
     {
       "source": "sig_48",
-      "target": "sig_47",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1052,8 +1062,18 @@
       "value": 1
     },
     {
+      "source": "sig_50",
+      "target": "sig_49",
+      "value": 1
+    },
+    {
       "source": "sig_51",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_51",
+      "target": "sig_50",
       "value": 1
     },
     {

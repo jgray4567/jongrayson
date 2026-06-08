@@ -69,7 +69,7 @@ function buildProceduralOntology(signals) {
     const nodes = [];
     const links = [];
     
-    nodes.push({ id: "intel_nexus", group: 0, label: "JerryKnows.ai - Global Nexus", size: 24 });
+    nodes.push({ id: "intel_nexus", group: 0, label: "JerryKnows", size: 24 });
     
     // Core regions to act as hubs
     const regions = [

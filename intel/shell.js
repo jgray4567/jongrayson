@@ -3857,7 +3857,8 @@ function renderOntologyGraph() {
             }
           });
           
-        graphInstance.d3Force('charge').strength(-200);
+        graphInstance.d3Force('charge').strength(-600);
+        graphInstance.d3Force('link').distance(70);
       })
       .catch(err => console.error("Intel Graph Error:", err));
   }
