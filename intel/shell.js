@@ -1650,7 +1650,9 @@ function openIntelDrawer(item = {}) {
       stateEl.style.borderColor = '#00e5ff';
       stateEl.style.color = '#00e5ff';
     }
-    if (summaryEl) summaryEl.textContent = `Graph Entity (Group ${node.group})`;
+    if (summaryEl) {
+       summaryEl.innerHTML = `Graph Entity (Group ${node.group})` + (node.url ? `<br><br><a href="${node.url}" target="_blank" rel="noopener noreferrer" style="color:#00e5ff; text-decoration:underline; font-size:13px; font-weight:bold;">→ View Source Article</a>` : '');
+    }
     setDrawerImage(node.image || null, node.label);
     
     if (mapEl) {
@@ -1670,12 +1672,9 @@ function openIntelDrawer(item = {}) {
         relHtml = '<div class="muted">No direct links found.</div>';
       }
       
-      const linkHtml = node.url ? `<a href="${node.url}" target="_blank" rel="noopener noreferrer" class="ghost-btn" style="margin-top:12px; display:flex; justify-content:center; text-decoration:none; color:var(--lime); border-color:rgba(210,255,84,0.4);">Open Source Report</a>` : '';
-      
       metricsEl.innerHTML = `
         <div style="font-family:var(--font-mono); text-transform:uppercase; font-size:10px; color:var(--lime); margin-bottom:12px; letter-spacing:0.05em; border-bottom:1px solid var(--border); padding-bottom:6px;">Direct Relationships</div>
         ${relHtml}
-        ${linkHtml}
       `;
     }
     
