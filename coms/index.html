@@ -204,9 +204,10 @@ body {
 .cat-btn.active { background: rgba(0,229,255,0.1); color: var(--lime); border-color: var(--lime); }
 .cat-btn[data-cat="Website"].active { background: rgba(0,229,255,0.1); color: var(--lime); border-color: var(--lime); }
 .cat-btn[data-cat="Application"].active { background: rgba(167,139,250,0.1); color: #a78bfa; border-color: #a78bfa; }
-.cat-btn[data-cat="AI"].active { background: rgba(244,114,182,0.1); color: #f472b6; border-color: #f472b6; }
+.cat-btn[data-cat="AI"].active { background: rgba(52,211,153,0.1); color: #34d399; border-color: #34d399; }
 .cat-btn[data-cat="Other"].active { background: rgba(232,244,248,0.06); color: var(--text); border-color: var(--muted); }
 .stage-card[data-category="Website"] { background: rgba(0,229,255,0.06) !important; border-color: rgba(0,229,255,0.25) !important; }
+.stage-card[data-category="AI"] { background: rgba(52,211,153,0.08) !important; border-color: rgba(52,211,153,0.3) !important; }
 
 /* Modal */
 .modal-overlay {
@@ -381,7 +382,7 @@ body {
           <button class="cat-btn active" data-cat="all" onclick="filterCategory('all')">All</button>
           <button class="cat-btn" data-cat="Website" onclick="filterCategory('Website')" style="--cat-color:var(--lime)">🌐 Website</button>
           <button class="cat-btn" data-cat="Application" onclick="filterCategory('Application')" style="--cat-color:#a78bfa">📱 App</button>
-          <button class="cat-btn" data-cat="AI" onclick="filterCategory('AI')" style="--cat-color:#f472b6">🤖 AI</button>
+          <button class="cat-btn" data-cat="AI" onclick="filterCategory('AI')" style="--cat-color:#34d399">🤖 AI</button>
           <button class="cat-btn" data-cat="Other" onclick="filterCategory('Other')" style="--cat-color:var(--muted)">📦 Other</button>
         </div>
         <button id="priority-toggle" class="priority-btn" title="Show priority projects first" onclick="togglePriority()">⚡ Priority</button>
@@ -665,7 +666,7 @@ function togglePriority(){
 
 function projectCard(p,isStarred){
   const urlRow=p.url?`<div class="detail-row"><span class="detail-label">URL</span><span class="detail-value"><a href="${p.url}" target="_blank" style="color:var(--lime);font-family:var(--font-mono);font-size:.72rem;text-decoration:none">${p.url.replace('https://','')}</a></span></div>`:'';
-  const catColors={Website:'var(--lime)',Application:'#a78bfa',AI:'#f472b6',Other:'var(--muted)'};
+  const catColors={Website:'var(--lime)',Application:'#a78bfa',AI:'#34d399',Other:'var(--muted)'};
   const catColor=catColors[p.category]||catColors['Other'];
   return `<div class="stage-card${isStarred?' priority-card':''}" data-project="${p.id}" data-category="${p.category}" tabindex="0" role="button" aria-label="Expand ${p.name}">
     <h3><button class="star-btn${isStarred?' starred':''}" data-star="${p.id}" onclick="event.stopPropagation();toggleStar('${p.id}')" title="${isStarred?'Remove from priority':'Add to priority'}">${isStarred?'★':'☆'}</button> ${p.name} <span class="intel-state-chip ${chipClass(p.tag)}" style="font-size:0.58rem;margin-left:4px">${p.tag.toUpperCase()}</span><span style="font-size:0.55rem;margin-left:4px;color:${catColor};font-family:var(--font-mono);font-weight:600;text-transform:uppercase">${p.category}</span>${p.url?`<a href="${p.url}" target="_blank" style="color:var(--lime);font-size:.7rem;margin-left:6px;font-family:var(--font-mono)" onclick="event.stopPropagation()">↗</a>`:''}<span class="expand-hint">tap to expand</span></h3>
