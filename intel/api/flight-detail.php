@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
-header('Cache-Control: no-store');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 
 $callsign = strtoupper(trim((string) ($_GET['callsign'] ?? '')));
 if ($callsign === '') {
@@ -35,7 +36,7 @@ $formatDuration = function ($seconds) {
     return $minutes . 'm';
 };
 
-if (file_exists($cachePath)) {
+if (empty($_GET["refresh"]) && file_exists($cachePath)) {
     $cached = json_decode(file_get_contents($cachePath), true);
     if (is_array($cached) && (time() - intval($cached['fetchedAt'] ?? 0)) < $cacheTtlSeconds) {
         $emit($cached);
@@ -90,15 +91,31 @@ foreach ($activityLog as $f) {
 }
 if (!$flight) {
     foreach ($activityLog as $f) {
-        if (!empty($f['takeoffTimes']['actual'])) {
+        $status = strtolower($f['flightStatus'] ?? '');
+        $hasTakenOff = !empty($f['takeoffTimes']['actual']) || !empty($f['gateDepartureTimes']['actual']);
+        $hasLanded = !empty($f['landingTimes']['actual']) || !empty($f['gateArrivalTimes']['actual']);
+        
+        // If it explicitly says it's in the air, or it took off and hasn't landed
+        if (strpos($status, 'airborne') !== false || strpos($status, 'en route') !== false || strpos($status, 'enroute') !== false) {
+            $flight = $f;
+            break;
+        }
+        
+        if ($hasTakenOff && !$hasLanded) {
             $flight = $f;
             break;
         }
     }
 }
-if (!$flight && !empty($activityLog)) {
-    $flight = $activityLog[0];
+
+// If we STILL don't have one, then the flight isn't actually in the air according to FlightAware's log,
+// even if OpenSky Network says it is. This happens when a flight just landed but OpenSky hasn't updated its transponder state.
+// We must return a 404 so the UI knows this flight is no longer active and can drop it.
+if (!$flight) {
+    http_response_code(404);
+    $emit(['error' => 'flight_no_longer_airborne', 'callsign' => $callsign, 'reason' => 'No airborne activity found in flight log.']);
 }
+
 
 if (!is_array($flight)) {
     http_response_code(404);
