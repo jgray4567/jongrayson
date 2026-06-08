@@ -50,6 +50,8 @@ let hoveredCityLabel = null;
 let satelliteLayerEnabled = false;
 let currentSatelliteCatalog = [];
 let satelliteLayerTimer = null;
+let selectedSatNetwork = null;
+let selectedSatOrbit = null;
 const visibleSatelliteOrbits = new Set(['LEO', 'MEO', 'GEO']);
 const cityCrimeScans = {
   'Los Angeles Port': {
@@ -2234,6 +2236,23 @@ function buildPlaneSvg(heading = 0, isSelected = false, isCommercial = true) {
 }
 
 
+function getSatAlpha(sat) {
+  const baseAlpha = 1;
+  const dimmedAlpha = 0.5;
+  const selectedAlpha = 1;
+
+  if (selectedSatOrbit) {
+    return sat.orbitClass === selectedSatOrbit ? selectedAlpha : dimmedAlpha;
+  }
+
+  if (selectedSatNetwork) {
+    const net = sat.network || 'Unknown';
+    return net === selectedSatNetwork ? selectedAlpha : dimmedAlpha;
+  }
+
+  return baseAlpha;
+}
+
 function getFlightAlpha(flight, isPath = false) {
   const baseAlpha = isPath ? 0.6 : 1;
   const selectedAlpha = isPath ? 0.8 : 1;
@@ -3430,6 +3449,8 @@ function initOrUpdateGlobe(items = []) {
         el.style.width = '10px';
         el.style.height = '10px';
         el.style.borderRadius = '999px';
+        const opacity = getSatAlpha(item.raw || {});
+        el.style.opacity = String(opacity);
         el.style.background = `rgba(${satDotColor},0.98)`;
         el.style.boxShadow = `0 0 10px rgba(${satDotColor},0.68)`;
         if (coarsePointer) {
@@ -4066,36 +4087,73 @@ function updateDataPanel() {
         
     let html = `
       <div style="display:flex; justify-content:space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-        <div style="padding: 4px 6px; border-radius: 4px;">
+        <div data-sat-orbit="all" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${!selectedSatOrbit ? 'rgba(0,229,255,0.15)' : 'transparent'};">
           <div style="color:var(--cyan); font-size:16px; font-weight:600;">${total}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase;">Tracked Total</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${!selectedSatOrbit ? '#fff' : ''}">Tracked Total</div>
         </div>
-        <div style="padding: 4px 6px; border-radius: 4px;">
+        <div data-sat-orbit="LEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSatOrbit === 'LEO' ? 'rgba(0,229,100,0.15)' : 'transparent'};">
           <div style="color:#00e564; font-size:16px; font-weight:600;">${leo}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase;">LEO</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSatOrbit === 'LEO' ? '#fff' : ''}">LEO</div>
         </div>
-        <div style="padding: 4px 6px; border-radius: 4px;">
+        <div data-sat-orbit="MEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSatOrbit === 'MEO' ? 'rgba(0,229,255,0.15)' : 'transparent'};">
           <div style="color:#00e5ff; font-size:16px; font-weight:600;">${meo}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase;">MEO</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSatOrbit === 'MEO' ? '#fff' : ''}">MEO</div>
         </div>
-        <div style="padding: 4px 6px; border-radius: 4px;">
+        <div data-sat-orbit="GEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSatOrbit === 'GEO' ? 'rgba(255,60,60,0.15)' : 'transparent'};">
           <div style="color:#ff3c3c; font-size:16px; font-weight:600;">${geo}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase;">GEO</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSatOrbit === 'GEO' ? '#fff' : ''}">GEO</div>
         </div>
       </div>
       <div style="margin-bottom: 8px; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Top Constellations</div>
     `;
     
     topNetworks.forEach(([net, count], i) => {
+        const isSelected = selectedSatNetwork === net;
         html += `
-        <div style="display:flex; justify-content:space-between; padding: 6px 4px; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-          <span style="color:#ccc;">${i+1}. ${net}</span>
+        <div data-sat-network="${net}" style="cursor:pointer; display:flex; justify-content:space-between; padding: 6px 4px; font-size: 11px; background: ${isSelected ? 'rgba(0,229,255,0.15)' : 'transparent'}; border-radius: 4px; transition: background 0.2s;">
+          <span style="color:${isSelected ? '#fff' : '#ccc'}; font-weight:${isSelected ? 'bold' : 'normal'};">${i+1}. ${net}</span>
           <span style="color:var(--cyan); font-family:var(--font-mono);">${count}</span>
         </div>
         `;
     });
     
     container.innerHTML = html;
+    
+    // Bind click events if not already bound via a delegated handler
+    if (!container.dataset.satBound) {
+      container.addEventListener('click', (event) => {
+        const orbitBtn = event.target.closest('[data-sat-orbit]');
+        if (orbitBtn) {
+          const orbit = orbitBtn.dataset.satOrbit;
+          if (orbit === 'all') {
+             selectedSatOrbit = null;
+          } else if (selectedSatOrbit === orbit) {
+             selectedSatOrbit = null;
+          } else {
+             selectedSatOrbit = orbit;
+          }
+          selectedSatNetwork = null; // Clear network when orbit is toggled
+          if (typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
+          if (typeof updateDataPanel === 'function') updateDataPanel();
+          return;
+        }
+        
+        const netBtn = event.target.closest('[data-sat-network]');
+        if (netBtn) {
+          const net = netBtn.dataset.satNetwork;
+          if (selectedSatNetwork === net) {
+              selectedSatNetwork = null;
+          } else {
+              selectedSatNetwork = net;
+          }
+          selectedSatOrbit = null; // Clear orbit when network is toggled
+          if (typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
+          if (typeof updateDataPanel === 'function') updateDataPanel();
+          return;
+        }
+      });
+      container.dataset.satBound = '1';
+    }
   } else {
     title.textContent = 'Data Target: GLOBAL ZONES';
     let html = '';
