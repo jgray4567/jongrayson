@@ -7,328 +7,402 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0a0a0f;--surface:#12121a;--card:#181824;--card-hover:#1e1e2e;
-  --border:#2a2a3e;--border-bright:#3d3d5c;
-  --text:#e8e8f0;--text-dim:#8888a8;--text-muted:#555570;
-  --accent:#00e5a0;--accent2:#6c5ce7;--accent3:#fd79a8;
-  --danger:#ff6b6b;--warn:#ffd93d;
-  --font-display:'Inter',sans-serif;--font-mono:'Inter',monospace;
-  --radius:12px;--radius-sm:8px;
+:root {
+  --bg: #030404;
+  --panel: #0a0c0e;
+  --panel-2: #0f1216;
+  --border: rgba(0, 229, 255, 0.18);
+  --border-strong: rgba(0, 229, 255, 0.35);
+  --lime: #00e5ff;
+  --lime-dim: rgba(0, 229, 255, 0.1);
+  --text: #e8f4f8;
+  --muted: rgba(232, 244, 248, 0.65);
+  --chip: rgba(255, 255, 255, 0.03);
+  --font-mono: 'JetBrains Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+  --accent2: #6c5ce7;
+  --danger: #ff7186;
+  --warn: #ffd93d;
+  --stable: #d7ef4b;
 }
-html{font-size:15px;scroll-behavior:smooth}
-body{
-  background:var(--bg);color:var(--text);font-family:var(--font-display);
-  min-height:100vh;overflow-x:hidden;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%,rgba(108,92,231,.12),transparent),
-    radial-gradient(ellipse 60% 40% at 80% 100%,rgba(0,229,160,.06),transparent);
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 80%; scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, Arial, sans-serif;
+  background: radial-gradient(circle at top, rgba(0, 229, 255, 0.05), transparent 45%), var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
 }
+.brand-block, .panel, .hero-card, .stage-card {
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+.brand-kicker, .panel-kicker, .hero-kicker {
+  color: var(--lime);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+.brand-block h1, .panel-title, .hero-card h2, .big-query {
+  letter-spacing: -0.04em;
+}
+.brand-block { padding: 22px; margin-bottom: 18px; }
+.brand-block h1 { margin: 10px 0 8px; font-size: 2.4rem; }
+.panel { padding: 18px; margin-bottom: 18px; }
+.panel-title { margin-top: 8px; font-size: 1.5rem; font-weight: 700; }
+.muted { color: var(--muted); line-height: 1.6; }
 
-/* Scanline overlay */
-body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);
+/* App shell */
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
 }
+@media (min-width: 900px) {
+  .app-shell { grid-template-columns: 300px 1fr; }
+}
+.left-rail {
+  border-right: 1px solid var(--border);
+  background: rgba(8,10,8,0.88);
+  padding: 24px;
+  overflow-y: auto;
+  max-height: 100vh;
+  position: sticky;
+  top: 0;
+}
+.center-stage { padding: 24px; }
 
-/* Header */
-.header{
-  padding:2rem 2rem 1rem;display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--border);
+/* Status strip */
+.status-hero {
+  padding: 12px 18px;
+  background: linear-gradient(180deg, rgba(16, 21, 16, 0.86), rgba(11, 15, 11, 0.72));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 14px 42px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(255,255,255,0.02);
+  margin-bottom: 18px;
+  border-radius: 5px;
 }
-.header h1{
-  font-family:var(--font-display);font-weight:800;font-size:1.8rem;
-  letter-spacing:-.02em;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+.status-strip { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
+.status-stat {
+  display: inline-flex; flex-direction: row; align-items: center; gap: 8px;
+  position: relative; padding-right: 18px;
 }
-.header h1 span{font-weight:200;opacity:.6;-webkit-text-fill-color:var(--text)}
-.header-meta{font-size:.75rem;color:var(--text-muted);font-family:var(--font-mono);text-align:right}
-.header-meta .live{color:var(--accent);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.status-stat:not(:last-child)::after {
+  content: ''; position: absolute; right: 0; top: 50%;
+  width: 1px; height: 18px; transform: translateY(-50%);
+  background: linear-gradient(180deg, transparent, var(--border-strong), transparent);
+}
+.status-label {
+  color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em;
+  font-size: 0.68rem; font-weight: 700;
+}
+.status-stat strong {
+  color: var(--text); font-size: 1.05rem; letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.status-stat strong[data-tone="stable"] { color: var(--stable); text-shadow: 0 0 18px rgba(196,214,0,0.3); }
+.status-stat strong[data-tone="critical"] { color: var(--danger); text-shadow: 0 0 18px rgba(255,51,102,0.35); }
 
-/* Nav tabs */
-.nav{
-  display:flex;gap:4px;padding:1rem 2rem .5rem;
-  border-bottom:1px solid var(--border);overflow-x:auto;
+/* Nav */
+.command-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+.command-pill {
+  border: 1px solid var(--border); background: rgba(9,12,9,0.88); border-radius: 4px;
+  padding: 8px 11px; display: inline-flex; gap: 8px; align-items: center;
+  cursor: pointer; transition: all .2s; user-select: none;
 }
-.nav button{
-  background:transparent;border:1px solid transparent;color:var(--text-dim);
-  font-family:var(--font-mono);font-size:.75rem;padding:.5rem 1rem;
-  border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;
-  white-space:nowrap;
-}
-.nav button:hover{color:var(--text);background:var(--card)}
-.nav button.active{
-  color:var(--accent);background:var(--card);border-color:var(--accent);
-  box-shadow:0 0 20px rgba(0,229,160,.1);
-}
+.command-pill:hover { border-color: var(--lime); background: var(--lime-dim); }
+.command-pill.active { border-color: var(--lime); background: var(--lime-dim); }
+.command-pill .command-label { color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.72rem; font-weight: 700; }
+.command-pill strong { color: var(--text); font-size: 0.98rem; }
+.command-pill.active .command-label { color: var(--lime); }
 
-/* Main grid */
-.main{padding:1.5rem 2rem 3rem}
-.tab-content{display:none}
-.tab-content.active{display:block;animation:fadeUp .3s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* Card grid */
+.stage-grid { display: grid; gap: 14px; }
+.stage-grid-2 { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+.stage-grid-3 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.stage-grid-4 { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.stage-card {
+  padding: 16px; position: relative; overflow: hidden; transition: all .25s;
+}
+.stage-card:hover {
+  border-color: var(--lime); transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,229,255,0.08);
+}
+.stage-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--lime), var(--accent2)); opacity: 0; transition: opacity .25s;
+}
+.stage-card:hover::before { opacity: 1; }
+.stage-card h3 { font-size: 0.92rem; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.stage-card p { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
 
-/* Cards */
-.grid{display:grid;gap:1rem}
-.grid-2{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
-.grid-3{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
-.grid-4{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
-
-.card{
-  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:1.2rem;transition:all .25s;position:relative;overflow:hidden;
+/* Tags */
+.intel-state-chip {
+  display: inline-flex; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--chip); color: var(--text);
+  text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.68rem; font-weight: 700;
 }
-.card:hover{
-  border-color:var(--accent);background:var(--card-hover);
-  transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,160,.08);
-}
-.card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity .25s;
-}
-.card:hover::before{opacity:1}
-.card h3{font-size:.9rem;font-weight:600;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
-.card p{font-size:.75rem;color:var(--text-dim);line-height:1.6}
-.card .tag{
-  display:inline-block;font-size:.6rem;font-family:var(--font-mono);
-  padding:.15rem .5rem;border-radius:4px;margin-right:.3rem;margin-top:.4rem;
-}
-.tag-active{background:rgba(0,229,160,.15);color:var(--accent)}
-.tag-dev{background:rgba(108,92,231,.15);color:var(--accent2)}
-.tag-paused{background:rgba(255,217,61,.15);color:var(--warn)}
-.tag-archive{background:rgba(136,136,168,.1);color:var(--text-dim)}
-.tag-critical{background:rgba(255,107,107,.15);color:var(--danger)}
-.tag-karpathy{background:rgba(108,92,231,.15);color:var(--accent2)}
+.chip-active { border-color: rgba(196,214,0,0.4); color: var(--stable); }
+.chip-dev { border-color: rgba(108,92,231,0.4); color: var(--accent2); }
+.chip-paused { border-color: rgba(255,217,61,0.4); color: var(--warn); }
+.chip-archive { border-color: var(--border); color: var(--muted); }
+.chip-karpathy { border-color: rgba(108,92,231,0.4); color: var(--accent2); }
 
 /* Stat cards */
-.stat{text-align:center;padding:1.5rem 1rem}
-.stat .num{font-size:2rem;font-weight:800;font-family:var(--font-display)}
-.stat .label{font-size:.7rem;color:var(--text-muted);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;margin-top:.3rem}
-
-/* Section titles */
-.section-title{
-  font-size:1rem;font-weight:600;margin:2rem 0 .8rem;
-  display:flex;align-items:center;gap:.5rem;
+.stat-card { text-align: center; padding: 20px 12px; }
+.stat-num { font-size: 2.2rem; font-weight: 800; color: var(--lime); letter-spacing: -0.02em; }
+.stat-label {
+  font-size: 0.68rem; color: var(--muted); font-family: var(--font-mono);
+  text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;
 }
-.section-title::before{
-  content:'';width:3px;height:18px;border-radius:2px;
-  background:linear-gradient(180deg,var(--accent),var(--accent2));
+
+/* Section kicker */
+.section-kicker {
+  color: var(--lime); font-size: 0.82rem; text-transform: uppercase;
+  letter-spacing: 0.08em; font-weight: 700; margin: 28px 0 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-kicker::before {
+  content: ''; width: 3px; height: 16px; border-radius: 2px;
+  background: linear-gradient(180deg, var(--lime), var(--accent2));
 }
 
 /* Memory file list */
-.mem-file{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.7rem 1rem;background:var(--card);border:1px solid var(--border);
-  border-radius:var(--radius-sm);margin-bottom:.4rem;cursor:pointer;transition:all .2s;
-  font-size:.8rem;
+.mem-file {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; background: var(--panel); border: 1px solid var(--border);
+  border-radius: 4px; margin-bottom: 6px; transition: all .2s;
+  font-size: 0.82rem; cursor: pointer;
 }
-.mem-file:hover{border-color:var(--accent);background:var(--card-hover)}
-.mem-clickable{cursor:pointer}
-.mem-clickable:hover .name{text-decoration:underline}
-.mem-file .name{font-family:var(--font-mono);color:var(--accent)}
-.mem-file .meta{color:var(--text-muted);font-size:.7rem;font-family:var(--font-mono)}
-.mem-file .desc{color:var(--text-dim);font-size:.75rem;flex:1;margin-left:1rem}
-
-/* Memory viewer */
-.mem-viewer{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:1.2rem;margin-top:1rem;display:none;max-height:400px;overflow-y:auto;
-}
-.mem-viewer.visible{display:block;animation:fadeUp .2s}
-.mem-viewer pre{font-family:var(--font-mono);font-size:.75rem;color:var(--text-dim);line-height:1.7;white-space:pre-wrap}
-.mem-viewer h4{font-size:.85rem;margin-bottom:.5rem;color:var(--accent)}
-
-/* Modal overlay */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:10000;
-  display:none;align-items:center;justify-content:center;
-  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-}
-.modal-overlay.open{display:flex}
-.modal{
-  background:var(--surface);border:1px solid var(--border-bright);border-radius:var(--radius);
-  width:min(720px,92vw);max-height:80vh;display:flex;flex-direction:column;
-  box-shadow:0 24px 80px rgba(0,0,0,.6);
-  animation:modalIn .25s ease;
-}
-@keyframes modalIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-.modal-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:1rem 1.2rem;border-bottom:1px solid var(--border);
-}
-.modal-header h3{font-size:.9rem;font-weight:600;color:var(--accent);margin:0;font-family:var(--font-mono)}
-.modal-close{
-  background:none;border:1px solid var(--border);color:var(--text-dim);font-size:1rem;
-  width:28px;height:28px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all .2s;
-}
-.modal-close:hover{border-color:var(--accent);color:var(--accent);background:var(--card)}
-.modal-body{
-  padding:1.2rem;overflow-y:auto;flex:1;
-}
-.modal-body pre{
-  font-family:var(--font-mono);font-size:.78rem;color:var(--text-dim);
-  line-height:1.7;white-space:pre-wrap;word-break:break-word;margin:0;
-}
-.modal-body .loading{color:var(--text-muted);font-family:var(--font-mono);font-size:.8rem;text-align:center;padding:2rem}
-.modal-meta{
-  padding:.6rem 1.2rem;border-top:1px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:.65rem;color:var(--text-muted);font-family:var(--font-mono);
-}
-
-/* Cron table */
-.cron-table{width:100%;border-collapse:collapse;font-size:.75rem}
-.cron-table th{
-  text-align:left;padding:.6rem .5rem;border-bottom:1px solid var(--border);
-  color:var(--text-muted);font-family:var(--font-mono);font-weight:400;
-  text-transform:uppercase;letter-spacing:.06em;font-size:.65rem;
-}
-.cron-table td{padding:.6rem .5rem;border-bottom:1px solid var(--border)}
-.cron-table tr:hover td{background:var(--card);color:var(--text)}
-
-/* Karpathy grid */
-.karpathy-card .stars{color:var(--warn);font-size:.7rem}
-.karpathy-card .why{font-size:.72rem;color:var(--text-dim);margin-top:.4rem;line-height:1.5}
-.karpathy-card .tier{
-  position:absolute;top:.6rem;right:.6rem;font-size:.55rem;font-family:var(--font-mono);
-  padding:.15rem .4rem;border-radius:3px;
-}
-.tier-1{background:rgba(0,229,160,.15);color:var(--accent)}
-.tier-2{background:rgba(108,92,231,.15);color:var(--accent2)}
-.tier-3{background:rgba(136,136,168,.1);color:var(--text-dim)}
-
-/* Scrollbar */
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--border-bright)}
+.mem-file:hover { border-color: var(--lime); background: var(--panel-2); }
+.mem-file .name { font-family: var(--font-mono); color: var(--lime); font-size: 0.78rem; }
+.mem-file .meta { color: var(--muted); font-size: 0.68rem; font-family: var(--font-mono); }
+.mem-file .desc { color: var(--muted); font-size: 0.75rem; flex: 1; margin-left: 12px; }
+.mem-clickable { cursor: pointer; }
+.mem-clickable:hover .name { text-decoration: underline; }
 
 /* Search */
-.search-bar{
-  display:flex;gap:.5rem;margin-bottom:1.5rem;
+.command-input {
+  flex: 1; background: var(--panel); border: 1px solid var(--border); border-radius: 4px;
+  padding: 10px 14px; color: var(--text); font-family: var(--font-mono); font-size: 0.82rem;
+  outline: none; transition: border-color .2s;
 }
-.search-bar input{
-  flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
-  padding:.6rem 1rem;color:var(--text);font-family:var(--font-mono);font-size:.8rem;
-  outline:none;transition:border-color .2s;
+.command-input:focus { border-color: var(--lime); }
+.command-input::placeholder { color: var(--muted); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.78); z-index: 10000;
+  display: none; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
 }
-.search-bar input:focus{border-color:var(--accent)}
-.search-bar input::placeholder{color:var(--text-muted)}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--panel); border: 1px solid var(--border-strong); border-radius: 8px;
+  width: min(740px, 92vw); max-height: 82vh; display: flex; flex-direction: column;
+  box-shadow: 0 24px 80px rgba(0,0,0,.6);
+  animation: modalIn .22s ease;
+}
+@keyframes modalIn { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { font-size: 0.88rem; font-weight: 700; color: var(--lime); font-family: var(--font-mono); margin: 0; }
+.modal-close {
+  background: none; border: 1px solid var(--border); color: var(--muted); font-size: 1rem;
+  width: 28px; height: 28px; border-radius: 4px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .2s;
+}
+.modal-close:hover { border-color: var(--lime); color: var(--lime); background: var(--lime-dim); }
+.modal-body { padding: 18px; overflow-y: auto; flex: 1; }
+.modal-body pre {
+  font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted);
+  line-height: 1.75; white-space: pre-wrap; word-break: break-word; margin: 0;
+}
+.modal-body .loading {
+  color: var(--muted); font-family: var(--font-mono); font-size: 0.82rem;
+  text-align: center; padding: 32px;
+}
+.modal-meta {
+  padding: 8px 18px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.65rem; color: var(--muted); font-family: var(--font-mono);
+}
+
+/* Karpathy tier badges */
+.tier-badge {
+  position: absolute; top: 10px; right: 10px; font-size: 0.58rem;
+  font-family: var(--font-mono); padding: 2px 6px; border-radius: 3px;
+  text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;
+}
+.tier-1 { background: rgba(0,229,255,0.12); color: var(--lime); border: 1px solid rgba(0,229,255,0.25); }
+.tier-2 { background: rgba(108,92,231,0.12); color: var(--accent2); border: 1px solid rgba(108,92,231,0.25); }
+.tier-3 { background: var(--chip); color: var(--muted); border: 1px solid var(--border); }
+
+/* Cron table */
+.cron-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.cron-table th {
+  text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border);
+  color: var(--muted); font-family: var(--font-mono); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.65rem;
+}
+.cron-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
+.cron-table tr:hover td { background: var(--panel); }
+
+/* Tab content */
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeUp .25s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Live dot */
+.live-dot { color: var(--stable); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 
 /* Responsive */
-@media(max-width:768px){
-  .header{flex-direction:column;gap:.5rem;text-align:center}
-  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
-  .nav{gap:2px;padding:.8rem 1rem .4rem}
-  .main{padding:1rem}
+@media (max-width: 899px) {
+  .left-rail { position: relative; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+  .app-shell { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div>
-    <h1>Jon Grayson <span>JK Command</span></h1>
-  </div>
-  <div class="header-meta">
-    <span class="live">●</span> MEMORY ACTIVE<br>
-    <span id="clock"></span>
+<div class="app-shell">
+  <!-- LEFT RAIL -->
+  <aside class="left-rail">
+    <div class="brand-block">
+      <div class="brand-kicker">JK Command</div>
+      <h1>Jon Grayson</h1>
+      <div class="muted" style="font-size:0.78rem">Intelligence &amp; Operations Center</div>
+    </div>
+
+    <div class="status-hero">
+      <div class="status-strip">
+        <div class="status-stat">
+          <span class="status-label">Memory</span>
+          <strong data-tone="stable">ACTIVE</strong>
+        </div>
+        <div class="status-stat">
+          <span class="status-label">Clock</span>
+          <strong id="clock" data-tone="neutral">--:--</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="command-bar" id="nav">
+      <div class="command-pill active" data-tab="overview"><span class="command-label">Overview</span></div>
+      <div class="command-pill" data-tab="projects"><span class="command-label">Projects</span></div>
+      <div class="command-pill" data-tab="memory"><span class="command-label">Memory</span></div>
+      <div class="command-pill" data-tab="karpathy"><span class="command-label">Karpathy</span></div>
+      <div class="command-pill" data-tab="cron"><span class="command-label">Jobs</span></div>
+    </div>
+
+    <!-- Scheduled Jobs (rail panel) -->
+    <div class="panel">
+      <div class="panel-kicker">Scheduled Jobs</div>
+      <div style="margin-top:10px;font-family:var(--font-mono);font-size:0.72rem;">
+        <div style="padding:8px;border:1px solid var(--border);background:var(--chip);border-radius:4px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <strong style="color:var(--lime);font-size:0.78rem">Dream Sequence</strong>
+            <span class="intel-state-chip chip-active" style="font-size:0.58rem">ACTIVE</span>
+          </div>
+          <div style="color:var(--muted);margin-top:4px">Mon 9:00 AM ET</div>
+          <div style="color:var(--muted);margin-top:2px">Weekly audit — promotes insights, cleans orphans</div>
+        </div>
+        <div style="padding:8px;border:1px solid var(--border);background:var(--chip);border-radius:4px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <strong style="color:var(--lime);font-size:0.78rem">Karpathy Check</strong>
+            <span class="intel-state-chip chip-active" style="font-size:0.58rem">ACTIVE</span>
+          </div>
+          <div style="color:var(--muted);margin-top:4px">Daily 8:00 AM ET</div>
+          <div style="color:var(--muted);margin-top:2px">Scans for new repos, clones, assesses</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER STAGE -->
+  <main class="center-stage">
+
+    <!-- OVERVIEW -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="stage-grid stage-grid-4" id="stats-row"></div>
+      <div class="section-kicker">Active Projects</div>
+      <div class="stage-grid stage-grid-2" id="active-projects"></div>
+      <div class="section-kicker">Recent Memory Activity</div>
+      <div id="recent-activity"></div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="tab-content" id="tab-projects">
+      <div class="command-bar" style="margin-bottom:18px">
+        <input type="text" class="command-input" id="project-search" placeholder="Search projects...">
+      </div>
+      <div class="stage-grid stage-grid-2" id="all-projects"></div>
+    </div>
+
+    <!-- MEMORY -->
+    <div class="tab-content" id="tab-memory">
+      <div class="command-bar" style="margin-bottom:18px">
+        <input type="text" class="command-input" id="memory-search" placeholder="Search memory files...">
+      </div>
+      <div class="section-kicker">Wiki System</div>
+      <div id="wiki-files"></div>
+      <div class="section-kicker">Project Memories <span style="font-weight:400;font-size:0.72rem;color:var(--muted);margin-left:6px">click to expand</span></div>
+      <div id="project-memories"></div>
+      <div class="section-kicker">Session Logs <span style="font-weight:400;font-size:0.72rem;color:var(--muted);margin-left:6px">click to expand</span></div>
+      <div id="session-logs"></div>
+      <div class="section-kicker">Raw Inputs</div>
+      <div id="raw-files"></div>
+    </div>
+
+    <!-- KARPATHY -->
+    <div class="tab-content" id="tab-karpathy">
+      <div class="command-bar" style="margin-bottom:18px">
+        <input type="text" class="command-input" id="karpathy-search" placeholder="Search repos...">
+      </div>
+      <div class="section-kicker">Tier 1 — Directly Benefits Us</div>
+      <div class="stage-grid stage-grid-3" id="karpathy-tier1"></div>
+      <div class="section-kicker">Tier 2 — Useful Tools</div>
+      <div class="stage-grid stage-grid-3" id="karpathy-tier2"></div>
+      <div class="section-kicker">Tier 3 — Educational / Reference</div>
+      <div class="stage-grid stage-grid-3" id="karpathy-tier3"></div>
+    </div>
+
+    <!-- CRON -->
+    <div class="tab-content" id="tab-cron">
+      <div class="section-kicker">Scheduled Jobs</div>
+      <table class="cron-table">
+        <thead><tr><th>Name</th><th>Schedule</th><th>Model</th><th>Next Run</th><th>Status</th></tr></thead>
+        <tbody id="cron-body"></tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Loading...</h3>
+      <button class="modal-close" id="modal-close">&times;</button>
+    </div>
+    <div class="modal-body"><div class="loading" id="modal-loading">Fetching file...</div><pre id="modal-content" style="display:none"></pre></div>
+    <div class="modal-meta"><span id="modal-path"></span><span id="modal-lines"></span></div>
   </div>
 </div>
 
-<nav class="nav" id="nav">
-  <button class="active" data-tab="overview">Overview</button>
-  <button data-tab="projects">Projects</button>
-  <button data-tab="memory">Memory Topics</button>
-  <button data-tab="karpathy">Karpathy Labs</button>
-  <button data-tab="cron">Scheduled Jobs</button>
-</nav>
-
-<div class="main">
-
-  <!-- OVERVIEW -->
-  <div class="tab-content active" id="tab-overview">
-    <div class="grid grid-4" id="stats-row"></div>
-
-    <div class="section-title">Active Projects</div>
-    <div class="grid grid-2" id="active-projects"></div>
-
-    <div class="section-title">Recent Memory Activity</div>
-    <div id="recent-activity"></div>
-  </div>
-
-  <!-- PROJECTS -->
-  <div class="tab-content" id="tab-projects">
-    <div class="search-bar">
-      <input type="text" id="project-search" placeholder="Search projects...">
-    </div>
-    <div class="grid grid-2" id="all-projects"></div>
-  </div>
-
-  <!-- MEMORY TOPICS -->
-  <div class="tab-content" id="tab-memory">
-    <div class="search-bar">
-      <input type="text" id="memory-search" placeholder="Search memory files...">
-    </div>
-    <div class="section-title">Wiki System</div>
-    <div id="wiki-files"></div>
-
-    <div class="section-title">Project Memories <span style="font-weight:300;font-size:.7rem;color:var(--text-muted);margin-left:.5rem">click to expand</span></div>
-    <div id="project-memories"></div>
-
-    <div class="section-title">Session Logs <span style="font-weight:300;font-size:.7rem;color:var(--text-muted);margin-left:.5rem">click to expand</span></div>
-    <div id="session-logs"></div>
-
-    <div class="section-title">Raw Inputs</div>
-    <div id="raw-files"></div>
-
-    <div class="mem-viewer" id="mem-viewer">
-      <h4 id="mem-viewer-title"></h4>
-      <pre id="mem-viewer-content"></pre>
-    </div>
-  </div>
-
-  <!-- KARPATHY -->
-  <div class="tab-content" id="tab-karpathy">
-    <div class="search-bar">
-      <input type="text" id="karpathy-search" placeholder="Search repos...">
-    </div>
-    <div class="section-title">Tier 1 — Directly Benefits Us</div>
-    <div class="grid grid-3" id="karpathy-tier1"></div>
-    <div class="section-title">Tier 2 — Useful Tools</div>
-    <div class="grid grid-3" id="karpathy-tier2"></div>
-    <div class="section-title">Tier 3 — Educational / Reference</div>
-    <div class="grid grid-3" id="karpathy-tier3"></div>
-  </div>
-
-  <!-- CRON -->
-  <div class="tab-content" id="tab-cron">
-    <div class="section-title">Scheduled Jobs</div>
-    <table class="cron-table">
-      <thead>
-        <tr><th>Name</th><th>Schedule</th><th>Model</th><th>Next Run</th><th>Status</th></tr>
-      </thead>
-      <tbody id="cron-body"></tbody>
-    </table>
-  </div>
-
-  <!-- MODAL -->
-  <div class="modal-overlay" id="modal-overlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 id="modal-title">Loading...</h3>
-        <button class="modal-close" id="modal-close">&times;</button>
-      </div>
-      <div class="modal-body"><div class="loading" id="modal-loading">Fetching file...</div><pre id="modal-content" style="display:none"></pre></div>
-      <div class="modal-meta"><span id="modal-path"></span><span id="modal-lines"></span></div>
-    </div>
-  </div>
-
-</div><!-- end .main -->
+<script>
 // ─── DATA ───────────────────────────────────────────────────────────
 const PROJECTS = [
   {id:"jerry-ai",name:"Jerry AI",tag:"active",desc:"Local AI project — DeepSeek, Qwen, Flux on WD_BLACK NVMe",file:"jerry-ai.md"},
@@ -403,18 +477,18 @@ const KARPATHY = {
 };
 
 const CRON_JOBS = [
-  {name:"Memory Dream Sequence",schedule:"Mon 9:00 AM ET",model:"brainwave/auto",next:"Mondays",status:"active",desc:"Weekly audit of MEMORY.md + wiki"},
-  {name:"Karpathy New Repo Check",schedule:"Daily 8:00 AM ET",model:"ollama/glm-5.1:cloud → brainwave → sonnet",next:"Tomorrow 8AM",status:"active",desc:"Scans for new Karpathy repos"},
+  {name:"Memory Dream Sequence",schedule:"Mon 9:00 AM ET",model:"brainwave/auto",next:"Mondays",status:"active"},
+  {name:"Karpathy New Repo Check",schedule:"Daily 8:00 AM ET",model:"glm-5.1:cloud → brainwave → sonnet",next:"Tomorrow 8AM",status:"active"},
 ];
 
 const WIKI_FILES = [
-  {name:"index.md",desc:"Table of contents mapping all topics to files",lines:37},
-  {name:"log.md",desc:"Changelog of every ingestion, dream run, and update",lines:35},
+  {name:"index.md",desc:"Table of contents mapping all topics",lines:37},
+  {name:"log.md",desc:"Changelog of ingestions and updates",lines:35},
   {name:"processed.md",desc:"Tracks which raw files have been ingested",lines:9},
 ];
 
 const SESSION_LOGS = [
-  {name:"2026-06-08.md",desc:"Today — Karpathy repos, second brain setup"},
+  {name:"2026-06-08.md",desc:"Karpathy repos, second brain, dashboard"},
   {name:"2026-06-07.md",desc:"Previous day"},
   {name:"2026-06-05.md",desc:""},
   {name:"2026-06-04.md",desc:""},
@@ -423,81 +497,65 @@ const SESSION_LOGS = [
 ];
 
 // ─── RENDER ─────────────────────────────────────────────────────────
-function tagClass(t){
-  const m={active:'tag-active',dev:'tag-dev',paused:'tag-paused',archive:'tag-archive',critical:'tag-critical'};
-  return m[t]||'tag-dev';
+function chipClass(t){
+  const m={active:'chip-active',dev:'chip-dev',paused:'chip-paused',archive:'chip-archive'};
+  return m[t]||'chip-dev';
 }
 
 function renderStats(){
   const active=PROJECTS.filter(p=>p.tag==='active').length;
   const dev=PROJECTS.filter(p=>p.tag==='dev').length;
+  const total=KARPATHY.tier1.length+KARPATHY.tier2.length+KARPATHY.tier3.length;
   document.getElementById('stats-row').innerHTML=`
-    <div class="card stat"><div class="num" style="color:var(--accent)">${PROJECTS.length}</div><div class="label">Total Projects</div></div>
-    <div class="card stat"><div class="num" style="color:var(--accent)">${active}</div><div class="label">Active</div></div>
-    <div class="card stat"><div class="num" style="color:var(--accent2)">${dev}</div><div class="label">In Dev</div></div>
-    <div class="card stat"><div class="num" style="color:var(--warn)">${KARPATHY.tier1.length+KARPATHY.tier2.length+KARPATHY.tier3.length}</div><div class="label">Karpathy Repos</div></div>
-    <div class="card stat"><div class="num" style="color:var(--accent3)">5</div><div class="label">Memory Blocks</div></div>
-    <div class="card stat"><div class="num" style="color:var(--text-dim)">${SESSION_LOGS.length}</div><div class="label">Session Logs</div></div>
-    <div class="card stat"><div class="num" style="color:var(--accent)">2</div><div class="label">Cron Jobs</div></div>
-    <div class="card stat"><div class="num" style="color:var(--accent2)">3</div><div class="label">Wiki Files</div></div>
+    <div class="stage-card stat-card"><div class="stat-num">${PROJECTS.length}</div><div class="stat-label">Projects</div></div>
+    <div class="stage-card stat-card"><div class="stat-num" style="color:var(--stable)">${active}</div><div class="stat-label">Active</div></div>
+    <div class="stage-card stat-card"><div class="stat-num" style="color:var(--accent2)">${dev}</div><div class="stat-label">In Dev</div></div>
+    <div class="stage-card stat-card"><div class="stat-num">${total}</div><div class="stat-label">Karpathy</div></div>
+    <div class="stage-card stat-card"><div class="stat-num">5</div><div class="stat-label">Memory Blocks</div></div>
+    <div class="stage-card stat-card"><div class="stat-num">${SESSION_LOGS.length}</div><div class="stat-label">Sessions</div></div>
+    <div class="stage-card stat-card"><div class="stat-num">2</div><div class="stat-label">Cron Jobs</div></div>
+    <div class="stage-card stat-card"><div class="stat-num">3</div><div class="stat-label">Wiki Files</div></div>
   `;
 }
 
 function renderActiveProjects(){
-  const el=document.getElementById('active-projects');
-  el.innerHTML=PROJECTS.filter(p=>p.tag==='active'||p.tag==='dev').slice(0,8).map(p=>`
-    <div class="card">
-      <h3><span style="color:var(--accent)">▸</span> ${p.name}</h3>
+  document.getElementById('active-projects').innerHTML=PROJECTS.filter(p=>p.tag==='active'||p.tag==='dev').slice(0,8).map(p=>`
+    <div class="stage-card">
+      <h3><span style="color:var(--lime)">▸</span> ${p.name}</h3>
       <p>${p.desc}</p>
-      <span class="tag ${tagClass(p.tag)}">${p.tag.toUpperCase()}</span>
+      <span class="intel-state-chip ${chipClass(p.tag)}">${p.tag.toUpperCase()}</span>
     </div>
   `).join('');
 }
 
 function renderAllProjects(filter=''){
-  const el=document.getElementById('all-projects');
   const f=filter.toLowerCase();
   const filtered=PROJECTS.filter(p=>!f||p.name.toLowerCase().includes(f)||p.desc.toLowerCase().includes(f)||p.tag.includes(f));
-  el.innerHTML=filtered.map(p=>`
-    <div class="card">
+  document.getElementById('all-projects').innerHTML=filtered.map(p=>`
+    <div class="stage-card">
       <h3>${p.name}</h3>
       <p>${p.desc}</p>
-      <span class="tag ${tagClass(p.tag)}">${p.tag.toUpperCase()}</span>
+      <span class="intel-state-chip ${chipClass(p.tag)}">${p.tag.toUpperCase()}</span>
     </div>
   `).join('');
 }
 
 function renderMemoryTopics(){
-  // Wiki
   document.getElementById('wiki-files').innerHTML=WIKI_FILES.map(f=>`
-    <div class="mem-file" data-type="wiki" data-name="${f.name}">
-      <span class="name">wiki/${f.name}</span>
-      <span class="desc">${f.desc}</span>
-      <span class="meta">${f.lines} lines</span>
-    </div>
+    <div class="mem-file"><span class="name">wiki/${f.name}</span><span class="desc">${f.desc}</span><span class="meta">${f.lines} lines</span></div>
   `).join('');
-
-  // Project memories
   document.getElementById('project-memories').innerHTML=PROJECTS.map(p=>`
-    <div class="mem-file mem-clickable" data-type="project" data-name="${p.file}" tabindex="0" role="button" aria-label="Open ${p.name} memory file">
-      <span class="name">${p.file}</span>
-      <span class="desc">${p.name}</span>
-      <span class="meta">${p.tag}</span>
+    <div class="mem-file mem-clickable" data-type="project" data-name="${p.file}" tabindex="0" role="button" aria-label="Open ${p.name}">
+      <span class="name">${p.file}</span><span class="desc">${p.name}</span><span class="meta">${p.tag}</span>
     </div>
   `).join('');
-
-  // Session logs
   document.getElementById('session-logs').innerHTML=SESSION_LOGS.map(s=>`
-    <div class="mem-file mem-clickable" data-type="session" data-name="${s.name}" tabindex="0" role="button" aria-label="Open session log ${s.name}">
-      <span class="name">${s.name}</span>
-      <span class="desc">${s.desc||'Session log'}</span>
-      <span class="meta">log</span>
+    <div class="mem-file mem-clickable" data-type="session" data-name="${s.name}" tabindex="0" role="button" aria-label="Open session ${s.name}">
+      <span class="name">${s.name}</span><span class="desc">${s.desc||'Session log'}</span><span class="meta">log</span>
     </div>
   `).join('');
-
-  // Raw folder
   document.getElementById('raw-files').innerHTML=`
-    <div class="mem-file"><span class="name" style="color:var(--text-muted)">raw/</span><span class="desc">Empty — drop files here via "save this"</span><span class="meta">0 files</span></div>
+    <div class="mem-file"><span class="name" style="color:var(--muted)">raw/</span><span class="desc">Empty — drop files here via "save this"</span><span class="meta">0 files</span></div>
   `;
 }
 
@@ -505,24 +563,24 @@ function renderKarpathy(filter=''){
   const f=filter.toLowerCase();
   function match(r){return !f||r.name.toLowerCase().includes(f)||r.desc.toLowerCase().includes(f)}
   document.getElementById('karpathy-tier1').innerHTML=KARPATHY.tier1.filter(match).map(r=>`
-    <div class="card karpathy-card">
-      <span class="tier tier-1">T1</span>
-      <h3>${r.name} <span class="stars">⭐${r.stars}</span></h3>
-      <div class="why">${r.desc}</div>
+    <div class="stage-card" style="position:relative">
+      <span class="tier-badge tier-1">T1</span>
+      <h3>${r.name} <span style="color:var(--warn);font-size:.7rem">⭐${r.stars}</span></h3>
+      <p>${r.desc}</p>
     </div>
   `).join('');
   document.getElementById('karpathy-tier2').innerHTML=KARPATHY.tier2.filter(match).map(r=>`
-    <div class="card karpathy-card">
-      <span class="tier tier-2">T2</span>
-      <h3>${r.name} <span class="stars">⭐${r.stars}</span></h3>
-      <div class="why">${r.desc}</div>
+    <div class="stage-card" style="position:relative">
+      <span class="tier-badge tier-2">T2</span>
+      <h3>${r.name} <span style="color:var(--warn);font-size:.7rem">⭐${r.stars}</span></h3>
+      <p>${r.desc}</p>
     </div>
   `).join('');
   document.getElementById('karpathy-tier3').innerHTML=KARPATHY.tier3.filter(match).map(r=>`
-    <div class="card karpathy-card">
-      <span class="tier tier-3">T3</span>
-      <h3>${r.name} <span class="stars">⭐${r.stars}</span></h3>
-      <div class="why">${r.desc}</div>
+    <div class="stage-card" style="position:relative">
+      <span class="tier-badge tier-3">T3</span>
+      <h3>${r.name} <span style="color:var(--warn);font-size:.7rem">⭐${r.stars}</span></h3>
+      <p>${r.desc}</p>
     </div>
   `).join('');
 }
@@ -531,26 +589,26 @@ function renderCron(){
   document.getElementById('cron-body').innerHTML=CRON_JOBS.map(j=>`
     <tr>
       <td style="color:var(--text)">${j.name}</td>
-      <td><span class="tag tag-active">${j.schedule}</span></td>
-      <td style="color:var(--text-dim);font-family:var(--font-mono);font-size:.7rem">${j.model}</td>
-      <td style="color:var(--text-muted)">${j.next}</td>
-      <td><span class="tag tag-active">● ACTIVE</span></td>
+      <td><span class="intel-state-chip chip-active">${j.schedule}</span></td>
+      <td style="color:var(--muted);font-family:var(--font-mono);font-size:.72rem">${j.model}</td>
+      <td style="color:var(--muted)">${j.next}</td>
+      <td><span class="intel-state-chip chip-active"><span class="live-dot">●</span> ACTIVE</span></td>
     </tr>
   `).join('');
 }
 
 function renderRecentActivity(){
   document.getElementById('recent-activity').innerHTML=`
-    <div class="mem-file"><span class="name">2026-06-08</span><span class="desc">Karpathy repos cloned (26), second brain wiki setup, dream sequence cron created</span><span class="meta">today</span></div>
-    <div class="mem-file"><span class="name">wiki/log.md</span><span class="desc">Updated with all Karpathy repo assessments and second brain video synthesis</span><span class="meta">updated</span></div>
+    <div class="mem-file"><span class="name">2026-06-08</span><span class="desc">Karpathy repos cloned (26), second brain wiki setup, dashboard deployed</span><span class="meta">today</span></div>
+    <div class="mem-file"><span class="name">wiki/log.md</span><span class="desc">Updated with all repo assessments and second brain synthesis</span><span class="meta">updated</span></div>
     <div class="mem-file"><span class="name">MEMORY.md</span><span class="desc">Added Second Brain architecture + Karpathy repos section</span><span class="meta">updated</span></div>
   `;
 }
 
 // ─── TABS ───────────────────────────────────────────────────────────
-document.querySelectorAll('.nav button').forEach(btn=>{
+document.querySelectorAll('.command-pill').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.command-pill').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
@@ -561,7 +619,7 @@ document.querySelectorAll('.nav button').forEach(btn=>{
 document.getElementById('project-search').addEventListener('input',e=>renderAllProjects(e.target.value));
 document.getElementById('memory-search').addEventListener('input',e=>{
   const f=e.target.value.toLowerCase();
-  document.querySelectorAll('#memory .mem-file').forEach(el=>{
+  document.querySelectorAll('#tab-memory .mem-file').forEach(el=>{
     const name=el.querySelector('.name').textContent.toLowerCase();
     const desc=el.querySelector('.desc').textContent.toLowerCase();
     el.style.display=(!f||name.includes(f)||desc.includes(f))?'flex':'none';
@@ -579,13 +637,7 @@ function updateClock(){
 setInterval(updateClock,1000);updateClock();
 
 // ─── INIT ───────────────────────────────────────────────────────────
-renderStats();
-renderActiveProjects();
-renderAllProjects();
-renderMemoryTopics();
-renderKarpathy();
-renderCron();
-renderRecentActivity();
+renderStats();renderActiveProjects();renderAllProjects();renderMemoryTopics();renderKarpathy();renderCron();renderRecentActivity();
 
 // ─── MODAL ─────────────────────────────────────────────────────────
 const MEMORY_GH='https://raw.githubusercontent.com/jgray4567/jongrayson/main/memory/';
@@ -597,33 +649,14 @@ const mPath=document.getElementById('modal-path');
 const mLines=document.getElementById('modal-lines');
 
 function openModal(title,path){
-  mTitle.textContent=title;
-  mContent.style.display='none';
-  mLoading.style.display='block';
-  mLoading.textContent='Fetching file...';
-  overlay.classList.add('open');
-  document.body.style.overflow='hidden';
-  mPath.textContent=path;
-  mLines.textContent='';
-
+  mTitle.textContent=title;mContent.style.display='none';mLoading.style.display='block';
+  mLoading.textContent='Fetching file...';overlay.classList.add('open');document.body.style.overflow='hidden';
+  mPath.textContent=path;mLines.textContent='';
   fetch(MEMORY_GH+path)
     .then(r=>{if(!r.ok)throw new Error('Not found');return r.text()})
-    .then(text=>{
-      mContent.textContent=text;
-      mLines.textContent=text.split('\n').length+' lines';
-      mLoading.style.display='none';
-      mContent.style.display='block';
-    })
-    .catch(()=>{
-      const p=PROJECTS.find(x=>x.file===path.split('/').pop());
-      const desc=p?p.desc:'Memory file';
-      mContent.textContent=`# ${title}\n\n${desc}\n\n---\nFile: ${path}\nStatus: Available in local workspace\n\nEdit this file locally or via the agent to add detailed content.`;
-      mLines.textContent='\u2014';
-      mLoading.style.display='none';
-      mContent.style.display='block';
-    });
+    .then(text=>{mContent.textContent=text;mLines.textContent=text.split('\n').length+' lines';mLoading.style.display='none';mContent.style.display='block'})
+    .catch(()=>{const p=PROJECTS.find(x=>x.file===path.split('/').pop());mContent.textContent=`# ${title}\n\n${p?p.desc:'Memory file'}\n\n---\nFile: ${path}\nStatus: Available in local workspace`;mLines.textContent='—';mLoading.style.display='none';mContent.style.display='block'});
 }
-
 function closeModal(){overlay.classList.remove('open');document.body.style.overflow=''}
 
 document.getElementById('modal-close').addEventListener('click',closeModal);
@@ -631,19 +664,10 @@ overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
 document.addEventListener('click',e=>{
-  const row=e.target.closest('.mem-clickable');
-  if(!row)return;
-  const name=row.dataset.name;
-  const type=row.dataset.type;
-  const proj=PROJECTS.find(p=>p.file===name);
-  let title, path;
-  if(type==='session'){
-    title='Session Log: '+name;
-    path=name; // flat in memory/
-  } else {
-    title=proj?proj.name:name;
-    path='projects/'+name;
-  }
+  const row=e.target.closest('.mem-clickable');if(!row)return;
+  const name=row.dataset.name;const type=row.dataset.type;
+  let title,path;
+  if(type==='session'){title='Session: '+name;path=name}else{const proj=PROJECTS.find(p=>p.file===name);title=proj?proj.name:name;path='projects/'+name}
   openModal(title,path);
 });
 </script>
