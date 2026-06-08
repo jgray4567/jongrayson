@@ -1,5 +1,7 @@
 # Jerry + Gathered Table: Infrastructure & Redundancy Plan
 
+**Category:** AI
+
 ## Overview
 
 This document covers the full setup for running Jerry (MLX LLM inference) on Jon's Mac Studio and serving Gathered Table app traffic, with automatic failover to a cloud VPS.

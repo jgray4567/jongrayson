@@ -1,5 +1,7 @@
 # Jerry Hardware Discussion — April 25, 2026
 
+**Category:** AI
+
 ## Context
 
 Jon asked about hardware for running Jerry (local AI assistant). The discussion covered current Mac Studio options, M5 rumors, and what's needed to run Jerry's full model stack efficiently.

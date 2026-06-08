@@ -1,5 +1,7 @@
 # Joanie Karaoke
 
+**Category:** Application
+
 ## Overview
 Karaoke DJ (KJ) app project. Research phase started April 2026.
 

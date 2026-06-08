@@ -1,5 +1,7 @@
 # Mac GPU Inference
 
+**Category:** AI
+
 ## Idea source
 - Video: `I Plugged an RTX 5090 Into a Mac... and Didn’t Expect This`
 - URL: `https://youtu.be/C4KWsmezXm4?si=N7OOFtZEK-kkAdMO`

@@ -1,5 +1,7 @@
 # Reusable Pattern: Band Site Facebook Events Scraper
 
+**Category:** Other
+
 **Date Added:** 2026-04-21
 **Origin:** Developed for `onehotmess` and `crackedsky` repositories.
 

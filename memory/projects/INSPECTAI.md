@@ -1,5 +1,7 @@
 # InspectAI
 
+**Category:** AI
+
 ## Overview
 Compliance / inspection automation concept for Kevin at Virginia DHP.
 

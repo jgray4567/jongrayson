@@ -1,5 +1,7 @@
 # Frankenstein AI — Build Blueprint
 
+**Category:** AI
+
 **Goal:** Build a custom AI on Mac Studio (512GB RAM, 4TB SSD) that competes with ChatGPT/Claude for coding, image generation, and research — all local, zero API costs.
 
 **Date:** April 25, 2026

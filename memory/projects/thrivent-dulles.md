@@ -1,5 +1,7 @@
 # Thrivent Dulles Group — AI & Automation Plan
 
+**Category:** Website
+
 **Key Contact:** Marty Cox (Financial Advisor / Office Head)
 **Location:** Chantilly, VA
 **Website:** https://connect.thrivent.com/dulles-group/

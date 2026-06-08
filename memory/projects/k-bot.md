@@ -1,4 +1,6 @@
 
+
+**Category:** AI
 ## 2-Hour Paper Trading Test (2026-04-29)
 **Summary of the K-Bot overnight paper trading test after 2 hours:**
 - **Analyses:** 20 market analyses performed.

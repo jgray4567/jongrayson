@@ -1,5 +1,7 @@
 # Kalshi Arbitrage Agent (Project K-Bot)
 
+**Category:** AI
+
 **Goal:** Build a fully automated, AI-driven trading agent for Kalshi (US CFTC-regulated prediction market) that exploits reasoning, speed, and discipline gaps.
 **Architecture:** Python-based execution engine + Local AI (Jerry) reasoning engine.
 

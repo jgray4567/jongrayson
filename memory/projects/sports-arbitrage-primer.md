@@ -1,5 +1,7 @@
 # Sports Arbitrage (Matched Betting) - Beginner Primer
 
+**Category:** Other
+
 ## What is it?
 Sports arbitrage (or "arbing") is the practice of placing bets on all possible outcomes of an event across different sportsbooks to guarantee a mathematical profit, regardless of who wins the game.
 

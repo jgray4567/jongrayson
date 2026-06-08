@@ -1,5 +1,7 @@
 # Jon Grayson Website (jongrayson.com)
 
+**Category:** Website
+
 ## Overview
 Jon's personal portfolio/consulting site — UX Strategist & AI Consultant, Washington DC.
 

@@ -1,6 +1,7 @@
 # One Hot Mess
 
 **Status:** Active
+**Category:** Website
 **Type:** Band Website
 **Main URL:** https://www.onehotmess.band
 **GitHub:** jgray4567/onehotmess

@@ -1,5 +1,7 @@
 # JerryKnows AI
 
+**Category:** AI
+
 ## Overview
 Standalone ChatGPT-style app for `https://jerryknows.ai` / `https://www.jerryknows.ai`, separate from JerryKnows Web Team and BogleAI.
 

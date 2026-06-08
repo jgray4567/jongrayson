@@ -1,5 +1,7 @@
 # Polymarket Trading & Safe Compounder
 
+**Category:** AI
+
 ## Overview
 - **Wallet Setup:** Configured a Polymarket proxy wallet for Jon.
   - EOA Address: `0x9d74e37Bde55f0e0C5EA27B96ae28585DAfC3858`

@@ -1,5 +1,7 @@
 # WOOF
 
+**Category:** AI
+
 ## What it is
 Woof is the working project/brand for Woof Bakery social and marketing creative.
 

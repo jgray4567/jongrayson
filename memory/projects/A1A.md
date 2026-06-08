@@ -1,6 +1,7 @@
 # A1A — AI-Powered Real Estate Automation Platform
 
 **Status:** Active
+**Category:** Website
 **Type:** Client Website (SaaS Platform + Storefront)
 **Main URL:** https://a1asells.com
 **Platform:** https://a1a.com (AI-powered real estate automation)

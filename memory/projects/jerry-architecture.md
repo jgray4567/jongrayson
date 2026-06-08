@@ -1,5 +1,7 @@
 # Jerry — Model Architecture
 
+**Category:** AI
+
 ## Philosophy: Right Model, Right Job
 
 Jerry isn't one model — it's a **team of specialists**. Each model does what it's best at, routed by a lightweight orchestrator. Small models handle 80% of requests at 50-90 tok/s. Big models handle the 20% that need deep reasoning or complex generation.

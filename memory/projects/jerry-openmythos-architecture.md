@@ -1,5 +1,7 @@
 # Jerry + OpenMythos: Production Architecture for Table & Tine
 
+**Category:** AI
+
 ## Overview
 
 Jerry is Table & Tine's AI inference server, running on Jon's Mac Studio M4 Max (128GB RAM, 2TB SSD). It uses the OpenMythos Recurrent-Depth Transformer architecture to serve recipe extraction, dietary reasoning, and content moderation with variable compute per request.

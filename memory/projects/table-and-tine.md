@@ -1,5 +1,7 @@
 # Table & Tine — Recipe App
 
+**Category:** Application
+
 **Status:** Active
 **Type:** Mobile App (iOS) + AI Backend
 **Main URL:** https://tableandtine.com

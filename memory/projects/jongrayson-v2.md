@@ -1,5 +1,7 @@
 # Jon Grayson (jongrayson.com) - V2 Rebuild
 
+**Category:** Website
+
 **Goal:** Rebuild the static portfolio site using modern React, Tailwind, and shadcn/ui, compiled to static files for DreamHost SFTP deployment.
 **Repo:** jgray4567/jongrayson
 

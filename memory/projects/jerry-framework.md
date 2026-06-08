@@ -1,5 +1,7 @@
 # Jerry Framework
 
+**Category:** AI
+
 An opinionated full-stack project generator for rapid prototyping → production web/mobile apps.
 
 ## Architecture

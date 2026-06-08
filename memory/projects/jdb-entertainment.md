@@ -1,5 +1,7 @@
 # JDB Entertainment Global (Website)
 
+**Category:** Website
+
 ## Overview
 - **Location:** `/Users/jsg/.openclaw/workspace/projects/jdb-entertainment/jdb-site/`
 - **Type:** Static HTML/CSS website (originally exported from Webflow).

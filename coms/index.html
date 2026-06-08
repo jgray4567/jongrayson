@@ -199,6 +199,13 @@ body {
 .star-btn:hover { color: var(--warn); }
 .star-btn.starred { color: var(--warn); text-shadow: 0 0 6px rgba(255,200,0,0.4); }
 .priority-card { border-color: rgba(255,200,0,0.3) !important; box-shadow: 0 0 12px rgba(255,200,0,0.08) !important; }
+.cat-btn { background: var(--panel-2); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 5px 10px; font-family: var(--font-mono); font-size: 0.65rem; cursor: pointer; transition: all 0.15s ease; white-space: nowrap; }
+.cat-btn:hover { border-color: var(--cat-color, var(--lime)); color: var(--text); }
+.cat-btn.active { background: rgba(0,229,255,0.1); color: var(--lime); border-color: var(--lime); }
+.cat-btn[data-cat="Website"].active { background: rgba(0,229,255,0.1); color: var(--lime); border-color: var(--lime); }
+.cat-btn[data-cat="Application"].active { background: rgba(167,139,250,0.1); color: #a78bfa; border-color: #a78bfa; }
+.cat-btn[data-cat="AI"].active { background: rgba(244,114,182,0.1); color: #f472b6; border-color: #f472b6; }
+.cat-btn[data-cat="Other"].active { background: rgba(232,244,248,0.06); color: var(--text); border-color: var(--muted); }
 
 /* Modal */
 .modal-overlay {
@@ -367,8 +374,15 @@ body {
 
     <!-- PROJECTS -->
     <div class="tab-content" id="tab-projects">
-      <div class="command-bar" style="margin-bottom:18px;display:flex;gap:8px;align-items:center">
-        <input type="text" class="command-input" id="project-search" placeholder="Search projects..." style="flex:1">
+      <div class="command-bar" style="margin-bottom:18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="text" class="command-input" id="project-search" placeholder="Search projects..." style="flex:1;min-width:120px">
+        <div class="cat-filters" style="display:flex;gap:4px">
+          <button class="cat-btn active" data-cat="all" onclick="filterCategory('all')">All</button>
+          <button class="cat-btn" data-cat="Website" onclick="filterCategory('Website')" style="--cat-color:var(--lime)">🌐 Website</button>
+          <button class="cat-btn" data-cat="Application" onclick="filterCategory('Application')" style="--cat-color:#a78bfa">📱 App</button>
+          <button class="cat-btn" data-cat="AI" onclick="filterCategory('AI')" style="--cat-color:#f472b6">🤖 AI</button>
+          <button class="cat-btn" data-cat="Other" onclick="filterCategory('Other')" style="--cat-color:var(--muted)">📦 Other</button>
+        </div>
         <button id="priority-toggle" class="priority-btn" title="Show priority projects first" onclick="togglePriority()">⚡ Priority</button>
       </div>
       <div class="stage-grid stage-grid-2" id="all-projects"></div>
@@ -447,6 +461,13 @@ function extractDesc(content){
   return lines.length?lines[0].replace(/^[-*]\s+/,'').slice(0,80):'No description';
 }
 
+// Extract category from markdown frontmatter
+function extractCategory(content){
+  const m=content.match(/\*\*Category:\*\*\s*(Website|Application|AI|Other)/i);
+  if(m)return m[1].charAt(0).toUpperCase()+m[1].slice(1).toLowerCase();
+  return 'Other';
+}
+
 // Parse karpathy-repos.md tier tables
 function parseKarpathyMd(text){
   const tiers={tier1:[],tier2:[],tier3:[]};
@@ -494,6 +515,7 @@ async function fetchAllData(){
         if(!name){name=f.path.split('/').pop().replace('.md','').replace(/-/g,' ');}
         const tag=inferTag(text);
         const desc=extractDesc(text);
+        const category=extractCategory(text);
         const file=f.path.split('/').pop();
         const id=file.replace('.md','');
         // Extract Main URL or first URL
@@ -502,7 +524,7 @@ async function fetchAllData(){
         const domainUrl=(text.match(/\*\*Domains?:\*\*\s*`?(https?:\/\/[^`\s,]+)`?/m)||[])[1];
         const plainUrl=(text.match(/https?:\/\/[^\s)"']+/m)||[])[0];
         url=mainUrl||domainUrl||plainUrl||'';
-        return{id,name,tag,desc,file,url};
+        return{id,name,tag,desc,file,url,category};
       }catch(e){console.warn('[JK] Project fetch failed:',f.path,e);return null}
     });
     
@@ -642,11 +664,14 @@ function togglePriority(){
 
 function projectCard(p,isStarred){
   const urlRow=p.url?`<div class="detail-row"><span class="detail-label">URL</span><span class="detail-value"><a href="${p.url}" target="_blank" style="color:var(--lime);font-family:var(--font-mono);font-size:.72rem;text-decoration:none">${p.url.replace('https://','')}</a></span></div>`:'';
-  return `<div class="stage-card${isStarred?' priority-card':''}" data-project="${p.id}" tabindex="0" role="button" aria-label="Expand ${p.name}">
-    <h3><button class="star-btn${isStarred?' starred':''}" data-star="${p.id}" onclick="event.stopPropagation();toggleStar('${p.id}')" title="${isStarred?'Remove from priority':'Add to priority'}">${isStarred?'★':'☆'}</button> ${p.name} <span class="intel-state-chip ${chipClass(p.tag)}" style="font-size:0.58rem;margin-left:4px">${p.tag.toUpperCase()}</span>${p.url?`<a href="${p.url}" target="_blank" style="color:var(--lime);font-size:.7rem;margin-left:6px;font-family:var(--font-mono)" onclick="event.stopPropagation()">↗</a>`:''}<span class="expand-hint">tap to expand</span></h3>
+  const catColors={Website:'var(--lime)',Application:'#a78bfa',AI:'#f472b6',Other:'var(--muted)'};
+  const catColor=catColors[p.category]||catColors['Other'];
+  return `<div class="stage-card${isStarred?' priority-card':''}" data-project="${p.id}" data-category="${p.category}" tabindex="0" role="button" aria-label="Expand ${p.name}">
+    <h3><button class="star-btn${isStarred?' starred':''}" data-star="${p.id}" onclick="event.stopPropagation();toggleStar('${p.id}')" title="${isStarred?'Remove from priority':'Add to priority'}">${isStarred?'★':'☆'}</button> ${p.name} <span class="intel-state-chip ${chipClass(p.tag)}" style="font-size:0.58rem;margin-left:4px">${p.tag.toUpperCase()}</span><span style="font-size:0.55rem;margin-left:4px;color:${catColor};font-family:var(--font-mono);font-weight:600;text-transform:uppercase">${p.category}</span>${p.url?`<a href="${p.url}" target="_blank" style="color:var(--lime);font-size:.7rem;margin-left:6px;font-family:var(--font-mono)" onclick="event.stopPropagation()">↗</a>`:''}<span class="expand-hint">tap to expand</span></h3>
     <p>${p.desc}</p>
     <div class="card-expand">
       <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${p.tag==='active'?'🟢 Active':p.tag==='dev'?'🟡 In Development':'⏸ Archived'}</span></div>
+      <div class="detail-row"><span class="detail-label">Category</span><span class="detail-value" style="color:${catColor};font-weight:600">${p.category}</span></div>
       ${urlRow}
       <div class="detail-row"><span class="detail-label">Memory</span><span class="detail-value"><span class="mem-link" data-type="project" data-name="${p.file}">projects/${p.file}</span></span></div>
       <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" style="font-family:var(--font-mono)">${p.id}</span></div>
@@ -654,9 +679,16 @@ function projectCard(p,isStarred){
   </div>`;
 }
 
+let CURRENT_CAT='all';
+function filterCategory(cat){
+  CURRENT_CAT=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>{b.classList.toggle('active',b.dataset.cat===cat)});
+  renderAllProjects(document.getElementById('project-search')?.value||'');
+}
+
 function renderAllProjects(filter=''){
   const f=filter.toLowerCase();
-  let filtered=PROJECTS.filter(p=>!f||p.name.toLowerCase().includes(f)||p.desc.toLowerCase().includes(f)||p.tag.includes(f));
+  let filtered=PROJECTS.filter(p=>(CURRENT_CAT==='all'||p.category===CURRENT_CAT)&&(!f||p.name.toLowerCase().includes(f)||p.desc.toLowerCase().includes(f)||p.tag.includes(f)));
   console.log('[JK] renderAllProjects:',filtered.length,'of',PROJECTS.length,'projects');
   if(!filtered.length){
     document.getElementById('all-projects').innerHTML='<div style="color:var(--muted);padding:20px;font-family:var(--font-mono);font-size:0.8rem">No projects found</div>';return;

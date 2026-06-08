@@ -1,6 +1,7 @@
 # Cracked Sky
 
 **Status:** Active
+**Category:** Website
 **Type:** Band Website
 **Main URL:** https://www.crackedsky.band
 **GitHub:** jgray4567/crackedsky

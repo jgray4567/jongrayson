@@ -1,5 +1,7 @@
 # BogleAI
 
+**Category:** Application
+
 ## Overview
 Separate public Boglehead-style financial advisor app, distinct from JerryKnows AI and Web Team.
 

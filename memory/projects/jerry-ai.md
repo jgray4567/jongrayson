@@ -1,5 +1,7 @@
 # Jerry — Local AI Project
 
+**Category:** AI
+
 **Name:** Jerry (official)
 **Drive:** WD_BLACK SN7100 1TB NVMe SSD → `/Volumes/Frankenstein/`
 **Models Path:** `/Volumes/Frankenstein/MLX-Models/`

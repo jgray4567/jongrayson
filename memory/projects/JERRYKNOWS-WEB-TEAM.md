@@ -1,5 +1,7 @@
 # JerryKnows Web Team
 
+**Category:** Other
+
 ## Overview
 Separate app at `https://api.jerryknows.ai`, distinct from `jerryknows-ai` and `bogleai.jerryknows.ai`.
 

@@ -1,5 +1,7 @@
 # DataBadger
 
+**Category:** Application
+
 ## Overview
 Data/product project using probate and county records data.
 

@@ -1,5 +1,7 @@
 # JerryKnows Intelligence
 
+**Category:** AI
+
 ## Overview
 A proposed JerryKnows intelligence dashboard / desktop tool inspired by Palantir-style workflows and "Eye of God" concepts, built from public data sources.
 

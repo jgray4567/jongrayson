@@ -1,5 +1,7 @@
 # Giuseppe's Ristorante (giuseppesva.com)
 
+**Category:** Website
+
 ## Overview
 Restaurant website for Giuseppe's Ristorante Italiano in Haymarket, VA. Family-owned Italian restaurant, est. 1982.
 
