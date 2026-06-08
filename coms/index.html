@@ -398,7 +398,7 @@ body {
     <div class="tab-content" id="tab-cron">
       <div class="section-kicker">Scheduled Jobs</div>
       <table class="cron-table">
-        <thead><tr><th>Name</th><th>Schedule</th><th>Model</th><th>Next Run</th><th>Status</th></tr></thead>
+        <thead><tr><th>Job</th><th>Schedule</th><th>Model</th><th>Next Run</th><th>URL</th></tr></thead>
         <tbody id="cron-body"></tbody>
       </table>
     </div>
@@ -535,10 +535,16 @@ async function fetchAllData(){
     WIKI_FILES=wikiResults.filter(Boolean);
     SESSION_LOGS=sessionResults.filter(Boolean);
     
-    // Cron jobs are config-based, keep static but update model labels
+    // Cron jobs - static config with website links
     CRON_JOBS=[
-      {name:"Memory Dream Sequence",schedule:"Mon 9:00 AM ET",model:"glm-5.1:cloud",next:"Mondays",status:"active"},
-      {name:"Karpathy New Repo Check",schedule:"Daily 8:00 AM ET",model:"glm-5.1:cloud",next:"Daily 8AM",status:"active"},
+      {name:"Memory Dream Sequence",schedule:"Mon 9:00 AM ET",model:"glm-5.1:cloud",next:"Mondays",status:"active",url:"",desc:"Audits MEMORY.md + wiki for contradictions, stale claims, duplicates"},
+      {name:"Karpathy New Repo Check",schedule:"Daily 8:00 AM ET",model:"glm-5.1:cloud",next:"Daily 8AM",status:"active",url:"https://github.com/karpathy",desc:"Scans for new repos, clones useful ones"},
+      {name:"K-Bot Morning Planner",schedule:"Daily 8:00 AM ET",model:"glm-5.1:cloud",next:"Daily 8AM",status:"active",url:"",desc:"Drafts trading plan for Kalshi markets"},
+      {name:"K-Bot Daily P&L",schedule:"Daily 6:00 PM ET",model:"glm-5.1:cloud",next:"Daily 6PM",status:"active",url:"",desc:"Reports Kalshi portfolio balance"},
+      {name:"Morning Briefing",schedule:"Mon-Fri 8:00 AM ET",model:"glm-5.1:cloud",next:"Weekdays 8AM",status:"active",url:"",desc:"Checks Gmail for unread client emails"},
+      {name:"Jerry Ontology Builder",schedule:"Every 4 hours",model:"local",next:"Every 4h",status:"active",url:"https://jongrayson.com/intel/",desc:"Updates intel graph on jongrayson.com"},
+      {name:"Weekly Skill Audit",schedule:"Fri 3:00 PM ET",model:"local",next:"Fridays 3PM",status:"active",url:"",desc:"Reviews tools and proposes new automations"},
+      {name:"Qwen3 Coder 24h Review",schedule:"Jun 9 1:25 PM ET",model:"glm-5.1:cloud",next:"One-shot",status:"active",url:"",desc:"Final assessment of qwen3-coder:480b-cloud"},
     ];
     
     DATA_LOADED=true;
@@ -661,15 +667,16 @@ function renderCron(){
   if(!CRON_JOBS.length){
     document.getElementById('cron-body').innerHTML='<tr><td colspan="5" style="color:var(--muted);padding:20px;font-family:var(--font-mono);font-size:0.8rem">No cron jobs loaded</td></tr>';return;
   }
-  document.getElementById('cron-body').innerHTML=CRON_JOBS.map(j=>`
-    <tr>
-      <td style="color:var(--text)">${j.name}</td>
+  document.getElementById('cron-body').innerHTML=CRON_JOBS.map(j=>{
+    const urlCell=j.url?`<a href="${j.url}" target="_blank" style="color:var(--lime);font-family:var(--font-mono);font-size:.68rem;text-decoration:none">${j.url.replace('https://','')}</a>`:'<span style="color:var(--muted);font-size:.68rem">—</span>';
+    return `<tr>
+      <td><div style="color:var(--text);font-weight:600">${j.name}</div><div style="color:var(--muted);font-size:.68rem;margin-top:2px">${j.desc}</div></td>
       <td><span class="intel-state-chip chip-active">${j.schedule}</span></td>
       <td style="color:var(--muted);font-family:var(--font-mono);font-size:.72rem">${j.model}</td>
       <td style="color:var(--muted)">${j.next}</td>
-      <td><span class="intel-state-chip chip-active"><span class="live-dot">●</span> ACTIVE</span></td>
-    </tr>
-  `).join('');
+      <td>${urlCell}</td>
+    </tr>`;
+  }).join('');
 }
 
 function renderRecentActivity(){
