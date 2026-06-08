@@ -1,66 +1,390 @@
 {
   "nodes": [
     {
-      "id": "bbc_news",
-      "group": 1,
-      "label": "BBC News",
-      "size": 10
-    },
-    {
-      "id": "ukr_drones_st_petersburg",
-      "group": 2,
-      "label": "Ukrainian drones target St Petersburg",
-      "size": 10
-    },
-    {
-      "id": "us_iran_gulf_strikes",
-      "group": 2,
-      "label": "US and Iran exchange strikes in Gulf",
-      "size": 10
-    },
-    {
-      "id": "hegseth_europe_beach_invasion",
-      "group": 3,
-      "label": "Hegseth attacks Europe over migration",
-      "size": 10
-    },
-    {
-      "id": "baby_funeral_israeli_troops",
-      "group": 3,
-      "label": "Funeral for baby shot dead by Israeli troops",
-      "size": 10
-    },
-    {
       "id": "intel_nexus",
       "group": 0,
       "label": "JerryKnows.ai - Global Nexus",
-      "size": 10
+      "size": 24
+    },
+    {
+      "id": "reg_na",
+      "group": 3,
+      "label": "North America",
+      "size": 16
+    },
+    {
+      "id": "reg_eu",
+      "group": 3,
+      "label": "Europe",
+      "size": 16
+    },
+    {
+      "id": "reg_me",
+      "group": 3,
+      "label": "Middle East",
+      "size": 16
+    },
+    {
+      "id": "reg_asia",
+      "group": 3,
+      "label": "Asia-Pacific",
+      "size": 16
+    },
+    {
+      "id": "reg_sa",
+      "group": 3,
+      "label": "South America",
+      "size": 16
+    },
+    {
+      "id": "reg_afr",
+      "group": 3,
+      "label": "Africa",
+      "size": 16
+    },
+    {
+      "id": "theme_geo",
+      "group": 4,
+      "label": "Geopolitical Tension",
+      "size": 14
+    },
+    {
+      "id": "theme_cyber",
+      "group": 4,
+      "label": "Cyber Security",
+      "size": 14
+    },
+    {
+      "id": "theme_econ",
+      "group": 4,
+      "label": "Global Economy",
+      "size": 14
+    },
+    {
+      "id": "theme_sport",
+      "group": 4,
+      "label": "International Sports",
+      "size": 14
+    },
+    {
+      "id": "sig_0",
+      "group": 2,
+      "label": "BBC News",
+      "size": 12
+    },
+    {
+      "id": "sig_1",
+      "group": 2,
+      "label": "Israel strikes Beirut suburb days after US-brokered truce",
+      "size": 12
+    },
+    {
+      "id": "sig_2",
+      "group": 2,
+      "label": "Zelensky's close European allies set out five conditions for peace talks",
+      "size": 12
+    },
+    {
+      "id": "sig_3",
+      "group": 2,
+      "label": "Friendship or leverage: Why is Xi Jinping going to North Korea?",
+      "size": 12
+    },
+    {
+      "id": "sig_4",
+      "group": 2,
+      "label": "'A World Cup for them not us': Fans' anger at US travel bans and visa restrictions",
+      "size": 12
+    },
+    {
+      "id": "sig_5",
+      "group": 2,
+      "label": "Trump abruptly ends NBC interview after clash over 'rigged election' claim",
+      "size": 12
+    },
+    {
+      "id": "sig_6",
+      "group": 2,
+      "label": "Last-minute visas and moving training camp: Iran's road to the World Cup",
+      "size": 12
+    },
+    {
+      "id": "sig_7",
+      "group": 2,
+      "label": "Oil prices edge higher after strikes on Israel test ceasefire",
+      "size": 12
+    },
+    {
+      "id": "sig_8",
+      "group": 2,
+      "label": "One dead, five injured after shooting in Israel",
+      "size": 12
+    },
+    {
+      "id": "sig_9",
+      "group": 2,
+      "label": "Mexico City attempts record-breaking wave",
+      "size": 12
+    },
+    {
+      "id": "sig_10",
+      "group": 2,
+      "label": "Hundreds of captives freed from Boko Haram mountain hideout",
+      "size": 12
+    },
+    {
+      "id": "sig_11",
+      "group": 2,
+      "label": "Insecurity and instability drive voters in Peru's tight presidential race",
+      "size": 12
+    },
+    {
+      "id": "sig_12",
+      "group": 2,
+      "label": "Eriksen conscious after collapsing in Denmark game",
+      "size": 12
+    },
+    {
+      "id": "sig_13",
+      "group": 2,
+      "label": "'We don't look at the sky anymore': The Air India crash victims who were not on the plane",
+      "size": 12
     }
   ],
   "links": [
     {
-      "source": "bbc_news",
+      "source": "reg_na",
+      "target": "intel_nexus",
+      "value": 2
+    },
+    {
+      "source": "reg_eu",
+      "target": "intel_nexus",
+      "value": 2
+    },
+    {
+      "source": "reg_me",
+      "target": "intel_nexus",
+      "value": 2
+    },
+    {
+      "source": "reg_asia",
+      "target": "intel_nexus",
+      "value": 2
+    },
+    {
+      "source": "reg_sa",
+      "target": "intel_nexus",
+      "value": 2
+    },
+    {
+      "source": "reg_afr",
+      "target": "intel_nexus",
+      "value": 2
+    },
+    {
+      "source": "theme_geo",
       "target": "intel_nexus",
       "value": 1
     },
     {
-      "source": "ukr_drones_st_petersburg",
+      "source": "theme_cyber",
       "target": "intel_nexus",
       "value": 1
     },
     {
-      "source": "us_iran_gulf_strikes",
+      "source": "theme_econ",
       "target": "intel_nexus",
       "value": 1
     },
     {
-      "source": "hegseth_europe_beach_invasion",
+      "source": "theme_sport",
       "target": "intel_nexus",
       "value": 1
     },
     {
-      "source": "baby_funeral_israeli_troops",
-      "target": "intel_nexus",
+      "source": "theme_geo",
+      "target": "reg_me",
+      "value": 3
+    },
+    {
+      "source": "theme_geo",
+      "target": "reg_eu",
+      "value": 3
+    },
+    {
+      "source": "theme_geo",
+      "target": "reg_asia",
+      "value": 2
+    },
+    {
+      "source": "theme_cyber",
+      "target": "reg_na",
+      "value": 3
+    },
+    {
+      "source": "theme_econ",
+      "target": "reg_na",
+      "value": 2
+    },
+    {
+      "source": "theme_econ",
+      "target": "reg_eu",
+      "value": 2
+    },
+    {
+      "source": "theme_sport",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "theme_sport",
+      "target": "reg_sa",
+      "value": 1
+    },
+    {
+      "source": "sig_0",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_1",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_1",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_1",
+      "target": "sig_0",
+      "value": 1
+    },
+    {
+      "source": "sig_2",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_2",
+      "target": "sig_1",
+      "value": 1
+    },
+    {
+      "source": "sig_3",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_4",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_4",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_4",
+      "target": "sig_3",
+      "value": 1
+    },
+    {
+      "source": "sig_5",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_6",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_6",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_6",
+      "target": "sig_5",
+      "value": 1
+    },
+    {
+      "source": "sig_7",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_7",
+      "target": "theme_econ",
+      "value": 1
+    },
+    {
+      "source": "sig_7",
+      "target": "sig_6",
+      "value": 1
+    },
+    {
+      "source": "sig_8",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_9",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_9",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_9",
+      "target": "sig_8",
+      "value": 1
+    },
+    {
+      "source": "sig_10",
+      "target": "reg_afr",
+      "value": 1
+    },
+    {
+      "source": "sig_10",
+      "target": "sig_9",
+      "value": 1
+    },
+    {
+      "source": "sig_11",
+      "target": "reg_sa",
+      "value": 1
+    },
+    {
+      "source": "sig_11",
+      "target": "sig_10",
+      "value": 1
+    },
+    {
+      "source": "sig_12",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_12",
+      "target": "sig_11",
+      "value": 1
+    },
+    {
+      "source": "sig_13",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_13",
+      "target": "sig_12",
       "value": 1
     }
   ]

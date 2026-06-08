@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const http = require('http');
 
 // Live Intelligence Feeds
 const FEEDS = [
@@ -27,7 +26,7 @@ async function fetchSignals() {
             const xml = await fetchUrl(url);
             const titleMatches = xml.match(/<title[^>]*>([\s\S]*?)<\/title>/gi) || [];
             
-            for (let i = 1; i < Math.min(titleMatches.length, 6); i++) {
+            for (let i = 1; i < Math.min(titleMatches.length, 15); i++) {
                 let text = titleMatches[i].replace(/<\/?title[^>]*>/gi, '').trim();
                 text = text.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1'); 
                 if (text && !text.includes('BBC News - World') && !text.includes('National Cyber Awareness System')) {
@@ -41,100 +40,78 @@ async function fetchSignals() {
     return signals;
 }
 
-
-async function extractOntology(signals) {
-function callOpenClawApi(prompt) {
-    return new Promise((resolve, reject) => {
-        const fs = require('fs');
-        const os = require('os');
-        let token = '';
-        try {
-            const configPath = path.join(os.homedir(), '.openclaw', 'openclaw.json');
-            const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-            token = configData.gateway.auth.token;
-        } catch (e) {
-            token = process.env.OPENCLAW_GATEWAY_TOKEN || '';
-        }
-
-        const reqOpts = {
-            hostname: '127.0.0.1',
-            port: 18789,
-            path: '/v1/chat/completions',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        };
-
-        const req = http.request(reqOpts, (res) => {
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => {
-                if (res.statusCode >= 400) {
-                    reject(new Error(`API Error: ${res.statusCode} ${data}`));
-                    return;
-                }
-                try {
-                    const parsed = JSON.parse(data);
-                    resolve(parsed.choices[0].message.content);
-                } catch (e) {
-                    reject(e);
-                }
-            });
-        });
-
-        req.on('error', reject);
-
-        req.write(JSON.stringify({
-            model: "openclaw",
-            messages: [
-                { role: "system", content: "OVERRIDE_MODEL: ollama/glm-5.1:cloud" },
-                { role: "user", content: prompt }
-            ]
-        }));
-        req.end();
-    });
-}
-    const prompt = `You are the automated Intelligence Extraction Engine for jongrayson.com (powered by JerryKnows.ai). Your job is to convert the following live global threat signals into a Palantir-style node graph ontology.
-Return ONLY valid JSON. Format:
-{"nodes": [{"id": "id_string", "group": 0-4, "label": "Display Name", "size": 10}], "links": [{"source": "id1", "target": "id2", "value": 1}]}
-Groups: 0=Nexus, 1=Org/Asset, 2=Threat/Event, 3=Location, 4=Misc.
-Include an 'intel_nexus' node (group 0) with the label 'JerryKnows.ai - Global Nexus' and link the most important extracted events, organizations, and locations to it.
-Always ensure the JSON is perfectly valid and contains no markdown formatting.
-
-Signals:
-${signals.join("\n")}`;
-
-    console.log("Pinging OpenClaw Local API...");
+// Procedurally generate a rich interconnected ontology from headlines
+function buildProceduralOntology(signals) {
+    const nodes = [];
+    const links = [];
     
-    try {
-        let jsonStr = await callOpenClawApi(prompt);
-        jsonStr = jsonStr.trim();
-        if (jsonStr.startsWith('```json')) jsonStr = jsonStr.substring(7);
-        if (jsonStr.startsWith('```')) jsonStr = jsonStr.substring(3);
-        if (jsonStr.endsWith('```')) jsonStr = jsonStr.substring(0, jsonStr.length - 3);
+    nodes.push({ id: "intel_nexus", group: 0, label: "JerryKnows.ai - Global Nexus", size: 24 });
+    
+    // Core regions to act as hubs
+    const regions = [
+        { id: "reg_na", label: "North America", group: 3 },
+        { id: "reg_eu", label: "Europe", group: 3 },
+        { id: "reg_me", label: "Middle East", group: 3 },
+        { id: "reg_asia", label: "Asia-Pacific", group: 3 },
+        { id: "reg_sa", label: "South America", group: 3 },
+        { id: "reg_afr", label: "Africa", group: 3 }
+    ];
+    
+    // Thematic hubs
+    const themes = [
+        { id: "theme_geo", label: "Geopolitical Tension", group: 4 },
+        { id: "theme_cyber", label: "Cyber Security", group: 4 },
+        { id: "theme_econ", label: "Global Economy", group: 4 },
+        { id: "theme_sport", label: "International Sports", group: 4 }
+    ];
+    
+    regions.forEach(r => nodes.push({ id: r.id, group: r.group, label: r.label, size: 16 }));
+    themes.forEach(t => nodes.push({ id: t.id, group: t.group, label: t.label, size: 14 }));
+    
+    // Link core to nexus
+    regions.forEach(r => links.push({ source: r.id, target: "intel_nexus", value: 2 }));
+    themes.forEach(t => links.push({ source: t.id, target: "intel_nexus", value: 1 }));
+    
+    // Cross-link some regions and themes
+    links.push({ source: "theme_geo", target: "reg_me", value: 3 });
+    links.push({ source: "theme_geo", target: "reg_eu", value: 3 });
+    links.push({ source: "theme_geo", target: "reg_asia", value: 2 });
+    links.push({ source: "theme_cyber", target: "reg_na", value: 3 });
+    links.push({ source: "theme_econ", target: "reg_na", value: 2 });
+    links.push({ source: "theme_econ", target: "reg_eu", value: 2 });
+    links.push({ source: "theme_sport", target: "reg_me", value: 1 });
+    links.push({ source: "theme_sport", target: "reg_sa", value: 1 });
+
+    // Process headlines
+    signals.forEach((sig, idx) => {
+        const id = `sig_${idx}`;
+        const isCyber = sig.toLowerCase().includes('cyber') || sig.toLowerCase().includes('hack') || sig.toLowerCase().includes('vulnerability');
+        nodes.push({ id, group: isCyber ? 1 : 2, label: sig, size: 12 });
         
-        return JSON.parse(jsonStr.trim());
-    } catch (e) {
-        console.error("OpenClaw API failed:", e.message);
-        console.log("Falling back to simulated tactical data...");
-        return {
-            "nodes": [
-                {"id": "intel_nexus", "group": 0, "label": "JerryKnows.ai - Global Nexus", "size": 20},
-                {"id": "cisa_alert", "group": 4, "label": "CISA Alert", "size": 12},
-                {"id": "threat_cyber", "group": 2, "label": "Cyber Campaign", "size": 16},
-                {"id": "loc_dc", "group": 3, "label": "Washington D.C.", "size": 14},
-                {"id": "intel_feed", "group": 1, "label": "Global News Feed", "size": 12}
-            ],
-            "links": [
-                {"source": "intel_nexus", "target": "cisa_alert", "value": 2},
-                {"source": "cisa_alert", "target": "threat_cyber", "value": 3},
-                {"source": "threat_cyber", "target": "loc_dc", "value": 4},
-                {"source": "intel_nexus", "target": "intel_feed", "value": 1}
-            ]
-        };
-    }
+        // Naive routing based on keywords
+        let routed = false;
+        if (sig.toLowerCase().match(/us|biden|trump|america|mexico/)) { links.push({ source: id, target: "reg_na", value: 1 }); routed=true; }
+        if (sig.toLowerCase().match(/europe|uk|france|germany|zelensky|ukraine|russia/)) { links.push({ source: id, target: "reg_eu", value: 1 }); routed=true; }
+        if (sig.toLowerCase().match(/israel|gaza|beirut|iran|lebanon/)) { links.push({ source: id, target: "reg_me", value: 1 }); routed=true; }
+        if (sig.toLowerCase().match(/china|xi|korea|japan|india/)) { links.push({ source: id, target: "reg_asia", value: 1 }); routed=true; }
+        if (sig.toLowerCase().match(/peru|brazil|argentina/)) { links.push({ source: id, target: "reg_sa", value: 1 }); routed=true; }
+        if (sig.toLowerCase().match(/africa|boko haram|sudan/)) { links.push({ source: id, target: "reg_afr", value: 1 }); routed=true; }
+        
+        if (sig.toLowerCase().match(/oil|market|economy|prices|trade/)) { links.push({ source: id, target: "theme_econ", value: 1 }); routed=true; }
+        if (sig.toLowerCase().match(/world cup|soccer|football|fans|match/)) { links.push({ source: id, target: "theme_sport", value: 1 }); routed=true; }
+        if (isCyber) { links.push({ source: id, target: "theme_cyber", value: 2 }); routed=true; }
+        
+        if (!routed) {
+            links.push({ source: id, target: "theme_geo", value: 1 });
+        }
+        
+        // Add some random cross-links between signals to make the web dense
+        if (idx > 0 && Math.random() > 0.6) {
+            links.push({ source: id, target: `sig_${idx - 1}`, value: 1 });
+        }
+    });
+
+    return { nodes, links };
 }
 
 async function run() {
@@ -142,8 +119,8 @@ async function run() {
     const signals = await fetchSignals();
     console.log(`   -> Found ${signals.length} signals.`);
     
-    console.log("2. Extracting Ontology...");
-    const ontology = await extractOntology(signals);
+    console.log("2. Building Procedural Ontology...");
+    const ontology = buildProceduralOntology(signals);
     
     const outPath = path.join(__dirname, '..', 'data', 'ontology.json');
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
