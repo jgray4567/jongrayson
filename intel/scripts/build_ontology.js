@@ -5,17 +5,17 @@ const https = require('https');
 // Live Intelligence Feeds
 const FEEDS = [
     "https://www.cisa.gov/uscert/ncas/alerts.xml",
-    "https://feeds.bbci.co.uk/news/world/rss.xml"
+    "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+    "https://moxie.foxnews.com/google-publisher/world.xml",
+    "https://www.aljazeera.com/xml/rss/all.xml",
+    "https://feeds.skynews.com/feeds/rss/world.xml"
 ];
 
-function fetchUrl(url) {
-    return new Promise((resolve, reject) => {
-        https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => resolve(data));
-        }).on('error', reject);
-    });
+async function fetchUrl(url) {
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+    return await res.text();
 }
 
 async function fetchSignals() {
@@ -28,7 +28,7 @@ async function fetchSignals() {
             // Extract individual items
             const items = xml.match(/<item[^>]*>([\s\S]*?)<\/item>/gi) || xml.match(/<entry[^>]*>([\s\S]*?)<\/entry>/gi) || [];
             
-            for (let i = 0; i < Math.min(items.length, 15); i++) {
+            for (let i = 0; i < Math.min(items.length, 10); i++) {
                 const itemXml = items[i];
                 
                 // Get title
