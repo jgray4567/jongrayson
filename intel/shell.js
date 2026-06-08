@@ -3603,6 +3603,13 @@ function showGraphStage() {
   
   updatePrimaryStageHeight();
   if (typeof renderOntologyGraph === 'function') renderOntologyGraph();
+  if (graphInstance) {
+      setTimeout(() => {
+          const w = graphStage.clientWidth || window.innerWidth;
+          const h = graphStage.clientHeight || (window.innerHeight * 0.6);
+          graphInstance.width(w).height(h);
+      }, 50);
+  }
 }
 
 function updatePrimaryStageHeight() {
@@ -3641,6 +3648,8 @@ function renderOntologyGraph() {
       .then(res => res.json())
       .then(gData => {
         graphInstance = ForceGraph()(container)
+          .width(container.clientWidth || window.innerWidth)
+          .height(container.clientHeight || (window.innerHeight * 0.6))
           .graphData(gData)
           .backgroundColor('#050505')
           .nodeRelSize(4)
