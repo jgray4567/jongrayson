@@ -48,6 +48,11 @@ let selectedAirRegion = null;
 let selectedAirCategory = null;
 let hoveredCityLabel = null;
 let satelliteLayerEnabled = false;
+let seaLayerEnabled = false;
+let currentVesselCatalog = [];
+let seaLayerTimer = null;
+let selectedSeaType = null;
+let selectedSeaFlag = null;
 let currentSatelliteCatalog = [];
 let satelliteLayerTimer = null;
 let selectedSatNetwork = null;
@@ -1642,7 +1647,27 @@ function openIntelDrawer(item = {}) {
   const deepEl = document.getElementById('intel-drawer-deep');
   setDrawerImage(null);
 
-  if (item.kind === 'graph-node') {
+  if (item.kind === 'sea') {
+    const v = item.raw;
+    if (titleEl) titleEl.textContent = v.name || 'Maritime Vessel';
+    if (stateEl) {
+      stateEl.textContent = 'transmitting';
+      stateEl.style.borderColor = '#0096ff';
+      stateEl.style.color = '#0096ff';
+    }
+    if (summaryEl) summaryEl.textContent = `Type: ${v.type} | Flag: ${v.flag}`;
+    
+    if (mapEl) {
+      mapEl.innerHTML = `
+        <div style="padding:16px;">
+          <div style="font-family:var(--font-mono); font-size:12px; color:#fff; margin-bottom:8px;">Speed: <span style="color:#0096ff">${v.speedKnots} kts</span></div>
+          <div style="font-family:var(--font-mono); font-size:12px; color:#fff; margin-bottom:8px;">Heading: <span style="color:#0096ff">${v.heading}°</span></div>
+          <div style="font-family:var(--font-mono); font-size:12px; color:#fff; margin-bottom:8px;">Destination: <span style="color:orange">${v.destination || 'Unknown'}</span></div>
+          <div style="font-family:var(--font-mono); font-size:12px; color:#fff;">MMSI: <span style="color:#888">${v.id}</span></div>
+        </div>
+      `;
+    }
+  } else if (item.kind === 'graph-node') {
     const node = item.node;
     if (titleEl) titleEl.textContent = node.label || 'Ontology Node';
     if (stateEl) {
@@ -2308,6 +2333,32 @@ function getAirTrafficPaths() {
       ]
     };
   });
+}
+
+async function refreshMaritimeCatalog() {
+  if (!seaLayerEnabled) {
+    currentVesselCatalog = [];
+    return;
+  }
+  try {
+    currentVesselCatalog = (await fetchJson('api/maritime-tracker.php')).items || [];
+    initOrUpdateGlobe(currentGlobeBaseItems || []);
+    updateDataPanel();
+  } catch {
+    currentVesselCatalog = [];
+  }
+}
+
+function getSeaAlpha(vessel) {
+  const baseAlpha = 1;
+  const dimmedAlpha = 0.4;
+  if (selectedSeaType) {
+    return vessel.type === selectedSeaType ? 1 : dimmedAlpha;
+  }
+  if (selectedSeaFlag) {
+    return vessel.flag === selectedSeaFlag ? 1 : dimmedAlpha;
+  }
+  return baseAlpha;
 }
 
 async function refreshSatelliteCatalog() {
@@ -3367,7 +3418,15 @@ function initOrUpdateGlobe(items = []) {
   const overlayElements = [...airElements, ...satelliteElements];
   const overlayPaths = [...airPaths, ...satellitePaths];
   const hoveredCityPoints = hoveredCityLabel ? cityPoints.filter((point) => point.shortLabel === hoveredCityLabel) : [];
-  const pointsData = [...cityPoints, ...airElements.filter(a => a.opacity > 0).map(a => ({ ...a, kind: 'air', raw: a.raw || a })), ...satelliteElements.map(s => ({ ...s, kind: 'satellite', raw: s.raw || s })), ...getThreatHotspotPoints()];
+  const seaElements = seaLayerEnabled ? currentVesselCatalog.map(v => ({
+    lat: v.lat,
+    lng: v.lng,
+    size: 0.15,
+    kind: 'sea',
+    raw: v,
+    label: v.name
+  })) : [];
+  const pointsData = [...cityPoints, ...airElements.filter(a => a.opacity > 0).map(a => ({ ...a, kind: 'air', raw: a.raw || a })), ...satelliteElements.map(s => ({ ...s, kind: 'satellite', raw: s.raw || s })), ...seaElements, ...getThreatHotspotPoints()];
 
   currentGlobePointsData = cityPoints;
 
@@ -4073,6 +4132,78 @@ function updateDataPanel() {
     }
 
     container.innerHTML = html;
+  } else if (seaLayerEnabled && currentVesselCatalog && currentVesselCatalog.length > 0) {
+    title.textContent = 'Data Target: MARITIME TRAFFIC';
+    const total = currentVesselCatalog.length;
+    let tankers = 0, cargo = 0;
+    const flags = {};
+    
+    currentVesselCatalog.forEach(v => {
+        if (v.type === 'Tanker' || v.type === 'LNG Carrier') tankers++;
+        else cargo++;
+        const f = v.flag || 'Unknown';
+        flags[f] = (flags[f] || 0) + 1;
+    });
+    
+    const topFlags = Object.entries(flags)
+        .sort((a,b) => b[1] - a[1])
+        .slice(0, 5);
+        
+    let html = `
+      <div style="display:flex; justify-content:space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div data-sea-type="all" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${!selectedSeaType ? 'rgba(0,150,255,0.15)' : 'transparent'};">
+          <div style="color:#0096ff; font-size:16px; font-weight:600;">${total}</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${!selectedSeaType ? '#fff' : ''}">Vessels Tracked</div>
+        </div>
+        <div data-sea-type="Tanker" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSeaType === 'Tanker' ? 'rgba(255,165,0,0.15)' : 'transparent'};">
+          <div style="color:orange; font-size:16px; font-weight:600;">${tankers}</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSeaType === 'Tanker' ? '#fff' : ''}">Tankers</div>
+        </div>
+        <div data-sea-type="Cargo" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSeaType === 'Cargo' ? 'rgba(0,150,255,0.15)' : 'transparent'};">
+          <div style="color:#0096ff; font-size:16px; font-weight:600;">${cargo}</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSeaType === 'Cargo' ? '#fff' : ''}">Cargo</div>
+        </div>
+      </div>
+      <div style="margin-bottom: 8px; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Vessels by Flag</div>
+    `;
+    
+    topFlags.forEach(([flag, count], i) => {
+        const isSelected = selectedSeaFlag === flag;
+        html += `
+        <div data-sea-flag="${flag}" style="cursor:pointer; display:flex; justify-content:space-between; padding: 6px 4px; font-size: 11px; background: ${isSelected ? 'rgba(0,150,255,0.15)' : 'transparent'}; border-radius: 4px; transition: background 0.2s;">
+          <span style="color:${isSelected ? '#fff' : '#ccc'}; font-weight:${isSelected ? 'bold' : 'normal'};">${i+1}. ${flag}</span>
+          <span style="color:#0096ff; font-family:var(--font-mono);">${count}</span>
+        </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    
+    if (!container.dataset.seaBound) {
+      container.addEventListener('click', (event) => {
+        const typeBtn = event.target.closest('[data-sea-type]');
+        if (typeBtn) {
+          const type = typeBtn.dataset.seaType;
+          if (type === 'all' || selectedSeaType === type) selectedSeaType = null;
+          else selectedSeaType = type;
+          selectedSeaFlag = null;
+          initOrUpdateGlobe(currentGlobeBaseItems || []);
+          updateDataPanel();
+          return;
+        }
+        const flagBtn = event.target.closest('[data-sea-flag]');
+        if (flagBtn) {
+          const flag = flagBtn.dataset.seaFlag;
+          if (selectedSeaFlag === flag) selectedSeaFlag = null;
+          else selectedSeaFlag = flag;
+          selectedSeaType = null;
+          initOrUpdateGlobe(currentGlobeBaseItems || []);
+          updateDataPanel();
+          return;
+        }
+      });
+      container.dataset.seaBound = '1';
+    }
   } else if (satelliteLayerEnabled && currentSatelliteCatalog && currentSatelliteCatalog.length > 0) {
     title.textContent = 'Data Target: SATELLITE ORBITS';
     const total = currentSatelliteCatalog.length;
