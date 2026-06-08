@@ -2384,9 +2384,20 @@ async function refreshMaritimeCatalog(zoomToRegion = false) {
   try {
     currentVesselCatalog = (await fetchJson('api/maritime-tracker.php?region=' + seaRegion)).items || [];
     if (zoomToRegion && typeof intelGlobe !== 'undefined' && intelGlobe) {
-        if (seaRegion === 'hormuz') intelGlobe.pointOfView({ lat: 26.5, lng: 56.2, altitude: 0.8 }, 2000);
-        if (seaRegion === 'mexico') intelGlobe.pointOfView({ lat: 25.0, lng: -90.0, altitude: 1.2 }, 2000);
+        const targetLat = seaRegion === 'hormuz' ? 26.5 : 25.0;
+        const targetLng = seaRegion === 'hormuz' ? 56.2 : -90.0;
+        intelGlobe.pointOfView({ lat: targetLat, lng: targetLng, altitude: 0.8 }, 2000);
         if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(false);
+        setTimeout(() => {
+            if (typeof showMapStage === 'function') {
+                showMapStage({
+                    kind: 'sea-region',
+                    lat: targetLat,
+                    lng: targetLng,
+                    locationName: seaRegion === 'hormuz' ? 'Strait of Hormuz' : 'Gulf of Mexico'
+                });
+            }
+        }, 2200);
     }
     initOrUpdateGlobe(currentGlobeBaseItems || []);
     updateDataPanel();
@@ -3291,13 +3302,18 @@ function renderCityCrimeMap(item = {}) {
   const mapStage = document.getElementById('intel-map-stage');
   if (!mapStage || typeof item.lat !== 'number' || typeof item.lng !== 'number') return;
 
-  const crimeScan = cityCrimeScans[item.locationName] || {
+  const isSeaRegion = item.kind === 'sea-region';
+  const crimeScan = isSeaRegion ? {
+    center: [item.lat, item.lng],
+    zoom: 6,
+    points: []
+  } : (cityCrimeScans[item.locationName] || {
     center: [item.lat, item.lng],
     zoom: 12,
     incidents: 0,
     hotspots: 0,
     points: [{ lat: item.lat, lng: item.lng, intensity: 0.35, zone: item.locationName || 'Unknown zone', totals: { activity: 0 } }]
-  };
+  });
 
   if (typeof L === 'undefined') {
   if (mapStage) mapStage.innerHTML = `<iframe title="${item.locationName || item.action || 'Location'} map view" src="${buildMapEmbedUrl(item.lat, item.lng)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
@@ -3323,6 +3339,30 @@ function renderCityCrimeMap(item = {}) {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19
   }).addTo(cityMapInstance);
+
+  if (isSeaRegion && typeof currentVesselCatalog !== 'undefined') {
+      currentVesselCatalog.forEach(v => {
+          const isTanker = v.type === 'Tanker' || v.type === 'LNG Carrier';
+          const dotColor = isTanker ? '#FFA500' : '#0096ff';
+          const marker = L.circleMarker([v.lat, v.lng], {
+              radius: 6,
+              fillColor: dotColor,
+              color: '#fff',
+              weight: 1,
+              opacity: 0.8,
+              fillOpacity: 0.8
+          }).addTo(cityMapInstance);
+          
+          marker.bindTooltip(`<b>${v.name}</b><br>${v.type} | ${v.speedKnots} kts`);
+          
+          marker.on('click', (e) => {
+             L.DomEvent.stopPropagation(e);
+             if (typeof openIntelDrawer === 'function') {
+                 openIntelDrawer({ kind: 'sea', raw: v });
+             }
+          });
+      });
+  }
 
   /*
   if (L.heatLayer) {
