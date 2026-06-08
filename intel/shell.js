@@ -1627,12 +1627,36 @@ function closeIntelDrawer() {
   }
 }
 
+
+function getSeaFlagCode(country) {
+    const map = {
+        'USA': 'us',
+        'Panama': 'pa',
+        'Liberia': 'lr',
+        'Marshall Islands': 'mh',
+        'Hong Kong': 'hk',
+        'Singapore': 'sg',
+        'Malta': 'mt',
+        'Bahamas': 'bs',
+        'Saudi Arabia': 'sa',
+        'Iran': 'ir',
+        'UAE': 'ae',
+        'Mexico': 'mx'
+    };
+    return map[country] || null;
+}
+
 function openIntelDrawer(item = {}) {
   const drawer = document.getElementById('intel-activation-panel');
   if (!drawer) return;
 
   const airlineLogoEl = document.getElementById('intel-drawer-airline-logo');
-  if (airlineLogoEl) { airlineLogoEl.style.display = 'none'; airlineLogoEl.src = ''; }
+  if (airlineLogoEl) { 
+      airlineLogoEl.style.display = 'none'; 
+      airlineLogoEl.src = ''; 
+      airlineLogoEl.style.borderRadius = '0';
+      airlineLogoEl.style.border = 'none';
+  }
 
   const state = item.recoveryTrustDriverTransitionBalanceStructuralState || 'neutral';
   const title = item.locationName || item.action || item.name || 'Activated point';
@@ -1657,6 +1681,16 @@ function openIntelDrawer(item = {}) {
       stateEl.style.color = '#0096ff';
     }
     if (summaryEl) summaryEl.textContent = `Type: ${v.type} | Flag: ${v.flag}`;
+    
+    if (airlineLogoEl && v.flag) {
+        const code = getSeaFlagCode(v.flag);
+        if (code) {
+            airlineLogoEl.src = `https://flagcdn.com/w160/${code}.png`;
+            airlineLogoEl.style.display = 'block';
+            airlineLogoEl.style.borderRadius = '3px';
+            airlineLogoEl.style.border = '1px solid rgba(255,255,255,0.1)';
+        }
+    }
     
     if (mapEl) {
       mapEl.innerHTML = `
