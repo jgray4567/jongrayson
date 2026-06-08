@@ -3647,7 +3647,7 @@ function renderOntologyGraph() {
   
   if (!graphInstance) {
     console.log("Intel Graph: Fetching ontology.json...");
-    fetch('data/ontology.json')
+    fetch('data/ontology.json?v=' + Date.now())
       .then(res => {
         if (!res.ok) throw new Error("Network response was not ok: " + res.status);
         return res.json();
