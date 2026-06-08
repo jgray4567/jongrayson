@@ -57,6 +57,13 @@ A1A is an AI-powered real estate automation platform. Eliminates manual work, au
 - `terms.html` — Terms of service
 - `css/`, `js/`, `images/` — Assets including `a1a-logo.png`
 
+## Local Assets
+- **Google Drive backup:** `clients/A1A/google-drive/A1A/` (92 files, 18MB)
+- **Website source:** `a1a-website/` subfolder with full HTML/CSS/JS/images
+- **Figma assets:** `NEW Items/FIGMA Assets/` with React/TSX components + Supabase backend
+- **Screenshots:** `Screenshots/` with 5 UI reference screenshots
+- **Key docs:** 30+ .docx/.pdf spec and design documents
+
 ## Deployment
 - Push to `jgray4567/exita1a-landing` → auto-deploys to a1a.com via GitHub Pages
 - Push to `jgray4567/a1asells` → auto-deploys to a1asells.com via GitHub Pages
