@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JK Command</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -657,6 +658,9 @@ function renderKarpathy(filter=''){
 }
 
 function renderCron(){
+  if(!CRON_JOBS.length){
+    document.getElementById('cron-body').innerHTML='<tr><td colspan="5" style="color:var(--muted);padding:20px;font-family:var(--font-mono);font-size:0.8rem">No cron jobs loaded</td></tr>';return;
+  }
   document.getElementById('cron-body').innerHTML=CRON_JOBS.map(j=>`
     <tr>
       <td style="color:var(--text)">${j.name}</td>
@@ -699,6 +703,8 @@ document.querySelectorAll('.command-pill').forEach(btn=>{
       }
     }
     if(tab==='memory')renderMemoryTopics();
+    if(tab==='karpathy')renderKarpathy(document.getElementById('karpathy-search')?.value||'');
+    if(tab==='cron')renderCron();
   });
 });
 
