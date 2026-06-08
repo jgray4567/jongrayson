@@ -192,6 +192,13 @@ body {
 }
 .command-input:focus { border-color: var(--lime); }
 .command-input::placeholder { color: var(--muted); }
+.priority-btn { background: var(--panel-2); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 6px 12px; font-family: var(--font-mono); font-size: 0.72rem; cursor: pointer; transition: all 0.15s ease; white-space: nowrap; }
+.priority-btn:hover { border-color: var(--lime); color: var(--text); }
+.priority-btn.active { background: rgba(0,229,255,0.12); color: var(--lime); border-color: var(--lime); box-shadow: 0 0 8px rgba(0,229,255,0.2); }
+.star-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; padding: 0 4px; transition: all 0.15s ease; vertical-align: middle; }
+.star-btn:hover { color: var(--warn); }
+.star-btn.starred { color: var(--warn); text-shadow: 0 0 6px rgba(255,200,0,0.4); }
+.priority-card { border-color: rgba(255,200,0,0.3) !important; box-shadow: 0 0 12px rgba(255,200,0,0.08) !important; }
 
 /* Modal */
 .modal-overlay {
@@ -360,8 +367,9 @@ body {
 
     <!-- PROJECTS -->
     <div class="tab-content" id="tab-projects">
-      <div class="command-bar" style="margin-bottom:18px">
-        <input type="text" class="command-input" id="project-search" placeholder="Search projects...">
+      <div class="command-bar" style="margin-bottom:18px;display:flex;gap:8px;align-items:center">
+        <input type="text" class="command-input" id="project-search" placeholder="Search projects..." style="flex:1">
+        <button id="priority-toggle" class="priority-btn" title="Show priority projects first" onclick="togglePriority()">⚡ Priority</button>
       </div>
       <div class="stage-grid stage-grid-2" id="all-projects"></div>
     </div>
@@ -600,14 +608,42 @@ function renderStats(){
 }
 
 function renderActiveProjects(){
-  document.getElementById('active-projects').innerHTML=PROJECTS.filter(p=>p.tag==='active'||p.tag==='dev').slice(0,8).map(p=>projectCard(p)).join('');
+  const stars=getStars();
+  let active=PROJECTS.filter(p=>p.tag==='active'||p.tag==='dev').slice(0,8);
+  const prioOn=document.getElementById('priority-toggle')?.classList.contains('active');
+  if(prioOn){
+    active=active.sort((a,b)=>{
+      const aS=stars.includes(a.id)?0:1;
+      const bS=stars.includes(b.id)?0:1;
+      return aS-bS;
+    });
+  }
+  document.getElementById('active-projects').innerHTML=active.map(p=>projectCard(p,stars.includes(p.id))).join('');
   bindProjectCards();
 }
 
-function projectCard(p){
+// Priority/star system — localStorage-persisted
+function getStars(){try{return JSON.parse(localStorage.getItem('jk_priority_projects')||'[]')}catch{return[]}}
+function saveStars(s){localStorage.setItem('jk_priority_projects',JSON.stringify(s))}
+function toggleStar(id){
+  const stars=getStars();
+  const idx=stars.indexOf(id);
+  if(idx>=0)stars.splice(idx,1);else stars.push(id);
+  saveStars(stars);
+  renderActiveProjects();renderAllProjects(document.getElementById('project-search')?.value||'');
+}
+function togglePriority(){
+  const btn=document.getElementById('priority-toggle');
+  btn.classList.toggle('active');
+  const on=btn.classList.contains('active');
+  localStorage.setItem('jk_priority_on',on?'1':'0');
+  renderActiveProjects();renderAllProjects(document.getElementById('project-search')?.value||'');
+}
+
+function projectCard(p,isStarred){
   const urlRow=p.url?`<div class="detail-row"><span class="detail-label">URL</span><span class="detail-value"><a href="${p.url}" target="_blank" style="color:var(--lime);font-family:var(--font-mono);font-size:.72rem;text-decoration:none">${p.url.replace('https://','')}</a></span></div>`:'';
-  return `<div class="stage-card" data-project="${p.id}" tabindex="0" role="button" aria-label="Expand ${p.name}">
-    <h3>${p.name} <span class="intel-state-chip ${chipClass(p.tag)}" style="font-size:0.58rem;margin-left:4px">${p.tag.toUpperCase()}</span>${p.url?`<a href="${p.url}" target="_blank" style="color:var(--lime);font-size:.7rem;margin-left:6px;font-family:var(--font-mono)" onclick="event.stopPropagation()">↗</a>`:''}<span class="expand-hint">tap to expand</span></h3>
+  return `<div class="stage-card${isStarred?' priority-card':''}" data-project="${p.id}" tabindex="0" role="button" aria-label="Expand ${p.name}">
+    <h3><button class="star-btn${isStarred?' starred':''}" data-star="${p.id}" onclick="event.stopPropagation();toggleStar('${p.id}')" title="${isStarred?'Remove from priority':'Add to priority'}">${isStarred?'★':'☆'}</button> ${p.name} <span class="intel-state-chip ${chipClass(p.tag)}" style="font-size:0.58rem;margin-left:4px">${p.tag.toUpperCase()}</span>${p.url?`<a href="${p.url}" target="_blank" style="color:var(--lime);font-size:.7rem;margin-left:6px;font-family:var(--font-mono)" onclick="event.stopPropagation()">↗</a>`:''}<span class="expand-hint">tap to expand</span></h3>
     <p>${p.desc}</p>
     <div class="card-expand">
       <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${p.tag==='active'?'🟢 Active':p.tag==='dev'?'🟡 In Development':'⏸ Archived'}</span></div>
@@ -620,12 +656,21 @@ function projectCard(p){
 
 function renderAllProjects(filter=''){
   const f=filter.toLowerCase();
-  const filtered=PROJECTS.filter(p=>!f||p.name.toLowerCase().includes(f)||p.desc.toLowerCase().includes(f)||p.tag.includes(f));
+  let filtered=PROJECTS.filter(p=>!f||p.name.toLowerCase().includes(f)||p.desc.toLowerCase().includes(f)||p.tag.includes(f));
   console.log('[JK] renderAllProjects:',filtered.length,'of',PROJECTS.length,'projects');
   if(!filtered.length){
     document.getElementById('all-projects').innerHTML='<div style="color:var(--muted);padding:20px;font-family:var(--font-mono);font-size:0.8rem">No projects found</div>';return;
   }
-  document.getElementById('all-projects').innerHTML=filtered.map(p=>projectCard(p)).join('');
+  const stars=getStars();
+  const prioOn=document.getElementById('priority-toggle')?.classList.contains('active');
+  if(prioOn){
+    filtered=filtered.sort((a,b)=>{
+      const aS=stars.includes(a.id)?0:1;
+      const bS=stars.includes(b.id)?0:1;
+      return aS-bS;
+    });
+  }
+  document.getElementById('all-projects').innerHTML=filtered.map(p=>projectCard(p,stars.includes(p.id))).join('');
 }
 
 let RAW_COUNT=0;
@@ -758,12 +803,16 @@ async function boot(){
     return;
   }
   renderStats();renderActiveProjects();renderAllProjects();renderMemoryTopics();renderKarpathy();renderCron();renderRecentActivity();
+  // Restore priority toggle state
+  if(localStorage.getItem('jk_priority_on')==='1'){document.getElementById('priority-toggle').classList.add('active');}
   updateRefreshBadge();
   // Auto-refresh every 5 minutes
   setInterval(async()=>{
     const r=await fetchAllData();
     RAW_COUNT=r.rawCount||0;
     renderStats();renderActiveProjects();renderAllProjects();renderMemoryTopics();renderKarpathy();renderCron();
+    // Restore priority toggle state after data loads
+    if(localStorage.getItem('jk_priority_on')==='1'){document.getElementById('priority-toggle').classList.add('active');}
     updateRefreshBadge();
   },300000);
   // Update refresh badge every minute
