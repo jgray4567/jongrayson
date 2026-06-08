@@ -3445,11 +3445,18 @@ function initOrUpdateGlobe(items = []) {
           return el;
         }
         const satOrbitClass = item.raw?.orbitClass || 'LEO';
-        const satDotColor = satOrbitClass === 'LEO' ? '0,229,100' : satOrbitClass === 'GEO' ? '255,60,60' : '0,229,255';
+        let satDotColor = satOrbitClass === 'LEO' ? '0,229,100' : satOrbitClass === 'GEO' ? '255,60,60' : '0,229,255';
+        
+        const opacity = getSatAlpha(item.raw || {});
+        
+        // If a specific network or orbit is selected and this satellite is selected (opacity == 1), turn it white
+        if ((selectedSatOrbit || selectedSatNetwork) && opacity === 1) {
+            satDotColor = '255,255,255';
+        }
+
         el.style.width = '10px';
         el.style.height = '10px';
         el.style.borderRadius = '999px';
-        const opacity = getSatAlpha(item.raw || {});
         el.style.opacity = String(opacity);
         el.style.background = `rgba(${satDotColor},0.98)`;
         el.style.boxShadow = `0 0 10px rgba(${satDotColor},0.68)`;
