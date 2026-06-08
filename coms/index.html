@@ -491,8 +491,8 @@ const KARPATHY = {
 };
 
 const CRON_JOBS = [
-  {name:"Memory Dream Sequence",schedule:"Mon 9:00 AM ET",model:"brainwave/auto",next:"Mondays",status:"active"},
-  {name:"Karpathy New Repo Check",schedule:"Daily 8:00 AM ET",model:"glm-5.1:cloud → brainwave → sonnet",next:"Tomorrow 8AM",status:"active"},
+  {name:"Memory Dream Sequence",schedule:"Mon 9:00 AM ET",model:"glm-5.1:cloud",next:"Mondays",status:"active"},
+  {name:"Karpathy New Repo Check",schedule:"Daily 8:00 AM ET",model:"glm-5.1:cloud",next:"Tomorrow 8AM",status:"active"},
 ];
 
 const WIKI_FILES = [
@@ -534,6 +534,7 @@ function renderStats(){
 
 function renderActiveProjects(){
   document.getElementById('active-projects').innerHTML=PROJECTS.filter(p=>p.tag==='active'||p.tag==='dev').slice(0,8).map(p=>projectCard(p)).join('');
+  bindProjectCards();
 }
 
 function projectCard(p){
@@ -552,7 +553,6 @@ function renderAllProjects(filter=''){
   const f=filter.toLowerCase();
   const filtered=PROJECTS.filter(p=>!f||p.name.toLowerCase().includes(f)||p.desc.toLowerCase().includes(f)||p.tag.includes(f));
   document.getElementById('all-projects').innerHTML=filtered.map(p=>projectCard(p)).join('');
-  bindProjectCards();
 }
 
 function renderMemoryTopics(){
@@ -652,7 +652,7 @@ function updateClock(){
 setInterval(updateClock,1000);updateClock();
 
 // ─── INIT ───────────────────────────────────────────────────────────
-renderStats();renderActiveProjects();renderAllProjects();renderMemoryTopics();renderKarpathy();renderCron();renderRecentActivity();bindProjectCards();
+renderStats();renderActiveProjects();renderAllProjects();renderMemoryTopics();renderKarpathy();renderCron();renderRecentActivity();
 
 // ─── MODAL ─────────────────────────────────────────────────────────
 const MEMORY_GH='https://raw.githubusercontent.com/jgray4567/jongrayson/main/memory/';
@@ -678,27 +678,28 @@ document.getElementById('modal-close').addEventListener('click',closeModal);
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
-// Expand project cards on click
-function bindProjectCards(){
-  document.querySelectorAll('.stage-card[data-project]').forEach(card=>{
-    card.addEventListener('click',e=>{
-      // If clicking a mem-link inside expanded card, open modal instead
-      if(e.target.closest('.mem-link')){
-        const ml=e.target.closest('.mem-link');
-        const name=ml.dataset.name;
-        const proj=PROJECTS.find(p=>p.file===name);
-        openModal(proj?proj.name:name,'projects/'+name);
-        return;
-      }
-      // Toggle expand
-      const wasExpanded=card.classList.contains('expanded');
-      // Collapse all others in same container
-      card.parentElement.querySelectorAll('.stage-card.expanded').forEach(c=>{if(c!==card)c.classList.remove('expanded')});
-      card.classList.toggle('expanded');
-    });
-    card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();card.click()}});
-  });
-}
+// Expand project cards on click (uses event delegation so no duplicate listeners)
+document.addEventListener('click',e=>{
+  const memLink=e.target.closest('.mem-link');
+  if(memLink){
+    const name=memLink.dataset.name;
+    const proj=PROJECTS.find(p=>p.file===name);
+    openModal(proj?proj.name:name,'projects/'+name);
+    return;
+  }
+  const card=e.target.closest('.stage-card[data-project]');
+  if(card){
+    card.parentElement.querySelectorAll('.stage-card.expanded').forEach(c=>{if(c!==card)c.classList.remove('expanded')});
+    card.classList.toggle('expanded');
+    return;
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key===' '){
+    const card=document.activeElement?.closest('.stage-card[data-project]');
+    if(card){e.preventDefault();card.click();}
+  }
+});
 
 document.addEventListener('click',e=>{
   const row=e.target.closest('.mem-clickable');if(!row)return;
