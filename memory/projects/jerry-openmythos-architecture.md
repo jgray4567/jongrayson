@@ -1,10 +1,26 @@
-# Jerry + OpenMythos: Production Architecture for Table & Tine
+# OpenMythos — Adaptive Inference Architecture
 
 **Category:** AI
+**Status:** Active
+**Applies to:** Table & Tine, JerryKnows AI, InspectAI, any project needing efficient local inference
 
 ## Overview
 
-Jerry is Table & Tine's AI inference server, running on Jon's Mac Studio M4 Max (128GB RAM, 2TB SSD). It uses the OpenMythos Recurrent-Depth Transformer architecture to serve recipe extraction, dietary reasoning, and content moderation with variable compute per request.
+OpenMythos is a **general-purpose Adaptive Inference architecture** using Recurrent-Depth Transformers (RDT) with Mixture-of-Experts (MoE). Originally designed for Table & Tine's recipe extraction, it's now the standard inference pattern for any project that needs efficient, variable-depth AI on local hardware.
+
+**The core idea:** One model, variable depth, adaptive compute, zero marginal cost. Easy tasks exit early. Hard tasks get more loops. No need to run multiple models.
+
+### Cross-Project Use Cases
+
+| Project | Use Case | Loop Depth | Latency Target |
+|---|---|---|---|
+| **Table & Tine** | Recipe URL extraction | 2-4 | <2s |
+| **Table & Tine** | Complex dietary adaptation | 8-16 | <5s |
+| **Table & Tine** | Content moderation | 4-8 | <3s |
+| **JerryKnows AI** | Chat/reasoning (general) | 4-8 | <3s |
+| **InspectAI** | Property analysis | 2-4 | <2s |
+| **BogleAI** | Market data extraction | 2-4 | <2s |
+| **Any project** | Classification/routing | 1-2 | <500ms |
 
 ---
 
@@ -219,9 +235,9 @@ The beauty of MoE + looped inference: you scale by adjusting loop counts, not by
 
 1. **Get the Mac Studio** — M4 Max, 128GB, 2TB
 2. **Install MLX + OpenMythos** — Set up the inference runtime
-3. **Fine-tune Mythos-3B** on recipe extraction data
+3. **Fine-tune Mythos-3B** on domain-specific data (recipes, property analysis, financial data)
 4. **Deploy Jerry API** — Swift/NIO or Node.js API layer
-5. **Connect Table & Tine** — Update RecipeExtractionService.swift to point at Jerry
+5. **Connect projects** — Table & Tine, JerryKnows AI, InspectAI, BogleAI
 6. **Test with real traffic** — Start with 10 beta users, measure latency
 7. **Add failover** — Hetzner VPS + cloud API backup
 
