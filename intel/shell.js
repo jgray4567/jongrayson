@@ -1595,6 +1595,12 @@ function setDiagnosticsVisible(visible) {
     if (card) card.classList.toggle('diagnostic-hidden', !visible);
   });
 
+  const modalOverlay = document.getElementById('diagnostics-modal-overlay');
+  if (modalOverlay) {
+    modalOverlay.style.display = visible ? 'flex' : 'none';
+    document.body.style.overflow = visible ? 'hidden' : '';
+  }
+
   const toggleButton = document.getElementById('toggle-diagnostics');
   if (toggleButton) toggleButton.textContent = visible ? 'Hide diagnostics' : 'Show diagnostics';
 }
@@ -2432,6 +2438,12 @@ function initializeCommandSurface() {
   if (toggleButton && !toggleButton.dataset.bound) {
     toggleButton.addEventListener('click', () => setDiagnosticsVisible(!diagnosticsVisible));
     toggleButton.dataset.bound = '1';
+  }
+  
+  const closeModalBtn = document.getElementById('close-diagnostics-modal');
+  if (closeModalBtn && !closeModalBtn.dataset.bound) {
+    closeModalBtn.addEventListener('click', () => setDiagnosticsVisible(false));
+    closeModalBtn.dataset.bound = '1';
   }
 
   const closeButton = document.getElementById('intel-drawer-close');
