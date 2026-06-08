@@ -1640,6 +1640,49 @@ function openIntelDrawer(item = {}) {
   const deepEl = document.getElementById('intel-drawer-deep');
   setDrawerImage(null);
 
+  if (item.kind === 'graph-node') {
+    const node = item.node;
+    if (titleEl) titleEl.textContent = node.label || 'Ontology Node';
+    if (stateEl) {
+      stateEl.textContent = 'linked';
+      stateEl.style.borderColor = '#00e5ff';
+      stateEl.style.color = '#00e5ff';
+    }
+    if (summaryEl) summaryEl.textContent = `Graph Entity (Group ${node.group})`;
+    setDrawerImage(null);
+    
+    if (mapEl) {
+      mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Node is currently focused on the Link Graph canvas.</div>`;
+    }
+    
+    if (metricsEl) {
+      let relHtml = '';
+      if (item.related && item.related.length > 0) {
+        relHtml = item.related.map(r => `
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:6px;">
+            <div style="color:#fff; flex-grow:1; word-break:break-word; padding-right:12px;">${r.label || r.id}</div>
+            <div style="color:var(--lime); text-transform:uppercase; font-size:9px; letter-spacing:0.05em; background:rgba(210,255,84,0.1); padding:2px 4px; border-radius:3px;">LINKED</div>
+          </div>
+        `).join('');
+      } else {
+        relHtml = '<div class="muted">No direct links found.</div>';
+      }
+      
+      metricsEl.innerHTML = `
+        <div style="font-family:var(--font-mono); text-transform:uppercase; font-size:10px; color:var(--lime); margin-bottom:12px; letter-spacing:0.05em; border-bottom:1px solid var(--border); padding-bottom:6px;">Direct Relationships</div>
+        ${relHtml}
+      `;
+    }
+    
+    if (deepEl) deepEl.innerHTML = '';
+    if (selectedQuery) selectedQuery.textContent = node.label || 'Entity Node';
+    if (selectedMeta) selectedMeta.textContent = `${item.related?.length || 0} connections established`;
+    
+    drawer.classList.add('visible');
+    drawer.setAttribute('aria-hidden', 'false');
+    return;
+  }
+
   if (item.kind === 'air') {
     const aircraftTitle = item.callsign || 'Tracked aircraft';
     if (titleEl) titleEl.textContent = aircraftTitle;
@@ -3677,6 +3720,23 @@ function renderOntologyGraph() {
           .onNodeClick(node => {
             graphInstance.centerAt(node.x, node.y, 1000);
             graphInstance.zoom(2, 2000);
+            
+            const { nodes, links } = graphInstance.graphData();
+            const relatedLinks = links.filter(l => (l.source.id === node.id || l.source === node.id) || (l.target.id === node.id || l.target === node.id));
+            const relatedNodes = relatedLinks.map(l => {
+                const sId = l.source.id || l.source;
+                const tId = l.target.id || l.target;
+                const otherId = sId === node.id ? tId : sId;
+                return nodes.find(n => n.id === otherId) || { id: otherId };
+            });
+            
+            if (typeof openIntelDrawer === 'function') {
+                openIntelDrawer({
+                    kind: 'graph-node',
+                    node: node,
+                    related: relatedNodes
+                });
+            }
           });
           
         graphInstance.d3Force('charge').strength(-200);
