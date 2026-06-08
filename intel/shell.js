@@ -4031,7 +4031,55 @@ function updateDataPanel() {
     container.innerHTML = html;
   } else if (satelliteLayerEnabled && currentSatelliteCatalog && currentSatelliteCatalog.length > 0) {
     title.textContent = 'Data Target: SATELLITE ORBITS';
-    container.innerHTML = `<div style="color:var(--cyan); font-size:14px; margin-bottom:8px;">${currentSatelliteCatalog.length} Objects Tracked</div><div class="muted">Active satellite mapping engaged. Select an object for details.</div>`;
+    const total = currentSatelliteCatalog.length;
+    let leo = 0, meo = 0, geo = 0;
+    const networks = {};
+    
+    currentSatelliteCatalog.forEach(sat => {
+        if (sat.orbitClass === 'LEO') leo++;
+        else if (sat.orbitClass === 'GEO') geo++;
+        else meo++;
+        
+        const net = sat.network || 'Unknown';
+        networks[net] = (networks[net] || 0) + 1;
+    });
+    
+    const topNetworks = Object.entries(networks)
+        .sort((a,b) => b[1] - a[1])
+        .slice(0, 10);
+        
+    let html = `
+      <div style="display:flex; justify-content:space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div style="padding: 4px 6px; border-radius: 4px;">
+          <div style="color:var(--cyan); font-size:16px; font-weight:600;">${total}</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase;">Tracked Total</div>
+        </div>
+        <div style="padding: 4px 6px; border-radius: 4px;">
+          <div style="color:#00e564; font-size:16px; font-weight:600;">${leo}</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase;">LEO</div>
+        </div>
+        <div style="padding: 4px 6px; border-radius: 4px;">
+          <div style="color:#00e5ff; font-size:16px; font-weight:600;">${meo}</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase;">MEO</div>
+        </div>
+        <div style="padding: 4px 6px; border-radius: 4px;">
+          <div style="color:#ff3c3c; font-size:16px; font-weight:600;">${geo}</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase;">GEO</div>
+        </div>
+      </div>
+      <div style="margin-bottom: 8px; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Top Constellations</div>
+    `;
+    
+    topNetworks.forEach(([net, count], i) => {
+        html += `
+        <div style="display:flex; justify-content:space-between; padding: 6px 4px; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <span style="color:#ccc;">${i+1}. ${net}</span>
+          <span style="color:var(--cyan); font-family:var(--font-mono);">${count}</span>
+        </div>
+        `;
+    });
+    
+    container.innerHTML = html;
   } else {
     title.textContent = 'Data Target: GLOBAL ZONES';
     let html = '';
