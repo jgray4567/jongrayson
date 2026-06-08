@@ -45,6 +45,7 @@ let currentAirTrafficItems = [];
 const flightDetailCache = new Map();
 let selectedAirIcao24 = null;
 let selectedAirRegion = null;
+let selectedAirCategory = null;
 let hoveredCityLabel = null;
 let satelliteLayerEnabled = false;
 let currentSatelliteCatalog = [];
@@ -2177,6 +2178,29 @@ function buildPlaneSvg(heading = 0, isSelected = false) {
   `;
 }
 
+
+function getFlightAlpha(flight, isPath = false) {
+  const baseAlpha = isPath ? 0.6 : 1;
+  const selectedAlpha = isPath ? 0.8 : 1;
+  const dimmedAlpha = isPath ? 0.2 : 0.5;
+
+  if (selectedAirRegion && flight.country !== selectedAirRegion) {
+    return 0;
+  }
+
+  if (selectedAirIcao24) {
+    return flight.icao24 === selectedAirIcao24 ? selectedAlpha : dimmedAlpha;
+  }
+
+  if (selectedAirCategory) {
+    const isCommercial = flight.callsign && /^[A-Z]{3}[A-Z0-9]{1,5}$/i.test(flight.callsign.trim());
+    const matchesCat = selectedAirCategory === 'commercial' ? isCommercial : !isCommercial;
+    return matchesCat ? baseAlpha : dimmedAlpha;
+  }
+
+  return baseAlpha;
+}
+
 function getAirTrafficGlobeElements() {
   if (!airLayerEnabled) return [];
   return currentAirTrafficItems.map((flight) => ({
@@ -2185,7 +2209,7 @@ function getAirTrafficGlobeElements() {
     lng: flight.lng,
     altitude: getAircraftAltitudeRatio(flight.altitude || 0),
     heading: flight.heading || 0,
-    opacity: selectedAirRegion ? (flight.country === selectedAirRegion ? (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 1 : 0.5) : 1) : 0) : (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 1 : 0.5) : 1),
+    opacity: getFlightAlpha(flight, false),
     label: `${flight.callsign || 'Unknown'} · ${flight.country || 'In flight'}`,
     raw: {
       ...flight,
@@ -2200,7 +2224,7 @@ function getAirTrafficPaths() {
     const distanceKm = Math.max(80, Math.min(260, ((flight.velocity || 220) * 900) / 1000));
     const forwardPoint = projectPointFromBearing(flight.lat, flight.lng, flight.heading || 0, distanceKm * 0.55);
     const trailingPoint = projectPointFromBearing(flight.lat, flight.lng, (flight.heading || 0) + 180, distanceKm * 0.45);
-    const alpha = selectedAirRegion ? (flight.country === selectedAirRegion ? (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 0.8 : 0.2) : 0.6) : 0) : (selectedAirIcao24 ? (selectedAirIcao24 === flight.icao24 ? 0.8 : 0.2) : 0.6);
+    const alpha = getFlightAlpha(flight, true);
     const altitude = getAircraftAltitudeRatio(flight.altitude || 0);
     return {
       color: `rgba(210,255,84,${alpha})`,
@@ -2357,6 +2381,21 @@ function initializeCommandSurface() {
   const triageContainer = document.getElementById('intel-live-triage');
   if (triageContainer && !triageContainer.dataset.boundClicks) {
     triageContainer.addEventListener('click', (event) => {
+      const catBtn = event.target.closest('[data-air-category]');
+      if (catBtn) {
+        const cat = catBtn.dataset.airCategory;
+        if (cat === 'all') {
+          selectedAirCategory = null;
+        } else if (selectedAirCategory === cat) {
+          selectedAirCategory = null;
+        } else {
+          selectedAirCategory = cat;
+        }
+        if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems || []);
+        if (typeof updateDataPanel === "function") updateDataPanel();
+        return;
+      }
+
       const regionBtn = event.target.closest('[data-air-region]');
       if (regionBtn) {
         const region = regionBtn.dataset.airRegion;
@@ -3698,17 +3737,17 @@ function updateDataPanel() {
 
     let html = `
       <div style="display:flex; justify-content:space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-        <div>
+        <div data-air-category="all" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${!selectedAirCategory ? 'rgba(210,255,84,0.15)' : 'transparent'};">
           <div style="color:var(--lime); font-size:16px; font-weight:600;">${total}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase;">Airborne Total</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${!selectedAirCategory ? '#fff' : ''}">Airborne Total</div>
         </div>
-        <div>
+        <div data-air-category="commercial" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedAirCategory === 'commercial' ? 'rgba(210,255,84,0.15)' : 'transparent'};">
           <div style="color:#fff; font-size:16px; font-weight:600;">${commercial}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase;">Commercial</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedAirCategory === 'commercial' ? '#fff' : ''}">Commercial</div>
         </div>
-        <div>
+        <div data-air-category="private" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedAirCategory === 'private' ? 'rgba(210,255,84,0.15)' : 'transparent'};">
           <div style="color:#ffb878; font-size:16px; font-weight:600;">${privateMil}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase;">Private/Military</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedAirCategory === 'private' ? '#fff' : ''}">Private/Military</div>
         </div>
       </div>
       <div style="margin-bottom: 8px; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Top 5 Regions of Origin</div>
