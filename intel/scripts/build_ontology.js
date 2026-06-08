@@ -24,13 +24,37 @@ async function fetchSignals() {
         try {
             console.log(`Fetching ${url}...`);
             const xml = await fetchUrl(url);
-            const titleMatches = xml.match(/<title[^>]*>([\s\S]*?)<\/title>/gi) || [];
             
-            for (let i = 1; i < Math.min(titleMatches.length, 15); i++) {
-                let text = titleMatches[i].replace(/<\/?title[^>]*>/gi, '').trim();
-                text = text.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1'); 
+            // Extract individual items
+            const items = xml.match(/<item[^>]*>([\s\S]*?)<\/item>/gi) || xml.match(/<entry[^>]*>([\s\S]*?)<\/entry>/gi) || [];
+            
+            for (let i = 0; i < Math.min(items.length, 15); i++) {
+                const itemXml = items[i];
+                
+                // Get title
+                let titleMatch = itemXml.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+                if (!titleMatch) continue;
+                let text = titleMatch[1].trim();
+                text = text.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1');
+                
+                // Get link
+                let linkMatch = itemXml.match(/<link[^>]*>([\s\S]*?)<\/link>/i) || itemXml.match(/<link[^>]*href="([^"]+)"/i);
+                let linkUrl = '';
+                if (linkMatch) {
+                    linkUrl = (linkMatch[1] || '').trim();
+                    linkUrl = linkUrl.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1');
+                }
+                
+                // Get image/thumbnail
+                let imgMatch = itemXml.match(/<media:thumbnail[^>]*url="([^"]+)"/i) || itemXml.match(/<enclosure[^>]*url="([^"]+)"/i);
+                let imgUrl = imgMatch ? imgMatch[1] : '';
+                
                 if (text && !text.includes('BBC News - World') && !text.includes('National Cyber Awareness System')) {
-                    signals.push(text);
+                    signals.push({
+                        title: text,
+                        url: linkUrl,
+                        image: imgUrl
+                    });
                 }
             }
         } catch (e) {
@@ -83,10 +107,19 @@ function buildProceduralOntology(signals) {
     links.push({ source: "theme_sport", target: "reg_sa", value: 1 });
 
     // Process headlines
-    signals.forEach((sig, idx) => {
+    signals.forEach((sigObj, idx) => {
+        const sig = sigObj.title;
         const id = `sig_${idx}`;
         const isCyber = sig.toLowerCase().includes('cyber') || sig.toLowerCase().includes('hack') || sig.toLowerCase().includes('vulnerability');
-        nodes.push({ id, group: isCyber ? 1 : 2, label: sig, size: 12 });
+        
+        nodes.push({ 
+            id, 
+            group: isCyber ? 1 : 2, 
+            label: sig, 
+            size: 12,
+            url: sigObj.url,
+            image: sigObj.image
+        });
         
         // Naive routing based on keywords
         let routed = false;
@@ -113,7 +146,6 @@ function buildProceduralOntology(signals) {
 
     return { nodes, links };
 }
-
 async function run() {
     console.log("1. Fetching live signals...");
     const signals = await fetchSignals();

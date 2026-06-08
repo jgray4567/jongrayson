@@ -1649,7 +1649,7 @@ function openIntelDrawer(item = {}) {
       stateEl.style.color = '#00e5ff';
     }
     if (summaryEl) summaryEl.textContent = `Graph Entity (Group ${node.group})`;
-    setDrawerImage(null);
+    setDrawerImage(node.image || null, node.label);
     
     if (mapEl) {
       mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Node is currently focused on the Link Graph canvas.</div>`;
@@ -1668,9 +1668,12 @@ function openIntelDrawer(item = {}) {
         relHtml = '<div class="muted">No direct links found.</div>';
       }
       
+      const linkHtml = node.url ? `<a href="${node.url}" target="_blank" rel="noopener noreferrer" class="ghost-btn" style="margin-top:12px; display:flex; justify-content:center; text-decoration:none; color:var(--lime); border-color:rgba(210,255,84,0.4);">Open Source Report</a>` : '';
+      
       metricsEl.innerHTML = `
         <div style="font-family:var(--font-mono); text-transform:uppercase; font-size:10px; color:var(--lime); margin-bottom:12px; letter-spacing:0.05em; border-bottom:1px solid var(--border); padding-bottom:6px;">Direct Relationships</div>
         ${relHtml}
+        ${linkHtml}
       `;
     }
     
@@ -3705,7 +3708,15 @@ function renderOntologyGraph() {
           .backgroundColor('#050505')
           .nodeRelSize(4)
           .nodeVal(node => node.size || 10)
-          .nodeLabel(node => `<div style="color: #fff; font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.8); padding: 4px; border: 1px solid #333;">${node.label}</div>`)
+          .nodeLabel(node => {
+            if (node.image) {
+                return `<div style="background: rgba(0,0,0,0.8); border: 1px solid #333; padding: 4px; border-radius: 4px; max-width: 220px;">
+                          <img src="${node.image}" style="width: 100%; height: auto; border-radius: 2px; margin-bottom: 4px; display: block;">
+                          <div style="color: #fff; font-family: monospace; font-size: 11px; white-space: normal;">${node.label}</div>
+                        </div>`;
+            }
+            return `<div style="color: #fff; font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.8); padding: 4px; border: 1px solid #333;">${node.label}</div>`;
+          })
           .nodeColor(node => {
             if(node.group === 0) return '#00e5ff';
             if(node.group === 1) return '#ffffff';
