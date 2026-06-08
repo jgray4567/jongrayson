@@ -280,7 +280,7 @@ body::after{
     <div class="section-title">Project Memories <span style="font-weight:300;font-size:.7rem;color:var(--text-muted);margin-left:.5rem">click to expand</span></div>
     <div id="project-memories"></div>
 
-    <div class="section-title">Session Logs</div>
+    <div class="section-title">Session Logs <span style="font-weight:300;font-size:.7rem;color:var(--text-muted);margin-left:.5rem">click to expand</span></div>
     <div id="session-logs"></div>
 
     <div class="section-title">Raw Inputs</div>
@@ -488,7 +488,7 @@ function renderMemoryTopics(){
 
   // Session logs
   document.getElementById('session-logs').innerHTML=SESSION_LOGS.map(s=>`
-    <div class="mem-file" data-type="session" data-name="${s.name}">
+    <div class="mem-file mem-clickable" data-type="session" data-name="${s.name}" tabindex="0" role="button" aria-label="Open session log ${s.name}">
       <span class="name">${s.name}</span>
       <span class="desc">${s.desc||'Session log'}</span>
       <span class="meta">log</span>
@@ -634,8 +634,17 @@ document.addEventListener('click',e=>{
   const row=e.target.closest('.mem-clickable');
   if(!row)return;
   const name=row.dataset.name;
+  const type=row.dataset.type;
   const proj=PROJECTS.find(p=>p.file===name);
-  openModal(proj?proj.name:name,`projects/${name}`);
+  let title, path;
+  if(type==='session'){
+    title='Session Log: '+name;
+    path=name; // flat in memory/
+  } else {
+    title=proj?proj.name:name;
+    path='projects/'+name;
+  }
+  openModal(title,path);
 });
 </script>
 </body>
