@@ -65,8 +65,8 @@ foreach ($states as $state) {
     $heading = $state[10] ?? null;
     $altitude = $state[13] ?? ($state[7] ?? null);
 
-    if ($latitude === null || $longitude === null || $onGround) continue;
-    if ($altitude !== null && floatval($altitude) < 1000) continue;
+    if ($latitude === null || $longitude === null || $onGround || empty($velocity) || floatval($velocity) < 25) continue;
+    if ($altitude === null || floatval($altitude) < 1000) continue;
 
     $items[] = [
         'icao24' => trim((string) ($state[0] ?? '')),

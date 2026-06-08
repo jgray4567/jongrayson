@@ -2124,7 +2124,7 @@ async function refreshAirTraffic() {
     return;
   }
   try {
-    currentAirTrafficItems = (await fetchJson('api/air-traffic.php')).items || [];
+    currentAirTrafficItems = ((await fetchJson('api/air-traffic.php')).items || []).filter(f => f.altitude > 0 && f.velocity > 25);
   } catch {
     currentAirTrafficItems = [];
   }
