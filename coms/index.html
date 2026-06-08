@@ -460,8 +460,10 @@ async function fetchAllData(){
   try{
     // 1. Get repo tree for file listing
     const treeRes=await fetch(GH_API);
+    if(!treeRes.ok)throw new Error('Tree fetch failed: '+treeRes.status);
     const treeData=await treeRes.json();
     const files=treeData.tree||[];
+    console.log('[JK] Tree loaded:',files.length,'files');
     
     // 2. Find project files
     const projectFiles=files.filter(f=>f.path.startsWith('memory/projects/')&&f.path.endsWith('.md')&&!f.path.endsWith('README.md'));
@@ -478,13 +480,15 @@ async function fetchAllData(){
         const res=await fetch(GH_RAW+f.path);
         if(!res.ok)return null;
         const text=await res.text();
-        const name=(text.match(/^#\s+(.+)/m)||[])[1]||f.path.split('/').pop().replace('.md','');
+        let name=(text.match(/^#\s+(.+)/m)||[])[1]||'';
+        if(name){name=name.replace(/\*\*/g,'').trim();}
+        if(!name){name=f.path.split('/').pop().replace('.md','').replace(/-/g,' ');}
         const tag=inferTag(text);
         const desc=extractDesc(text);
         const file=f.path.split('/').pop();
         const id=file.replace('.md','');
         return{id,name,tag,desc,file};
-      }catch(e){return null}
+      }catch(e){console.warn('[JK] Project fetch failed:',f.path,e);return null}
     });
     
     // 6. Fetch karpathy-repos.md
@@ -538,6 +542,7 @@ async function fetchAllData(){
     
     DATA_LOADED=true;
     LAST_FETCH=new Date();
+    console.log('[JK] Data loaded:',PROJECTS.length,'projects,',KARPATHY.tier1.length+KARPATHY.tier2.length+KARPATHY.tier3.length,'karpathy,',SESSION_LOGS.length,'sessions,',WIKI_FILES.length,'wiki');
     
     // Find raw files
     const rawFiles=files.filter(f=>f.path.startsWith('memory/raw/')&&!f.path.endsWith('/'));
@@ -704,8 +709,16 @@ setInterval(updateClock,1000);updateClock();
 // ─── INIT ───────────────────────────────────────────────────────────
 // ─── BOOT ────────────────────────────────────────────────────────────
 async function boot(){
-  const res=await fetchAllData();
-  RAW_COUNT=res.rawCount||0;
+  document.getElementById('all-projects').innerHTML='<div style="color:var(--muted);padding:20px;font-family:var(--font-mono);font-size:0.8rem">Loading live data...</div>';
+  document.getElementById('active-projects').innerHTML='<div style="color:var(--muted);padding:10px;font-family:var(--font-mono);font-size:0.8rem">Loading...</div>';
+  try{
+    const res=await fetchAllData();
+    RAW_COUNT=res.rawCount||0;
+  }catch(e){
+    console.error('[JK] Boot fetch failed:',e);
+    document.getElementById('all-projects').innerHTML='<div style="color:var(--danger);padding:20px;font-family:var(--font-mono);font-size:0.8rem">Data fetch failed — check console</div>';
+    return;
+  }
   renderStats();renderActiveProjects();renderAllProjects();renderMemoryTopics();renderKarpathy();renderCron();renderRecentActivity();
   updateRefreshBadge();
   // Auto-refresh every 5 minutes
