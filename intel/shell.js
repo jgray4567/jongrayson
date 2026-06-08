@@ -3602,6 +3602,7 @@ function showGraphStage() {
   if (graphButton) graphButton.style.display = 'none';
   
   updatePrimaryStageHeight();
+  console.log("Intel Graph: Toggled visibility, rendering...");
   if (typeof renderOntologyGraph === 'function') renderOntologyGraph();
   if (graphInstance) {
       setTimeout(() => {
@@ -3642,11 +3643,18 @@ let graphInstance = null;
 
 function renderOntologyGraph() {
   const container = document.getElementById('intel-graph-stage');
+  if (!container) return console.error("Intel Graph Error: #intel-graph-stage not found.");
   
   if (!graphInstance) {
+    console.log("Intel Graph: Fetching ontology.json...");
     fetch('data/ontology.json')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("Network response was not ok: " + res.status);
+        return res.json();
+      })
       .then(gData => {
+        console.log("Intel Graph: Rendering with", gData.nodes.length, "nodes");
+        container.style.display = 'block'; // Ensure it's not hidden while rendering
         graphInstance = ForceGraph()(container)
           .width(container.clientWidth || window.innerWidth)
           .height(container.clientHeight || (window.innerHeight * 0.6))
