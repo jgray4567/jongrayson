@@ -1,4 +1,9 @@
-# Cracked Sky (crackedsky.band)
+# Cracked Sky
+
+**Status:** Active
+**Type:** Band Website
+**Main URL:** https://www.crackedsky.band
+**GitHub:** jgray4567/crackedsky
 
 ## Overview
 Band website for Cracked Sky — a music group performing at venues around Virginia.

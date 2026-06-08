@@ -1,4 +1,9 @@
-# One Hot Mess (onehotmess.band)
+# One Hot Mess
+
+**Status:** Active
+**Type:** Band Website
+**Main URL:** https://www.onehotmess.band
+**GitHub:** jgray4567/onehotmess
 
 ## Overview
 Band website for One Hot Mess — a music group performing at venues around Virginia.
