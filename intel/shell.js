@@ -3687,6 +3687,57 @@ function updatePrimaryStageHeight() {
 }
 let graphInstance = null;
 
+window.fullOntologyData = null;
+window.expandedNodes = new Set();
+
+function getVisibleOntology(clickedNode = null) {
+    if (!window.fullOntologyData) return { nodes: [], links: [] };
+    
+    const visibleNodes = new Set();
+    // Always show Nexus (0), Regions (3), Themes (4)
+    window.fullOntologyData.nodes.forEach(n => {
+        if (n.group === 0 || n.group === 3 || n.group === 4) {
+            visibleNodes.add(n.id);
+        }
+    });
+    
+    // Add signals connected to expanded hubs
+    window.fullOntologyData.links.forEach(l => {
+        const sId = typeof l.source === 'object' ? l.source.id : l.source;
+        const tId = typeof l.target === 'object' ? l.target.id : l.target;
+        if (window.expandedNodes.has(sId)) visibleNodes.add(tId);
+        if (window.expandedNodes.has(tId)) visibleNodes.add(sId);
+    });
+    
+    const outNodes = window.fullOntologyData.nodes.filter(n => visibleNodes.has(n.id));
+    
+    // Spawning animation logic
+    if (clickedNode && window.expandedNodes.has(clickedNode.id)) {
+        outNodes.forEach(n => {
+            if (n._collapsed && (n.group === 1 || n.group === 2)) {
+                n.x = clickedNode.x + (Math.random() - 0.5) * 10;
+                n.y = clickedNode.y + (Math.random() - 0.5) * 10;
+                n.vx = 0;
+                n.vy = 0;
+            }
+            n._collapsed = false;
+        });
+    }
+    
+    // Update collapsed state trackers
+    window.fullOntologyData.nodes.forEach(n => {
+        n._collapsed = !visibleNodes.has(n.id);
+    });
+    
+    const outLinks = window.fullOntologyData.links.filter(l => {
+        const sId = typeof l.source === 'object' ? l.source.id : l.source;
+        const tId = typeof l.target === 'object' ? l.target.id : l.target;
+        return visibleNodes.has(sId) && visibleNodes.has(tId);
+    });
+    
+    return { nodes: outNodes, links: outLinks };
+}
+
 function renderOntologyGraph() {
   const container = document.getElementById('intel-graph-stage');
   if (!container) return console.error("Intel Graph Error: #intel-graph-stage not found.");
@@ -3699,12 +3750,16 @@ function renderOntologyGraph() {
         return res.json();
       })
       .then(gData => {
+        window.fullOntologyData = gData;
+        window.expandedNodes = new Set();
+        gData.nodes.forEach(n => n._collapsed = true);
+        
         console.log("Intel Graph: Rendering with", gData.nodes.length, "nodes");
         container.style.display = 'block'; // Ensure it's not hidden while rendering
         graphInstance = ForceGraph()(container)
           .width(container.clientWidth || window.innerWidth)
           .height(container.clientHeight || (window.innerHeight * 0.6))
-          .graphData(gData)
+          .graphData(getVisibleOntology())
           .backgroundColor('#050505')
           .nodeRelSize(4)
           .nodeVal(node => node.size || 10)
@@ -3729,14 +3784,29 @@ function renderOntologyGraph() {
           .linkDirectionalParticles(2)
           .linkDirectionalParticleWidth(1.5)
           .onNodeClick(node => {
+            // Toggle expansion logic for hub nodes (Groups 0, 3, 4)
+            if (node.group === 0 || node.group === 3 || node.group === 4) {
+                if (window.expandedNodes.has(node.id)) {
+                    window.expandedNodes.delete(node.id);
+                } else {
+                    window.expandedNodes.add(node.id);
+                }
+                graphInstance.graphData(getVisibleOntology(node));
+            }
+            
             graphInstance.centerAt(node.x, node.y, 1000);
             graphInstance.zoom(2, 2000);
             
-            const { nodes, links } = graphInstance.graphData();
-            const relatedLinks = links.filter(l => (l.source.id === node.id || l.source === node.id) || (l.target.id === node.id || l.target === node.id));
+            // Query related items against the FULL dataset so everything shows up in the drawer
+            const { nodes, links } = window.fullOntologyData;
+            const relatedLinks = links.filter(l => {
+                const sId = typeof l.source === 'object' ? l.source.id : l.source;
+                const tId = typeof l.target === 'object' ? l.target.id : l.target;
+                return sId === node.id || tId === node.id;
+            });
             const relatedNodes = relatedLinks.map(l => {
-                const sId = l.source.id || l.source;
-                const tId = l.target.id || l.target;
+                const sId = typeof l.source === 'object' ? l.source.id : l.source;
+                const tId = typeof l.target === 'object' ? l.target.id : l.target;
                 const otherId = sId === node.id ? tId : sId;
                 return nodes.find(n => n.id === otherId) || { id: otherId };
             });
