@@ -2383,9 +2383,10 @@ async function refreshMaritimeCatalog(zoomToRegion = false) {
   }
   try {
     currentVesselCatalog = (await fetchJson('api/maritime-tracker.php?region=' + seaRegion)).items || [];
-    if (zoomToRegion && typeof globeInstance !== 'undefined' && globeInstance) {
-        if (seaRegion === 'hormuz') globeInstance.pointOfView({ lat: 26.5, lng: 56.2, altitude: 0.8 }, 2000);
-        if (seaRegion === 'mexico') globeInstance.pointOfView({ lat: 25.0, lng: -90.0, altitude: 1.2 }, 2000);
+    if (zoomToRegion && typeof intelGlobe !== 'undefined' && intelGlobe) {
+        if (seaRegion === 'hormuz') intelGlobe.pointOfView({ lat: 26.5, lng: 56.2, altitude: 0.8 }, 2000);
+        if (seaRegion === 'mexico') intelGlobe.pointOfView({ lat: 25.0, lng: -90.0, altitude: 1.2 }, 2000);
+        if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(false);
     }
     initOrUpdateGlobe(currentGlobeBaseItems || []);
     updateDataPanel();
