@@ -2656,9 +2656,54 @@ function initializeCommandSurface() {
       syncSatelliteToggle();
       await refreshSatelliteCatalog();
       syncSatelliteLayerTimer();
+      
+      if (satelliteLayerEnabled) {
+          airLayerEnabled = false;
+          syncAirToggle();
+          seaLayerEnabled = false;
+          const bSea = document.getElementById('toggle-sea-layer');
+          if (bSea) { bSea.classList.remove('active'); }
+          currentVesselCatalog = [];
+          if (seaLayerTimer) clearInterval(seaLayerTimer);
+      }
+      
       initOrUpdateGlobe(currentGlobeBaseItems || []);
+      updateDataPanel();
     });
     satelliteButton.dataset.bound = '1';
+  }
+
+  const seaButton = document.getElementById('toggle-sea-layer');
+  if (seaButton && !seaButton.dataset.bound) {
+      seaButton.addEventListener('click', async () => {
+          seaLayerEnabled = !seaLayerEnabled;
+          seaButton.classList.toggle('active', seaLayerEnabled);
+          
+          if (seaLayerEnabled) {
+              airLayerEnabled = false;
+              syncAirToggle();
+              satelliteLayerEnabled = false;
+              syncSatelliteToggle();
+              if (satelliteLayerTimer) { clearInterval(satelliteLayerTimer); satelliteLayerTimer = null; }
+              
+              seaRegion = null;
+              selectedSeaType = null;
+              selectedSeaFlag = null;
+              
+              await refreshMaritimeCatalog(false);
+              if (!seaLayerTimer) {
+                  seaLayerTimer = setInterval(() => refreshMaritimeCatalog(false), 15000);
+              }
+          } else {
+              if (seaLayerTimer) { clearInterval(seaLayerTimer); seaLayerTimer = null; }
+              currentVesselCatalog = [];
+              seaRegion = null;
+          }
+          
+          initOrUpdateGlobe(currentGlobeBaseItems || []);
+          updateDataPanel();
+      });
+      seaButton.dataset.bound = '1';
   }
 
   const threatButton = document.getElementById('toggle-threat-layer');
@@ -3374,6 +3419,8 @@ function showMapStage(item = {}) {
   if (rotationButton) rotationButton.style.display = 'none';
   if (airButton) airButton.style.display = 'none';
   if (satelliteButton) satelliteButton.style.display = 'none';
+  const seaButton = document.getElementById('toggle-sea-layer');
+  if (seaButton) seaButton.style.display = 'none';
   if (threatButton) threatButton.style.display = 'none';
   const satOrbitFilters = document.getElementById('sat-orbit-filters');
   if (satOrbitFilters) satOrbitFilters.style.display = 'none';
@@ -3408,6 +3455,8 @@ function showGlobeStage() {
   if (returnButton) returnButton.style.display = 'none';
   if (airButton) airButton.style.display = 'inline-flex';
   if (satelliteButton) satelliteButton.style.display = 'inline-flex';
+  const seaButton = document.getElementById('toggle-sea-layer');
+  if (seaButton) seaButton.style.display = 'inline-flex';
   if (threatButton) threatButton.style.display = 'inline-flex';
   const satOrbitFilters = document.getElementById('sat-orbit-filters');
   if (satOrbitFilters && satelliteLayerEnabled) satOrbitFilters.style.display = 'inline-flex';

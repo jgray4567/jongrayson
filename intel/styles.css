@@ -730,8 +730,8 @@ body {
 .signal-filters .ghost-btn.active,
 .tag-chip.active,
 .ghost-btn.active {
-  background: var(--lime);
-  color: var(--bg);
+  background: var(--lime-dim);
+  color: var(--lime);
   border-color: var(--lime);
 }
 .signal-btn.active {
