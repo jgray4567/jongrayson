@@ -2363,6 +2363,7 @@ function initializeCommandSurface() {
         if (selectedAirRegion === region) {
           selectedAirRegion = null;
           if (typeof intelGlobe !== 'undefined' && intelGlobe) intelGlobe.pointOfView({ altitude: 1.7 }, 1800);
+          if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(true);
         } else {
           selectedAirRegion = region;
           const regionalFlights = currentAirTrafficItems.filter(f => f.country === region);
@@ -2370,6 +2371,7 @@ function initializeCommandSurface() {
              const avgLat = regionalFlights.reduce((sum, f) => sum + f.lat, 0) / regionalFlights.length;
              const avgLng = regionalFlights.reduce((sum, f) => sum + f.lng, 0) / regionalFlights.length;
              intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 0.6 }, 1800);
+             if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(false);
           }
         }
         
