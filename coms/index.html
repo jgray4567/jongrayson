@@ -635,30 +635,25 @@ function renderMemoryTopics(){
     :`<div class="mem-file"><span class="name" style="color:var(--muted)">raw/</span><span class="desc">Empty — drop files here via "save this"</span><span class="meta">0</span></div>`;
 }
 
+function karpathyCard(r,tier){
+  return `<div class="stage-card" data-karpathy="${r.name}" style="position:relative" tabindex="0" role="button" aria-label="Expand ${r.name}">
+    <span class="tier-badge tier-${tier}">T${tier}</span>
+    <h3>${r.name} <span style="color:var(--warn);font-size:.7rem">⭐${r.stars}</span><span class="expand-hint">tap</span></h3>
+    <p>${r.desc}</p>
+    <div class="card-expand">
+      <div class="detail-row"><span class="detail-label">Repo</span><span class="detail-value"><a href="https://github.com/karpathy/${r.name}" target="_blank" style="color:var(--lime)">github.com/karpathy/${r.name}</a></span></div>
+      <div class="detail-row"><span class="detail-label">Stars</span><span class="detail-value">⭐ ${r.stars}</span></div>
+      <div class="detail-row"><span class="detail-label">Tier</span><span class="detail-value">${tier==='1'?'🟢 High Value':tier==='2'?'🟡 Useful':'🔵 Educational'}</span></div>
+    </div>
+  </div>`;
+}
+
 function renderKarpathy(filter=''){
   const f=filter.toLowerCase();
   function match(r){return !f||r.name.toLowerCase().includes(f)||r.desc.toLowerCase().includes(f)}
-  document.getElementById('karpathy-tier1').innerHTML=KARPATHY.tier1.filter(match).map(r=>`
-    <div class="stage-card" style="position:relative">
-      <span class="tier-badge tier-1">T1</span>
-      <h3>${r.name} <span style="color:var(--warn);font-size:.7rem">⭐${r.stars}</span></h3>
-      <p>${r.desc}</p>
-    </div>
-  `).join('');
-  document.getElementById('karpathy-tier2').innerHTML=KARPATHY.tier2.filter(match).map(r=>`
-    <div class="stage-card" style="position:relative">
-      <span class="tier-badge tier-2">T2</span>
-      <h3>${r.name} <span style="color:var(--warn);font-size:.7rem">⭐${r.stars}</span></h3>
-      <p>${r.desc}</p>
-    </div>
-  `).join('');
-  document.getElementById('karpathy-tier3').innerHTML=KARPATHY.tier3.filter(match).map(r=>`
-    <div class="stage-card" style="position:relative">
-      <span class="tier-badge tier-3">T3</span>
-      <h3>${r.name} <span style="color:var(--warn);font-size:.7rem">⭐${r.stars}</span></h3>
-      <p>${r.desc}</p>
-    </div>
-  `).join('');
+  document.getElementById('karpathy-tier1').innerHTML=KARPATHY.tier1.filter(match).map(r=>karpathyCard(r,'1')).join('');
+  document.getElementById('karpathy-tier2').innerHTML=KARPATHY.tier2.filter(match).map(r=>karpathyCard(r,'2')).join('');
+  document.getElementById('karpathy-tier3').innerHTML=KARPATHY.tier3.filter(match).map(r=>karpathyCard(r,'3')).join('');
 }
 
 function renderCron(){
@@ -695,7 +690,14 @@ document.querySelectorAll('.command-pill').forEach(btn=>{
     const tab=btn.dataset.tab;
     document.getElementById('tab-'+tab).classList.add('active');
     // Re-render tab content when switching
-    if(tab==='projects')renderAllProjects(document.getElementById('project-search')?.value||'');
+    if(tab==='projects'){
+      if(!PROJECTS.length){
+        document.getElementById('all-projects').innerHTML='<div style="color:var(--muted);padding:20px;font-family:var(--font-mono);font-size:0.8rem">Reloading data...</div>';
+        fetchAllData().then(r=>{RAW_COUNT=r.rawCount||0;renderAllProjects(document.getElementById('project-search')?.value||'');});
+      }else{
+        renderAllProjects(document.getElementById('project-search')?.value||'');
+      }
+    }
     if(tab==='memory')renderMemoryTopics();
   });
 });
@@ -781,8 +783,10 @@ document.addEventListener('click',e=>{
     openModal(proj?proj.name:name,'projects/'+name);
     return;
   }
-  const card=e.target.closest('.stage-card[data-project]');
+  const card=e.target.closest('.stage-card[data-project],.stage-card[data-karpathy]');
   if(card){
+    // Don't toggle if clicking a link inside expanded card
+    if(e.target.closest('a'))return;
     card.parentElement.querySelectorAll('.stage-card.expanded').forEach(c=>{if(c!==card)c.classList.remove('expanded')});
     card.classList.toggle('expanded');
     return;
@@ -790,7 +794,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'||e.key===' '){
-    const card=document.activeElement?.closest('.stage-card[data-project]');
+    const card=document.activeElement?.closest('.stage-card[data-project],.stage-card[data-karpathy]');
     if(card){e.preventDefault();card.click();}
   }
 });
