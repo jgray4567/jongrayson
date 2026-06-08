@@ -318,6 +318,7 @@ body {
       <div class="command-pill" data-tab="memory"><span class="command-label">Memory</span></div>
       <div class="command-pill" data-tab="karpathy"><span class="command-label">Karpathy</span></div>
       <div class="command-pill" data-tab="cron"><span class="command-label">Jobs</span></div>
+      <span id="refresh-badge" style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);margin-left:auto">loading...</span>
     </div>
 
     <!-- Scheduled Jobs (rail panel) -->
@@ -417,98 +418,146 @@ body {
 </div>
 
 <script>
-// ─── DATA ───────────────────────────────────────────────────────────
-const PROJECTS = [
-  {id:"jerry-ai",name:"Jerry AI",tag:"active",desc:"Local AI project — DeepSeek, Qwen, Flux on WD_BLACK NVMe",file:"jerry-ai.md"},
-  {id:"jerry-architecture",name:"Jerry Architecture",tag:"active",desc:"Model architecture and hardware specs",file:"jerry-architecture.md"},
-  {id:"jerry-framework",name:"Jerry Framework",tag:"dev",desc:"Core framework for Jerry system",file:"jerry-framework.md"},
-  {id:"jerry-hardware",name:"Jerry Hardware",tag:"active",desc:"Hardware specs and GPU inference setup",file:"jerry-hardware.md"},
-  {id:"MAC-GPU-INFERENCE",name:"Mac GPU Inference",tag:"active",desc:"Local inference pipeline on Apple Silicon",file:"MAC-GPU-INFERENCE.md"},
-  {id:"jongrayson-v2",name:"Jon Grayson V2",tag:"dev",desc:"Personal/portfolio site rebuild",file:"jongrayson-v2.md"},
-  {id:"jongrayson",name:"Jon Grayson Site",tag:"active",desc:"Current personal site with crime map + AI Playbook",file:"jongrayson.md"},
-  {id:"GIUSEPPES",name:"Giuseppe's Ristorante",tag:"active",desc:"Restaurant site with FB event scraper",file:"GIUSEPPES.md"},
-  {id:"crackedsky",name:"Cracked Sky",tag:"active",desc:"Band site with JSON calendar",file:"crackedsky.md"},
-  {id:"onehotmess",name:"One Hot Mess",tag:"active",desc:"Band site on GitHub Pages",file:"onehotmess.md"},
-  {id:"kalshi-agent",name:"Kalshi Agent (K-Bot)",tag:"dev",desc:"Kalshi arbitrage agent",file:"kalshi-agent.md"},
-  {id:"polymarket-trading",name:"Polymarket Trading",tag:"dev",desc:"Trading and safe compounder",file:"polymarket-trading.md"},
-  {id:"JERRYKNOWS-AI",name:"JerryKnows AI",tag:"active",desc:"Main AI platform",file:"JERRYKNOWS-AI.md"},
-  {id:"JERRYKNOWS-WEB-TEAM",name:"JK Web Team",tag:"active",desc:"Web team capabilities and arsenal",file:"JERRYKNOWS-WEB-TEAM.md"},
-  {id:"JK-INTELLIGENCE",name:"JK Intelligence",tag:"active",desc:"Intelligence and data operations",file:"JK-INTELLIGENCE.md"},
-  {id:"thrivent-dulles",name:"Thrivent Dulles",tag:"dev",desc:"AI & automation plan",file:"thrivent-dulles.md"},
-  {id:"jdb-entertainment",name:"JDB Entertainment",tag:"dev",desc:"Website project",file:"jdb-entertainment.md"},
-  {id:"INSPECTAI",name:"InspectAI",tag:"dev",desc:"AI inspection tool",file:"INSPECTAI.md"},
-  {id:"BOGLEAI",name:"BogleAI",tag:"dev",desc:"AI project",file:"BOGLEAI.md"},
-  {id:"DATABADGER",name:"DataBadger",tag:"dev",desc:"Data tool",file:"DATABADGER.md"},
-  {id:"WOOF",name:"WOOF",tag:"dev",desc:"Project WOOF",file:"WOOF.md"},
-  {id:"k-bot",name:"K-Bot",tag:"dev",desc:"Bot project",file:"k-bot.md"},
-  {id:"joanie-karaoke",name:"Joanie Karaoke",tag:"dev",desc:"Karaoke project",file:"joanie-karaoke.md"},
-  {id:"table-and-tine",name:"Table & Tine",tag:"dev",desc:"Membership and iOS app",file:"table-and-tine.md"},
-  {id:"sports-arbitrage-primer",name:"Sports Arbitrage Primer",tag:"archive",desc:"Matched betting reference",file:"sports-arbitrage-primer.md"},
-  {id:"band-site-scraper",name:"Band Site Scraper",tag:"archive",desc:"Reusable FB events scraper pattern",file:"band-site-scraper.md"},
-  {id:"frankenstein-ai",name:"Frankenstein AI",tag:"archive",desc:"Build blueprint (legacy)",file:"frankenstein-ai.md"},
-  {id:"jerry-openmythos-architecture",name:"OpenMythos Arch",tag:"archive",desc:"T&T production architecture",file:"jerry-openmythos-architecture.md"},
-  {id:"jerry-infrastructure",name:"Jerry Infrastructure",tag:"archive",desc:"Infrastructure plan (legacy)",file:"jerry-infrastructure.md"},
-];
+// ─── LIVE DATA ────────────────────────────────────────────────────────
+const GH_RAW='https://raw.githubusercontent.com/jgray4567/jongrayson/main/';
+const GH_API='https://api.github.com/repos/jgray4567/jongrayson/git/trees/main?recursive=1';
+let PROJECTS=[],KARPATHY={tier1:[],tier2:[],tier3:[]},CRON_JOBS=[],WIKI_FILES=[],SESSION_LOGS=[];
+let DATA_LOADED=false,LAST_FETCH=null;
 
-const KARPATHY = {
-  tier1:[
-    {name:"nanoGPT",stars:"59K",desc:"Core GPT training/finetuning — feeds Jerry AI"},
-    {name:"nanochat",stars:"55K",desc:"Lightweight chat trainer, parent of autoresearch"},
-    {name:"llm.c",stars:"30K",desc:"Pure C/CUDA LLM training — Metal port potential"},
-    {name:"llama2.c",stars:"20K",desc:"Single-file Llama 2 inference — MLX port"},
-    {name:"micrograd",stars:"16K",desc:"Tiny autograd engine — best backprop intro"},
-    {name:"minGPT",stars:"25K",desc:"Minimal GPT impl — understanding internals"},
-    {name:"minbpe",stars:"11K",desc:"Minimal BPE tokenizer — needed for training"},
-    {name:"autoresearch",stars:"86K",desc:"Self-evolving overnight research loop"},
-    {name:"nn-zero-to-hero",stars:"23K",desc:"Full NN course — reference material"},
-    {name:"makemore",stars:"4K",desc:"Char-level LM — runs locally on Mac"},
-    {name:"build-nanogpt",stars:"5K",desc:"Step-by-step nanoGPT build"},
-    {name:"LLM101n",stars:"37K",desc:"Karpathy's LLM course"},
-  ],
-  tier2:[
-    {name:"rendergit",stars:"2.3K",desc:"Renders git repo to single HTML — LLM context injection"},
-    {name:"gitstats",stars:"144",desc:"Git branch activity visualizer"},
-    {name:"reader3",stars:"3.7K",desc:"Read books with LLMs — wiki integration"},
-    {name:"ulogme",stars:"1.2K",desc:"Usage stats tracker — productivity"},
-    {name:"calorie",stars:"152",desc:"Simple calorie web app"},
-    {name:"cryptos",stars:"1.9K",desc:"From-scratch Bitcoin in Python — finance education"},
-    {name:"llm-council",stars:"20K",desc:"Multi-LLM council — multi-agent pattern"},
-    {name:"arxiv-sanity-lite",stars:"1.6K",desc:"Arxiv paper recommendations — research workflow"},
-    {name:"hn-time-capsule",stars:"641",desc:"HN analysis with LLMs"},
-    {name:"paper-notes",stars:"710",desc:"Karpathy's raw paper notes — dump into raw/"},
-  ],
-  tier3:[
-    {name:"char-rnn",stars:"12K",desc:"Classic char-level RNN (Lua/Torch)"},
-    {name:"convnetjs",stars:"11K",desc:"Browser-based DL (JS, dated)"},
-    {name:"lecun1989-repro",stars:"764",desc:"Reproducing LeCun's 1989 paper"},
-    {name:"pytorch-made",stars:"592",desc:"MADE implementation in PyTorch"},
-    {name:"pytorch-normalizing-flows",stars:"917",desc:"Normalizing flows — niche"},
-    {name:"deep-vector-quantization",stars:"647",desc:"VQ-VAE research — niche"},
-    {name:"researchlei",stars:"268",desc:"Academic paper discovery"},
-    {name:"researchpooler",stars:"459",desc:"Automating lit review"},
-    {name:"jobs",stars:"1.8K",desc:"BLS occupational data explorer"},
-  ]
-};
+// Tag inference from project file content
+function inferTag(content){
+  const c=content.toLowerCase();
+  if(c.includes('archive')||c.includes('legacy')||c.includes('deprecated'))return'archive';
+  if(c.includes('in development')||c.includes('wip')||c.includes('todo')||c.includes('planned'))return'dev';
+  return'active';
+}
 
-const CRON_JOBS = [
-  {name:"Memory Dream Sequence",schedule:"Mon 9:00 AM ET",model:"glm-5.1:cloud",next:"Mondays",status:"active"},
-  {name:"Karpathy New Repo Check",schedule:"Daily 8:00 AM ET",model:"glm-5.1:cloud",next:"Tomorrow 8AM",status:"active"},
-];
+// Extract first meaningful line as description
+function extractDesc(content){
+  const lines=content.split('\n').filter(l=>l.trim()&&!l.startsWith('#')&&!l.startsWith('>'));
+  return lines.length?lines[0].replace(/^[-*]\s+/,'').slice(0,80):'No description';
+}
 
-const WIKI_FILES = [
-  {name:"index.md",desc:"Table of contents mapping all topics",lines:37},
-  {name:"log.md",desc:"Changelog of ingestions and updates",lines:35},
-  {name:"processed.md",desc:"Tracks which raw files have been ingested",lines:9},
-];
+// Parse karpathy-repos.md tier tables
+function parseKarpathyMd(text){
+  const tiers={tier1:[],tier2:[],tier3:[]};
+  let currentTier=null;
+  const tierMap={'High Value':'tier1','Useful':'tier2','Educational':'tier3','Tier 1':'tier1','Tier 2':'tier2','Tier 3':'tier3'};
+  for(const line of text.split('\n')){
+    const tierMatch=Object.entries(tierMap).find(([k])=>line.includes(k));
+    if(tierMatch)currentTier=tierMatch[1];
+    if(!currentTier)continue;
+    const m=line.match(/\|\s*\*\*(.+?)\*\*\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|/);
+    if(m){
+      tiers[currentTier].push({name:m[1].trim(),stars:m[2].trim(),desc:m[3].trim()});
+    }
+  }
+  return tiers;
+}
 
-const SESSION_LOGS = [
-  {name:"2026-06-08.md",desc:"Karpathy repos, second brain, dashboard"},
-  {name:"2026-06-07.md",desc:"Previous day"},
-  {name:"2026-06-05.md",desc:""},
-  {name:"2026-06-04.md",desc:""},
-  {name:"2026-06-02.md",desc:""},
-  {name:"2026-06-01.md",desc:""},
-];
+// Fetch all data from GitHub
+async function fetchAllData(){
+  try{
+    // 1. Get repo tree for file listing
+    const treeRes=await fetch(GH_API);
+    const treeData=await treeRes.json();
+    const files=treeData.tree||[];
+    
+    // 2. Find project files
+    const projectFiles=files.filter(f=>f.path.startsWith('memory/projects/')&&f.path.endsWith('.md')&&!f.path.endsWith('README.md'));
+    
+    // 3. Find session logs
+    const sessionFiles=files.filter(f=>f.path.match(/^memory\/[\d-]+\.md$/)).sort((a,b)=>b.path.localeCompare(a.path)).slice(0,10);
+    
+    // 4. Find wiki files
+    const wikiFilesList=files.filter(f=>f.path.startsWith('memory/wiki/')&&f.path.endsWith('.md'));
+    
+    // 5. Fetch project files in parallel (batch)
+    const projectPromises=projectFiles.map(async f=>{
+      try{
+        const res=await fetch(GH_RAW+f.path);
+        if(!res.ok)return null;
+        const text=await res.text();
+        const name=(text.match(/^#\s+(.+)/m)||[])[1]||f.path.split('/').pop().replace('.md','');
+        const tag=inferTag(text);
+        const desc=extractDesc(text);
+        const file=f.path.split('/').pop();
+        const id=file.replace('.md','');
+        return{id,name,tag,desc,file};
+      }catch(e){return null}
+    });
+    
+    // 6. Fetch karpathy-repos.md
+    const karpathyPromise=fetch(GH_RAW+'memory/karpathy-repos.md').then(r=>r.ok?r.text():'').then(parseKarpathyMd).catch(()=>({tier1:[],tier2:[],tier3:[]}));
+    
+    // 7. Fetch wiki files for line counts
+    const wikiPromises=wikiFilesList.map(async f=>{
+      try{
+        const res=await fetch(GH_RAW+f.path);
+        if(!res.ok)return null;
+        const text=await res.text();
+        const lines=text.split('\n').length;
+        const name=f.path.split('/').pop();
+        // Extract first line after # as desc
+        const descLine=text.split('\n').find(l=>l.trim()&&!l.startsWith('#')&&!l.startsWith('>'));
+        const desc=descLine?descLine.replace(/^[-*]\s+/,'').slice(0,60):'Wiki file';
+        return{name,desc,lines};
+      }catch(e){return null}
+    });
+    
+    // 8. Fetch session log first lines
+    const sessionPromises=sessionFiles.map(async f=>{
+      try{
+        const res=await fetch(GH_RAW+f.path);
+        if(!res.ok)return null;
+        const text=await res.text();
+        const firstLine=text.split('\n').find(l=>l.trim()&&!l.startsWith('#')&&!l.startsWith('>'));
+        const desc=firstLine?firstLine.replace(/^[-*]\s+/,'').slice(0,70):'Session log';
+        return{name:f.path.split('/').pop(),desc};
+      }catch(e){return null}
+    });
+    
+    // Await all
+    const[projects,karpathy,wikiResults,sessionResults]=await Promise.all([
+      Promise.all(projectPromises),
+      karpathyPromise,
+      Promise.all(wikiPromises),
+      Promise.all(sessionPromises)
+    ]);
+    
+    PROJECTS=projects.filter(Boolean);
+    KARPATHY=karpathy;
+    WIKI_FILES=wikiResults.filter(Boolean);
+    SESSION_LOGS=sessionResults.filter(Boolean);
+    
+    // Cron jobs are config-based, keep static but update model labels
+    CRON_JOBS=[
+      {name:"Memory Dream Sequence",schedule:"Mon 9:00 AM ET",model:"glm-5.1:cloud",next:"Mondays",status:"active"},
+      {name:"Karpathy New Repo Check",schedule:"Daily 8:00 AM ET",model:"glm-5.1:cloud",next:"Daily 8AM",status:"active"},
+    ];
+    
+    DATA_LOADED=true;
+    LAST_FETCH=new Date();
+    
+    // Find raw files
+    const rawFiles=files.filter(f=>f.path.startsWith('memory/raw/')&&!f.path.endsWith('/'));
+    
+    return{rawCount:rawFiles.length};
+  }catch(e){
+    console.error('Data fetch failed:',e);
+    return{rawCount:0};
+  }
+}
+
+// Refresh indicator
+function updateRefreshBadge(){
+  const badge=document.getElementById('refresh-badge');
+  if(!badge)return;
+  if(!LAST_FETCH){badge.textContent='loading...';badge.style.color='var(--warn)';return;}
+  const age=Math.round((Date.now()-LAST_FETCH.getTime())/60000);
+  if(age<1){badge.textContent='live';badge.style.color='var(--stable)';}
+  else{badge.textContent=age+'m ago';badge.style.color=age>10?'var(--danger)':'var(--muted)';}
+}
 
 // ─── RENDER ─────────────────────────────────────────────────────────
 function chipClass(t){
@@ -527,8 +576,8 @@ function renderStats(){
     <div class="stage-card stat-card"><div class="stat-num">${total}</div><div class="stat-label">Karpathy</div></div>
     <div class="stage-card stat-card"><div class="stat-num">5</div><div class="stat-label">Memory Blocks</div></div>
     <div class="stage-card stat-card"><div class="stat-num">${SESSION_LOGS.length}</div><div class="stat-label">Sessions</div></div>
-    <div class="stage-card stat-card"><div class="stat-num">2</div><div class="stat-label">Cron Jobs</div></div>
-    <div class="stage-card stat-card"><div class="stat-num">3</div><div class="stat-label">Wiki Files</div></div>
+    <div class="stage-card stat-card"><div class="stat-num">${CRON_JOBS.length}</div><div class="stat-label">Cron Jobs</div></div>
+    <div class="stage-card stat-card"><div class="stat-num">${WIKI_FILES.length}</div><div class="stat-label">Wiki Files</div></div>
   `;
 }
 
@@ -555,6 +604,7 @@ function renderAllProjects(filter=''){
   document.getElementById('all-projects').innerHTML=filtered.map(p=>projectCard(p)).join('');
 }
 
+let RAW_COUNT=0;
 function renderMemoryTopics(){
   document.getElementById('wiki-files').innerHTML=WIKI_FILES.map(f=>`
     <div class="mem-file"><span class="name">wiki/${f.name}</span><span class="desc">${f.desc}</span><span class="meta">${f.lines} lines</span></div>
@@ -569,9 +619,9 @@ function renderMemoryTopics(){
       <span class="name">${s.name}</span><span class="desc">${s.desc||'Session log'}</span><span class="meta">log</span>
     </div>
   `).join('');
-  document.getElementById('raw-files').innerHTML=`
-    <div class="mem-file"><span class="name" style="color:var(--muted)">raw/</span><span class="desc">Empty — drop files here via "save this"</span><span class="meta">0 files</span></div>
-  `;
+  document.getElementById('raw-files').innerHTML=RAW_COUNT>0
+    ?`<div class="mem-file"><span class="name" style="color:var(--lime)">raw/</span><span class="desc">${RAW_COUNT} file${RAW_COUNT>1?'s':''} pending ingestion</span><span class="meta">${RAW_COUNT}</span></div>`
+    :`<div class="mem-file"><span class="name" style="color:var(--muted)">raw/</span><span class="desc">Empty — drop files here via "save this"</span><span class="meta">0</span></div>`;
 }
 
 function renderKarpathy(filter=''){
@@ -652,7 +702,23 @@ function updateClock(){
 setInterval(updateClock,1000);updateClock();
 
 // ─── INIT ───────────────────────────────────────────────────────────
-renderStats();renderActiveProjects();renderAllProjects();renderMemoryTopics();renderKarpathy();renderCron();renderRecentActivity();
+// ─── BOOT ────────────────────────────────────────────────────────────
+async function boot(){
+  const res=await fetchAllData();
+  RAW_COUNT=res.rawCount||0;
+  renderStats();renderActiveProjects();renderAllProjects();renderMemoryTopics();renderKarpathy();renderCron();renderRecentActivity();
+  updateRefreshBadge();
+  // Auto-refresh every 5 minutes
+  setInterval(async()=>{
+    const r=await fetchAllData();
+    RAW_COUNT=r.rawCount||0;
+    renderStats();renderActiveProjects();renderAllProjects();renderMemoryTopics();renderKarpathy();renderCron();
+    updateRefreshBadge();
+  },300000);
+  // Update refresh badge every minute
+  setInterval(updateRefreshBadge,60000);
+}
+boot();
 
 // ─── MODAL ─────────────────────────────────────────────────────────
 const MEMORY_GH='https://raw.githubusercontent.com/jgray4567/jongrayson/main/memory/';
