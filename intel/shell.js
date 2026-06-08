@@ -53,6 +53,7 @@ let currentVesselCatalog = [];
 let seaLayerTimer = null;
 let selectedSeaType = null;
 let selectedSeaFlag = null;
+let seaRegion = null;
 let currentSatelliteCatalog = [];
 let satelliteLayerTimer = null;
 let selectedSatNetwork = null;
@@ -2335,13 +2336,23 @@ function getAirTrafficPaths() {
   });
 }
 
-async function refreshMaritimeCatalog() {
+async function refreshMaritimeCatalog(zoomToRegion = false) {
   if (!seaLayerEnabled) {
     currentVesselCatalog = [];
     return;
   }
+  if (!seaRegion) {
+    currentVesselCatalog = [];
+    initOrUpdateGlobe(currentGlobeBaseItems || []);
+    updateDataPanel();
+    return;
+  }
   try {
-    currentVesselCatalog = (await fetchJson('api/maritime-tracker.php')).items || [];
+    currentVesselCatalog = (await fetchJson('api/maritime-tracker.php?region=' + seaRegion)).items || [];
+    if (zoomToRegion && typeof globeInstance !== 'undefined' && globeInstance) {
+        if (seaRegion === 'hormuz') globeInstance.pointOfView({ lat: 26.5, lng: 56.2, altitude: 0.8 }, 2000);
+        if (seaRegion === 'mexico') globeInstance.pointOfView({ lat: 25.0, lng: -90.0, altitude: 1.2 }, 2000);
+    }
     initOrUpdateGlobe(currentGlobeBaseItems || []);
     updateDataPanel();
   } catch {
@@ -4132,55 +4143,84 @@ function updateDataPanel() {
     }
 
     container.innerHTML = html;
-  } else if (seaLayerEnabled && currentVesselCatalog && currentVesselCatalog.length > 0) {
-    title.textContent = 'Data Target: MARITIME TRAFFIC';
-    const total = currentVesselCatalog.length;
-    let tankers = 0, cargo = 0;
-    const flags = {};
+  } else if (seaLayerEnabled) {
+    title.textContent = 'Data Target: MARITIME ZONES';
     
-    currentVesselCatalog.forEach(v => {
-        if (v.type === 'Tanker' || v.type === 'LNG Carrier') tankers++;
-        else cargo++;
-        const f = v.flag || 'Unknown';
-        flags[f] = (flags[f] || 0) + 1;
-    });
-    
-    const topFlags = Object.entries(flags)
-        .sort((a,b) => b[1] - a[1])
-        .slice(0, 5);
-        
     let html = `
-      <div style="display:flex; justify-content:space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-        <div data-sea-type="all" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${!selectedSeaType ? 'rgba(0,150,255,0.15)' : 'transparent'};">
-          <div style="color:#0096ff; font-size:16px; font-weight:600;">${total}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${!selectedSeaType ? '#fff' : ''}">Vessels Tracked</div>
-        </div>
-        <div data-sea-type="Tanker" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSeaType === 'Tanker' ? 'rgba(255,165,0,0.15)' : 'transparent'};">
-          <div style="color:orange; font-size:16px; font-weight:600;">${tankers}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSeaType === 'Tanker' ? '#fff' : ''}">Tankers</div>
-        </div>
-        <div data-sea-type="Cargo" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSeaType === 'Cargo' ? 'rgba(0,150,255,0.15)' : 'transparent'};">
-          <div style="color:#0096ff; font-size:16px; font-weight:600;">${cargo}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSeaType === 'Cargo' ? '#fff' : ''}">Cargo</div>
-        </div>
+      <div style="margin-bottom: 16px;">
+         <div data-sea-select="hormuz" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; border: 1px solid ${seaRegion === 'hormuz' ? 'var(--cyan)' : 'rgba(255,255,255,0.1)'}; background: ${seaRegion === 'hormuz' ? 'rgba(0,150,255,0.15)' : 'rgba(255,255,255,0.02)'}; transition:all 0.2s;">
+            <div style="color:${seaRegion === 'hormuz' ? '#fff' : '#ccc'}; font-size:13px; font-weight:bold;">1. Strait of Hormuz</div>
+            ${seaRegion === 'hormuz' ? '<div style="color:var(--cyan); font-size:10px; text-transform:uppercase; font-weight:bold;">Tracking</div>' : ''}
+         </div>
+         <div data-sea-select="mexico" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; border: 1px solid ${seaRegion === 'mexico' ? 'var(--cyan)' : 'rgba(255,255,255,0.1)'}; background: ${seaRegion === 'mexico' ? 'rgba(0,150,255,0.15)' : 'rgba(255,255,255,0.02)'}; transition:all 0.2s;">
+            <div style="color:${seaRegion === 'mexico' ? '#fff' : '#ccc'}; font-size:13px; font-weight:bold;">2. Gulf of Mexico</div>
+            ${seaRegion === 'mexico' ? '<div style="color:var(--cyan); font-size:10px; text-transform:uppercase; font-weight:bold;">Tracking</div>' : ''}
+         </div>
       </div>
-      <div style="margin-bottom: 8px; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Vessels by Flag</div>
     `;
-    
-    topFlags.forEach(([flag, count], i) => {
-        const isSelected = selectedSeaFlag === flag;
+
+    if (seaRegion && currentVesselCatalog && currentVesselCatalog.length > 0) {
+        const total = currentVesselCatalog.length;
+        let tankers = 0, cargo = 0;
+        const flags = {};
+        
+        currentVesselCatalog.forEach(v => {
+            if (v.type === 'Tanker' || v.type === 'LNG Carrier') tankers++;
+            else cargo++;
+            const f = v.flag || 'Unknown';
+            flags[f] = (flags[f] || 0) + 1;
+        });
+        
+        const topFlags = Object.entries(flags)
+            .sort((a,b) => b[1] - a[1])
+            .slice(0, 5);
+            
         html += `
-        <div data-sea-flag="${flag}" style="cursor:pointer; display:flex; justify-content:space-between; padding: 6px 4px; font-size: 11px; background: ${isSelected ? 'rgba(0,150,255,0.15)' : 'transparent'}; border-radius: 4px; transition: background 0.2s;">
-          <span style="color:${isSelected ? '#fff' : '#ccc'}; font-weight:${isSelected ? 'bold' : 'normal'};">${i+1}. ${flag}</span>
-          <span style="color:#0096ff; font-family:var(--font-mono);">${count}</span>
-        </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div data-sea-type="all" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${!selectedSeaType ? 'rgba(0,150,255,0.15)' : 'transparent'};">
+              <div style="color:#0096ff; font-size:16px; font-weight:600;">${total}</div>
+              <div class="muted" style="font-size:9px; text-transform:uppercase; color:${!selectedSeaType ? '#fff' : ''}">Vessels</div>
+            </div>
+            <div data-sea-type="Tanker" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSeaType === 'Tanker' ? 'rgba(255,165,0,0.15)' : 'transparent'};">
+              <div style="color:orange; font-size:16px; font-weight:600;">${tankers}</div>
+              <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSeaType === 'Tanker' ? '#fff' : ''}">Tankers</div>
+            </div>
+            <div data-sea-type="Cargo" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSeaType === 'Cargo' ? 'rgba(0,150,255,0.15)' : 'transparent'};">
+              <div style="color:#0096ff; font-size:16px; font-weight:600;">${cargo}</div>
+              <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSeaType === 'Cargo' ? '#fff' : ''}">Cargo</div>
+            </div>
+          </div>
+          <div style="margin-bottom: 8px; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Vessels by Flag</div>
         `;
-    });
+        
+        topFlags.forEach(([flag, count], i) => {
+            const isSelected = selectedSeaFlag === flag;
+            html += `
+            <div data-sea-flag="${flag}" style="cursor:pointer; display:flex; justify-content:space-between; padding: 6px 4px; font-size: 11px; background: ${isSelected ? 'rgba(0,150,255,0.15)' : 'transparent'}; border-radius: 4px; transition: background 0.2s;">
+              <span style="color:${isSelected ? '#fff' : '#ccc'}; font-weight:${isSelected ? 'bold' : 'normal'};">${i+1}. ${flag}</span>
+              <span style="color:#0096ff; font-family:var(--font-mono);">${count}</span>
+            </div>
+            `;
+        });
+    } else if (!seaRegion) {
+        html += '<div class="muted" style="font-size:12px; margin-top:16px; padding:12px; border-left:2px solid var(--cyan); background:rgba(0,150,255,0.05);">Awaiting zone selection. Click a maritime region above to initialize live AIS tracking.</div>';
+    }
     
     container.innerHTML = html;
     
     if (!container.dataset.seaBound) {
       container.addEventListener('click', (event) => {
+        const selBtn = event.target.closest('[data-sea-select]');
+        if (selBtn) {
+            const r = selBtn.dataset.seaSelect;
+            if (seaRegion !== r) {
+                seaRegion = r;
+                selectedSeaType = null;
+                selectedSeaFlag = null;
+                refreshMaritimeCatalog(true);
+            }
+            return;
+        }
         const typeBtn = event.target.closest('[data-sea-type]');
         if (typeBtn) {
           const type = typeBtn.dataset.seaType;
