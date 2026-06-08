@@ -899,6 +899,8 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   background-size: 10px auto;
   padding-right: 24px !important;
   color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
   text-shadow: 0 0 2px rgba(0,0,0,0.8);
 }
 
