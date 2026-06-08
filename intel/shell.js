@@ -3763,6 +3763,22 @@ function renderOntologyGraph() {
           .backgroundColor('#050505')
           .nodeRelSize(4)
           .nodeVal(node => node.size || 10)
+          .nodeCanvasObjectMode(() => 'after')
+          .nodeCanvasObject((node, ctx, globalScale) => {
+             // Only draw permanent text labels for hubs (Nexus, Regions, Themes)
+             if (node.group === 0 || node.group === 3 || node.group === 4) {
+                 const label = node.label;
+                 const fontSize = node.group === 0 ? 14/globalScale : 12/globalScale;
+                 ctx.font = `${fontSize}px monospace`;
+                 ctx.textAlign = 'center';
+                 ctx.textBaseline = 'middle';
+                 ctx.fillStyle = node.group === 0 ? 'rgba(0, 229, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)';
+                 
+                 // Offset the text so it sits just below the node circle
+                 const nodeRadius = Math.sqrt(node.size || 10) * 4;
+                 ctx.fillText(label, node.x, node.y + nodeRadius + (6/globalScale));
+             }
+          })
           .nodeLabel(node => {
             if (node.image) {
                 return `<div style="background: rgba(0,0,0,0.8); border: 1px solid #333; padding: 4px; border-radius: 4px; max-width: 220px;">
