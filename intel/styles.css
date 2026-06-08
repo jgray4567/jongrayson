@@ -898,6 +898,13 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   background-position: right 8px center;
   background-size: 10px auto;
   padding-right: 24px !important;
+  color: #ffffff !important;
+  text-shadow: 0 0 2px rgba(0,0,0,0.8);
+}
+
+#pittsburgh-month-select option, #pittsburgh-year-select option {
+  background-color: #0a0c0e;
+  color: #ffffff;
 }
 
 /* Palantir-style monospacing and typographic updates */
