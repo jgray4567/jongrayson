@@ -668,11 +668,16 @@ function renderCron(){
 }
 
 function renderRecentActivity(){
-  document.getElementById('recent-activity').innerHTML=`
-    <div class="mem-file"><span class="name">2026-06-08</span><span class="desc">Karpathy repos cloned (26), second brain wiki setup, dashboard deployed</span><span class="meta">today</span></div>
-    <div class="mem-file"><span class="name">wiki/log.md</span><span class="desc">Updated with all repo assessments and second brain synthesis</span><span class="meta">updated</span></div>
-    <div class="mem-file"><span class="name">MEMORY.md</span><span class="desc">Added Second Brain architecture + Karpathy repos section</span><span class="meta">updated</span></div>
-  `;
+  const recent=SESSION_LOGS.slice(0,5);
+  if(!recent.length){
+    document.getElementById('recent-activity').innerHTML='<div style="color:var(--muted);padding:10px;font-family:var(--font-mono);font-size:0.8rem">No recent activity</div>';return;
+  }
+  document.getElementById('recent-activity').innerHTML=recent.map(s=>{
+    const date=s.name.replace('.md','');
+    const label=s.desc||'Session log';
+    const isToday=date===new Date().toISOString().slice(0,10)?'today':date;
+    return `<div class="mem-file mem-clickable" data-type="session" data-name="${s.name}" tabindex="0" role="button" aria-label="Open ${s.name}"><span class="name">${date}</span><span class="desc">${label}</span><span class="meta">${isToday}</span></div>`;
+  }).join('');
 }
 
 // ─── TABS ───────────────────────────────────────────────────────────
