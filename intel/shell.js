@@ -1,3 +1,35 @@
+// ── Dynamic lazy-loaders for heavy dependencies ──
+let _satelliteLoadPromise = null;
+let _forceGraphLoadPromise = null;
+
+async function ensureSatelliteLib() {
+  if (window.satellite) return;
+  if (!_satelliteLoadPromise) {
+    _satelliteLoadPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://unpkg.com/satellite.js@5.0.0/dist/satellite.min.js';
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('Failed to load satellite.js'));
+      document.head.appendChild(s);
+    });
+  }
+  await _satelliteLoadPromise;
+}
+
+async function ensureForceGraphLib() {
+  if (window.ForceGraph || (typeof ForceGraph !== 'undefined')) return;
+  if (!_forceGraphLoadPromise) {
+    _forceGraphLoadPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://unpkg.com/force-graph';
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('Failed to load force-graph'));
+      document.head.appendChild(s);
+    });
+  }
+  await _forceGraphLoadPromise;
+}
+
 const recommendationsList = document.getElementById('third-order-escalation-recommendations-list');
 const analyticsList = document.getElementById('third-order-escalation-analytics-list');
 const effectivenessList = document.getElementById('third-order-escalation-effectiveness-list');
@@ -2666,19 +2698,18 @@ function initializeCommandSurface() {
     satelliteButton.addEventListener('click', async () => {
       satelliteLayerEnabled = !satelliteLayerEnabled;
       syncSatelliteToggle();
-      await refreshSatelliteCatalog();
-      syncSatelliteLayerTimer();
-      
       if (satelliteLayerEnabled) {
-          airLayerEnabled = false;
-          syncAirToggle();
-          seaLayerEnabled = false;
-          const bSea = document.getElementById('toggle-sea-layer');
-          if (bSea) { bSea.classList.remove('active'); }
-          currentVesselCatalog = [];
-          if (seaLayerTimer) clearInterval(seaLayerTimer);
+        await ensureSatelliteLib();
+        await refreshSatelliteCatalog();
+        syncSatelliteLayerTimer();
+        airLayerEnabled = false;
+        syncAirToggle();
+        seaLayerEnabled = false;
+        const bSea = document.getElementById('toggle-sea-layer');
+        if (bSea) { bSea.classList.remove('active'); }
+        currentVesselCatalog = [];
+        if (seaLayerTimer) clearInterval(seaLayerTimer);
       }
-      
       initOrUpdateGlobe(currentGlobeBaseItems || []);
       updateDataPanel();
     });
@@ -3566,6 +3597,9 @@ function initOrUpdateGlobe(items = []) {
   currentGlobePointsData = cityPoints;
 
   if (!intelGlobe) {
+    // Hide loading skeleton
+    const loadEl = document.getElementById('globe-loading');
+    if (loadEl) loadEl.remove();
     intelGlobe = Globe()(globeContainer)
       .globeImageUrl(isNightTime() ? '//unpkg.com/three-globe/example/img/earth-night.jpg' : '//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .backgroundColor('rgba(0,0,0,0)')
@@ -3959,9 +3993,11 @@ function getVisibleOntology(clickedNode = null) {
     return { nodes: outNodes, links: outLinks };
 }
 
-function renderOntologyGraph() {
+async function renderOntologyGraph() {
   const container = document.getElementById('intel-graph-stage');
   if (!container) return console.error("Intel Graph Error: #intel-graph-stage not found.");
+  
+  await ensureForceGraphLib();
   
   if (!graphInstance) {
     console.log("Intel Graph: Fetching ontology.json...");

@@ -1015,3 +1015,9 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   border-color: var(--lime);
   color: var(--lime);
 }
+
+/* Loading animation for globe init */
+@keyframes loadbar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
