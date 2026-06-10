@@ -13,9 +13,9 @@
   <link rel="dns-prefetch" href="https://unpkg.com">
   <style>
 /* Inline critical: will be overridden by hud.css */
-  body{background:#020408;color:#e0f0ff;font-family:'Space Grotesk',-apple-system,sans-serif;margin:0;}
+  body{background:#060806;color:#e4ede4;font-family:'JetBrains Mono','Roboto Mono',Menlo,monospace;margin:0;}
   </style>
-  <link rel="stylesheet" href="hud.css?v=0.009.2">
+  <link rel="stylesheet" href="hud.css?v=0.010">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script defer src="https://unpkg.com/globe.gl"></script>
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -90,32 +90,51 @@
             <div class="hud-panel-kicker">Global Posture</div>
           </div>
           <div class="hud-posture">
+            <div class="hud-posture-label">threat assessment</div>
             <strong id="global-posture" class="hud-posture-value">Scanning…</strong>
           </div>
         </div>
 
-        <!-- Stats Grid -->
+        <!-- Circular Gauges -->
         <div class="hud-panel">
           <div class="hud-panel-header">
-            <div class="hud-panel-kicker">Metrics</div>
+            <div class="hud-panel-kicker">System Metrics</div>
           </div>
-          <div class="hud-panel-body">
-            <div class="hud-stat-grid">
+          <div class="hud-panel-body" style="padding-bottom:18px;">
+            <div class="hud-gauge-row">
+              <div class="hud-gauge">
+                <svg viewBox="0 0 36 36">
+                  <circle class="hud-gauge-track" cx="18" cy="18" r="16"/>
+                  <circle class="hud-gauge-fill" cx="18" cy="18" r="16" stroke-dasharray="100" stroke-dashoffset="35" id="gauge-terminal"/>
+                </svg>
+                <span class="hud-gauge-value" id="terminal-count">0</span>
+                <span class="hud-gauge-label">Terminal</span>
+              </div>
+              <div class="hud-gauge">
+                <svg viewBox="0 0 36 36">
+                  <circle class="hud-gauge-track" cx="18" cy="18" r="16"/>
+                  <circle class="hud-gauge-fill" cx="18" cy="18" r="16" stroke-dasharray="100" stroke-dashoffset="48" id="gauge-fortified"/>
+                </svg>
+                <span class="hud-gauge-value" id="fortified-count">0</span>
+                <span class="hud-gauge-label">Fortified</span>
+              </div>
+              <div class="hud-gauge">
+                <svg viewBox="0 0 36 36">
+                  <circle class="hud-gauge-track" cx="18" cy="18" r="16"/>
+                  <circle class="hud-gauge-fill" cx="18" cy="18" r="16" stroke-dasharray="100" stroke-dashoffset="82" id="gauge-reversal"/>
+                </svg>
+                <span class="hud-gauge-value" id="reversal-count">0</span>
+                <span class="hud-gauge-label">Reversals</span>
+              </div>
+            </div>
+            <div class="hud-stat-grid" style="margin-top:6px;">
               <div class="hud-stat-block">
-                <div class="hud-stat-value" id="terminal-count">0</div>
-                <div class="hud-stat-label">Terminal</div>
+                <div class="hud-stat-value" id="status-strip-systems" style="font-size:1rem;">0</div>
+                <div class="hud-stat-label">Systems Online</div>
               </div>
               <div class="hud-stat-block">
-                <div class="hud-stat-value" id="fortified-count">0</div>
-                <div class="hud-stat-label">Fortified</div>
-              </div>
-              <div class="hud-stat-block">
-                <div class="hud-stat-value" id="reversal-count">0</div>
-                <div class="hud-stat-label">Reversals</div>
-              </div>
-              <div class="hud-stat-block">
-                <div class="hud-stat-value" id="status-strip-systems">0</div>
-                <div class="hud-stat-label">Online</div>
+                <div class="hud-stat-value" style="font-size:1rem;color:var(--text-mid);">v202</div>
+                <div class="hud-stat-label">Build</div>
               </div>
             </div>
           </div>
@@ -322,5 +341,37 @@
   </div>
 
   <script src="shell.js?v=0.008.46" type="module"></script>
+  <script>
+    // ── Circular Gauge Updater ──
+    // Updates SVG stroke-dashoffset based on data values
+    function updateGauges() {
+      const gauges = [
+        { id: 'gauge-terminal', valueId: 'terminal-count', max: 100 },
+        { id: 'gauge-fortified', valueId: 'fortified-count', max: 100 },
+        { id: 'gauge-reversal', valueId: 'reversal-count', max: 30 },
+      ];
+      gauges.forEach(g => {
+        const el = document.getElementById(g.id);
+        const valEl = document.getElementById(g.valueId);
+        if (!el || !valEl) return;
+        const val = parseInt(valEl.textContent) || 0;
+        const pct = Math.min(val / g.max, 1);
+        const dashLen = 100; // matches stroke-dasharray
+        const offset = dashLen - (pct * dashLen);
+        el.setAttribute('stroke-dashoffset', offset.toFixed(1));
+        // Color severity
+        if (g.valueId === 'reversal-count') {
+          el.classList.toggle('warn', pct > 0.5);
+          el.classList.toggle('crit', pct > 0.8);
+        }
+      });
+    }
+    // Run periodically and on DOM changes
+    setInterval(updateGauges, 2000);
+    setTimeout(updateGauges, 1500);
+    // Observe DOM mutations for live data
+    const gaugeObserver = new MutationObserver(updateGauges);
+    gaugeObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+  </script>
 </body>
 </html>
