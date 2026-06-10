@@ -956,9 +956,10 @@ body[data-interaction-mode="mobile"] .map-hover-card {
     order: 1; /* Globe on top */
     padding: 12px;
   }
-  /* Hide brand block and Global Posture on mobile */
+  /* Hide brand block, Global Posture, and Scheduled Jobs on mobile */
   .brand-block,
-  .panel:has(> #global-posture) {
+  .panel:has(> #global-posture),
+  #scheduled-jobs-panel {
     display: none !important;
   }
   #intel-live-triage {
