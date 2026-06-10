@@ -1,0 +1,48 @@
+{
+  "items": [
+    {
+      "id": "sig-001",
+      "source": "Maritime Watch",
+      "severity": "high",
+      "title": "Abnormal vessel loitering detected near Port SAR approach vector.",
+      "timestamp": "2026-04-13T01:45:00Z",
+      "status": "active",
+      "taskTag": "Maritime Ops",
+      "taskId": "task-001"
+    },
+    {
+      "id": "sig-002",
+      "source": "Air Ops",
+      "severity": "medium",
+      "title": "Unscheduled cargo flight filed for alternate routing bypassing standard corridors.",
+      "timestamp": "2026-04-13T00:10:00Z",
+      "status": "active",
+      "recoverCount": 1,
+      "archiveCount": 1,
+      "recoveredAt": "2026-04-13T02:20:00Z",
+      "taskTag": "Air Watch",
+      "taskId": "task-002"
+    },
+    {
+      "id": "sig-003",
+      "source": "SysMon",
+      "severity": "low",
+      "title": "Sensor mesh latency spike detected in Sector 7 perimeter nodes.",
+      "timestamp": "2026-04-12T23:30:00Z",
+      "taskTag": "SysMon",
+      "taskId": "task-004"
+    },
+    {
+      "id": "sig-004",
+      "source": "Coastal Watch",
+      "severity": "medium",
+      "title": "Fast-response patrol transponder dropped for 11 minutes outside standard checkpoint cadence.",
+      "timestamp": "2026-04-12T22:55:00Z",
+      "status": "dismiss",
+      "archiveCount": 1,
+      "actionedAt": "2026-04-13T00:42:00Z",
+      "taskTag": "Maritime Ops",
+      "taskId": "task-001"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "tasks": [
+    {
+      "id": "task-001",
+      "name": "Red Sea Transit Corridors",
+      "status": "active",
+      "tag": "Maritime Ops",
+      "signalsAttached": 1,
+      "createdAt": "2026-03-01T10:00:00Z"
+    },
+    {
+      "id": "task-002",
+      "name": "Taiwan Strait Air Defense Zone",
+      "status": "active",
+      "tag": "Air Watch",
+      "signalsAttached": 1,
+      "createdAt": "2026-03-15T12:00:00Z"
+    },
+    {
+      "id": "task-003",
+      "name": "Port SAR Approach Sector",
+      "status": "active",
+      "tag": "Maritime Ops",
+      "signalsAttached": 0,
+      "createdAt": "2026-04-10T08:00:00Z"
+    },
+    {
+      "id": "task-004",
+      "name": "Sector 7 Perimeter Grid",
+      "status": "archived",
+      "tag": "SysMon",
+      "signalsAttached": 1,
+      "createdAt": "2026-01-10T09:00:00Z",
+      "archivedAt": "2026-04-01T15:00:00Z"
+    },
+    {
+      "id": "task-005",
+      "name": "Rapid Deploy Team Alpha",
+      "status": "archived",
+      "tag": "Maritime Ops",
+      "signalsAttached": 0,
+      "createdAt": "2026-04-05T08:00:00Z",
+      "archivedAt": "2026-04-08T12:00:00Z"
+    }
+  ]
+}

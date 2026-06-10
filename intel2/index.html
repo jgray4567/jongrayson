@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
+  <meta name="theme-color" content="#0a0c0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <base href="/intel2/">
+  <title>Intel, Build 202 | Jon Grayson</title>
+  <meta name="description" content="Intel build 202, Geographic Intel Projection, HUD-style dashboard with global visualization inside jongrayson.com.">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <style>
+/* Inline critical: will be overridden by hud.css */
+  body{background:#020408;color:#e0f0ff;font-family:'Space Grotesk',-apple-system,sans-serif;margin:0;}
+  </style>
+  <link rel="stylesheet" href="hud.css?v=0.010">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script defer src="https://unpkg.com/globe.gl"></script>
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script defer src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+</head>
+<body>
+  <div class="hud-shell">
+
+    <!-- ═══ TOP BAR ═══ -->
+    <header class="hud-topbar">
+      <div class="hud-brand">
+        <a href="/" class="hud-home-link" title="Home">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3v-6h4v6h3a1 1 0 001-1V10"/></svg>
+        </a>
+        <div>
+          <div class="hud-brand-kicker">jongrayson.com /intel</div>
+          <div class="hud-brand-name">JerryKnows.ai <span class="hud-brand-sub">Automated Intelligence Platform</span></div>
+        </div>
+      </div>
+      <div class="hud-status-strip">
+        <div class="hud-status-item">
+          <span class="hud-status-dot"></span>
+          <span class="hud-status-label">Systems</span>
+          <strong class="hud-status-value" id="hud-status-systems">0</strong>
+        </div>
+        <div class="hud-status-item">
+          <span class="hud-status-dot" id="hud-posture-dot"></span>
+          <span class="hud-status-label">Posture</span>
+          <strong class="hud-status-value" id="hud-status-posture">Scanning…</strong>
+        </div>
+        <div class="hud-status-item">
+          <span class="hud-status-dot"></span>
+          <span class="hud-status-label">Terminal</span>
+          <strong class="hud-status-value" id="hud-status-terminal">0</strong>
+        </div>
+        <div class="hud-status-item">
+          <span class="hud-status-dot"></span>
+          <span class="hud-status-label">Fortified</span>
+          <strong class="hud-status-value" id="hud-status-fortified">0</strong>
+        </div>
+        <button id="toggle-diagnostics" class="hud-diag-btn">Diagnostics</button>
+      </div>
+    </header>
+
+    <!-- ═══ MAIN GRID ═══ -->
+    <div class="hud-main">
+
+      <!-- ─── TOP CONTROL BAR ─── -->
+      <div class="hud-top-controls">
+        <div class="hud-controls-bar">
+          <span style="font-family:var(--font-mono);font-size:0.62rem;color:var(--cyan);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;">Layers</span>
+          <div class="hud-ctrl-divider"></div>
+          <button id="toggle-air-layer" class="hud-ctrl-btn">Air</button>
+          <button id="toggle-sea-layer" class="hud-ctrl-btn">Sea</button>
+          <button id="toggle-satellite-layer" class="hud-ctrl-btn">Sat</button>
+          <button id="toggle-threat-layer" class="hud-ctrl-btn">Cyber</button>
+          <button id="toggle-ontology-graph" class="hud-ctrl-btn">Link Graph</button>
+          <button id="return-to-globe" class="hud-ctrl-btn" style="display:none;">Globe</button>
+          <button id="toggle-pittsburgh-zones" class="hud-ctrl-btn" style="display:none;">Zones</button>
+          <button id="toggle-danger-zones" class="hud-ctrl-btn" style="display:none;">Threats</button>
+          <select id="pittsburgh-month-select" class="map-control-select" style="display:none;"></select>
+          <button id="toggle-globe-rotation" class="hud-ctrl-btn" style="display:none;">Rotate</button>
+        </div>
+      </div>
+
+      <!-- ─── LEFT PANELS ─── -->
+      <div class="hud-left-panels">
+
+        <!-- Global Posture -->
+        <div class="hud-panel">
+          <div class="hud-panel-header">
+            <div class="hud-panel-kicker">Global Posture</div>
+          </div>
+          <div class="hud-posture">
+            <strong id="global-posture" class="hud-posture-value">Scanning…</strong>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="hud-panel">
+          <div class="hud-panel-header">
+            <div class="hud-panel-kicker">Metrics</div>
+          </div>
+          <div class="hud-panel-body">
+            <div class="hud-stat-grid">
+              <div class="hud-stat-block">
+                <div class="hud-stat-value" id="terminal-count">0</div>
+                <div class="hud-stat-label">Terminal</div>
+              </div>
+              <div class="hud-stat-block">
+                <div class="hud-stat-value" id="fortified-count">0</div>
+                <div class="hud-stat-label">Fortified</div>
+              </div>
+              <div class="hud-stat-block">
+                <div class="hud-stat-value" id="reversal-count">0</div>
+                <div class="hud-stat-label">Reversals</div>
+              </div>
+              <div class="hud-stat-block">
+                <div class="hud-stat-value" id="status-strip-systems">0</div>
+                <div class="hud-stat-label">Online</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Signal Feed -->
+        <div class="hud-panel" style="flex:1;min-height:180px;">
+          <div class="hud-panel-header">
+            <div class="hud-panel-kicker" id="dynamic-panel-title">Data Target: Global Zones</div>
+          </div>
+          <div class="hud-panel-body">
+            <div id="intel-live-triage" class="hud-signal-list" style="font-family:var(--font-mono);font-size:0.68rem;">
+              <div class="muted">Loading global signals...</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /hud-left-panels -->
+
+      <!-- ─── CENTER: GLOBE ─── -->
+      <div class="hud-globe-area">
+        <div class="hud-globe-label">Live Globe</div>
+        <div class="hud-globe-coords" id="hud-globe-coords">0.00°N 0.00°E</div>
+
+        <div id="thin-intel-panel" class="thin-intel-panel">
+          <a href="/" class="thin-intel-home" title="Home" aria-label="Home">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3v-6h4v6h3a1 1 0 001-1V10"/></svg>
+          </a>
+          <span class="thin-intel-title">Intel</span>
+          <div class="thin-intel-divider"></div>
+          <!-- Globe control buttons are dynamically added by shell.js -->
+        </div>
+
+        <div id="sat-orbit-filters" class="sat-orbit-row" style="display:none;">
+          <button id="toggle-sat-leo" class="hud-ctrl-btn" style="background:rgba(0,229,100,0.18);border-color:rgba(0,229,100,0.4);color:rgba(0,229,100,0.98);" data-orbit="LEO">LEO</button>
+          <button id="toggle-sat-meo" class="hud-ctrl-btn" style="background:rgba(0,224,255,0.18);border-color:rgba(0,224,255,0.4);color:rgba(0,224,255,0.98);" data-orbit="MEO">MEO</button>
+          <button id="toggle-sat-geo" class="hud-ctrl-btn" style="background:rgba(255,60,60,0.18);border-color:rgba(255,60,60,0.4);color:rgba(255,60,60,0.98);" data-orbit="GEO">GEO</button>
+        </div>
+
+        <div id="crime-legend" class="crime-legend" style="display:none;"></div>
+
+        <div id="intel-globe" style="width:100%;height:100%;cursor:grab;">
+          <div id="globe-loading" style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;">
+            <div style="text-align:center;">
+              <div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--text-dim);margin-bottom:12px;">Initializing globe</div>
+              <div class="loadbar-track">
+                <div class="loadbar-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="intel-map-stage" style="display:none;width:100%;height:100%;position:relative;"></div>
+        <div id="intel-graph-stage" style="display:none;width:100%;height:100%;position:relative;background:var(--surface);"></div>
+
+        <!-- Activation panel (drawer overlay on globe) -->
+        <aside id="intel-activation-panel" class="intel-drawer" aria-hidden="true" style="display:none;">
+          <div class="intel-drawer-head">
+            <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+              <img id="intel-drawer-airline-logo" class="intel-airline-logo" style="display:none;" alt="Airline logo">
+              <div style="min-width:0;">
+                <div class="hud-panel-kicker">Activated Focus</div>
+                <div id="intel-drawer-title" class="intel-drawer-title">Click a point on the globe</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button id="intel-drawer-close" class="ghost-btn">X</button>
+              <button id="intel-drawer-thumb" class="intel-drawer-thumb" type="button" style="display:none;" aria-label="Open image preview">
+                <img id="intel-drawer-thumb-image" alt="Satellite preview">
+              </button>
+            </div>
+          </div>
+          <div id="intel-drawer-state" class="intel-state-chip" style="margin-top:10px;">Awaiting activation</div>
+          <div id="intel-drawer-summary" class="muted" style="margin-top:10px;font-size:0.72rem;">Hover for a quick read. Click a globe point to reveal the full location panel.</div>
+          <div id="intel-drawer-map" class="intel-map-preview"></div>
+          <div id="intel-drawer-metrics" class="intel-metrics" style="margin-top:10px;"></div>
+          <details class="intel-deep-details" style="margin-top:10px;">
+            <summary style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text-dim);cursor:pointer;">Deep diagnostics</summary>
+            <div id="intel-drawer-deep" class="task-focus-meta" style="margin-top:8px;"></div>
+          </details>
+        </aside>
+
+        <div id="intel-image-lightbox" class="intel-image-lightbox" aria-hidden="true" style="display:none;">
+          <button id="intel-image-lightbox-close" class="ghost-btn" type="button" style="position:absolute;top:16px;right:16px;z-index:10;">X</button>
+          <img id="intel-image-lightbox-image" alt="Expanded preview">
+        </div>
+      </div><!-- /hud-globe-area -->
+
+      <!-- ─── RIGHT PANELS ─── -->
+      <div class="hud-right-panels">
+
+        <!-- Scheduled Jobs -->
+        <div class="hud-panel">
+          <div class="hud-panel-header">
+            <div class="hud-panel-kicker">Scheduled Jobs</div>
+          </div>
+          <div class="hud-panel-body">
+            <div class="hud-job-item">
+              <div class="hud-job-header">
+                <strong class="hud-job-name">Dream Sequence</strong>
+                <span class="hud-job-status">● Active</span>
+              </div>
+              <div class="hud-job-detail">Mon 9:00 AM ET</div>
+              <div class="hud-job-detail">Weekly audit of MEMORY.md + wiki</div>
+              <div>
+                <span class="hud-job-tag">brainwave/auto</span>
+              </div>
+            </div>
+            <div class="hud-job-item">
+              <div class="hud-job-header">
+                <strong class="hud-job-name">Karpathy Repo Check</strong>
+                <span class="hud-job-status">● Active</span>
+              </div>
+              <div class="hud-job-detail">Daily 8:00 AM ET</div>
+              <div class="hud-job-detail">Scans GitHub for new repos</div>
+              <div>
+                <span class="hud-job-tag">glm-5.1:cloud</span>
+                <span class="hud-job-tag" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);">→ brainwave → sonnet</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Query -->
+        <div class="hud-panel" id="selected-query-panel">
+          <div class="hud-panel-header">
+            <div class="hud-panel-kicker">Active Query</div>
+          </div>
+          <div class="hud-panel-body">
+            <div id="selected-query" style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--cyan);letter-spacing:-0.02em;">harbor</div>
+            <div id="selected-meta" class="muted" style="font-size:0.68rem;margin-top:6px;">Use the signal feed to focus a recommendation case.</div>
+          </div>
+        </div>
+
+        <!-- Signal Severity Filters -->
+        <div class="hud-panel">
+          <div class="hud-panel-header">
+            <div class="hud-panel-kicker">Signal Filters</div>
+          </div>
+          <div class="hud-panel-body">
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <button class="hud-ctrl-btn active" data-severity="all">All</button>
+              <button class="hud-ctrl-btn" data-severity="high" style="color:var(--red);border-color:rgba(239,68,68,0.3);">High</button>
+              <button class="hud-ctrl-btn" data-severity="medium" style="color:var(--amber);border-color:rgba(251,191,36,0.3);">Medium</button>
+              <button class="hud-ctrl-btn" data-severity="low" style="color:var(--cyan);">Low</button>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+              <button class="hud-ctrl-btn active" data-feed-view="active">Active</button>
+              <button class="hud-ctrl-btn" data-feed-view="archived">Archived</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /hud-right-panels -->
+
+    </div><!-- /hud-main -->
+
+  <!-- ═══ DIAGNOSTICS MODAL ═══ -->
+  <div id="diagnostics-modal-overlay" style="display:none;">
+    <div class="diag-modal" style="background:var(--surface);width:92%;max-width:1200px;max-height:90vh;overflow-y:auto;border:1px solid var(--border-bright);border-radius:8px;padding:24px;position:relative;box-shadow:0 10px 40px rgba(0,0,0,0.5),0 0 30px rgba(0,224,255,0.06);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:16px;">
+        <h2 style="margin:0;color:var(--cyan);font-size:1.1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;font-family:var(--font-mono);">System Diagnostics</h2>
+        <button id="close-diagnostics-modal" class="ghost-btn">Close</button>
+      </div>
+
+      <div class="stage-grid" style="display:grid;gap:14px;">
+        <section class="hud-panel" style="grid-column:1/-1;">
+          <div class="hud-panel-header"><div class="hud-panel-kicker">Live Timeline</div></div>
+          <div class="hud-panel-body">
+            <div id="timeline-container" style="position:relative;height:60px;background:rgba(0,224,255,0.03);border:1px solid var(--border);border-radius:8px;margin-top:14px;"></div>
+          </div>
+        </section>
+
+        <section class="hud-panel">
+          <div class="hud-panel-header"><div class="hud-panel-kicker">Timeline Focus</div></div>
+          <div class="hud-panel-body">
+            <div id="timeline-focus-status" style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--cyan);margin-top:10px;">Full feed window</div>
+            <div id="timeline-focus-summary" class="task-focus-meta" style="margin-top:8px;">Click a live marker to isolate a temporal investigation window.</div>
+            <div class="filter-row" style="margin-top:14px;flex-wrap:wrap;gap:8px;">
+              <div class="signal-filters" id="timeline-window-buttons">
+                <button class="ghost-btn" data-window-minutes="30">30m</button>
+                <button class="ghost-btn active" data-window-minutes="60">1h</button>
+                <button class="ghost-btn" data-window-minutes="180">3h</button>
+                <button class="ghost-btn" data-window-minutes="360">6h</button>
+              </div>
+              <button id="save-timeline-view" class="ghost-btn">Save scope</button>
+              <button id="copy-share-link" class="ghost-btn">Copy link</button>
+              <button id="clear-timeline-filter" class="ghost-btn">Clear scope</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="hud-panel" style="grid-column:1/-1;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;padding:10px 14px 8px;border-bottom:1px solid var(--border);background:rgba(0,224,255,0.03);">
+            <div>
+              <div class="hud-panel-kicker">Signal Feed <span id="feed-status" style="margin-left:8px;font-size:0.55rem;color:var(--text-dim);font-weight:normal;text-transform:none;letter-spacing:normal;">● Live</span></div>
+            </div>
+          </div>
+          <div class="hud-panel-body">
+            <div id="signal-feed-list" style="margin-top:14px;"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="shell.js?v=0.008.46" type="module"></script>
+</body>
+</html>
