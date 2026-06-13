@@ -181,21 +181,37 @@
     {
       "id": "sig_14",
       "group": 2,
-      "label": "Fans on concourses instead of in seats, claims Fifa",
-      "size": 12,
-      "url": "https://www.bbc.com/sport/football/articles/c14y0dp6vrdo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/141f/live/52c65db0-6698-11f1-ba1a-d91f8cef28c9.jpg"
-    },
-    {
-      "id": "sig_15",
-      "group": 2,
       "label": "US kills leader of Venezuela's Tren de Aragua gang in airstrike, Trump says",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/cp36z37knlko?at_medium=RSS&amp;at_campaign=rss",
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/d3bf/live/d798f640-66d1-11f1-bb58-c91c9b854a9d.jpg"
     },
     {
+      "id": "sig_15",
+      "group": 2,
+      "label": "Woman seriously injured in shark attack at Sydney beach",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/c3ryw807133o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/fc78/live/5a8ddf40-6739-11f1-baaa-b1eba7000c81.jpg"
+    },
+    {
       "id": "sig_16",
+      "group": 2,
+      "label": "Trump's name being removed from Kennedy Center after judge order",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/c5yzd4dgxw4o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/6552/live/25a4df20-672c-11f1-8546-8f19e4fe30f4.jpg"
+    },
+    {
+      "id": "sig_17",
+      "group": 2,
+      "label": "Kidnapped Nigerian retired general dies in captivity",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/cvgq4veq2eqo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3fcd/live/c841d5e0-5ce5-11f1-8b8c-6d33e1d5abb6.jpg"
+    },
+    {
+      "id": "sig_18",
       "group": 2,
       "label": "Anthropic suspends new AI tools over US government security concerns",
       "size": 12,
@@ -203,28 +219,12 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/54a1/live/35ba2f90-66c9-11f1-b891-a117aef409ef.jpg"
     },
     {
-      "id": "sig_17",
-      "group": 2,
-      "label": "Warner Bros $111bn sale to Paramount approved by US justice department",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/cjwgled9jxwo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/6251/live/3d15a8f0-66a6-11f1-b7ab-1591368af17a.jpg"
-    },
-    {
-      "id": "sig_18",
-      "group": 2,
-      "label": "King leads tributes to 'giant of the art world' David Hockney",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/cvgjxdr27z4o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/8bb9/live/10dffaf0-667f-11f1-9286-5160d00e7bd3.jpg"
-    },
-    {
       "id": "sig_19",
       "group": 2,
-      "label": "French town buries murdered child as questions mount over police failings",
+      "label": "Fans on concourses instead of in seats, claims Fifa",
       "size": 12,
-      "url": "https://www.bbc.com/news/articles/cy9rq21dqego?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/9052/live/f8e9bda0-6679-11f1-b44a-dfe6fe570742.jpg"
+      "url": "https://www.bbc.com/sport/football/articles/c14y0dp6vrdo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/141f/live/52c65db0-6698-11f1-ba1a-d91f8cef28c9.jpg"
     },
     {
       "id": "sig_20",
@@ -389,13 +389,29 @@
     {
       "id": "sig_40",
       "group": 2,
+      "label": "Iranians divided on peace prospects after US-Iran say a deal is near",
+      "size": 12,
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/13/iranians-divided-on-peace-prospects-after-us-iran-say-a-deal-is-near?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_41",
+      "group": 2,
+      "label": "Workers remove Trump’s name from Kennedy Center after court ruling",
+      "size": 12,
+      "url": "https://www.aljazeera.com/news/2026/6/13/workers-remove-trumps-name-from-kennedy-center-after-court-ruling?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_42",
+      "group": 2,
       "label": "From colony to cell: Sexual violence in Israeli prisons",
       "size": 12,
       "url": "https://www.aljazeera.com/video/newsfeed/2026/6/13/from-colony-to-cell-sexual-violence-in-israeli-prisons?traffic_source=rss",
       "image": ""
     },
     {
-      "id": "sig_41",
+      "id": "sig_43",
       "group": 2,
       "label": "Fans reveal how much they paid for World Cup tickets",
       "size": 12,
@@ -403,7 +419,7 @@
       "image": ""
     },
     {
-      "id": "sig_42",
+      "id": "sig_44",
       "group": 2,
       "label": "‘Lots of things can still go wrong’ with US-Iran deal to end the war",
       "size": 12,
@@ -411,7 +427,7 @@
       "image": ""
     },
     {
-      "id": "sig_43",
+      "id": "sig_45",
       "group": 2,
       "label": "Iran announces funeral, burial dates for late Supreme Leader Khamenei",
       "size": 12,
@@ -419,7 +435,7 @@
       "image": ""
     },
     {
-      "id": "sig_44",
+      "id": "sig_46",
       "group": 2,
       "label": "Deadly military plane crash in India’s Assam",
       "size": 12,
@@ -427,7 +443,7 @@
       "image": ""
     },
     {
-      "id": "sig_45",
+      "id": "sig_47",
       "group": 2,
       "label": "Football: Why is India struggling to play the world’s most popular sport?",
       "size": 12,
@@ -435,7 +451,7 @@
       "image": ""
     },
     {
-      "id": "sig_46",
+      "id": "sig_48",
       "group": 2,
       "label": "Five Indian air force staff killed as transport plane crashes in Assam",
       "size": 12,
@@ -443,27 +459,11 @@
       "image": ""
     },
     {
-      "id": "sig_47",
+      "id": "sig_49",
       "group": 2,
       "label": "Violence erupts at anti-government protest in DR Congo",
       "size": 12,
       "url": "https://www.aljazeera.com/video/newsfeed/2026/6/13/violence-erupts-at-anti-government-protest-in-dr-congo?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_48",
-      "group": 2,
-      "label": "Qatar vs Switzerland: World Cup group match – preview, team news, lineups",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/13/qatar-vs-switzerland-world-cup-group-match-preview-team-news-lineups?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_49",
-      "group": 2,
-      "label": "Yemen’s ‘Spider-Man’ dies while scaling volcanic crater",
-      "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/13/yemens-spider-man-dies-while-scaling-volcanic-crater?traffic_source=rss",
       "image": ""
     },
     {
@@ -684,6 +684,11 @@
       "value": 2
     },
     {
+      "source": "sig_2",
+      "target": "sig_1",
+      "value": 1
+    },
+    {
       "source": "sig_3",
       "target": "theme_geo",
       "value": 1
@@ -691,6 +696,11 @@
     {
       "source": "sig_4",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_4",
+      "target": "sig_3",
       "value": 1
     },
     {
@@ -702,6 +712,11 @@
       "source": "sig_5",
       "target": "theme_cyber",
       "value": 2
+    },
+    {
+      "source": "sig_5",
+      "target": "sig_4",
+      "value": 1
     },
     {
       "source": "sig_6",
@@ -729,6 +744,11 @@
       "value": 1
     },
     {
+      "source": "sig_9",
+      "target": "sig_8",
+      "value": 1
+    },
+    {
       "source": "sig_10",
       "target": "reg_na",
       "value": 1
@@ -741,6 +761,11 @@
     {
       "source": "sig_11",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_11",
+      "target": "sig_10",
       "value": 1
     },
     {
@@ -759,13 +784,8 @@
       "value": 1
     },
     {
-      "source": "sig_13",
-      "target": "sig_12",
-      "value": 1
-    },
-    {
       "source": "sig_14",
-      "target": "theme_sport",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -784,23 +804,28 @@
       "value": 1
     },
     {
-      "source": "sig_16",
-      "target": "sig_15",
+      "source": "sig_17",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_17",
+      "target": "sig_16",
+      "value": 1
+    },
+    {
+      "source": "sig_18",
       "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_18",
-      "target": "theme_geo",
+      "target": "sig_17",
       "value": 1
     },
     {
       "source": "sig_19",
-      "target": "theme_geo",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -816,11 +841,6 @@
     {
       "source": "sig_21",
       "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_21",
-      "target": "sig_20",
       "value": 1
     },
     {
@@ -864,11 +884,6 @@
       "value": 1
     },
     {
-      "source": "sig_27",
-      "target": "sig_26",
-      "value": 1
-    },
-    {
       "source": "sig_28",
       "target": "theme_geo",
       "value": 1
@@ -909,13 +924,13 @@
       "value": 1
     },
     {
-      "source": "sig_32",
-      "target": "sig_31",
+      "source": "sig_33",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_33",
-      "target": "theme_geo",
+      "target": "sig_32",
       "value": 1
     },
     {
@@ -926,11 +941,6 @@
     {
       "source": "sig_34",
       "target": "reg_asia",
-      "value": 1
-    },
-    {
-      "source": "sig_34",
-      "target": "sig_33",
       "value": 1
     },
     {
@@ -954,6 +964,11 @@
       "value": 1
     },
     {
+      "source": "sig_36",
+      "target": "sig_35",
+      "value": 1
+    },
+    {
       "source": "sig_37",
       "target": "reg_eu",
       "value": 1
@@ -964,6 +979,11 @@
       "value": 1
     },
     {
+      "source": "sig_38",
+      "target": "sig_37",
+      "value": 1
+    },
+    {
       "source": "sig_39",
       "target": "reg_na",
       "value": 1
@@ -971,6 +991,11 @@
     {
       "source": "sig_39",
       "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_40",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -985,7 +1010,7 @@
     },
     {
       "source": "sig_41",
-      "target": "theme_sport",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -995,42 +1020,27 @@
     },
     {
       "source": "sig_42",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_43",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_44",
       "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_42",
+      "source": "sig_44",
       "target": "reg_me",
       "value": 1
     },
     {
-      "source": "sig_43",
+      "source": "sig_45",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_43",
-      "target": "sig_42",
-      "value": 1
-    },
-    {
-      "source": "sig_44",
-      "target": "reg_asia",
-      "value": 1
-    },
-    {
-      "source": "sig_44",
-      "target": "sig_43",
-      "value": 1
-    },
-    {
-      "source": "sig_45",
-      "target": "reg_asia",
-      "value": 1
-    },
-    {
-      "source": "sig_45",
-      "target": "theme_sport",
       "value": 1
     },
     {
@@ -1039,18 +1049,43 @@
       "value": 1
     },
     {
+      "source": "sig_46",
+      "target": "sig_45",
+      "value": 1
+    },
+    {
       "source": "sig_47",
-      "target": "theme_geo",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_47",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_47",
+      "target": "sig_46",
       "value": 1
     },
     {
       "source": "sig_48",
-      "target": "theme_sport",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_48",
+      "target": "sig_47",
       "value": 1
     },
     {
       "source": "sig_49",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_49",
+      "target": "sig_48",
       "value": 1
     },
     {
@@ -1079,23 +1114,18 @@
       "value": 1
     },
     {
-      "source": "sig_53",
-      "target": "sig_52",
-      "value": 1
-    },
-    {
       "source": "sig_54",
       "target": "reg_eu",
       "value": 1
     },
     {
-      "source": "sig_54",
-      "target": "sig_53",
+      "source": "sig_55",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_55",
-      "target": "theme_geo",
+      "target": "sig_54",
       "value": 1
     },
     {
@@ -1111,6 +1141,11 @@
     {
       "source": "sig_57",
       "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_57",
+      "target": "sig_56",
       "value": 1
     },
     {
