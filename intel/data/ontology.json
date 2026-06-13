@@ -694,13 +694,13 @@
       "value": 1
     },
     {
-      "source": "sig_4",
-      "target": "theme_geo",
+      "source": "sig_3",
+      "target": "sig_2",
       "value": 1
     },
     {
       "source": "sig_4",
-      "target": "sig_3",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -714,18 +714,23 @@
       "value": 2
     },
     {
-      "source": "sig_5",
-      "target": "sig_4",
-      "value": 1
-    },
-    {
       "source": "sig_6",
       "target": "theme_geo",
       "value": 1
     },
     {
+      "source": "sig_6",
+      "target": "sig_5",
+      "value": 1
+    },
+    {
       "source": "sig_7",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_7",
+      "target": "sig_6",
       "value": 1
     },
     {
@@ -739,13 +744,13 @@
       "value": 1
     },
     {
-      "source": "sig_9",
-      "target": "theme_geo",
+      "source": "sig_8",
+      "target": "sig_7",
       "value": 1
     },
     {
       "source": "sig_9",
-      "target": "sig_8",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -759,13 +764,13 @@
       "value": 1
     },
     {
-      "source": "sig_11",
-      "target": "theme_geo",
+      "source": "sig_10",
+      "target": "sig_9",
       "value": 1
     },
     {
       "source": "sig_11",
-      "target": "sig_10",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -804,13 +809,13 @@
       "value": 1
     },
     {
-      "source": "sig_17",
-      "target": "theme_geo",
+      "source": "sig_16",
+      "target": "sig_15",
       "value": 1
     },
     {
       "source": "sig_17",
-      "target": "sig_16",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -829,8 +834,18 @@
       "value": 1
     },
     {
+      "source": "sig_19",
+      "target": "sig_18",
+      "value": 1
+    },
+    {
       "source": "sig_20",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_20",
+      "target": "sig_19",
       "value": 1
     },
     {
@@ -851,6 +866,11 @@
     {
       "source": "sig_23",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_23",
+      "target": "sig_22",
       "value": 1
     },
     {
@@ -884,6 +904,11 @@
       "value": 1
     },
     {
+      "source": "sig_27",
+      "target": "sig_26",
+      "value": 1
+    },
+    {
       "source": "sig_28",
       "target": "theme_geo",
       "value": 1
@@ -891,11 +916,6 @@
     {
       "source": "sig_29",
       "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_29",
-      "target": "sig_28",
       "value": 1
     },
     {
@@ -909,11 +929,6 @@
       "value": 1
     },
     {
-      "source": "sig_31",
-      "target": "sig_30",
-      "value": 1
-    },
-    {
       "source": "sig_32",
       "target": "reg_na",
       "value": 1
@@ -924,13 +939,13 @@
       "value": 1
     },
     {
-      "source": "sig_33",
-      "target": "theme_geo",
+      "source": "sig_32",
+      "target": "sig_31",
       "value": 1
     },
     {
       "source": "sig_33",
-      "target": "sig_32",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -954,6 +969,11 @@
       "value": 1
     },
     {
+      "source": "sig_35",
+      "target": "sig_34",
+      "value": 1
+    },
+    {
       "source": "sig_36",
       "target": "reg_na",
       "value": 1
@@ -964,11 +984,6 @@
       "value": 1
     },
     {
-      "source": "sig_36",
-      "target": "sig_35",
-      "value": 1
-    },
-    {
       "source": "sig_37",
       "target": "reg_eu",
       "value": 1
@@ -976,11 +991,6 @@
     {
       "source": "sig_38",
       "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_38",
-      "target": "sig_37",
       "value": 1
     },
     {
@@ -1014,11 +1024,6 @@
       "value": 1
     },
     {
-      "source": "sig_41",
-      "target": "sig_40",
-      "value": 1
-    },
-    {
       "source": "sig_42",
       "target": "reg_me",
       "value": 1
@@ -1044,6 +1049,11 @@
       "value": 1
     },
     {
+      "source": "sig_45",
+      "target": "sig_44",
+      "value": 1
+    },
+    {
       "source": "sig_46",
       "target": "reg_asia",
       "value": 1
@@ -1064,11 +1074,6 @@
       "value": 1
     },
     {
-      "source": "sig_47",
-      "target": "sig_46",
-      "value": 1
-    },
-    {
       "source": "sig_48",
       "target": "reg_asia",
       "value": 1
@@ -1081,11 +1086,6 @@
     {
       "source": "sig_49",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_49",
-      "target": "sig_48",
       "value": 1
     },
     {
@@ -1159,6 +1159,11 @@
       "value": 1
     },
     {
+      "source": "sig_58",
+      "target": "sig_57",
+      "value": 1
+    },
+    {
       "source": "sig_59",
       "target": "reg_na",
       "value": 1
@@ -1166,6 +1171,11 @@
     {
       "source": "sig_59",
       "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_59",
+      "target": "sig_58",
       "value": 1
     }
   ]
