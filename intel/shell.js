@@ -47,7 +47,7 @@ let currentBaselineViewId = '';
 let autoRefreshTimer = null;
 let diagnosticsVisible = false;
 let currentPriorityItems = [];
-let globeAutoRotateEnabled = true;
+
 let currentGlobeBaseItems = [];
 let currentGlobePointsData = [];
 let cityMapInstance = null;
@@ -2425,7 +2425,6 @@ async function refreshMaritimeCatalog(zoomToRegion = false) {
           destination: Cesium.Cartesian3.fromDegrees(targetLng, targetLat, 2000000),
           duration: 2
         });
-        if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(false);
         setTimeout(() => {
             if (typeof showMapStage === 'function') {
                 showMapStage({
@@ -2624,7 +2623,6 @@ function initializeCommandSurface() {
             destination: Cesium.Cartesian3.fromDegrees(-98.0, 39.0, 10000000),
             duration: 1.8
           });
-          if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(true);
         } else {
           selectedAirRegion = region;
           const regionalFlights = currentAirTrafficItems.filter(f => f.country === region);
@@ -2635,7 +2633,6 @@ function initializeCommandSurface() {
                destination: Cesium.Cartesian3.fromDegrees(avgLng, avgLat, 3000000),
                duration: 1.8
              });
-             if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(false);
           }
         }
         
@@ -2913,15 +2910,8 @@ function syncGlobeControls(container, enabled) {
   if (!allowControls) container.style.cursor = 'default';
 }
 
-function setGlobeAutoRotate(enabled) {
-  globeAutoRotateEnabled = enabled;
-  // For Cesium, we control rotation through a flag that's checked in the tick handler
-  const button = document.getElementById('toggle-globe-rotation');
-  if (button) {
-    button.style.display = enabled ? 'none' : 'inline-flex';
-    button.textContent = enabled ? 'Pause rotation' : 'Rotate';
-  }
-  setGlobeOverlayVisibility(enabled);
+  // Rotation removed per user request
+  if (button) button.style.display = 'none';
 }
 
 function updateGlobeTexture() {
@@ -3638,7 +3628,6 @@ function showMapStage(item = {}) {
   const globe = document.getElementById('intel-globe');
   const mapStage = document.getElementById('intel-map-stage');
   const returnButton = document.getElementById('return-to-globe');
-  const rotationButton = document.getElementById('toggle-globe-rotation');
   const airButton = document.getElementById('toggle-air-layer');
   const satelliteButton = document.getElementById('toggle-satellite-layer');
   const threatButton = document.getElementById('toggle-threat-layer');
@@ -3655,7 +3644,6 @@ function showMapStage(item = {}) {
     title.style.color = '#000';
   }
   if (returnButton) returnButton.style.display = 'inline-flex';
-  if (rotationButton) rotationButton.style.display = 'none';
   if (airButton) airButton.style.display = 'none';
   if (satelliteButton) satelliteButton.style.display = 'none';
   const seaButton = document.getElementById('toggle-sea-layer');
@@ -3702,11 +3690,7 @@ function showGlobeStage() {
   if (threatButton) threatButton.style.display = 'inline-flex';
   const satOrbitFilters = document.getElementById('sat-orbit-filters');
   if (satOrbitFilters && satelliteLayerEnabled) satOrbitFilters.style.display = 'inline-flex';
-  if (!globeAutoRotateEnabled) {
-    const rotationButton = document.getElementById('toggle-globe-rotation');
-    if (rotationButton) rotationButton.style.display = 'inline-flex';
-  }
-  setGlobeOverlayVisibility(globeAutoRotateEnabled);
+  // Rotation removed — globe is static
 }
 
 function _initGlobeVars() {}
@@ -3766,7 +3750,7 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.scene.backgroundColor = Cesium.Color.BLACK;
     intelGlobe.scene.skyAtmosphere.show = true;
 
-    // Add rotation handler (uses global globeAutoRotateEnabled)
+    // Rotation removed per user request — globe stays static
     const toggleMapStyleButton = document.getElementById('toggle-map-style');
     if (toggleMapStyleButton) {
       toggleMapStyleButton.textContent = 'Satellite';
@@ -3796,12 +3780,8 @@ function initOrUpdateGlobe(items = []) {
       });
     }
 
-    // Add rotation handler
-    intelGlobe.clock.onTick.addEventListener(() => {
-      if (globeAutoRotateEnabled) {
-        intelGlobe.scene.camera.rotateRight(0.1 * Cesium.Math.RADIANS_PER_DEGREE);
-      }
-    });
+    // Rotation removed
+    // Rotation tick handler removed — globe is static
 
     // Handle resize
     window.addEventListener('resize', () => {
