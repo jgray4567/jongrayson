@@ -165,13 +165,21 @@
     {
       "id": "sig_12",
       "group": 2,
+      "label": "Nigerian author accuses hospital of stalling review into her son's death",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/cgk6jzkr0xvo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/4e80/live/e9ef2460-677e-11f1-9177-9b1b06fa8e36.jpg"
+    },
+    {
+      "id": "sig_13",
+      "group": 2,
       "label": "Ticketmaster says Knicks fans won't be locked out of game after last-minute panic",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/c5yz7gj4x3yo?at_medium=RSS&amp;at_campaign=rss",
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/2224/live/f00d5970-6774-11f1-9b6d-7de3d24967e2.jpg"
     },
     {
-      "id": "sig_13",
+      "id": "sig_14",
       "group": 2,
       "label": "Vincent's parents 'never say he's good enough' - so he turned to a middle-aged couple online",
       "size": 12,
@@ -179,7 +187,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/963c/live/e31fbd90-1e93-11f1-9120-a910fc22c6ac.jpg"
     },
     {
-      "id": "sig_14",
+      "id": "sig_15",
       "group": 2,
       "label": "Married at First Sight Australia stars not told partners had drug and violence convictions",
       "size": 12,
@@ -187,7 +195,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/4cf0/live/889a7100-666c-11f1-8546-8f19e4fe30f4.jpg"
     },
     {
-      "id": "sig_15",
+      "id": "sig_16",
       "group": 2,
       "label": "Woman seriously injured in shark attack at Sydney beach",
       "size": 12,
@@ -195,7 +203,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/fc78/live/5a8ddf40-6739-11f1-baaa-b1eba7000c81.jpg"
     },
     {
-      "id": "sig_16",
+      "id": "sig_17",
       "group": 2,
       "label": "Trump's name removed from Kennedy Center after court order",
       "size": 12,
@@ -203,7 +211,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/ba3a/live/39e7e860-6745-11f1-b4c1-47ccd10ce929.jpg"
     },
     {
-      "id": "sig_17",
+      "id": "sig_18",
       "group": 2,
       "label": "Kidnapped Nigerian retired general dies in captivity",
       "size": 12,
@@ -211,20 +219,12 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3fcd/live/c841d5e0-5ce5-11f1-8b8c-6d33e1d5abb6.jpg"
     },
     {
-      "id": "sig_18",
+      "id": "sig_19",
       "group": 2,
       "label": "Anthropic suspends new AI tools over US government security concerns",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/c932g3v3e13o?at_medium=RSS&amp;at_campaign=rss",
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/54a1/live/35ba2f90-66c9-11f1-b891-a117aef409ef.jpg"
-    },
-    {
-      "id": "sig_19",
-      "group": 2,
-      "label": "Elon Musk becomes world's first trillionaire as SpaceX soars in stock market debut",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/c4gypy3wwl7o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/f94f/live/233c68e0-66a3-11f1-80bb-fb4d08542828.jpg"
     },
     {
       "id": "sig_20",
@@ -389,81 +389,81 @@
     {
       "id": "sig_40",
       "group": 2,
-      "label": "Brazil and Morocco kickoff amid electric atmosphere",
+      "label": "Knicks win first NBA title in 53 years with win over Spurs in Game 5",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/13/aje-onl-nf_brazil-and-morocco-kickoff-amid-electric-atmosphere-130626?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/14/knicks-vs-spurs-new-york-san-antonio-nba-finals-game-5?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_41",
       "group": 2,
-      "label": "Qatar net late against Switzerland to secure historic first World Cup point",
+      "label": "‘Lion of Mesopotamia’: How Aymen Hussein beat tragedy to reach World Cup",
       "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/13/qatar-net-dramatic-late-goal-to-draw-world-cup-opener-against-switzerland?traffic_source=rss",
+      "url": "https://www.aljazeera.com/features/2026/6/14/lion-of-mesopotamia-how-aymen-hussein-beat-tragedy-to-reach-world-cup?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_42",
       "group": 2,
-      "label": "Thousands mourn Thai princess as body taken to lie in state in Bangkok",
+      "label": "Scotland beat Haiti 1-0 to mark a winning return to the World Cup",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/13/thousands-mourn-thai-princess-as-body-taken-to-lie-in-state-in-bangkok?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/14/scotland-beat-haiti-1-0-to-mark-a-winning-return-to-the-world?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_43",
       "group": 2,
-      "label": "Dashcam shows US cop accidentally shooting colleague during ‘horseplay’",
+      "label": "Two killed in Israeli strike on Gaza",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/13/dashcam-shows-us-cop-accidentally-shooting-colleague-during?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/14/aje-onl-nf_two-killed-in-gaza-in-deadly-israeli-strike-130626?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_44",
       "group": 2,
-      "label": "Thousands rally in Rome, Italy for rival pro- and anti-migration marches",
+      "label": "After battling armed attacks, Mauritania attempts to revive tourism",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/13/thousands-rally-in-rome-italy-for-rival-pro-and-anti-migration-marches?traffic_source=rss",
+      "url": "https://www.aljazeera.com/features/2026/6/14/after-battling-armed-attacks-mauritania-attempts-to-revive-tourism?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_45",
       "group": 2,
-      "label": "Ten observations after attending a World Cup match in the US",
+      "label": "Why is the price of gold trending down?",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/13/ten-observations-after-attending-a-world-cup-match-in-the-us?traffic_source=rss",
+      "url": "https://www.aljazeera.com/economy/2026/6/14/why-is-the-price-of-gold-trending-down?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_46",
       "group": 2,
-      "label": "Israel attacks Lebanon as US says Iran deal to be signed on Sunday",
+      "label": "Vinicius drags low-key Brazil level against dominant Morocco at World Cup",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/13/israel-attacks-lebanon-as-us-says-iran-deal-to-be-signed-on-sunday?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/14/vinicius-drags-brazil-level-against-dominant-morocco-at-world-cup?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_47",
       "group": 2,
-      "label": "Will the new EU migration rules work?",
+      "label": "America250 versus Freedom 250: What to know about the US semiquincentennial",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/inside-story/2026/6/13/will-the-new-eu-migration-rules-work?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/14/america250-versus-freedom250-what-to-know-about-the-us-semiquincentennial?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_48",
       "group": 2,
-      "label": "‘A global rupture’: Carney calls for Canada-EU unity before G7 summit",
+      "label": "Haiti fans in the streets, Scotland faithful in kilts",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/13/a-global-rupture-carney-calls-for-canada-eu-unity-before-g7-summit?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/14/aje-onl-nf_haiti-fans-in-the-streets-scotland-in-kilts-130626?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_49",
       "group": 2,
-      "label": "Thousands attend anti-racism rally in Belfast",
+      "label": "Iran war live: Trump says deal to be signed today; Tehran disputes timing",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/13/thousands-attend-anti-racism-rally-in-belfast?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/liveblog/2026/6/14/iran-war-live-trump-says-deal-to-be-signed-today-as-tehran-urges-caution?traffic_source=rss",
       "image": ""
     },
     {
@@ -664,6 +664,11 @@
       "value": 2
     },
     {
+      "source": "sig_1",
+      "target": "sig_0",
+      "value": 1
+    },
+    {
       "source": "sig_2",
       "target": "reg_na",
       "value": 1
@@ -699,13 +704,13 @@
       "value": 2
     },
     {
-      "source": "sig_6",
-      "target": "theme_geo",
+      "source": "sig_5",
+      "target": "sig_4",
       "value": 1
     },
     {
       "source": "sig_6",
-      "target": "sig_5",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -724,11 +729,6 @@
       "value": 1
     },
     {
-      "source": "sig_8",
-      "target": "sig_7",
-      "value": 1
-    },
-    {
       "source": "sig_9",
       "target": "theme_geo",
       "value": 1
@@ -744,18 +744,13 @@
       "value": 1
     },
     {
-      "source": "sig_10",
-      "target": "sig_9",
-      "value": 1
-    },
-    {
       "source": "sig_11",
       "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_12",
-      "target": "theme_sport",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -765,12 +760,12 @@
     },
     {
       "source": "sig_13",
-      "target": "theme_geo",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_14",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -784,18 +779,18 @@
       "value": 1
     },
     {
+      "source": "sig_15",
+      "target": "sig_14",
+      "value": 1
+    },
+    {
       "source": "sig_16",
       "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_16",
-      "target": "sig_15",
-      "value": 1
-    },
-    {
       "source": "sig_17",
-      "target": "theme_geo",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -805,32 +800,17 @@
     },
     {
       "source": "sig_18",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_19",
       "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_19",
-      "target": "theme_econ",
-      "value": 1
-    },
-    {
-      "source": "sig_19",
-      "target": "sig_18",
       "value": 1
     },
     {
       "source": "sig_20",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_20",
-      "target": "sig_19",
       "value": 1
     },
     {
@@ -849,11 +829,6 @@
       "value": 1
     },
     {
-      "source": "sig_22",
-      "target": "sig_21",
-      "value": 1
-    },
-    {
       "source": "sig_23",
       "target": "reg_na",
       "value": 1
@@ -861,11 +836,6 @@
     {
       "source": "sig_23",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_23",
-      "target": "sig_22",
       "value": 1
     },
     {
@@ -889,8 +859,18 @@
       "value": 1
     },
     {
+      "source": "sig_26",
+      "target": "sig_25",
+      "value": 1
+    },
+    {
       "source": "sig_27",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_27",
+      "target": "sig_26",
       "value": 1
     },
     {
@@ -924,6 +904,11 @@
       "value": 1
     },
     {
+      "source": "sig_30",
+      "target": "sig_29",
+      "value": 1
+    },
+    {
       "source": "sig_31",
       "target": "reg_me",
       "value": 1
@@ -934,6 +919,11 @@
       "value": 1
     },
     {
+      "source": "sig_32",
+      "target": "sig_31",
+      "value": 1
+    },
+    {
       "source": "sig_33",
       "target": "reg_na",
       "value": 1
@@ -944,8 +934,18 @@
       "value": 1
     },
     {
+      "source": "sig_33",
+      "target": "sig_32",
+      "value": 1
+    },
+    {
       "source": "sig_34",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_34",
+      "target": "sig_33",
       "value": 1
     },
     {
@@ -994,68 +994,53 @@
       "value": 1
     },
     {
+      "source": "sig_38",
+      "target": "sig_37",
+      "value": 1
+    },
+    {
       "source": "sig_39",
       "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_39",
-      "target": "sig_38",
+      "source": "sig_40",
+      "target": "theme_geo",
       "value": 1
     },
     {
-      "source": "sig_40",
-      "target": "reg_sa",
-      "value": 1
-    },
-    {
-      "source": "sig_40",
-      "target": "sig_39",
+      "source": "sig_41",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_41",
       "target": "theme_sport",
-      "value": 1
-    },
-    {
-      "source": "sig_41",
-      "target": "sig_40",
       "value": 1
     },
     {
       "source": "sig_42",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_43",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_44",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_44",
-      "target": "sig_43",
-      "value": 1
-    },
-    {
-      "source": "sig_45",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_45",
       "target": "theme_sport",
       "value": 1
     },
     {
+      "source": "sig_43",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_43",
+      "target": "sig_42",
+      "value": 1
+    },
+    {
+      "source": "sig_44",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
       "source": "sig_45",
-      "target": "sig_44",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -1065,22 +1050,42 @@
     },
     {
       "source": "sig_46",
-      "target": "reg_me",
+      "target": "reg_sa",
+      "value": 1
+    },
+    {
+      "source": "sig_46",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_46",
+      "target": "sig_45",
       "value": 1
     },
     {
       "source": "sig_47",
-      "target": "theme_geo",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_47",
+      "target": "sig_46",
       "value": 1
     },
     {
       "source": "sig_48",
-      "target": "theme_geo",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_49",
       "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_49",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1114,11 +1119,6 @@
       "value": 1
     },
     {
-      "source": "sig_52",
-      "target": "sig_51",
-      "value": 1
-    },
-    {
       "source": "sig_53",
       "target": "theme_geo",
       "value": 1
@@ -1134,6 +1134,11 @@
       "value": 1
     },
     {
+      "source": "sig_54",
+      "target": "sig_53",
+      "value": 1
+    },
+    {
       "source": "sig_55",
       "target": "reg_eu",
       "value": 1
@@ -1141,11 +1146,6 @@
     {
       "source": "sig_56",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_56",
-      "target": "sig_55",
       "value": 1
     },
     {
@@ -1161,11 +1161,6 @@
     {
       "source": "sig_58",
       "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_58",
-      "target": "sig_57",
       "value": 1
     },
     {
