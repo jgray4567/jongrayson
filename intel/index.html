@@ -8,12 +8,13 @@
   <meta name="description" content="Intel build 201, Geographic Intel Projection, mapping structural states to global visualization inside jongrayson.com.">
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="dns-prefetch" href="https://unpkg.com">
-  <link rel="stylesheet" href="styles.css?v=0.008.46">
+  <link rel="stylesheet" href="styles.css?v=0.009.00">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <!-- Core: globe.gl + leaflet needed on first paint. defer ensures HTML renders first. -->
-  <script defer src="https://unpkg.com/globe.gl"></script>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <!-- Core: CesiumJS + leaflet needed on first paint. defer ensures HTML renders first. -->
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script defer src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+  <script defer src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script
   <!-- Lazy: satellite.js + force-graph loaded dynamically on demand -->
 </head>
 <body>
@@ -145,6 +146,7 @@
             <button id="toggle-ontology-graph" class="ghost-btn map-control-btn">Link Graph</button>
             <button id="toggle-pittsburgh-zones" class="ghost-btn map-control-btn" style="display: none;">Zones</button>
             <button id="toggle-danger-zones" class="ghost-btn map-control-btn" style="display: none;">Threats</button>
+            <button id="toggle-map-style" class="ghost-btn map-control-btn">Satellite</button>
             <select id="pittsburgh-month-select" class="map-control-select" style="display: none;"></select>
             <button id="toggle-globe-rotation" class="ghost-btn map-control-btn" style="display: none;">Rotate</button>
           </div>
@@ -173,7 +175,7 @@
           </div>
         </div>
       </div>
-          <div id="intel-map-stage" style="display:none; height:60vh; width:100%; position: relative;"></div>
+          <div id="intel-map-stage" style="display:none; height:60vh; width:100%; position: relative;"><div id="detail-panel" class="detail-panel"><div class="detail-panel-header"><button id="detail-panel-close" class="detail-panel-close" aria-label="Close">✕</button></div><div id="detail-panel-content" class="detail-panel-content"></div></div></div>
           <div id="intel-graph-stage" style="display:none; height:60vh; width:100%; position: relative; background: var(--surface);"></div>
         </section>
 

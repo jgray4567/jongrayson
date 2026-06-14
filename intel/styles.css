@@ -381,15 +381,15 @@ body {
   left: calc(18px + env(safe-area-inset-left, 0px));
   z-index: 900;
   width: min(280px, calc(100% - 36px));
-  padding: 14px 16px;
-  border-radius: 12px;
+  padding: 14px 20px;
+  border-radius: var(--gmpx-radius-md);
   background: rgba(255,255,255,0.96);
   border: none;
-  color: #202124;
+  color: var(--gmpx-color-on-surface);
   backdrop-filter: blur(10px);
   pointer-events: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: var(--gmpx-elevation-2);
+  font-family: var(--gmpx-font-family-base);
 }
 .leaflet-container {
   background: #1a1a1a;
@@ -404,8 +404,9 @@ body {
   border: none;
   box-shadow: none;
   color: #fff;
+  font-family: var(--gmpx-font-family-base);
   font-weight: 500;
-  font-size: 11px;
+  font-size: 0.6875rem;
   border-radius: 4px;
   padding: 2px 8px;
   letter-spacing: 0.02em;
@@ -452,6 +453,29 @@ body {
   display: none; /* replaced by chip bar */
 }
 
+/* ═══════════════════════════════════════════════════════
+   GOOGLE MAPS DESIGN SYSTEM — Tokens from gmpx component library
+   ═══════════════════════════════════════════════════════ */
+:root {
+  --gmpx-color-primary: #1976d2;
+  --gmpx-color-surface: #fff;
+  --gmpx-color-on-surface: #212121;
+  --gmpx-color-on-surface-variant: #757575;
+  --gmpx-color-outline: #e0e0e0;
+  --gmpx-color-outline-variant: #dadce0;
+  --gmpx-color-surface-variant: #f3f6fc;
+  --gmpx-font-family-base: 'Google Sans Text', 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  --gmpx-font-family-headings: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  --gmpx-font-size-base: 0.875rem;
+  --gmpx-elevation-1: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.15);
+  --gmpx-elevation-2: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.15);
+  --gmpx-elevation-3: 0 4px 8px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.15);
+  --gmpx-border-separator: 1px solid var(--gmpx-color-outline);
+  --gmpx-radius-sm: 8px;
+  --gmpx-radius-md: 12px;
+  --gmpx-radius-lg: 16px;
+}
+
 /* ── CRIME CHIP BAR (Google M3 FilterChip spec) ─────── */
 .crime-chip-bar {
   position: absolute;
@@ -462,15 +486,15 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--gmpx-color-surface);
+  border-radius: var(--gmpx-radius-sm);
   padding: 8px 12px;
-  font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 12px;
-  color: #5f6368;
+  font-family: var(--gmpx-font-family-base);
+  font-size: 0.75rem;
+  color: var(--gmpx-color-on-surface-variant);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  box-shadow: var(--gmpx-elevation-2);
 }
 .crime-chip {
   display: inline-flex;
@@ -478,12 +502,12 @@ body {
   gap: 8px;
   height: 32px;
   padding: 0 12px;
-  border-radius: 8px;
-  border: 1px solid #dadce0;
+  border-radius: var(--gmpx-radius-sm);
+  border: 1px solid var(--gmpx-color-outline-variant);
   background: transparent;
-  color: #5f6368;
-  font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 12px;
+  color: var(--gmpx-color-on-surface-variant);
+  font-family: var(--gmpx-font-family-base);
+  font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
@@ -496,15 +520,15 @@ body {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--chip-color, #5f6368);
+  background: var(--chip-color, var(--gmpx-color-on-surface-variant));
   opacity: 0.35;
   transition: opacity 0.15s;
   flex-shrink: 0;
 }
 .crime-chip.active {
-  color: #202124;
+  color: var(--gmpx-color-on-surface);
   background: rgba(var(--chip-rgb, 95,99,104), 0.08);
-  border-color: var(--chip-color, #dadce0);
+  border-color: var(--chip-color, var(--gmpx-color-outline-variant));
 }
 .crime-chip.active::before {
   opacity: 1;
@@ -518,27 +542,27 @@ body {
 .crime-chip-divider {
   width: 1px;
   height: 24px;
-  background: #dadce0;
+  background: var(--gmpx-color-outline-variant);
   margin: 0 4px;
   flex-shrink: 0;
 }
 
-/* ── CRIME DATA CARD (Google place-detail style) ─────── */
+/* ── CRIME DATA CARD (Google gmpx place-detail spec) ── */
 .crime-popup {
   min-width: 280px;
   max-width: 320px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  background: var(--gmpx-color-surface);
+  border-radius: var(--gmpx-radius-md);
+  box-shadow: var(--gmpx-elevation-2);
   overflow: hidden;
-  font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #202124;
+  font-family: var(--gmpx-font-family-base);
+  color: var(--gmpx-color-on-surface);
 }
 .crime-popup-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 16px 8px;
+  padding: 16px 20px 8px;
 }
 .crime-popup-dot {
   width: 12px;
@@ -547,19 +571,21 @@ body {
   flex-shrink: 0;
 }
 .crime-popup-cat {
-  font-size: 11px;
+  font-family: var(--gmpx-font-family-base);
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #80868b;
+  color: var(--gmpx-color-on-surface-variant);
   font-weight: 500;
 }
 .crime-popup-body {
-  padding: 0 16px 16px;
+  padding: 0 20px 16px;
 }
 .crime-popup-title {
-  font-size: 14px;
+  font-family: var(--gmpx-font-family-headings);
+  font-size: 1rem;
   font-weight: 500;
-  color: #202124;
+  color: var(--gmpx-color-on-surface);
   line-height: 1.4;
   margin-bottom: 12px;
 }
@@ -567,131 +593,134 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 12px;
-  color: #5f6368;
+  font-size: 0.75rem;
+  color: var(--gmpx-color-on-surface-variant);
   padding: 4px 0;
 }
 .crime-popup-row strong {
-  color: #202124;
+  color: var(--gmpx-color-on-surface);
   font-weight: 500;
 }
 .crime-popup-footer {
-  border-top: 1px solid #e8eaed;
-  padding: 10px 16px;
-  font-size: 11px;
-  color: #80868b;
+  border-top: var(--gmpx-border-separator);
+  padding: 10px 20px;
+  font-size: 0.75rem;
+  color: var(--gmpx-color-on-surface-variant);
 }
 
-/* ── DANGER ZONE POPUP (Google place-detail style) ──── */
+/* ── DANGER ZONE POPUP (Google gmpx place-detail spec) */
 .danger-popup {
   min-width: 280px;
   max-width: 320px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  background: var(--gmpx-color-surface);
+  border-radius: var(--gmpx-radius-md);
+  box-shadow: var(--gmpx-elevation-2);
   overflow: hidden;
-  font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #202124;
+  font-family: var(--gmpx-font-family-base);
+  color: var(--gmpx-color-on-surface);
 }
 .danger-popup-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 16px 16px 8px;
+  padding: 16px 20px 8px;
 }
 .danger-popup-badge {
   padding: 4px 10px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #fff;
+  color: var(--gmpx-color-surface);
 }
 .danger-popup-body {
-  padding: 0 16px 16px;
+  padding: 0 20px 16px;
 }
 .danger-popup-title {
-  font-size: 14px;
+  font-family: var(--gmpx-font-family-headings);
+  font-size: 1rem;
   font-weight: 500;
-  color: #202124;
+  color: var(--gmpx-color-on-surface);
   margin-bottom: 12px;
 }
 .danger-popup-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 12px;
-  color: #5f6368;
+  font-size: 0.75rem;
+  color: var(--gmpx-color-on-surface-variant);
   padding: 4px 0;
 }
 .danger-popup-row strong {
-  color: #202124;
+  color: var(--gmpx-color-on-surface);
   font-weight: 500;
 }
 .danger-popup-footer {
-  border-top: 1px solid #e8eaed;
-  padding: 10px 16px;
-  font-size: 11px;
-  color: #80868b;
+  border-top: var(--gmpx-border-separator);
+  padding: 10px 20px;
+  font-size: 0.75rem;
+  color: var(--gmpx-color-on-surface-variant);
 }
 
-/* ── ZONE POPUP (Google place-detail style) ──────────── */
+/* ── ZONE POPUP (Google gmpx place-detail spec) ─────── */
 .zone-popup {
   min-width: 280px;
   max-width: 320px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  background: var(--gmpx-color-surface);
+  border-radius: var(--gmpx-radius-md);
+  box-shadow: var(--gmpx-elevation-2);
   overflow: hidden;
-  font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #202124;
+  font-family: var(--gmpx-font-family-base);
+  color: var(--gmpx-color-on-surface);
 }
 .zone-popup-header {
-  padding: 16px 16px 8px;
+  padding: 16px 20px 8px;
 }
 .zone-popup-title {
-  font-size: 16px;
+  font-family: var(--gmpx-font-family-headings);
+  font-size: 1.125rem;
   font-weight: 500;
-  color: #202124;
+  color: var(--gmpx-color-on-surface);
 }
 .zone-popup-sub {
-  font-size: 11px;
-  color: #80868b;
+  font-size: 0.75rem;
+  color: var(--gmpx-color-on-surface-variant);
   margin-top: 2px;
 }
 .zone-popup-body {
-  padding: 0 16px 16px;
+  padding: 0 20px 16px;
 }
 .zone-popup-stat {
-  font-size: 28px;
+  font-family: var(--gmpx-font-family-headings);
+  font-size: 1.75rem;
   font-weight: 400;
-  color: #202124;
+  color: var(--gmpx-color-on-surface);
   line-height: 1.2;
 }
 .zone-popup-stat-label {
-  font-size: 11px;
-  color: #80868b;
+  font-size: 0.75rem;
+  color: var(--gmpx-color-on-surface-variant);
   margin-top: 2px;
 }
 .zone-popup-divider {
-  border-top: 1px solid #e8eaed;
+  border-top: var(--gmpx-border-separator);
   margin: 12px 0;
 }
 .zone-popup-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 12px;
-  color: #5f6368;
+  font-size: 0.75rem;
+  color: var(--gmpx-color-on-surface-variant);
   padding: 4px 0;
 }
 .zone-popup-row strong {
-  color: #202124;
+  color: var(--gmpx-color-on-surface);
   font-weight: 500;
 }
 
-/* ── LEAFLET POPUP OVERRIDE (Google style) ─────────── */
+/* ── LEAFLET POPUP OVERRIDE (Google gmpx style) ────── */
 .leaflet-popup-content-wrapper {
   background: transparent !important;
   box-shadow: none !important;
@@ -700,7 +729,7 @@ body {
 }
 .leaflet-popup-content {
   margin: 0 !important;
-  font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--gmpx-font-family-base);
 }
 .leaflet-popup-tip-container {
   display: none;
@@ -709,13 +738,84 @@ body {
   transform: translateY(-8px);
 }
 .leaflet-popup-close-button {
-  color: #5f6368 !important;
+  color: var(--gmpx-color-on-surface-variant) !important;
   font-size: 20px !important;
   padding: 8px 8px 0 0 !important;
   z-index: 1;
 }
 .leaflet-popup-close-button:hover {
-  color: #202124 !important;
+  color: var(--gmpx-color-on-surface) !important;
+}
+
+/* ── DETAIL SIDEBAR PANEL (Google gmpx OverlayLayout) ─ */
+.detail-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 360px;
+  max-width: 100%;
+  height: 100%;
+  background: var(--gmpx-color-surface);
+  box-shadow: -2px 0 8px rgba(0,0,0,0.15);
+  z-index: 500;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: var(--gmpx-font-family-base);
+}
+.detail-panel.open {
+  transform: translateX(0);
+}
+.detail-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px;
+}
+.detail-panel-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gmpx-color-on-surface-variant);
+  font-size: 20px;
+  transition: background 0.15s;
+}
+.detail-panel-close:hover {
+  background: rgba(0,0,0,0.04);
+}
+.detail-panel-content {
+  padding: 0;
+}
+.detail-panel-content .crime-popup,
+.detail-panel-content .danger-popup,
+.detail-panel-content .zone-popup {
+  box-shadow: none;
+  border-radius: 0;
+  min-width: 100%;
+  max-width: 100%;
+}
+.detail-panel-content .crime-popup-header,
+.detail-panel-content .danger-popup-header,
+.detail-panel-content .zone-popup-header {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.detail-panel-content .crime-popup-body,
+.detail-panel-content .danger-popup-body,
+.detail-panel-content .zone-popup-body {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.detail-panel-content .crime-popup-footer,
+.detail-panel-content .danger-popup-footer {
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 /* ── HEATMAP LAYER ───────────────────────────────────── */
@@ -1022,7 +1122,7 @@ body[data-interaction-mode="mobile"] .map-hover-card {
     top: 8px;
     padding: 6px 8px;
     gap: 4px;
-    border-radius: 8px;
+    border-radius: var(--gmpx-radius-sm);
     max-width: calc(100% - 16px);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -1030,7 +1130,7 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   .crime-chip {
     height: 28px;
     padding: 0 8px;
-    font-size: 11px;
+    font-size: 0.6875rem;
     gap: 4px;
   }
   .crime-chip::before {
@@ -1041,95 +1141,23 @@ body[data-interaction-mode="mobile"] .map-hover-card {
     min-width: 220px;
     max-width: 280px;
   }
-  }
-}
-@media (max-width: 920px) {
-  .app-shell { grid-template-columns: 1fr; }
-  .stage-grid { grid-template-columns: 1fr; }
-  .status-stat {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    padding-right: 0;
-  }
-  .status-stat::after {
-    display: none;
-  }
-  .intel-drawer {
+  .detail-panel {
+    width: 100%;
+    max-width: 100%;
+    height: 50vh;
     top: auto;
-    right: calc(12px + env(safe-area-inset-right, 0px));
-    left: calc(12px + env(safe-area-inset-left, 0px));
-    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-    width: auto;
-    max-height: calc(72vh - env(safe-area-inset-bottom, 0px));
-    padding: 14px;
+    bottom: 0;
+    right: 0;
+    transform: translateY(100%);
+    border-radius: var(--gmpx-radius-lg) var(--gmpx-radius-lg) 0 0;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
   }
-  .intel-drawer-title {
-    font-size: 1.1rem;
-    margin-top: 2px;
+  .detail-panel.open {
+    transform: translateY(0);
   }
-  .intel-state-chip {
-    margin-top: 8px;
-    padding: 4px 8px;
-    font-size: 0.68rem;
-  }
-  .intel-map-preview {
-    min-height: 0;
-  }
-  .intel-map-preview iframe {
-    height: 120px;
-  }
-  .intel-mini {
-    padding: 8px;
-  }
-  .intel-mini-label {
-    font-size: 0.68rem;
-  }
-  .intel-mini-value {
-    font-size: 0.82rem;
-  }
-  .thin-intel-panel {
-    top: calc(8px + env(safe-area-inset-top, 0px));
-    left: calc(8px + env(safe-area-inset-left, 0px));
-    right: calc(8px + env(safe-area-inset-right, 0px));
-    padding: 3px 6px;
-    gap: 4px;
-    flex-wrap: wrap;
-  }
-  .thin-intel-title {
-    font-size: 0.72rem;
-  }
-  .thin-intel-home {
-    width: 24px;
-    height: 24px;
-  }
-  .thin-intel-home svg {
-    width: 12px;
-    height: 12px;
-  }
-  .thin-intel-divider {
-    height: 14px;
-  }
-  .map-control-btn,
-  .map-control-select {
-    height: 28px;
-    line-height: 28px;
-    font-size: 0.72rem;
-    padding: 0 6px;
-  }
-  .sat-orbit-row {
-    top: calc(44px + env(safe-area-inset-top, 0px));
-    left: calc(8px + env(safe-area-inset-left, 0px));
-    padding: 3px 6px;
-    gap: 3px;
-  }
-  .sat-orbit-row .map-control-btn {
-    height: 26px;
-    line-height: 26px;
-    font-size: 0.68rem;
-    padding: 0 5px;
   }
 }
+/* old mobile breakpoint merged into block below */
 
 #pittsburgh-month-select, #pittsburgh-year-select {
   min-width: 130px;
@@ -1187,30 +1215,119 @@ body[data-interaction-mode="mobile"] .map-hover-card {
     flex-direction: column; 
   }
   .left-rail {
-    order: 2; /* Put the sidebar under the globe on mobile */
-    min-height: auto;
-    border-right: none;
-    border-top: 1px solid var(--border);
+    display: none !important; /* Kill left rail entirely on mobile */
   }
   .center-stage {
-    order: 1; /* Globe on top */
-    padding: 12px;
+    order: 1;
+    padding: 0; /* Full bleed on mobile */
   }
-  /* Hide brand block, Global Posture, and Scheduled Jobs on mobile */
-  .brand-block,
-  .panel:has(> #global-posture),
-  #scheduled-jobs-panel {
-    display: none !important;
-  }
-  #intel-live-triage {
-    max-height: 400px;
-    height: auto;
-  }
-  #intel-globe, #intel-map-stage, #intel-graph-stage {
-    height: 50vh; /* Slightly shorter on mobile to fit the rail */
+  .stage-grid {
+    gap: 0;
   }
   #global-operations-card {
-    height: auto;
+    height: 100vh; /* Full screen globe */
+    border-radius: 0;
+  }
+  #intel-globe, #intel-map-stage, #intel-graph-stage {
+    height: 100vh;
+  }
+  .thin-intel-panel {
+    top: calc(env(safe-area-inset-top, 8px) + 8px);
+    left: calc(env(safe-area-inset-left, 0px) + 8px);
+    right: calc(env(safe-area-inset-right, 0px) + 8px);
+    padding: 2px 4px;
+    gap: 3px;
+    flex-wrap: wrap;
+    border-radius: 8px;
+  }
+  .thin-intel-title { font-size: 0.72rem; }
+  .thin-intel-home { width: 24px; height: 24px; }
+  .thin-intel-home svg { width: 12px; height: 12px; }
+  .thin-intel-divider { height: 14px; }
+  .map-control-btn,
+  .map-control-select {
+    height: 28px;
+    line-height: 28px;
+    font-size: 0.68rem;
+    padding: 0 5px;
+  }
+  .sat-orbit-row {
+    top: calc(44px + env(safe-area-inset-top, 8px));
+    left: calc(env(safe-area-inset-left, 0px) + 8px);
+    padding: 2px 4px;
+    gap: 2px;
+  }
+  .sat-orbit-row .map-control-btn {
+    height: 26px;
+    line-height: 26px;
+    font-size: 0.65rem;
+    padding: 0 4px;
+  }
+  /* Drawer = bottom sheet only on mobile */
+  .intel-drawer {
+    top: auto;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 55vh;
+    border-radius: 16px 16px 0 0;
+    padding: 16px;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .intel-drawer[aria-hidden="false"] {
+    transform: translateY(0);
+  }
+  /* Detail panel = bottom sheet on mobile (already handled) */
+  .detail-panel {
+    width: 100%;
+    max-width: 100%;
+    height: 45vh;
+    top: auto;
+    bottom: 0;
+    right: 0;
+    transform: translateY(100%);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.2);
+  }
+  .detail-panel.open {
+    transform: translateY(0);
+  }
+  .crime-chip-bar {
+    top: calc(env(safe-area-inset-top, 8px) + 48px);
+    left: calc(env(safe-area-inset-left, 0px) + 8px);
+    right: calc(env(safe-area-inset-right, 0px) + 8px);
+    transform: none;
+    padding: 4px 6px;
+    gap: 3px;
+    border-radius: 8px;
+    max-width: none;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .crime-chip {
+    height: 28px;
+    padding: 0 8px;
+    font-size: 0.6875rem;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .crime-chip::before {
+    width: 8px;
+    height: 8px;
+  }
+  .crime-popup, .danger-popup, .zone-popup {
+    min-width: 100%;
+    max-width: 100%;
+  }
+  /* Diagnostics modal full screen on mobile */
+  #diagnostics-modal-overlay > div {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    padding: 16px;
   }
 }
 .panel {
@@ -1266,4 +1383,30 @@ body[data-interaction-mode="mobile"] .map-hover-card {
 @keyframes loadbar {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(350%); }
+}
+
+/* ── CESIUM WIDGET OVERRIDES ──────────────────────────── */
+/* Hide default Cesium UI chrome */
+.cesium-viewer-bottom,
+.cesium-viewer-animationContainer,
+.cesium-viewer-timelineContainer,
+.cesium-viewer-fullscreenContainer,
+.cesium-viewer-selectionIndicatorContainer,
+.cesium-viewer-infoBoxContainer {
+  display: none !important;
+}
+.cesium-widget-credits {
+  display: none !important;
+}
+/* Make Cesium container transparent */
+#intel-globe .cesium-widget {
+  background: transparent;
+}
+#intel-globe .cesium-viewer {
+  font-family: var(--gmpx-font-family-base, 'Google Sans', Roboto, -apple-system, sans-serif);
+}
+/* Cesium canvas fills container */
+#intel-globe .cesium-widget canvas {
+  width: 100% !important;
+  height: 100% !important;
 }

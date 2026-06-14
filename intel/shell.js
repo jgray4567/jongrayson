@@ -2209,7 +2209,7 @@ async function refreshThreatFeed() {
 
 function getThreatArcElements() {
   if (!threatLayerEnabled || threatArcData.length === 0) return [];
-  // Convert threat arcs into three-globe arc format
+  // Convert threat arcs into globe format
   return threatArcData.map(arc => ({
     kind: 'threat',
     srcLat: arc.srcLat,
@@ -2421,7 +2421,10 @@ async function refreshMaritimeCatalog(zoomToRegion = false) {
     if (zoomToRegion && typeof intelGlobe !== 'undefined' && intelGlobe) {
         const targetLat = seaRegion === 'hormuz' ? 26.5 : 25.0;
         const targetLng = seaRegion === 'hormuz' ? 56.2 : -90.0;
-        intelGlobe.pointOfView({ lat: targetLat, lng: targetLng, altitude: 0.8 }, 2000);
+        intelGlobe.camera.flyTo({
+          destination: Cesium.Cartesian3.fromDegrees(targetLng, targetLat, 2000000),
+          duration: 2
+        });
         if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(false);
         setTimeout(() => {
             if (typeof showMapStage === 'function') {
@@ -2617,7 +2620,10 @@ function initializeCommandSurface() {
         const region = regionBtn.dataset.airRegion;
         if (selectedAirRegion === region) {
           selectedAirRegion = null;
-          if (typeof intelGlobe !== 'undefined' && intelGlobe) intelGlobe.pointOfView({ altitude: 1.7 }, 1800);
+          if (typeof intelGlobe !== 'undefined' && intelGlobe) intelGlobe.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(-98.0, 39.0, 10000000),
+            duration: 1.8
+          });
           if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(true);
         } else {
           selectedAirRegion = region;
@@ -2625,7 +2631,10 @@ function initializeCommandSurface() {
           if (typeof intelGlobe !== 'undefined' && intelGlobe && regionalFlights.length > 0) {
              const avgLat = regionalFlights.reduce((sum, f) => sum + f.lat, 0) / regionalFlights.length;
              const avgLng = regionalFlights.reduce((sum, f) => sum + f.lng, 0) / regionalFlights.length;
-             intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 0.6 }, 1800);
+             intelGlobe.camera.flyTo({
+               destination: Cesium.Cartesian3.fromDegrees(avgLng, avgLat, 3000000),
+               duration: 1.8
+             });
              if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(false);
           }
         }
@@ -2800,6 +2809,54 @@ function initializeCommandSurface() {
     dangerBtn.dataset.bound = '1';
   }
 
+  // Map/Satellite toggle
+  const mapStyleBtn = document.getElementById('toggle-map-style');
+  if (mapStyleBtn && !mapStyleBtn.dataset.bound) {
+    mapStyleBtn.addEventListener('click', () => {
+      const isSatellite = mapStyleBtn.textContent.trim() === 'Satellite';
+      mapStyleBtn.textContent = isSatellite ? 'Map' : 'Satellite';
+      // Toggle Cesium globe imagery
+      if (typeof intelGlobe !== 'undefined' && intelGlobe && intelGlobe.imageryLayers) {
+        intelGlobe.imageryLayers.removeAll();
+        if (isSatellite) {
+          // Switch to map/OSM
+          intelGlobe.imageryLayers.addImageryProvider(new (typeof Cesium !== 'undefined' ? Cesium : window.Cesium).UrlTemplateImageryProvider({
+            url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            maximumLevel: 19
+          }));
+        } else {
+          // Switch back to satellite
+          intelGlobe.imageryLayers.addImageryProvider(new (typeof Cesium !== 'undefined' ? Cesium : window.Cesium).UrlTemplateImageryProvider({
+            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+            maximumLevel: 19
+          }));
+        }
+      }
+      // Toggle Leaflet city map tiles
+      if (cityMapInstance && cityMapInstance._satelliteTile && cityMapInstance._labelTile) {
+        if (isSatellite) {
+          cityMapInstance.removeLayer(cityMapInstance._satelliteTile);
+          cityMapInstance._osmTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(cityMapInstance);
+          if (cityMapInstance._labelTile) cityMapInstance.removeLayer(cityMapInstance._labelTile);
+          cityMapInstance._labelTile = null;
+        } else {
+          if (cityMapInstance._osmTile) cityMapInstance.removeLayer(cityMapInstance._osmTile);
+          cityMapInstance._osmTile = null;
+          cityMapInstance._satelliteTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(cityMapInstance);
+          cityMapInstance._labelTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', { maxZoom: 19, opacity: 0.8, subdomains: 'abcd' }).addTo(cityMapInstance);
+        }
+      }
+    });
+    mapStyleBtn.dataset.bound = '1';
+  }
+
+  // Detail panel close button
+  const detailCloseBtn = document.getElementById('detail-panel-close');
+  if (detailCloseBtn && !detailCloseBtn.dataset.bound) {
+    detailCloseBtn.addEventListener('click', closeDetailPanel);
+    detailCloseBtn.dataset.bound = '1';
+  }
+
   if (baselineRecommendationActions && !baselineRecommendationActions.dataset.drawerBound) {
     baselineRecommendationActions.addEventListener('click', (event) => {
       const chip = event.target.closest('[data-baseline-recommendation]');
@@ -2858,22 +2915,19 @@ function syncGlobeControls(container, enabled) {
 
 function setGlobeAutoRotate(enabled) {
   globeAutoRotateEnabled = enabled;
-  if (intelGlobe?.controls) {
-    intelGlobe.controls().autoRotate = enabled;
-    intelGlobe.controls().autoRotateSpeed = 0.5;
-  }
+  // For Cesium, we control rotation through a flag that's checked in the tick handler
   const button = document.getElementById('toggle-globe-rotation');
   if (button) {
     button.style.display = enabled ? 'none' : 'inline-flex';
-  if (button) button.textContent = enabled ? 'Pause rotation' : 'Rotate';
+    button.textContent = enabled ? 'Pause rotation' : 'Rotate';
   }
   setGlobeOverlayVisibility(enabled);
 }
 
 function updateGlobeTexture() {
   if (!intelGlobe) return;
-  const nightUrl = '//unpkg.com/three-globe/example/img/earth-night.jpg';
-  const dayUrl = '//unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
+  const nightUrl = '//cesium.com/Apps/SampleData/images/earth-night.jpg';
+  const dayUrl = '//cesium.com/Apps/SampleData/images/earth-blue-marble.jpg';
   intelGlobe.globeImageUrl(isNightTime() ? nightUrl : dayUrl);
 }
 
@@ -2901,6 +2955,7 @@ function buildMapEmbedUrl(lat, lng) {
 }
 
 function destroyCityMap() {
+  closeDetailPanel();
   if (pittsburghZoneLayer && cityMapInstance) {
     cityMapInstance.removeLayer(pittsburghZoneLayer);
   }
@@ -2965,6 +3020,24 @@ function filterCrimesByMonth(crimes, monthKey) {
   return filtered.filter((c) => pittsburghVisibleCategories.has(c.category));
 }
 
+let detailPanelOpen = false;
+
+function openDetailPanel(html) {
+  const panel = document.getElementById('detail-panel');
+  const content = document.getElementById('detail-panel-content');
+  if (!panel || !content) return;
+  content.innerHTML = html;
+  panel.classList.add('open');
+  detailPanelOpen = true;
+}
+
+function closeDetailPanel() {
+  const panel = document.getElementById('detail-panel');
+  if (!panel) return;
+  panel.classList.remove('open');
+  detailPanelOpen = false;
+}
+
 function renderCrimeMarkers(crimes) {
   if (pittsburghCrimesLayer) {
     cityMapInstance.removeLayer(pittsburghCrimesLayer);
@@ -2977,14 +3050,14 @@ function renderCrimeMarkers(crimes) {
     else if (crime.category === 'Drug') color = '#388e3c';
 
     const marker = L.circleMarker([crime.lat, crime.lng], {
-      radius: 8,
+      radius: 4,
       stroke: true,
       color: '#fff',
       weight: 2,
       fillOpacity: 0.9,
       fillColor: color
     });
-    marker.bindPopup(`
+    const popupHtml = `
       <div class="crime-popup">
         <div class="crime-popup-header">
           <div class="crime-popup-dot" style="background:${color};"></div>
@@ -2997,12 +3070,20 @@ function renderCrimeMarkers(crimes) {
         </div>
         <div class="crime-popup-footer">Pittsburgh Bureau of Police</div>
       </div>
-    `, { className: '', maxWidth: 300, closeButton: true });
+    `;
+    const isNarrow = window.innerWidth < 700;
+    if (isNarrow) {
+      marker.bindPopup(popupHtml, { className: '', maxWidth: 300, closeButton: true });
+    }
     marker.on('click', (event) => {
       if (event.originalEvent && typeof L !== 'undefined') {
         L.DomEvent.stop(event.originalEvent);
       }
-      marker.openPopup();
+      if (isNarrow) {
+        marker.openPopup();
+      } else {
+        openDetailPanel(popupHtml);
+      }
     });
     pittsburghCrimesLayer.addLayer(marker);
   });
@@ -3091,7 +3172,7 @@ function renderDangerZones(predictions) {
       fillColor,
       className: pred.threatLevel === 'high' ? 'danger-pulse' : ''
     });
-    marker.bindPopup(`
+    const popupHtml = `
       <div class="danger-popup">
         <div class="danger-popup-header">
           <div class="danger-popup-badge" style="${badgeColor}">${pred.threatLevel} risk</div>
@@ -3106,12 +3187,20 @@ function renderDangerZones(predictions) {
         </div>
         <div class="danger-popup-footer">Based on ${pred.dow} historical patterns ±2hrs</div>
       </div>
-    `, { className: '', maxWidth: 320, closeButton: true });
+    `;
+    const isNarrow = window.innerWidth < 700;
+    if (isNarrow) {
+      marker.bindPopup(popupHtml, { className: '', maxWidth: 320, closeButton: true });
+    }
     marker.on('click', (event) => {
       if (event.originalEvent && typeof L !== 'undefined') {
         L.DomEvent.stop(event.originalEvent);
       }
-      marker.openPopup();
+      if (isNarrow) {
+        marker.openPopup();
+      } else {
+        openDetailPanel(popupHtml);
+      }
     });
     pittsburghDangerLayer.addLayer(marker);
   });
@@ -3339,6 +3428,8 @@ function syncPittsburghZoneToggle(visible, eligible = false) {
   }
   const dangerBtn = document.getElementById('toggle-danger-zones');
   if (dangerBtn) dangerBtn.style.display = eligible ? 'inline-flex' : 'none';
+  const mapStyleBtn = document.getElementById('toggle-map-style');
+  // map-style toggle is always visible (works on both globe and city map)
   syncPittsburghYearControl(eligible);
   if (!eligible) {
     const ms = document.getElementById('pittsburgh-month-select');
@@ -3620,7 +3711,7 @@ function showGlobeStage() {
 }
 
 function _initGlobeVars() {}
-let intelGlobe = null;
+let intelGlobe = null; // Cesium viewer instance
 const stateColors = {
   'terminal': '#ff3366',
   'compromised': '#ff9933',
@@ -3631,8 +3722,297 @@ const stateColors = {
   'neutral': '#666666'
 };
 
+// Track Cesium entities for efficient updates
+let cityPointEntities = new Map();
+let airTrafficEntities = new Map();
+let satelliteEntities = new Map();
+let seaVesselEntities = new Map();
+let threatHotspotEntities = new Map();
+let threatArcEntities = new Map();
+let flightPathEntities = new Map();
+let satellitePathEntities = new Map();
+
 function initOrUpdateGlobe(items = []) {
   applyInteractionMode();
+  const globeContainer = document.getElementById('intel-globe');
+  if (!globeContainer) return;
+
+  updatePrimaryStageHeight();
+
+  // Initialize Cesium viewer if not already done
+  if (!intelGlobe) {
+    // Hide loading skeleton
+    const loadEl = document.getElementById('globe-loading');
+    if (loadEl) loadEl.remove();
+
+    // Create Cesium viewer
+    intelGlobe = new Cesium.Viewer('intel-globe', {
+      baseLayerPicker: false,
+      geocoder: false,
+      homeButton: false,
+      sceneModePicker: false,
+      navigationHelpButton: false,
+      animation: false,
+      timeline: false,
+      fullscreenButton: false,
+      selectionIndicator: false,
+      infoBox: false,
+      imageryProvider: new Cesium.UrlTemplateImageryProvider({
+        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        maximumLevel: 19
+      }),
+      terrainProvider: Cesium.createWorldTerrain()
+    });
+
+    // Set background to black
+    intelGlobe.scene.backgroundColor = Cesium.Color.BLACK;
+    intelGlobe.scene.skyAtmosphere.show = true;
+
+    // Add auto-rotation
+    let autoRotate = true;
+    const toggleMapStyleButton = document.getElementById('toggle-map-style');
+    if (toggleMapStyleButton) {
+      toggleMapStyleButton.textContent = 'Satellite';
+      toggleMapStyleButton.addEventListener('click', () => {
+        const isSatellite = toggleMapStyleButton.textContent === 'Satellite';
+        if (isSatellite) {
+          // Switch to map view
+          intelGlobe.imageryLayers.removeAll();
+          intelGlobe.imageryLayers.addImageryProvider(
+            new Cesium.UrlTemplateImageryProvider({
+              url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              credit: 'OpenStreetMap'
+            })
+          );
+          toggleMapStyleButton.textContent = 'Map';
+        } else {
+          // Switch to satellite view
+          intelGlobe.imageryLayers.removeAll();
+          intelGlobe.imageryLayers.addImageryProvider(
+            new Cesium.UrlTemplateImageryProvider({
+              url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+              maximumLevel: 19
+            })
+          );
+          toggleMapStyleButton.textContent = 'Satellite';
+        }
+      });
+    }
+
+    // Add rotation handler
+    intelGlobe.clock.onTick.addEventListener(() => {
+      if (autoRotate) {
+        intelGlobe.scene.camera.rotateRight(0.1 * Cesium.Math.RADIANS_PER_DEGREE);
+      }
+    });
+
+    // Handle resize
+    window.addEventListener('resize', () => {
+      applyInteractionMode();
+      updatePrimaryStageHeight();
+      if (intelGlobe) {
+        intelGlobe.resize();
+      }
+    });
+
+    // Handle click events
+    intelGlobe.screenSpaceEventHandler.setInputAction((click) => {
+      const pickedObject = intelGlobe.scene.pick(click.position);
+      if (pickedObject && pickedObject.id && pickedObject.id._rawData) {
+        openIntelDrawer(pickedObject.id._rawData);
+      }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+  }
+
+  // Clear existing entities
+  cityPointEntities.forEach(entity => intelGlobe.entities.remove(entity));
+  cityPointEntities.clear();
+  
+  airTrafficEntities.forEach(entity => intelGlobe.entities.remove(entity));
+  airTrafficEntities.clear();
+  
+  satelliteEntities.forEach(entity => intelGlobe.entities.remove(entity));
+  satelliteEntities.clear();
+  
+  seaVesselEntities.forEach(entity => intelGlobe.entities.remove(entity));
+  seaVesselEntities.clear();
+  
+  threatHotspotEntities.forEach(entity => intelGlobe.entities.remove(entity));
+  threatHotspotEntities.clear();
+  
+  threatArcEntities.forEach(entity => intelGlobe.entities.remove(entity));
+  threatArcEntities.clear();
+  
+  flightPathEntities.forEach(entity => intelGlobe.entities.remove(entity));
+  flightPathEntities.clear();
+  
+  satellitePathEntities.forEach(entity => intelGlobe.entities.remove(entity));
+  satellitePathEntities.clear();
+
+  // Process city points
+  const validItems = items.filter(i => i.lat !== undefined && i.lng !== undefined);
+  
+  validItems.forEach(item => {
+    const structuralState = item.recoveryTrustDriverTransitionBalanceStructuralState || 'neutral';
+    const color = Cesium.Color.fromCssColorString(stateColors[structuralState] || stateColors['neutral']);
+    
+    // Create entity for city point
+    const entity = intelGlobe.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(item.lng, item.lat),
+      point: {
+        pixelSize: 8,
+        color: color,
+        outlineColor: Cesium.Color.WHITE,
+        outlineWidth: 1
+      },
+      description: `<div><strong>${item.locationName || 'Unknown'}</strong></div><div>${item.action}</div><div>${structuralState}</div>`,
+      _rawData: item
+    });
+    
+    cityPointEntities.set(item.id || `${item.lat},${item.lng}`, entity);
+  });
+
+  // Process air traffic
+  if (airLayerEnabled) {
+    currentAirTrafficItems.forEach(aircraft => {
+      if (aircraft.lat && aircraft.lng) {
+        const entity = intelGlobe.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(aircraft.lng, aircraft.lat),
+          point: {
+            pixelSize: 6,
+            color: Cesium.Color.YELLOW,
+            outlineColor: Cesium.Color.WHITE,
+            outlineWidth: 1
+          },
+          description: aircraft.callsign || 'Aircraft',
+          _rawData: aircraft
+        });
+        
+        airTrafficEntities.set(aircraft.icao24, entity);
+      }
+    });
+  }
+
+  // Process satellites
+  if (satelliteLayerEnabled) {
+    currentSatelliteCatalog.forEach(satellite => {
+      if (satellite.lat && satellite.lng) {
+        const color = satellite.orbitClass === 'LEO' ? Cesium.Color.GREEN : 
+                     satellite.orbitClass === 'GEO' ? Cesium.Color.RED : Cesium.Color.CYAN;
+        
+        const entity = intelGlobe.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(satellite.lng, satellite.lat),
+          point: {
+            pixelSize: 6,
+            color: color,
+            outlineColor: Cesium.Color.WHITE,
+            outlineWidth: 1
+          },
+          description: `${satellite.name} · ${satellite.network} · ${satellite.orbitClass || 'LEO'}`,
+          _rawData: satellite
+        });
+        
+        satelliteEntities.set(satellite.id, entity);
+      }
+    });
+  }
+
+  // Process sea vessels
+  if (seaLayerEnabled) {
+    currentVesselCatalog.forEach(vessel => {
+      if (vessel.lat && vessel.lng) {
+        const isTanker = vessel.type === 'Tanker' || vessel.type === 'LNG Carrier';
+        const color = isTanker ? Cesium.Color.ORANGE : Cesium.Color.BLUE;
+        
+        const entity = intelGlobe.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(vessel.lng, vessel.lat),
+          point: {
+            pixelSize: 6,
+            color: color,
+            outlineColor: Cesium.Color.WHITE,
+            outlineWidth: 1
+          },
+          description: vessel.name,
+          _rawData: vessel
+        });
+        
+        seaVesselEntities.set(vessel.id, entity);
+      }
+    });
+  }
+
+  // Process threat hotspots
+  if (threatLayerEnabled) {
+    threatHotspots.forEach(hotspot => {
+      if (hotspot.lat && hotspot.lng) {
+        const entity = intelGlobe.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(hotspot.lng, hotspot.lat),
+          point: {
+            pixelSize: 10,
+            color: Cesium.Color.RED.withAlpha(0.7),
+            outlineColor: Cesium.Color.WHITE,
+            outlineWidth: 1
+          },
+          description: hotspot.description || 'Threat Hotspot',
+          _rawData: hotspot
+        });
+        
+        threatHotspotEntities.set(hotspot.id, entity);
+      }
+    });
+    
+    // Process threat arcs
+    threatArcData.forEach(arc => {
+      if (arc.srcLat && arc.srcLng && arc.tgtLat && arc.tgtLng) {
+        const typeColors = {
+          'SSH Brute Force': Cesium.Color.RED,
+          'Port Scan': Cesium.Color.ORANGE,
+          'Malware C2': Cesium.Color.MAGENTA,
+          'Web Exploit': Cesium.Color.fromCssColorString('#ff5544'),
+          'DDoS': Cesium.Color.YELLOW,
+          'Ransomware Probe': Cesium.Color.fromCssColorString('#ff0066')
+        };
+        const color = typeColors[arc.type] || Cesium.Color.RED;
+        
+        const entity = intelGlobe.entities.add({
+          polyline: {
+            positions: [
+              Cesium.Cartesian3.fromDegrees(arc.srcLng, arc.srcLat),
+              Cesium.Cartesian3.fromDegrees(arc.tgtLng, arc.tgtLat)
+            ],
+            material: color,
+            width: 2
+          },
+          description: arc.type || 'Cyber Attack',
+          _rawData: arc
+        });
+        
+        threatArcEntities.set(`${arc.srcLat},${arc.srcLng}-${arc.tgtLat},${arc.tgtLng}`, entity);
+      }
+    });
+  }
+
+  // Set initial view if not already set
+  if (!globeContainer.dataset.initialViewLocked && validItems.length > 0) {
+    const avgLat = validItems.reduce((sum, item) => sum + item.lat, 0) / validItems.length;
+    const avgLng = validItems.reduce((sum, item) => sum + item.lng, 0) / validItems.length;
+    
+    intelGlobe.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(avgLng, avgLat, 10000000),
+      duration: 2
+    });
+    
+    globeContainer.dataset.initialViewLocked = '1';
+  } else if (!globeContainer.dataset.initialViewLocked) {
+    // Default view of the US
+    intelGlobe.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(-98.0, 39.0, 10000000),
+      duration: 2
+    });
+    
+    globeContainer.dataset.initialViewLocked = '1';
+  }
+}
   const globeContainer = document.getElementById('intel-globe');
   if (!globeContainer || typeof Globe === 'undefined') return;
 
@@ -4003,7 +4383,7 @@ function updatePrimaryStageHeight() {
 
   let targetHeight;
   if (window.innerWidth <= 920) {
-    targetHeight = Math.max(300, window.innerHeight * 0.5);
+    targetHeight = window.innerHeight; // Full viewport on mobile
   } else {
     const top = card.getBoundingClientRect().top;
     const reservedBelow = 150;
@@ -4015,9 +4395,9 @@ function updatePrimaryStageHeight() {
   mapStage.style.height = `${targetHeight}px`;
   if (graphStage) graphStage.style.height = `${targetHeight}px`;
 
-  if (typeof intelGlobe !== 'undefined' && intelGlobe && intelGlobe.height && intelGlobe.width) {
-    intelGlobe.height(targetHeight);
-    intelGlobe.width(globe.clientWidth || window.innerWidth - 24);
+  // Cesium handles its own resize
+  if (intelGlobe && typeof intelGlobe.resize === 'function') {
+    intelGlobe.resize();
   }
 }
 let graphInstance = null;
