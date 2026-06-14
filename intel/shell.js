@@ -51,6 +51,9 @@ let globeAutoRotateEnabled = true;
 let currentGlobeBaseItems = [];
 let currentGlobePointsData = [];
 let cityMapInstance = null;
+let pittsburghHeatLayer = null;
+let pittsburghHeatVisible = true;
+let pittsburghMarkersVisible = false;
 let pittsburghZoneLayer = null;
 let pittsburghZoneGeojsonData = null;
 let pittsburghZoneStatsData = null;
@@ -2974,21 +2977,27 @@ function renderCrimeMarkers(crimes) {
     else if (crime.category === 'Drug') color = '#388e3c';
 
     const marker = L.circleMarker([crime.lat, crime.lng], {
-      radius: 8,
+      radius: 6,
       stroke: true,
       color: '#fff',
-      weight: 1,
-      fillOpacity: 0.8,
+      weight: 1.5,
+      fillOpacity: 0.85,
       fillColor: color
     });
     marker.bindPopup(`
-      <div style="min-width:200px; color:#111;">
-        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">${crime.category} Crime</div>
-        <div style="font-size:1rem; font-weight:700; margin-top:6px;">${crime.incident_type}</div>
-        <div style="margin-top:8px; font-size:0.85rem;">Zone: ${crime.zone}</div>
-        <div style="margin-top:4px; font-size:0.85rem;">Time: ${crime.time}</div>
+      <div class="crime-popup">
+        <div class="crime-popup-header">
+          <div class="crime-popup-dot" style="background:${color};"></div>
+          <div class="crime-popup-cat">${crime.category} Crime</div>
+        </div>
+        <div class="crime-popup-body">
+          <div class="crime-popup-title">${crime.incident_type}</div>
+          <div class="crime-popup-row"><span>Zone</span><strong>${crime.zone}</strong></div>
+          <div class="crime-popup-row"><span>Time</span><strong>${crime.time}</strong></div>
+        </div>
+        <div class="crime-popup-footer">Pittsburgh Bureau of Police</div>
       </div>
-    `);
+    `, { className: '', maxWidth: 300, closeButton: true });
     marker.on('click', (event) => {
       if (event.originalEvent && typeof L !== 'undefined') {
         L.DomEvent.stop(event.originalEvent);
@@ -2998,6 +3007,68 @@ function renderCrimeMarkers(crimes) {
     pittsburghCrimesLayer.addLayer(marker);
   });
   pittsburghCrimesLayer.addTo(cityMapInstance);
+
+  // Sync marker visibility with toggle state
+  if (!pittsburghMarkersVisible) {
+    cityMapInstance.removeLayer(pittsburghCrimesLayer);
+  }
+}
+
+function renderCrimeHeatmap(crimes) {
+  if (pittsburghHeatLayer) {
+    cityMapInstance.removeLayer(pittsburghHeatLayer);
+  }
+  if (typeof L.heatLayer === 'undefined') return;
+  const points = crimes.map(c => [c.lat, c.lng, categoryIntensity(c.category)]);
+  pittsburghHeatLayer = L.heatLayer(points, {
+    radius: 28,
+    blur: 22,
+    maxZoom: 16,
+    minOpacity: 0.4,
+    gradient: {
+      0.15: 'rgba(25,118,210,0.35)',
+      0.35: 'rgba(255,167,38,0.55)',
+      0.55: 'rgba(255,109,0,0.7)',
+      0.75: 'rgba(211,47,47,0.82)',
+      1.0: 'rgba(136,0,0,0.92)'
+    }
+  });
+  pittsburghHeatLayer.addTo(cityMapInstance);
+
+  if (!pittsburghHeatVisible) {
+    cityMapInstance.removeLayer(pittsburghHeatLayer);
+  }
+}
+
+function categoryIntensity(cat) {
+  if (cat === 'Violent') return 0.9;
+  if (cat === 'Property') return 0.6;
+  if (cat === 'Drug') return 0.45;
+  return 0.25;
+}
+
+function toggleCrimeHeatmap() {
+  if (!cityMapInstance) return;
+  pittsburghHeatVisible = !pittsburghHeatVisible;
+  if (pittsburghHeatVisible && pittsburghHeatLayer) {
+    pittsburghHeatLayer.addTo(cityMapInstance);
+  } else if (pittsburghHeatLayer) {
+    cityMapInstance.removeLayer(pittsburghHeatLayer);
+  }
+  const btn = document.getElementById('toggle-heatmap');
+  if (btn) btn.classList.toggle('active', pittsburghHeatVisible);
+}
+
+function toggleCrimeMarkers() {
+  if (!cityMapInstance) return;
+  pittsburghMarkersVisible = !pittsburghMarkersVisible;
+  if (pittsburghMarkersVisible && pittsburghCrimesLayer) {
+    pittsburghCrimesLayer.addTo(cityMapInstance);
+  } else if (pittsburghCrimesLayer) {
+    cityMapInstance.removeLayer(pittsburghCrimesLayer);
+  }
+  const btn = document.getElementById('toggle-markers');
+  if (btn) btn.classList.toggle('active', pittsburghMarkersVisible);
 }
 
 function renderDangerZones(predictions) {
@@ -3008,8 +3079,9 @@ function renderDangerZones(predictions) {
   predictions.forEach((pred) => {
     const radius = pred.threatLevel === 'high' ? 22 : pred.threatLevel === 'medium' ? 16 : 10;
     const fillColor = pred.threatLevel === 'high' ? '#ff1744' : pred.threatLevel === 'medium' ? '#ff9100' : '#ffea00';
-    const fillOpacity = pred.threatLevel === 'high' ? 0.45 : pred.threatLevel === 'medium' ? 0.35 : 0.25;
-    const pulse = pred.threatLevel === 'high' ? '<style>.danger-pulse{animation:dpulse 2s ease-in-out infinite}@keyframes dpulse{0%,100%{opacity:0.45}50%{opacity:0.7}}</style>' : '';
+    const fillOpacity = pred.threatLevel === 'high' ? 0.35 : pred.threatLevel === 'medium' ? 0.25 : 0.18;
+    const badgeColor = pred.threatLevel === 'high' ? 'background:#d32f2f;' : pred.threatLevel === 'medium' ? 'background:#e65100;' : 'background:#f9a825;color:#333;';
+
     const marker = L.circleMarker([pred.lat, pred.lng], {
       radius,
       stroke: true,
@@ -3020,23 +3092,21 @@ function renderDangerZones(predictions) {
       className: pred.threatLevel === 'high' ? 'danger-pulse' : ''
     });
     marker.bindPopup(`
-      <div style="min-width:220px; color:#111;">
-        ${pulse}
-        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">Predicted Danger Zone</div>
-        <div style="font-size:1rem; font-weight:700; margin-top:6px; color:${fillColor};">${pred.threatLevel.toUpperCase()} RISK</div>
-        <div style="font-size:0.92rem; font-weight:600; margin-top:4px;">Danger Score: ${pred.dangerScore}/100</div>
-        <div style="margin-top:8px; font-size:0.85rem;">
-          <div>Active incidents: ${pred.incidentsNow} (${pred.violentNow} violent)</div>
-          <div>Today's total: ${pred.incidentsToday}</div>
-          <div>Peak hour: ${String(pred.peakHour).padStart(2, '0')}:00</div>
-          <div>Top category: ${pred.topCategory}</div>
-          <div>Window: ${pred.hourWindow || 'current'}</div>
+      <div class="danger-popup">
+        <div class="danger-popup-header">
+          <div class="danger-popup-badge" style="${badgeColor}">${pred.threatLevel} risk</div>
         </div>
-        <div style="margin-top:8px; font-size:0.75rem; opacity:0.6; border-top:1px solid rgba(0,0,0,0.1); padding-top:6px;">
-          Based on ${pred.dow} historical patterns ±2hrs
+        <div class="danger-popup-body">
+          <div class="danger-popup-title">Predicted Danger Zone</div>
+          <div class="danger-popup-row"><span>Danger Score</span><strong>${pred.dangerScore}/100</strong></div>
+          <div class="danger-popup-row"><span>Active incidents</span><strong>${pred.incidentsNow} (${pred.violentNow} violent)</strong></div>
+          <div class="danger-popup-row"><span>Today's total</span><strong>${pred.incidentsToday}</strong></div>
+          <div class="danger-popup-row"><span>Peak hour</span><strong>${String(pred.peakHour).padStart(2, '0')}:00</strong></div>
+          <div class="danger-popup-row"><span>Top category</span><strong>${pred.topCategory}</strong></div>
         </div>
+        <div class="danger-popup-footer">Based on ${pred.dow} historical patterns ±2hrs</div>
       </div>
-    `);
+    `, { className: '', maxWidth: 320, closeButton: true });
     marker.on('click', (event) => {
       if (event.originalEvent && typeof L !== 'undefined') {
         L.DomEvent.stop(event.originalEvent);
@@ -3071,17 +3141,17 @@ function toggleDangerZones() {
 
 function syncPittsburghMonthControl(eligible = false) {
   const monthSelect = document.getElementById('pittsburgh-month-select');
-  const legend = document.getElementById('crime-legend');
+  const chipBar = document.getElementById('crime-chip-bar');
   if (!monthSelect) return;
   if (!eligible || !pittsburghCrimesData.length) {
     monthSelect.style.display = 'none';
-    if (legend) legend.style.display = 'none';
+    if (chipBar) chipBar.style.display = 'none';
     return;
   }
   const months = getAvailableMonths(pittsburghCrimesData);
   if (!months.length) {
     monthSelect.style.display = 'none';
-    if (legend) legend.style.display = 'none';
+    if (chipBar) chipBar.style.display = 'none';
     return;
   }
 
@@ -3101,57 +3171,53 @@ function syncPittsburghMonthControl(eligible = false) {
   monthSelect.value = pittsburghSelectedMonth;
   monthSelect.style.display = 'inline-flex';
 
-  if (legend) {
+  // Show chip bar
+  if (chipBar) {
+    chipBar.style.display = 'flex';
     const mapStage = document.getElementById('intel-map-stage');
-    if (mapStage && !mapStage.contains(legend)) {
-      mapStage.appendChild(legend);
+    if (mapStage && !mapStage.contains(chipBar)) {
+      mapStage.appendChild(chipBar);
     }
-    const isExpanded = window.pittsburghLegendExpanded === true;
-    const getStyle = (cat) => pittsburghVisibleCategories.has(cat) ? 'opacity:1;text-decoration:none;' : 'opacity:0.35;text-decoration:line-through;';
-  if (legend) legend.innerHTML = `
-      <div class="legend-header" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; font-size:0.72rem; opacity:0.9;">
-        <span>Crime Legend</span>
-        <svg class="legend-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; margin-left: 12px; transform: ${isExpanded ? 'rotate(0deg)' : 'rotate(180deg)'};"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
-      <div class="legend-content" style="display:${isExpanded ? 'flex' : 'none'}; flex-wrap: wrap; gap: 0 14px; margin-top:8px;">
-        <div class="legend-item legend-toggle" data-category="Violent" style="cursor:pointer; ${getStyle('Violent')}"><span class="legend-dot" style="background:#d32f2f;"></span> Violent</div>
-        <div class="legend-item legend-toggle" data-category="Property" style="cursor:pointer; ${getStyle('Property')}"><span class="legend-dot" style="background:#1976d2;"></span> Property</div>
-        <div class="legend-item legend-toggle" data-category="Drug" style="cursor:pointer; ${getStyle('Drug')}"><span class="legend-dot" style="background:#388e3c;"></span> Drug</div>
-        <div class="legend-item legend-toggle" data-category="Other" style="cursor:pointer; ${getStyle('Other')}"><span class="legend-dot" style="background:#757575;"></span> Other</div>
-      </div>
-    `;
-    legend.style.display = 'block';
 
-    const legendHeader = legend.querySelector('.legend-header');
-    const legendContent = legend.querySelector('.legend-content');
-    const chevron = legend.querySelector('.legend-chevron');
-    
-    legendHeader.addEventListener('click', () => {
-      window.pittsburghLegendExpanded = legendContent.style.display !== 'flex';
-      legendContent.style.display = window.pittsburghLegendExpanded ? 'flex' : 'none';
-      chevron.style.transform = window.pittsburghLegendExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+    // Sync chip active states
+    chipBar.querySelectorAll('.crime-chip[data-category]').forEach((chip) => {
+      const cat = chip.dataset.category;
+      chip.classList.toggle('active', pittsburghVisibleCategories.has(cat));
+      // remove old listeners
+      chip.replaceWith(chip.cloneNode(true));
     });
-
-    legend.querySelectorAll('.legend-toggle').forEach((item) => {
-      item.addEventListener('click', () => {
-        const cat = item.dataset.category;
+    chipBar.querySelectorAll('.crime-chip[data-category]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const cat = chip.dataset.category;
         if (pittsburghVisibleCategories.has(cat)) {
           pittsburghVisibleCategories.delete(cat);
-          item.style.opacity = '0.35';
-          item.style.textDecoration = 'line-through';
+          chip.classList.remove('active');
         } else {
           pittsburghVisibleCategories.add(cat);
-          item.style.opacity = '1';
-          item.style.textDecoration = 'none';
+          chip.classList.add('active');
         }
         const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth);
         renderCrimeMarkers(filtered);
+        renderCrimeHeatmap(filtered);
       });
     });
+
+    // Heatmap toggle
+    const heatBtn = document.getElementById('toggle-heatmap');
+    const markBtn = document.getElementById('toggle-markers');
+    if (heatBtn) {
+      heatBtn.classList.toggle('active', pittsburghHeatVisible);
+      heatBtn.onclick = () => toggleCrimeHeatmap();
+    }
+    if (markBtn) {
+      markBtn.classList.toggle('active', pittsburghMarkersVisible);
+      markBtn.onclick = () => toggleCrimeMarkers();
+    }
   }
 
   const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth);
   renderCrimeMarkers(filtered);
+  renderCrimeHeatmap(filtered);
 }
 
 function bindMonthSelect() {
@@ -3161,6 +3227,7 @@ function bindMonthSelect() {
       pittsburghSelectedMonth = monthSelect.value;
       const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth);
       renderCrimeMarkers(filtered);
+      renderCrimeHeatmap(filtered);
     });
     monthSelect.dataset.bound = '1';
   }
@@ -3205,18 +3272,19 @@ function updatePittsburghZoneLabelInteractivity() {
 
 function buildZonePopupHtml(zone, stats = {}) {
   const offenseRows = (stats.topOffenseTypes || []).slice(0, 5).map(([name, total]) => `
-    <div style="display:flex; justify-content:space-between; gap:16px; margin-top:4px;">
-      <span>${name}</span>
-      <strong>${total}</strong>
-    </div>
-  `).join('') || '<div style="margin-top:6px;">No offense totals available.</div>';
+    <div class="zone-popup-row"><span>${name}</span><strong>${total}</strong></div>
+  `).join('') || '<div style="font-size:12px;color:#5f6368;margin-top:6px;">No offense data available.</div>';
 
   return `
-    <div style="min-width:240px; color:#111;">
-      <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">Pittsburgh Police Zone</div>
-      <div style="font-size:1rem; font-weight:700; margin-top:6px;">Zone ${zone}</div>
-      <div style="margin-top:8px; font-size:0.86rem;">Total incidents <strong>${stats.incidentCount || 0}</strong></div>
-      <div style="margin-top:10px; border-top:1px solid rgba(0,0,0,0.12); padding-top:8px;">
+    <div class="zone-popup">
+      <div class="zone-popup-header">
+        <div class="zone-popup-title">Zone ${zone}</div>
+        <div class="zone-popup-sub">Pittsburgh Bureau of Police</div>
+      </div>
+      <div class="zone-popup-body">
+        <div class="zone-popup-stat">${(stats.incidentCount || 0).toLocaleString()}</div>
+        <div class="zone-popup-stat-label">Total incidents</div>
+        <div class="zone-popup-divider"></div>
         ${offenseRows}
       </div>
     </div>
@@ -3267,16 +3335,16 @@ function syncPittsburghZoneToggle(visible, eligible = false) {
   const button = document.getElementById('toggle-pittsburgh-zones');
   if (button) {
     button.style.display = eligible ? 'inline-flex' : 'none';
-  if (button) button.textContent = visible ? 'Zones On' : 'Zones Off';
+    if (button) button.textContent = visible ? 'Zones' : 'Zones';
   }
   const dangerBtn = document.getElementById('toggle-danger-zones');
   if (dangerBtn) dangerBtn.style.display = eligible ? 'inline-flex' : 'none';
   syncPittsburghYearControl(eligible);
   if (!eligible) {
     const ms = document.getElementById('pittsburgh-month-select');
-    const cl = document.getElementById('crime-legend');
+    const cb = document.getElementById('crime-chip-bar');
     if (ms) ms.style.display = 'none';
-    if (cl) cl.style.display = 'none';
+    if (cb) cb.style.display = 'none';
   }
   updatePittsburghZoneLabelInteractivity();
 }
@@ -3367,8 +3435,17 @@ function renderCityCrimeMap(item = {}) {
     setMapHoverCard('', false);
   });
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
+  // Satellite-first tile layer (Google-style)
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+    subdomains: []
+  }).addTo(cityMapInstance);
+
+  // Optional labels overlay for road/city names
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    opacity: 0.7,
+    subdomains: 'abcd'
   }).addTo(cityMapInstance);
 
   if (isSeaRegion && typeof currentVesselCatalog !== 'undefined') {
@@ -3518,6 +3595,9 @@ function showGlobeStage() {
   destroyCityMap();
   if (pittsburghDangerLayer) { cityMapInstance?.removeLayer(pittsburghDangerLayer); pittsburghDangerLayer = null; }
   pittsburghDangerVisible = false;
+  if (pittsburghHeatLayer) { pittsburghHeatLayer = null; }
+  pittsburghHeatVisible = true;
+  pittsburghMarkersVisible = false;
   if (mapStage) mapStage.innerHTML = '';
   syncPittsburghZoneToggle(true, false);
   if (title) {

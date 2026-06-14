@@ -391,7 +391,7 @@ body {
   box-shadow: 0 16px 38px rgba(0,0,0,0.18);
 }
 .leaflet-container {
-  background: #0b0f0b;
+  background: #1a1a1a;
 }
 #intel-map-stage .leaflet-container,
 #intel-map-stage .leaflet-grab,
@@ -445,49 +445,287 @@ body {
   box-shadow: 0 0 10px rgba(255,23,68,0.4);
 }
 .crime-legend {
+  display: none; /* replaced by chip bar */
+}
+
+/* ── CRIME CHIP BAR (Google-style) ─────────────────────── */
+.crime-chip-bar {
   position: absolute;
   bottom: calc(30px + env(safe-area-inset-bottom, 0px));
-  left: 18px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 400;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.18);
-  border-radius: 6px;
-  padding: 10px 14px;
-  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(32, 33, 36, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
   color: #fff;
-  line-height: 1.7;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
 }
-.crime-legend .legend-header {
+.crime-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 1.5px solid var(--chip-color, #5f6368);
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+.crime-chip::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--chip-color, #5f6368);
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.crime-chip.active {
+  color: #fff;
+   background: rgba(var(--chip-rgb, 95,99,104), 0.2);
+  border-color: var(--chip-color);
+}
+.crime-chip.active::before {
+  opacity: 1;
+}
+.crime-chip:hover {
+  background: rgba(255,255,255,0.08);
+}
+.crime-chip-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255,255,255,0.15);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+/* ── CRIME DATA CARD (Google-style popup) ────────────── */
+.crime-popup {
+  min-width: 240px;
+  max-width: 300px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2), 0 8px 32px rgba(0,0,0,0.12);
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #202124;
+}
+.crime-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #f1f3f4;
+}
+.crime-popup-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.crime-popup-cat {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #5f6368;
+  font-weight: 600;
+}
+.crime-popup-body {
+  padding: 10px 16px 14px;
+}
+.crime-popup-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #202124;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.crime-popup-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  color: #5f6368;
+  padding: 3px 0;
+}
+.crime-popup-row strong {
+  color: #202124;
+  font-weight: 500;
+}
+.crime-popup-footer {
+  border-top: 1px solid #f1f3f4;
+  padding: 8px 16px;
+  font-size: 10px;
+  color: #80868b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── DANGER ZONE POPUP (Google-style) ────────────────── */
+.danger-popup {
+  min-width: 260px;
+  max-width: 320px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2), 0 8px 32px rgba(0,0,0,0.12);
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #202124;
+}
+.danger-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #f1f3f4;
+}
+.danger-popup-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-size: 0.72rem;
-  opacity: 0.7;
-  margin-bottom: 4px;
+  color: #fff;
 }
-.crime-legend .legend-item {
+.danger-popup-body {
+  padding: 10px 16px 14px;
+}
+.danger-popup-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #202124;
+  margin-bottom: 8px;
+}
+.danger-popup-row {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 0;
-  min-height: 32px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  user-select: none;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  color: #5f6368;
+  padding: 3px 0;
 }
-.crime-legend .legend-item:active {
-  opacity: 0.7;
+.danger-popup-row strong {
+  color: #202124;
+  font-weight: 500;
 }
-.crime-legend .legend-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: inline-block;
-  flex-shrink: 0;
+.danger-popup-footer {
+  border-top: 1px solid #f1f3f4;
+  padding: 8px 16px;
+  font-size: 10px;
+  color: #80868b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── ZONE POPUP (Google-style) ───────────────────────── */
+.zone-popup {
+  min-width: 260px;
+  max-width: 300px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2), 0 8px 32px rgba(0,0,0,0.12);
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #202124;
+}
+.zone-popup-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #f1f3f4;
+}
+.zone-popup-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #202124;
+}
+.zone-popup-sub {
+  font-size: 11px;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+.zone-popup-body {
+  padding: 10px 16px 14px;
+}
+.zone-popup-stat {
+  font-size: 28px;
+  font-weight: 700;
+  color: #202124;
+  line-height: 1;
+}
+.zone-popup-stat-label {
+  font-size: 11px;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+.zone-popup-divider {
+  border-top: 1px solid #f1f3f4;
+  margin: 10px 0;
+}
+.zone-popup-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  color: #5f6368;
+  padding: 3px 0;
+}
+.zone-popup-row strong {
+  color: #202124;
+  font-weight: 500;
+}
+
+/* ── LEAFLET POPUP OVERRIDE (Google-style) ──────────── */
+.leaflet-popup-content-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.leaflet-popup-tip {
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+.leaflet-popup-close-button {
+  color: #5f6368 !important;
+  font-size: 18px !important;
+  padding: 4px 6px 0 0 !important;
+}
+.leaflet-popup-close-button:hover {
+  color: #202124 !important;
+}
+
+/* ── HEATMAP LAYER ───────────────────────────────────── */
+.leaflet-heat {
+  border-radius: 0;
+}
+
+/* ── MAP TILE OVERRIDE (satellite) ──────────────────── */
+#intel-map-stage .leaflet-tile-pane {
+  filter: none;
 }
 .intel-metrics {
   display: grid;
@@ -779,28 +1017,24 @@ body[data-interaction-mode="mobile"] .map-hover-card {
     font-size: 0.88rem;
     padding: 8px 14px;
   }
-  .crime-legend {
-    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-    left: calc(8px + env(safe-area-inset-left, 0px));
-    right: auto;
-    width: fit-content;
-    padding: 8px 12px;
-    font-size: 0.78rem;
-    display: block;
-    line-height: 1.4;
+  .crime-legend { display: none; }
+  .crime-chip-bar {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    padding: 4px 6px;
+    gap: 4px;
+    border-radius: 20px;
   }
-  .crime-legend .legend-header {
-    width: 100%;
-    font-size: 0.68rem;
+  .crime-chip {
+    padding: 4px 8px;
+    font-size: 10px;
   }
-  .crime-legend .legend-item {
-    padding: 3px 0;
-    min-height: 28px;
-    flex: 0 0 auto;
+  .crime-chip::before {
+    width: 6px;
+    height: 6px;
   }
-  .crime-legend .legend-dot {
-    width: 12px;
-    height: 12px;
+  .crime-popup, .danger-popup, .zone-popup {
+    min-width: 200px;
+  }
   }
 }
 @media (max-width: 920px) {
