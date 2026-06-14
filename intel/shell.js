@@ -2977,11 +2977,11 @@ function renderCrimeMarkers(crimes) {
     else if (crime.category === 'Drug') color = '#388e3c';
 
     const marker = L.circleMarker([crime.lat, crime.lng], {
-      radius: 6,
+      radius: 8,
       stroke: true,
       color: '#fff',
-      weight: 1.5,
-      fillOpacity: 0.85,
+      weight: 2,
+      fillOpacity: 0.9,
       fillColor: color
     });
     marker.bindPopup(`
@@ -3021,16 +3021,16 @@ function renderCrimeHeatmap(crimes) {
   if (typeof L.heatLayer === 'undefined') return;
   const points = crimes.map(c => [c.lat, c.lng, categoryIntensity(c.category)]);
   pittsburghHeatLayer = L.heatLayer(points, {
-    radius: 28,
-    blur: 22,
+    radius: 30,
+    blur: 24,
     maxZoom: 16,
-    minOpacity: 0.4,
+    minOpacity: 0.2,
     gradient: {
-      0.15: 'rgba(25,118,210,0.35)',
-      0.35: 'rgba(255,167,38,0.55)',
-      0.55: 'rgba(255,109,0,0.7)',
-      0.75: 'rgba(211,47,47,0.82)',
-      1.0: 'rgba(136,0,0,0.92)'
+      0.1: 'rgba(52,168,83,0.3)',
+      0.3: 'rgba(251,188,4,0.5)',
+      0.5: 'rgba(255,167,38,0.65)',
+      0.7: 'rgba(234,67,53,0.78)',
+      1.0: 'rgba(154,0,0,0.9)'
     }
   });
   pittsburghHeatLayer.addTo(cityMapInstance);
@@ -3441,10 +3441,10 @@ function renderCityCrimeMap(item = {}) {
     subdomains: []
   }).addTo(cityMapInstance);
 
-  // Optional labels overlay for road/city names
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+  // Optional labels overlay for road/city names (dark pills on satellite)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
     maxZoom: 19,
-    opacity: 0.7,
+    opacity: 0.8,
     subdomains: 'abcd'
   }).addTo(cityMapInstance);
 
