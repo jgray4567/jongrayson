@@ -3922,8 +3922,8 @@ function updatePrimaryStageHeight() {
     targetHeight = window.innerHeight; // Full viewport on mobile
   } else {
     const top = card.getBoundingClientRect().top;
-    const reservedBelow = 150;
-    targetHeight = Math.max(360, window.innerHeight - top - reservedBelow);
+    const reservedBelow = 32; // Minimal bottom padding
+    targetHeight = Math.max(400, window.innerHeight - top - reservedBelow);
   }
 
   card.style.height = `${targetHeight}px`;

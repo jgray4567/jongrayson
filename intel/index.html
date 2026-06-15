@@ -8,7 +8,7 @@
   <meta name="description" content="Intel build 201, Geographic Intel Projection, mapping structural states to global visualization inside jongrayson.com.">
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="dns-prefetch" href="https://unpkg.com">
-  <link rel="stylesheet" href="styles.css?v=0.010.00">
+  <link rel="stylesheet" href="styles.css?v=0.010.01">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script defer src="https://unpkg.com/globe.gl"></script>
   <!-- Core: globe.gl + leaflet loaded via defer for performance -->
@@ -163,7 +163,7 @@
             <button id="toggle-markers" class="crime-chip" style="--chip-color:#5f6368;">Markers</button>
           </div>
           <div id="crime-legend" class="crime-legend" style="display: none;"></div>
-          <div id="intel-globe" style="height: 60vh; width: 100%; cursor: grab;">
+          <div id="intel-globe" style="height: 100%; width: 100%; cursor: grab;">
         <div id="globe-loading" style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;">
           <div style="text-align:center;">
             <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:12px;">Initializing globe</div>
@@ -173,8 +173,8 @@
           </div>
         </div>
       </div>
-          <div id="intel-map-stage" style="display:none; height:60vh; width:100%; position: relative;"><div id="detail-panel" class="detail-panel"><div class="detail-panel-header"><button id="detail-panel-close" class="detail-panel-close" aria-label="Close">✕</button></div><div id="detail-panel-content" class="detail-panel-content"></div></div></div>
-          <div id="intel-graph-stage" style="display:none; height:60vh; width:100%; position: relative; background: var(--surface);"></div>
+          <div id="intel-map-stage" style="display:none; height:100%; width:100%; position: relative;"><div id="detail-panel" class="detail-panel"><div class="detail-panel-header"><button id="detail-panel-close" class="detail-panel-close" aria-label="Close">✕</button></div><div id="detail-panel-content" class="detail-panel-content"></div></div></div>
+          <div id="intel-graph-stage" style="display:none; height:100%; width:100%; position: relative; background: var(--surface);"></div>
         </section>
 
         </div> <!-- closes .stage-grid -->

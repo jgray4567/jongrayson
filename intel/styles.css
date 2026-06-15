@@ -365,6 +365,11 @@ body {
 #intel-map-canvas {
   touch-action: none;
 }
+#intel-globe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 #intel-map-stage {
   position: relative;
 }
