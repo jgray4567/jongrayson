@@ -3731,6 +3731,8 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.atmosphereColor('#4488ff');
       intelGlobe.atmosphereAltitude(0.12);
       intelGlobe.showGraticules(false);
+      // Force WebGL1 for iOS Safari compatibility + antialiasing for point visibility
+      intelGlobe.rendererConfig({ antialias: true, alpha: true });
       intelGlobe.pointRadius(0.35);
       intelGlobe.pointAltitude(0.05);
       intelGlobe.pointResolution(12);
@@ -3810,8 +3812,7 @@ function initOrUpdateGlobe(items = []) {
       raw: item,
       color: stateColors[structuralState] || stateColors['neutral'] || '#00e676',
       radius: 0.35 * touchBoost,
-      altitude: 0.04,
-      altitude: 0
+      altitude: 0.04
     };
   });
 
@@ -3882,6 +3883,12 @@ function initOrUpdateGlobe(items = []) {
   // Combine all point layers
   const allPoints = [...cityPoints, ...airPoints, ...satPoints, ...seaPoints, ...threatPoints];
 
+  // HTML element markers (DOM-based, works even if WebGL points fail)
+  const htmlMarkers = allPoints.filter(p => p.lat && p.lng).map(p => ({
+    lat: p.lat, lng: p.lng, altitude: p.altitude || 0.04,
+    color: p.color, label: p.label, raw: p.raw
+  }));
+
   // Update globe data
   try {
     intelGlobe.pointsData(allPoints);
@@ -3889,8 +3896,18 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.pointRadius(d => d.radius);
     intelGlobe.pointAltitude(d => d.altitude || 0);
     intelGlobe.pointsMerge(false);
-    intelGlobe.labelsData([]);
-    intelGlobe.htmlElementsData(overlayElements || []);
+    // HTML element markers (fallback rendering)
+    intelGlobe.htmlElementsData(htmlMarkers);
+    intelGlobe.htmlElement(d => {
+      const el = document.createElement('div');
+      const size = d.altitude > 0.03 ? 10 : 8;
+      el.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;background:${d.color};box-shadow:0 0 6px ${d.color};transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;`;
+      el.title = d.label || '';
+      el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
+      return el;
+    });
+    intelGlobe.htmlElementAltitude(d => d.altitude || 0.04);
+    intelGlobe.htmlElementVisibilityModifier((el, isVisible) => { el.style.opacity = isVisible ? '1' : '0.15'; });
     intelGlobe.arcsData(threatArcData);
     intelGlobe.arcColor(d => d.color);
     intelGlobe.arcStroke(0.5);
