@@ -373,6 +373,9 @@ body {
   align-items: center;
   justify-content: center;
 }
+#intel-globe canvas {
+  margin-top: 12vh;
+}
 #intel-map-stage {
   position: relative;
 }
@@ -1247,6 +1250,9 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   }
   #intel-globe, #intel-map-stage, #intel-graph-stage {
     height: 100vh;
+  }
+  #intel-globe canvas {
+    margin-top: 8vh;
   }
   .thin-intel-panel {
     top: calc(env(safe-area-inset-top, 8px) + 8px);
