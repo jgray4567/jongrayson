@@ -1549,11 +1549,6 @@ safeCall(syncBaselineControls, 'syncBaselineControls');
 safeCall(renderBaselineHistory, 'renderBaselineHistory');
 safeCall(initializeCommandSurface, 'initializeCommandSurface');
 
-// Debug: verify button bindings
-['toggle-air-layer','toggle-sea-layer','toggle-satellite-layer','toggle-threat-layer'].forEach(id => {
-  const btn = document.getElementById(id);
-  console.log('[Intel] Button', id, btn ? 'found' : 'MISSING', btn?.dataset?.bound ? 'bound' : 'NOT BOUND');
-});
 loadIntel().then(() => startAutoRefresh()).catch(e => console.error('[Intel] loadIntel failed:', e));
 
 function getStructuralStateCounts(items = []) {
@@ -3736,7 +3731,7 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.atmosphereColor('#4488ff');
       intelGlobe.atmosphereAltitude(0.12);
       intelGlobe.showGraticules(false);
-      intelGlobe.pointRadius(0.25);
+      intelGlobe.pointRadius(0.35);
       intelGlobe.pointAltitude(0.05);
       intelGlobe.pointResolution(12);
       intelGlobe.pointsMerge(false);
@@ -3755,36 +3750,6 @@ function initOrUpdateGlobe(items = []) {
         }
       });
       console.log('[Intel] Globe constructor OK');
-      
-      // TEST: Hardcode visible test points directly after constructor
-      try {
-        const testPts = [
-          { lat: 33.73, lng: -118.26, label: 'TEST LA', color: '#00ff00', radius: 2.0, altitude: 0.3, raw: {} },
-          { lat: 40.71, lng: -74.01, label: 'TEST NYC', color: '#00ff00', radius: 2.0, altitude: 0.3, raw: {} },
-          { lat: 51.51, lng: -0.13, label: 'TEST LONDON', color: '#00ff00', radius: 2.0, altitude: 0.3, raw: {} }
-        ];
-        intelGlobe.pointsData(testPts);
-        intelGlobe.pointColor(d => d.color);
-        intelGlobe.pointRadius(d => d.radius);
-        intelGlobe.pointAltitude(d => d.altitude);
-        intelGlobe.pointResolution(16);
-        console.log('[Intel] TEST POINTS applied:', testPts.length, '| width:', globeContainer.clientWidth, 'height:', globeContainer.clientHeight);
-        // Check Three.js scene directly after render
-        setTimeout(() => {
-          const canvas = globeContainer.querySelector('canvas');
-          console.log('[Intel] Canvas:', canvas ? canvas.width + 'x' + canvas.height : 'NOT FOUND');
-          try {
-            const scene = intelGlobe.scene ? intelGlobe.scene() : null;
-            if (scene) {
-              let meshes = 0, points = 0;
-              scene.traverse(obj => { if (obj.type === 'Mesh') meshes++; if (obj.type === 'Points') points++; });
-              console.log('[Intel] Scene children:', scene.children.length, '| Meshes:', meshes, 'Points:', points);
-            } else {
-              console.log('[Intel] No scene() method');
-            }
-          } catch(e) { console.error('[Intel] Scene check error:', e); }
-        }, 2000);
-      } catch(e) { console.error('[Intel] TEST POINTS error:', e); }
       
       // Set initial dimensions
       intelGlobe.width(globeContainer.clientWidth || window.innerWidth);
@@ -3844,7 +3809,8 @@ function initOrUpdateGlobe(items = []) {
       label: item.locationName || 'Unknown',
       raw: item,
       color: stateColors[structuralState] || stateColors['neutral'] || '#00e676',
-      radius: 0.25 * touchBoost,
+      radius: 0.35 * touchBoost,
+      altitude: 0.04,
       altitude: 0
     };
   });
@@ -3917,17 +3883,12 @@ function initOrUpdateGlobe(items = []) {
   const allPoints = [...cityPoints, ...airPoints, ...satPoints, ...seaPoints, ...threatPoints];
 
   // Update globe data
-  console.log('[Intel] Globe update:', allPoints.length, 'pts', threatArcData.length, 'arcs', overlayPaths.length, 'paths', '| intelGlobe:', !!intelGlobe);
-  if (!intelGlobe) { console.error('[Intel] ABORT: intelGlobe is null'); return; }
-  if (allPoints.length === 0) { console.warn('[Intel] WARNING: 0 points to render'); }
-  if (allPoints.length > 0) { console.log('[Intel] First point:', JSON.stringify(allPoints[0])); }
   try {
     intelGlobe.pointsData(allPoints);
     intelGlobe.pointColor(d => d.color);
     intelGlobe.pointRadius(d => d.radius);
     intelGlobe.pointAltitude(d => d.altitude || 0);
     intelGlobe.pointsMerge(false);
-    console.log('[Intel] Points applied:', allPoints.length);
     intelGlobe.labelsData([]);
     intelGlobe.htmlElementsData(overlayElements || []);
     intelGlobe.arcsData(threatArcData);
@@ -3944,8 +3905,7 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.pathColor(d => d.color);
     intelGlobe.pathPointAlt(d => d.alt);
     intelGlobe.pathStroke(1);
-    console.log('[Intel] Globe data applied successfully');
-  } catch(e) { console.error('[Intel] Globe chain error:', e); }
+  } catch(e) { console.error('[Intel] Globe data error:', e); }
 
   // Hover guard
   if (!globeContainer.dataset.hoverGuardBound) {
