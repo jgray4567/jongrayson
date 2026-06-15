@@ -3857,8 +3857,9 @@ function initOrUpdateGlobe(items = []) {
   const satOrbitPaths = getSatelliteOrbitPaths();
   if (satOrbitPaths.length) {
     overlayPaths.push(...satOrbitPaths.map(p => ({
-      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: 0.005 })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng)),
-      color: p.color
+      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng)),
+      color: p.color,
+      isOrbit: true
     })).filter(p => p.coords.length >= 2));
   }
 
@@ -3936,7 +3937,7 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.pathsData(overlayPaths);
     intelGlobe.pathPoints(d => d.coords);
     intelGlobe.pathColor(d => d.color);
-    intelGlobe.pathPointAlt(d => d.alt);
+    intelGlobe.pathPointAlt(d => d.isOrbit ? 0 : (d.alt || 0));
     intelGlobe.pathStroke(0.4);
   } catch(e) { console.error('[Intel] Globe data error:', e); }
 
