@@ -3880,7 +3880,11 @@ function initOrUpdateGlobe(items = []) {
   const allPoints = [...cityPoints, ...airPoints, ...satPoints, ...seaPoints, ...threatPoints];
 
   // Update globe data
-  console.log('[Intel] Globe update:', allPoints.length, 'pts', threatArcData.length, 'arcs', overlayPaths.length, 'paths');
+  console.log('[Intel] Globe update:', allPoints.length, 'pts', threatArcData.length, 'arcs', overlayPaths.length, 'paths', '| intelGlobe:', !!intelGlobe);
+  if (!intelGlobe) { console.error('[Intel] ABORT: intelGlobe is null'); return; }
+  if (allPoints.length === 0) { console.warn('[Intel] WARNING: 0 points to render'); }
+  if (allPoints.length > 0) { console.log('[Intel] First point:', JSON.stringify(allPoints[0])); }
+  try {
   intelGlobe
     .pointsData(allPoints)
     .pointColor(d => d.color)
@@ -3903,6 +3907,8 @@ function initOrUpdateGlobe(items = []) {
     .pathColor(d => d.color)
     .pathPointAlt(d => d.alt)
     .pathStroke(1);
+  console.log('[Intel] Globe data applied successfully');
+  } catch(e) { console.error('[Intel] Globe chain error:', e); }
 
   // Hover guard
   if (!globeContainer.dataset.hoverGuardBound) {
