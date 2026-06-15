@@ -3869,13 +3869,24 @@ function initOrUpdateGlobe(items = []) {
     raw: a, color: '#ffdd44', radius: 0.2, altitude: 0
   })) : [];
 
-  // Satellite points (computed from TLE data)
+  // Satellite points (computed from TLE data) — flat dots, no altitude columns
   const satGlobeElements = getSatelliteGlobeElements();
   const satPoints = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
     lat: s.lat, lng: s.lng, label: s.label,
     raw: s.raw, color: s.raw.orbitClass === 'GEO' ? '#ff4444' : s.raw.orbitClass === 'MEO' ? '#44ddff' : '#44ff44',
     radius: 0.25, altitude: 0  // Flat on surface (globe.gl renders altitude as vertical columns)
   }));
+
+  // Notable satellite HTML markers — top 3 per orbit class with glow
+  const notableSats = [];
+  const orbitClasses = ['LEO', 'MEO', 'GEO'];
+  orbitClasses.forEach(oc => {
+    const classSats = satGlobeElements.filter(s => s.raw.orbitClass === oc && s.lat && s.lng);
+    // Pick up to 5 notable ones (ISS, GPS, Galileo, etc.)
+    const notable = classSats.filter(s => s.label && (s.label.includes('ISS') || s.label.includes('GPS') || s.label.includes('Galileo') || s.label.includes('Hubble') || s.label.includes('Starlink') || s.label.includes('GOES') || s.label.includes('Iridium') || s.label.includes('CSS')));
+    if (notable.length) notableSats.push(...notable.slice(0, 3));
+    else if (classSats.length) notableSats.push(classSats[0]); // fallback: first in class
+  });
 
   // Sea vessel points
   const seaPoints = seaLayerEnabled ? currentVesselCatalog.filter(v => v.lat && v.lng).map(v => ({
@@ -3893,10 +3904,15 @@ function initOrUpdateGlobe(items = []) {
   // Combine all point layers
   const allPoints = [...cityPoints, ...airPoints, ...satPoints, ...seaPoints, ...threatPoints];
 
-  // HTML element markers: city tooltips only (DOM overlay for interaction)
+  // HTML element markers: city tooltips + notable satellite glow markers
   const htmlCityMarkers = cityPoints.filter(p => p.lat && p.lng).map(p => ({
     lat: p.lat, lng: p.lng, altitude: 0.01,
     type: 'city', color: p.color, label: p.label, raw: p.raw
+  }));
+  const htmlSatMarkers = notableSats.filter(s => s.lat && s.lng).map(s => ({
+    lat: s.lat, lng: s.lng, altitude: 0.005,
+    type: 'sat', color: s.raw.orbitClass === 'GEO' ? '#ff4444' : s.raw.orbitClass === 'MEO' ? '#44ddff' : '#44ff44',
+    label: s.label, raw: s.raw
   }));
 
   // Update globe data
@@ -3906,11 +3922,22 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.pointRadius(d => d.radius);
     intelGlobe.pointAltitude(d => d.altitude || 0);
     intelGlobe.pointsMerge(false);
-    // City tooltip HTML elements only (5 max, performant)
-    intelGlobe.htmlElementsData(htmlCityMarkers);
+    // City tooltip + notable satellite HTML elements
+    intelGlobe.htmlElementsData([...htmlCityMarkers, ...htmlSatMarkers]);
     intelGlobe.htmlElement(d => {
       const el = document.createElement('div');
       const stateColor = d.color || '#00e676';
+      if (d.type === 'sat') {
+        // Satellite glow marker — small pulsing dot
+        el.setAttribute('data-globe-marker', 'sat');
+        el.setAttribute('data-label', d.label || '');
+        el.style.cssText = `position:relative;transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;`;
+        el.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:${stateColor};box-shadow:0 0 6px ${stateColor},0 0 2px ${stateColor};animation:satPulse 2s ease-in-out infinite;"></div>`;
+        el.title = d.label || 'Satellite';
+        el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
+        return el;
+      }
+      // City tooltip marker
       const name = (d.raw && (d.raw.locationName || d.label)) || '';
       el.setAttribute('data-globe-marker', 'city');
       el.setAttribute('data-label', name);
