@@ -3731,7 +3731,7 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.atmosphereColor('#4488ff');
       intelGlobe.atmosphereAltitude(0.12);
       intelGlobe.showGraticules(false);
-      intelGlobe.pointRadius(0.35);
+      intelGlobe.pointRadius(0.25);
       intelGlobe.pointAltitude(0.05);
       intelGlobe.pointResolution(12);
       intelGlobe.pointsMerge(false);
@@ -3809,8 +3809,8 @@ function initOrUpdateGlobe(items = []) {
       label: item.locationName || 'Unknown',
       raw: item,
       color: stateColors[structuralState] || stateColors['neutral'] || '#00e676',
-      radius: 0.35 * touchBoost,
-      altitude: 0.04
+      radius: 0.25 * touchBoost,
+      altitude: 0
     };
   });
 
@@ -3881,9 +3881,9 @@ function initOrUpdateGlobe(items = []) {
   // Combine all point layers
   const allPoints = [...cityPoints, ...airPoints, ...satPoints, ...seaPoints, ...threatPoints];
 
-  // HTML element markers (DOM-based, works even if WebGL points fail)
-  const htmlMarkers = allPoints.filter(p => p.lat && p.lng).map(p => ({
-    lat: p.lat, lng: p.lng, altitude: p.altitude || 0.04,
+  // HTML element markers for satellites only (DOM fallback for iOS Safari WebGL issues)
+  const htmlSatMarkers = satPoints.filter(p => p.lat && p.lng).map(p => ({
+    lat: p.lat, lng: p.lng, altitude: p.altitude || 0.05,
     color: p.color, label: p.label, raw: p.raw
   }));
 
@@ -3894,17 +3894,17 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.pointRadius(d => d.radius);
     intelGlobe.pointAltitude(d => d.altitude || 0);
     intelGlobe.pointsMerge(false);
-    // HTML element markers (fallback rendering)
-    intelGlobe.htmlElementsData(htmlMarkers);
+    // Satellite HTML markers (DOM overlay, works on all browsers)
+    intelGlobe.htmlElementsData(htmlSatMarkers);
     intelGlobe.htmlElement(d => {
       const el = document.createElement('div');
-      const size = d.altitude > 0.03 ? 10 : 8;
-      el.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;background:${d.color};box-shadow:0 0 6px ${d.color};transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;`;
+      const orbitColor = d.raw?.orbitClass === 'GEO' ? '#ff4444' : d.raw?.orbitClass === 'MEO' ? '#44ddff' : '#44ff44';
+      el.style.cssText = `width:8px;height:8px;border-radius:50%;background:${orbitColor};box-shadow:0 0 8px ${orbitColor},0 0 3px ${orbitColor};transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;`;
       el.title = d.label || '';
       el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
       return el;
     });
-    intelGlobe.htmlElementAltitude(d => d.altitude || 0.04);
+    intelGlobe.htmlElementAltitude(d => d.altitude || 0.05);
     intelGlobe.htmlElementVisibilityModifier((el, isVisible) => { el.style.opacity = isVisible ? '1' : '0.15'; });
     intelGlobe.arcsData(threatArcData);
     intelGlobe.arcColor(d => d.color);
