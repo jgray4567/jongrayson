@@ -3741,7 +3741,17 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.onPointHover(point => {
         const label = globeContainer.querySelector('.globe-hover-label');
         if (label) label.remove();
+        // Show/hide city HTML markers on hover
+        const htmlMarkers = globeContainer.querySelectorAll('[data-globe-marker]');
+        htmlMarkers.forEach(m => { m.style.opacity = '0'; m.style.pointerEvents = 'none'; });
         if (point) {
+          // Find the matching HTML marker for this point
+          htmlMarkers.forEach(m => {
+            if (m.dataset.label === (point.label || point.locationName)) {
+              m.style.opacity = '1';
+              m.style.pointerEvents = 'auto';
+            }
+          });
           const el = document.createElement('div');
           el.className = 'globe-hover-label';
           el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(32,33,36,0.85);color:#e8eaed;padding:4px 10px;border-radius:6px;font-size:12px;font-family:Google Sans,Roboto,sans-serif;white-space:nowrap;z-index:10;transform:translate(-50%,-100%);margin-top:-8px;';
@@ -3794,8 +3804,9 @@ function initOrUpdateGlobe(items = []) {
   }
 
   // ── DATA RENDERING ────────────────────────────────────────
-  // Skip redundant updates: hash the data to avoid re-rendering identical data
-  const dataHash = items.length + ':' + (items[0]?.locationName || '') + ':' + (items[items.length-1]?.locationName || '');
+  // Skip redundant updates only when satellite/air/threat layer state hasn't changed
+  const layerStateHash = [satelliteLayerEnabled, airLayerEnabled, seaLayerEnabled, threatLayerEnabled, currentSatelliteCatalog?.length || 0, currentAirTrafficItems?.length || 0].join(',');
+  const dataHash = items.length + ':' + (items[0]?.locationName || '') + ':' + (items[items.length-1]?.locationName || '') + ':' + layerStateHash;
   if (dataHash === _lastGlobeDataHash && intelGlobe) return; // No change, skip
   _lastGlobeDataHash = dataHash;
 
@@ -3900,13 +3911,19 @@ function initOrUpdateGlobe(items = []) {
       const el = document.createElement('div');
       const stateColor = d.color || '#00e676';
       const name = (d.raw && (d.raw.locationName || d.label)) || '';
-      el.style.cssText = `position:relative;transform:translate(-50%,-100%);cursor:pointer;pointer-events:auto;white-space:nowrap;`;
+      el.setAttribute('data-globe-marker', 'city');
+      el.setAttribute('data-label', name);
+      el.style.cssText = `position:relative;transform:translate(-50%,-100%);cursor:pointer;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity 0.15s;`;
       el.innerHTML = `<div style="display:flex;align-items:center;gap:4px;background:rgba(10,11,14,0.92);border:1px solid ${stateColor};border-radius:4px;padding:2px 7px 2px 5px;font-size:11px;color:#e8eaed;pointer-events:auto;"><span style="width:6px;height:6px;border-radius:50%;background:${stateColor};flex-shrink:0;"></span>${name}</div>`;
       el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
       return el;
     });
     intelGlobe.htmlAltitude(d => d.altitude || 0.01);
-    intelGlobe.htmlElementVisibilityModifier((el, isVisible) => { el.style.opacity = isVisible ? '1' : '0'; });
+    intelGlobe.htmlElementVisibilityModifier((el, isVisible) => {
+      // Hide city labels by default; they're shown via onPointHover
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
+    });
     intelGlobe.arcsData(threatArcData);
     intelGlobe.arcColor(d => d.color);
     intelGlobe.arcStroke(1);
