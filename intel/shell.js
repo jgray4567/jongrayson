@@ -2543,9 +2543,9 @@ function computeSatelliteLiveState(satItem, date = new Date()) {
 }
 
 function satelliteOrbitColor(orbitClass, alpha) {
-  if (orbitClass === 'LEO') return `rgba(0,229,100,${alpha})`;
-  if (orbitClass === 'GEO') return `rgba(255,60,60,${alpha})`;
-  return `rgba(0,229,255,${alpha})`;
+  if (orbitClass === 'LEO') return `rgba(102,255,136,${alpha})`;
+  if (orbitClass === 'GEO') return `rgba(255,102,102,${alpha})`;
+  return `rgba(102,221,255,${alpha})`;
 }
 
 function getSatelliteGlobeElements() {
@@ -2583,7 +2583,7 @@ function getSatelliteOrbitPaths() {
     }).filter(Boolean);
     if (points.length < 2) return null;
     return {
-      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', 0.25),
+      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', 0.15),
       points
     };
   }).filter(Boolean);
@@ -3872,8 +3872,8 @@ function initOrUpdateGlobe(items = []) {
   const satGlobeElements = getSatelliteGlobeElements();
   const satPoints = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
     lat: s.lat, lng: s.lng, label: s.label,
-    raw: s.raw, color: s.raw.orbitClass === 'GEO' ? '#ff4444' : s.raw.orbitClass === 'MEO' ? '#44ddff' : '#44ff44',
-    radius: 0.25, altitude: 0.15  // Fixed altitude for visibility (TLE ratio is too low)
+    raw: s.raw, color: s.raw.orbitClass === 'GEO' ? '#ff6666' : s.raw.orbitClass === 'MEO' ? '#66ddff' : '#66ff88',
+    radius: 0.2, altitude: 0.15  // Fixed altitude for visibility (TLE ratio is too low)
   }));
 
   // Sea vessel points
@@ -3937,7 +3937,7 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.pathPoints(d => d.coords);
     intelGlobe.pathColor(d => d.color);
     intelGlobe.pathPointAlt(d => d.alt);
-    intelGlobe.pathStroke(0.7);
+    intelGlobe.pathStroke(0.4);
   } catch(e) { console.error('[Intel] Globe data error:', e); }
 
   // Hover guard
