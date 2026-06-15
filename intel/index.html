@@ -10,8 +10,8 @@
   <link rel="dns-prefetch" href="https://unpkg.com">
   <link rel="stylesheet" href="styles.css?v=0.010.03">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script defer src="https://unpkg.com/globe.gl"></script>
-  <!-- Core: globe.gl + leaflet loaded via defer for performance -->
+  <script src="https://unpkg.com/globe.gl"></script>
+  <!-- Leaflet + heatmap loaded async for mobile performance -->
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script defer src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <!-- Lazy: satellite.js + force-graph loaded dynamically on demand -->
@@ -239,6 +239,6 @@
     </main>
   </div>
 
-  <script defer src="shell.js?v=0.008.47"></script>
+  <script src="shell.js?v=0.008.48"></script>
 </body>
 </html>

@@ -3701,6 +3701,12 @@ function initOrUpdateGlobe(items = []) {
 
   // Initialize globe.gl if not already done
   if (!intelGlobe) {
+    // Wait for Globe library to load (may be deferred)
+    if (typeof Globe === 'undefined') {
+      setTimeout(() => initOrUpdateGlobe(items), 300);
+      return;
+    }
+
     // Hide loading skeleton
     const loadEl = document.getElementById('globe-loading');
     if (loadEl) loadEl.remove();
