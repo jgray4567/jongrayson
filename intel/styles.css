@@ -55,6 +55,7 @@ body {
   left: calc(18px + env(safe-area-inset-left, 0px));
   right: calc(18px + env(safe-area-inset-right, 0px));
   z-index: 520;
+  pointer-events: auto;
   padding: 0;
   background: none;
   border: none;
@@ -444,6 +445,8 @@ body {
   justify-content: center;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  pointer-events: auto;
+  cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
 .map-control-btn:hover,
