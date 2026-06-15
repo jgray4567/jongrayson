@@ -1,4 +1,4 @@
-// ── Intel shell.js v0.008.60 ──
+// ── Intel shell.js v0.008.61 ──
 window.addEventListener('error', (e) => console.error('[Intel] Uncaught error:', e.message, e.filename, e.lineno));
 window.addEventListener('unhandledrejection', (e) => console.error('[Intel] Unhandled promise:', e.reason));
 
@@ -3728,8 +3728,8 @@ function initOrUpdateGlobe(items = []) {
       .backgroundColor('#050505')
       .showAtmosphere(true)
       .showGraticules(false)
-      .pointAltitude(0.01)
-      .pointRadius(0.4)
+      .pointAltitude(0.25)
+      .pointRadius(0.5)
       .pointsMerge(false)
       .onPointClick(point => {
         if (point && point.raw) openIntelDrawer(point.raw);
@@ -3798,9 +3798,9 @@ function initOrUpdateGlobe(items = []) {
       lng: item.lng,
       label: item.locationName || 'Unknown',
       raw: item,
-      color: stateColors[structuralState] || stateColors['neutral'] || '#4a90d9',
-      radius: 0.35 * touchBoost,
-      altitude: 0.01
+      color: stateColors[structuralState] || stateColors['neutral'] || '#00e676',
+      radius: 0.6 * touchBoost,
+      altitude: 0.25
     };
   });
 
@@ -3836,27 +3836,27 @@ function initOrUpdateGlobe(items = []) {
   // Air traffic points
   const airPoints = airLayerEnabled ? currentAirTrafficItems.filter(a => a.lat && a.lng).map(a => ({
     lat: a.lat, lng: a.lng, label: a.callsign || 'Aircraft',
-    raw: a, color: '#ffdd44', radius: 0.3, altitude: 0.05
+    raw: a, color: '#ffdd44', radius: 0.4, altitude: 0.3
   })) : [];
 
   // Satellite points
   const satPoints = satelliteLayerEnabled ? currentSatelliteCatalog.filter(s => s.lat && s.lng).map(s => ({
     lat: s.lat, lng: s.lng, label: `${s.name} · ${s.network} · ${s.orbitClass || 'LEO'}`,
     raw: s, color: s.orbitClass === 'GEO' ? '#ff4444' : s.orbitClass === 'MEO' ? '#44ddff' : '#44ff44',
-    radius: 0.25, altitude: 0.15
+    radius: 0.35, altitude: 0.4
   })) : [];
 
   // Sea vessel points
   const seaPoints = seaLayerEnabled ? currentVesselCatalog.filter(v => v.lat && v.lng).map(v => ({
     lat: v.lat, lng: v.lng, label: v.name || 'Vessel',
     raw: v, color: (v.type === 'Tanker' || v.type === 'LNG Carrier') ? '#ff8844' : '#4488ff',
-    radius: 0.25, altitude: 0.005
+    radius: 0.35, altitude: 0.1
   })) : [];
 
   // Threat hotspot points
   const threatPoints = threatLayerEnabled ? threatHotspots.filter(t => t.lat && t.lng).map(t => ({
     lat: t.lat, lng: t.lng, label: t.description || 'Threat Hotspot',
-    raw: t, color: '#ff2222', radius: 0.5, altitude: 0.02
+    raw: t, color: '#ff2222', radius: 0.6, altitude: 0.15
   })) : [];
 
   // Combine all point layers
@@ -3870,7 +3870,7 @@ function initOrUpdateGlobe(items = []) {
     .pointsData(allPoints)
     .pointColor(d => d.color)
     .pointRadius(d => d.radius)
-    .pointAltitude(d => d.altitude || 0.01)
+    .pointAltitude(d => d.altitude || 0.25)
     .pointsMerge(false)
     .labelsData([])
     .htmlElementsData(overlayElements || [])
