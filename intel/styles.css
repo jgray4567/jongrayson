@@ -1384,29 +1384,3 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(350%); }
 }
-
-/* ── CESIUM WIDGET OVERRIDES ──────────────────────────── */
-/* Hide default Cesium UI chrome */
-.cesium-viewer-bottom,
-.cesium-viewer-animationContainer,
-.cesium-viewer-timelineContainer,
-.cesium-viewer-fullscreenContainer,
-.cesium-viewer-selectionIndicatorContainer,
-.cesium-viewer-infoBoxContainer {
-  display: none !important;
-}
-.cesium-widget-credits {
-  display: none !important;
-}
-/* Make Cesium container transparent */
-#intel-globe .cesium-widget {
-  background: transparent;
-}
-#intel-globe .cesium-viewer {
-  font-family: var(--gmpx-font-family-base, 'Google Sans', Roboto, -apple-system, sans-serif);
-}
-/* Cesium canvas fills container */
-#intel-globe .cesium-widget canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
