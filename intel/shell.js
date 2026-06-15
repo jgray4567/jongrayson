@@ -3737,6 +3737,8 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.atmosphereAltitude(0.12);
       intelGlobe.showGraticules(false);
       intelGlobe.pointRadius(0.25);
+      intelGlobe.pointAltitude(0.05);
+      intelGlobe.pointResolution(12);
       intelGlobe.pointsMerge(false);
       intelGlobe.onPointClick(point => {
         if (point && point.raw) openIntelDrawer(point.raw);
@@ -3767,6 +3769,21 @@ function initOrUpdateGlobe(items = []) {
         intelGlobe.pointAltitude(d => d.altitude);
         intelGlobe.pointResolution(16);
         console.log('[Intel] TEST POINTS applied:', testPts.length, '| width:', globeContainer.clientWidth, 'height:', globeContainer.clientHeight);
+        // Check Three.js scene directly after render
+        setTimeout(() => {
+          const canvas = globeContainer.querySelector('canvas');
+          console.log('[Intel] Canvas:', canvas ? canvas.width + 'x' + canvas.height : 'NOT FOUND');
+          try {
+            const scene = intelGlobe.scene ? intelGlobe.scene() : null;
+            if (scene) {
+              let meshes = 0, points = 0;
+              scene.traverse(obj => { if (obj.type === 'Mesh') meshes++; if (obj.type === 'Points') points++; });
+              console.log('[Intel] Scene children:', scene.children.length, '| Meshes:', meshes, 'Points:', points);
+            } else {
+              console.log('[Intel] No scene() method');
+            }
+          } catch(e) { console.error('[Intel] Scene check error:', e); }
+        }, 2000);
       } catch(e) { console.error('[Intel] TEST POINTS error:', e); }
       
       // Set initial dimensions
