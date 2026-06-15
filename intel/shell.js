@@ -3922,7 +3922,7 @@ function initOrUpdateGlobe(items = []) {
       el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
       return el;
     });
-    intelGlobe.htmlElementAltitude(d => d.altitude || 0.01);
+    intelGlobe.htmlAltitude(d => d.altitude || 0.01);
     intelGlobe.htmlElementVisibilityModifier((el, isVisible) => { el.style.opacity = isVisible ? '1' : '0.1'; });
     intelGlobe.arcsData(threatArcData);
     intelGlobe.arcColor(d => d.color);
