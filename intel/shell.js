@@ -117,11 +117,23 @@ function setupSatelliteCustomLayer() {
       // Outer glow shell
       const glowGeo = new T.SphereGeometry(sz * 2.5, 8, 6);
       const glowMat = new T.MeshBasicMaterial({ color: d.color || 0x44ff44, transparent: true, opacity: 0.12 });
-      group.add(new T.Mesh(glowGeo, glowMat));
+      glowMat.userData = { isGlow: true };
+      const glowMesh = new T.Mesh(glowGeo, glowMat);
+      group.add(glowMesh);
       return group;
     })
     .customThreeObjectUpdate((obj, d) => {
       Object.assign(obj.position, intelGlobe.getCoords(d.lat, d.lng, d.alt));
+      // Highlight/fade based on selected orbit class
+      const isHighlighted = !highlightedOrbitClass || d.orbitClass === highlightedOrbitClass;
+      const targetOpacity = isHighlighted ? 0.95 : 0.4; // fade non-highlighted to ~50%
+      const targetGlowOpacity = isHighlighted ? 0.12 : 0.05;
+      obj.children.forEach(child => {
+        if (child.material) {
+          child.material.opacity = child.material.userData?.isGlow ? targetGlowOpacity : targetOpacity;
+          child.material.needsUpdate = true;
+        }
+      });
     });
   
   // Re-render with current data if SAT is already enabled
@@ -140,6 +152,7 @@ let satelliteLayerTimer = null;
 let selectedSatNetwork = null;
 let selectedSatOrbit = null;
 const visibleSatelliteOrbits = new Set(['LEO', 'MEO', 'GEO']);
+let highlightedOrbitClass = null; // null = no highlight, 'LEO'/'MEO'/'GEO' = highlighted class
 const cityCrimeScans = {
   'Los Angeles Port': {
     center: [33.739, -118.262],
@@ -2236,8 +2249,17 @@ function syncSatelliteToggle() {
       const btn = filters.querySelector(`[data-orbit="${cls}"]`);
       if (btn) {
         const on = visibleSatelliteOrbits.has(cls);
+        const highlighted = highlightedOrbitClass === cls;
         btn.style.opacity = on ? '1' : '0.35';
         btn.style.textDecoration = on ? 'none' : 'line-through';
+        // Highlighted class gets a glow effect
+        if (highlighted) {
+          btn.style.boxShadow = '0 0 8px 2px currentColor';
+          btn.style.transform = 'scale(1.1)';
+        } else {
+          btn.style.boxShadow = 'none';
+          btn.style.transform = 'scale(1)';
+        }
       }
     });
   }
@@ -2626,6 +2648,7 @@ function getSatelliteOrbitPaths() {
     }).filter(Boolean);
     if (points.length < 2) return null;
     return {
+      orbitClass: satItem.orbitClass || 'LEO',
       color: satelliteOrbitColor(satItem.orbitClass || 'LEO', 0.2),
       points
     };
@@ -2820,8 +2843,12 @@ function initializeCommandSurface() {
     btn.dataset.bound = '1';
     btn.addEventListener('click', () => {
       const cls = btn.dataset.orbit;
-      if (visibleSatelliteOrbits.has(cls)) visibleSatelliteOrbits.delete(cls);
-      else visibleSatelliteOrbits.add(cls);
+      // Toggle highlight: tap to highlight that class, tap again to un-highlight
+      if (highlightedOrbitClass === cls) {
+        highlightedOrbitClass = null;
+      } else {
+        highlightedOrbitClass = cls;
+      }
       syncSatelliteToggle();
       initOrUpdateGlobe(currentGlobeBaseItems || []);
     });
@@ -3904,7 +3931,7 @@ function initOrUpdateGlobe(items = []) {
   if (satOrbitPaths.length) {
     overlayPaths.push(...satOrbitPaths.map(p => ({
       coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
-      color: p.color,
+      color: satelliteOrbitColor(p.orbitClass || 'LEO', (!highlightedOrbitClass || p.orbitClass === highlightedOrbitClass) ? 0.2 : 0.06),
       isOrbit: true
     })).filter(p => p.coords.length >= 2));
   }
