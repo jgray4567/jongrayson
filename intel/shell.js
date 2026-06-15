@@ -3731,8 +3731,6 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.atmosphereColor('#4488ff');
       intelGlobe.atmosphereAltitude(0.12);
       intelGlobe.showGraticules(false);
-      // Force WebGL1 for iOS Safari compatibility + antialiasing for point visibility
-      intelGlobe.rendererConfig({ antialias: true, alpha: true });
       intelGlobe.pointRadius(0.35);
       intelGlobe.pointAltitude(0.05);
       intelGlobe.pointResolution(12);
