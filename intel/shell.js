@@ -4133,6 +4133,7 @@ document.head.appendChild(style);
 
 async function loadIntel() {
   try {
+    console.log('[Intel] loadIntel starting...');
     syncUrlState();
     const params = buildFeedParams();
 
@@ -4142,7 +4143,8 @@ async function loadIntel() {
     ]);
 
     renderTimelineViews(timelineViews.items || []);
-    const globeSeed = await fetchJson('data/globe-demo-locations.json').catch(() => ({ items: [] }));
+    const globeSeed = await fetchJson('data/globe-demo-locations.json').catch((e) => { console.warn('[Intel] Failed to load globe data:', e); return { items: [] }; });
+    console.log('[Intel] Globe data loaded:', (globeSeed.items || []).length, 'items');
     
     currentPriorityItems = globeSeed.items || [];
     currentGlobeBaseItems = currentPriorityItems;
@@ -4151,7 +4153,12 @@ async function loadIntel() {
     await refreshSatelliteCatalog();
     renderCommandBar(currentPriorityItems);
     
-    if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems);
+    if (typeof initOrUpdateGlobe === "function") {
+      console.log('[Intel] Calling initOrUpdateGlobe with', (currentGlobeBaseItems || []).length, 'items');
+      initOrUpdateGlobe(currentGlobeBaseItems);
+    } else {
+      console.error('[Intel] initOrUpdateGlobe is not a function!');
+    }
     if (typeof updateDataPanel === 'function') updateDataPanel();
     
     renderTimelineFocus(signals.items || []);
