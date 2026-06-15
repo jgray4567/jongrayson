@@ -3854,8 +3854,8 @@ function initOrUpdateGlobe(items = []) {
   const allPoints = [...cityPoints, ...airPoints, ...satPoints, ...seaPoints, ...threatPoints];
 
   // Update globe data
-  console.log('[Intel] Globe data update:', allPoints.length, 'points,', threatArcData.length, 'arcs');
-  if (allPoints.length && !allPoints[0].lat && !allPoints[0].lng) console.warn('[Intel] First point missing coords:', allPoints[0]);
+  console.log('[Intel] Globe data update:', allPoints.length, 'points,', threatArcData.length, 'arcs, validItems:', validItems.length, 'from', items.length, 'items');
+  if (allPoints.length === 0 && validItems.length === 0) console.warn('[Intel] No valid items with lat/lng found in data:', items);
   intelGlobe
     .pointsData(allPoints)
     .pointColor(d => d.color)

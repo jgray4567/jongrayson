@@ -1390,7 +1390,7 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   border: 1px solid var(--border);
   color: var(--text);
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 999px;
   transition: all 0.2s ease;
 }
 .ghost-btn:hover, .map-control-btn:hover {
