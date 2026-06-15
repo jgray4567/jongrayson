@@ -1548,6 +1548,12 @@ safeCall(syncFeedViewButtons, 'syncFeedViewButtons');
 safeCall(syncBaselineControls, 'syncBaselineControls');
 safeCall(renderBaselineHistory, 'renderBaselineHistory');
 safeCall(initializeCommandSurface, 'initializeCommandSurface');
+
+// Debug: verify button bindings
+['toggle-air-layer','toggle-sea-layer','toggle-satellite-layer','toggle-threat-layer'].forEach(id => {
+  const btn = document.getElementById(id);
+  console.log('[Intel] Button', id, btn ? 'found' : 'MISSING', btn?.dataset?.bound ? 'bound' : 'NOT BOUND');
+});
 loadIntel().then(() => startAutoRefresh()).catch(e => console.error('[Intel] loadIntel failed:', e));
 
 function getStructuralStateCounts(items = []) {
