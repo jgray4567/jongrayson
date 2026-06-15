@@ -1087,7 +1087,7 @@ function startAutoRefresh() {
   if (autoRefreshTimer) clearInterval(autoRefreshTimer);
   autoRefreshTimer = setInterval(() => {
     loadIntel();
-  }, 5000);
+  }, 30000); // 30s refresh, not 5s
 }
 
 signalSeverityFilters?.addEventListener('click', async (event) => {
@@ -3676,6 +3676,7 @@ function showGlobeStage() {
 
 function _initGlobeVars() {}
 let intelGlobe = null; // globe.gl instance
+let _lastGlobeDataHash = ''; // Skip redundant data updates
 const stateColors = {
   'terminal': '#ff3366',
   'compromised': '#ff9933',
@@ -3766,6 +3767,11 @@ function initOrUpdateGlobe(items = []) {
   }
 
   // ── DATA RENDERING ────────────────────────────────────────
+  // Skip redundant updates: hash the data to avoid re-rendering identical data
+  const dataHash = items.length + ':' + (items[0]?.locationName || '') + ':' + (items[items.length-1]?.locationName || '');
+  if (dataHash === _lastGlobeDataHash && intelGlobe) return; // No change, skip
+  _lastGlobeDataHash = dataHash;
+
   const validItems = (items || []).filter(i => i.lat !== undefined && i.lng !== undefined);
   const touchBoost = ('ontouchstart' in window) ? 1.5 : 1;
   const cityPoints = validItems.map(item => {
