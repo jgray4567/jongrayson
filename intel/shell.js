@@ -3880,6 +3880,7 @@ function initOrUpdateGlobe(items = []) {
   const allPoints = [...cityPoints, ...airPoints, ...satPoints, ...seaPoints, ...threatPoints];
 
   // Update globe data
+  console.log('[Intel] Globe update:', allPoints.length, 'pts', threatArcData.length, 'arcs', overlayPaths.length, 'paths');
   intelGlobe
     .pointsData(allPoints)
     .pointColor(d => d.color)
