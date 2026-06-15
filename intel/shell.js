@@ -3701,18 +3701,20 @@ function initOrUpdateGlobe(items = []) {
 
   // Initialize globe.gl if not already done
   if (!intelGlobe) {
-    // Wait for Globe library to load (may be deferred)
-    if (typeof Globe === 'undefined') {
-      setTimeout(() => initOrUpdateGlobe(items), 300);
+    // Wait for Globe library to load (may be deferred or slow CDN)
+    if (typeof window.Globe === 'undefined' && typeof Globe === 'undefined') {
+      console.warn('[Intel] Globe library not loaded, retrying in 500ms...');
+      setTimeout(() => initOrUpdateGlobe(items), 500);
       return;
     }
+    const GlobeLib = window.Globe || Globe;
 
     // Hide loading skeleton
     const loadEl = document.getElementById('globe-loading');
     if (loadEl) loadEl.remove();
 
     // Create globe.gl instance
-    intelGlobe = Globe()(globeContainer)
+    intelGlobe = GlobeLib()(globeContainer)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
       .backgroundColor('#050505')
@@ -4517,6 +4519,20 @@ function updateDataPanel() {
        html = '<div class="muted">No active zones detected.</div>';
     }
     container.innerHTML = html;
+  }
+}
+
+// ── Boot: ensure globe initializes after DOM + scripts ready ──
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!intelGlobe && typeof (window.Globe || Globe) !== 'undefined') {
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    }
+  });
+} else {
+  // DOM already parsed
+  if (!intelGlobe && typeof (window.Globe || Globe) !== 'undefined') {
+    setTimeout(() => initOrUpdateGlobe(currentGlobeBaseItems || []), 100);
   }
 }
 
