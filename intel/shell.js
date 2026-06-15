@@ -2621,7 +2621,7 @@ function getSatelliteOrbitPaths() {
   return currentSatelliteCatalog.filter((satItem) => visibleSatelliteOrbits.has(satItem.orbitClass || 'LEO')).map((satItem) => {
     const points = offsetsMinutes.map((offsetMinutes) => {
       const state = computeSatelliteLiveState(satItem, new Date(Date.now() + (offsetMinutes * 60000)));
-      if (!state) return null;
+      if (!state || !isFinite(state.lat) || !isFinite(state.lng) || Math.abs(state.lat) > 90 || Math.abs(state.lng) > 180) return null;
       return { lat: state.lat, lng: state.lng, alt: state.altitudeRatio };
     }).filter(Boolean);
     if (points.length < 2) return null;
@@ -3903,7 +3903,7 @@ function initOrUpdateGlobe(items = []) {
   const satOrbitPaths = getSatelliteOrbitPaths();
   if (satOrbitPaths.length) {
     overlayPaths.push(...satOrbitPaths.map(p => ({
-      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng)),
+      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
       color: p.color,
       isOrbit: true
     })).filter(p => p.coords.length >= 2));
