@@ -3857,9 +3857,9 @@ function initOrUpdateGlobe(items = []) {
   const satOrbitPaths = getSatelliteOrbitPaths();
   if (satOrbitPaths.length) {
     overlayPaths.push(...satOrbitPaths.map(p => ({
-      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: 0.15 })),
+      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: 0.15 })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng)),
       color: p.color
-    })));
+    })).filter(p => p.coords.length >= 2));
   }
 
   // Air traffic points
@@ -3870,7 +3870,7 @@ function initOrUpdateGlobe(items = []) {
 
   // Satellite points (computed from TLE data)
   const satGlobeElements = getSatelliteGlobeElements();
-  const satPoints = satGlobeElements.filter(s => s.lat && s.lng).map(s => ({
+  const satPoints = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
     lat: s.lat, lng: s.lng, label: s.label,
     raw: s.raw, color: s.raw.orbitClass === 'GEO' ? '#ff4444' : s.raw.orbitClass === 'MEO' ? '#44ddff' : '#44ff44',
     radius: 0.35, altitude: 0.15  // Fixed altitude for visibility (TLE ratio is too low)
