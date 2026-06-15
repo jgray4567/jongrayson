@@ -3768,10 +3768,10 @@ function initOrUpdateGlobe(items = []) {
     }
   } catch(e) {
     console.error('[Intel] Globe creation failed:', e);
-    // Show error details in container
+    // Show error details in container with readable font size
     const errMsg = e.message || e.toString();
     const errStack = (e.stack || '').split('\n').slice(0, 3).join('\n');
-    globeContainer.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#e8eaed;font-family:monospace;font-size:12px;padding:20px;text-align:center;"><div style="color:#ff4444;font-size:16px;margin-bottom:12px;">Globe failed to load</div><div style="color:#aaa;margin-bottom:12px;">Error: ' + errMsg + '</div><pre style="color:#666;font-size:10px;max-width:90%;overflow:auto;">' + errStack + '</pre><a href="javascript:location.reload()" style="color:#00e676;margin-top:12px;">Retry</a></div>';
+    globeContainer.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px 20px;text-align:center;font-family:monospace;"><div style="color:#ff4444;font-size:20px;margin-bottom:16px;">⚠ Globe Error</div><div style="color:#e8eaed;font-size:14px;margin-bottom:8px;word-break:break-all;">${errMsg}</div><div style="color:#888;font-size:11px;margin-bottom:20px;word-break:break-all;">${errStack}</div><button onclick="location.reload()" style="background:#00e676;color:#000;border:none;padding:12px 24px;border-radius:8px;font-size:16px;cursor:pointer;">Retry</button></div>`;
     return;
   }
   }
