@@ -3736,7 +3736,6 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.atmosphereColor('#4488ff');
       intelGlobe.atmosphereAltitude(0.12);
       intelGlobe.showGraticules(false);
-      intelGlobe.pointAltitude(0);
       intelGlobe.pointRadius(0.25);
       intelGlobe.pointsMerge(false);
       intelGlobe.onPointClick(point => {
@@ -3758,15 +3757,16 @@ function initOrUpdateGlobe(items = []) {
       // TEST: Hardcode visible test points directly after constructor
       try {
         const testPts = [
-          { lat: 33.73, lng: -118.26, label: 'TEST LA', color: '#00ff00', radius: 1.0, altitude: 0.05, raw: {} },
-          { lat: 40.71, lng: -74.01, label: 'TEST NYC', color: '#00ff00', radius: 1.0, altitude: 0.05, raw: {} },
-          { lat: 51.51, lng: -0.13, label: 'TEST LONDON', color: '#00ff00', radius: 1.0, altitude: 0.05, raw: {} }
+          { lat: 33.73, lng: -118.26, label: 'TEST LA', color: '#00ff00', radius: 2.0, altitude: 0.3, raw: {} },
+          { lat: 40.71, lng: -74.01, label: 'TEST NYC', color: '#00ff00', radius: 2.0, altitude: 0.3, raw: {} },
+          { lat: 51.51, lng: -0.13, label: 'TEST LONDON', color: '#00ff00', radius: 2.0, altitude: 0.3, raw: {} }
         ];
         intelGlobe.pointsData(testPts);
         intelGlobe.pointColor(d => d.color);
         intelGlobe.pointRadius(d => d.radius);
         intelGlobe.pointAltitude(d => d.altitude);
-        console.log('[Intel] TEST POINTS applied:', testPts.length);
+        intelGlobe.pointResolution(16);
+        console.log('[Intel] TEST POINTS applied:', testPts.length, '| width:', globeContainer.clientWidth, 'height:', globeContainer.clientHeight);
       } catch(e) { console.error('[Intel] TEST POINTS error:', e); }
       
       // Set initial dimensions
