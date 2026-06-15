@@ -83,6 +83,9 @@ let selectedAirRegion = null;
 let selectedAirCategory = null;
 let hoveredCityLabel = null;
 let hoveredCity = null;
+let overlayFlightPaths = [];
+let overlaySatelliteOrbits = [];
+let overlayElements = [];
 let satelliteLayerEnabled = false;
 let seaLayerEnabled = false;
 let currentVesselCatalog = [];
@@ -3857,6 +3860,7 @@ function initOrUpdateGlobe(items = []) {
   // Update globe data
   console.log('[Intel] Globe data update:', allPoints.length, 'points,', threatArcData.length, 'arcs, validItems:', validItems.length, 'from', items.length, 'items');
   if (allPoints.length === 0 && validItems.length === 0) console.warn('[Intel] No valid items with lat/lng found in data:', items);
+  try {
   intelGlobe
     .pointsData(allPoints)
     .pointColor(d => d.color)
@@ -3878,6 +3882,7 @@ function initOrUpdateGlobe(items = []) {
     .pathColor(d => d.color)
     .pathPointAlt(d => d.alt)
     .pathStroke(1);
+  } catch(e) { console.error('[Intel] Globe data update error:', e); }
 
   // Hover guard
   if (!globeContainer.dataset.hoverGuardBound) {
