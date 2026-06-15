@@ -3705,13 +3705,15 @@ function initOrUpdateGlobe(items = []) {
       return;
     }
     const GlobeLib = window.Globe || Globe;
+    console.log('[Intel] Initializing globe with', GlobeLib.name || 'Globe');
 
     // Hide loading skeleton
     const loadEl = document.getElementById('globe-loading');
     if (loadEl) loadEl.remove();
 
     // Create globe.gl instance
-    intelGlobe = GlobeLib()(globeContainer)
+    try {
+      intelGlobe = GlobeLib()(globeContainer)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
       .backgroundColor('#050505')
@@ -3764,6 +3766,12 @@ function initOrUpdateGlobe(items = []) {
       });
       mapStyleBtn.dataset.bound = '1';
     }
+  } catch(e) {
+    console.error('[Intel] Globe creation failed:', e);
+    // Show error in container instead of hanging
+    globeContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#e8eaed;font-family:Google Sans,Roboto,sans-serif;font-size:14px;">Globe failed to load. <a href="javascript:location.reload()" style="color:#00e676;margin-left:8px;">Retry</a></div>';
+    return;
+  }
   }
 
   // ── DATA RENDERING ────────────────────────────────────────
