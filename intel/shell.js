@@ -87,6 +87,36 @@ let overlayFlightPaths = [];
 let overlaySatelliteOrbits = [];
 let overlayElements = [];
 let satelliteLayerEnabled = false;
+
+// Set up satellite custom layer with Three.js spheres
+let _satCustomLayerSetup = false;
+function setupSatelliteCustomLayer() {
+  if (_satCustomLayerSetup || !window.THREE || !intelGlobe) return;
+  _satCustomLayerSetup = true;
+  intelGlobe
+    .customThreeObject(d => {
+      const sz = Math.max(0.01, d.size || 0.35);
+      const group = new window.THREE.Group();
+      // Core bright sphere
+      const geo = new window.THREE.SphereGeometry(sz, 8, 6);
+      const mat = new window.THREE.MeshBasicMaterial({ color: d.color || 0x44ff44, transparent: true, opacity: 0.95 });
+      const mesh = new window.THREE.Mesh(geo, mat);
+      group.add(mesh);
+      // Outer glow shell
+      const glowGeo = new window.THREE.SphereGeometry(sz * 2.5, 8, 6);
+      const glowMat = new window.THREE.MeshBasicMaterial({ color: d.color || 0x44ff44, transparent: true, opacity: 0.12 });
+      const glow = new window.THREE.Mesh(glowGeo, glowMat);
+      group.add(glow);
+      return group;
+    })
+    .customThreeObjectUpdate((obj, d) => {
+      Object.assign(obj.position, intelGlobe.getCoords(d.lat, d.lng, d.alt));
+    });
+  // Re-render with current data if SAT is already enabled
+  if (satelliteLayerEnabled && currentSatelliteCatalog.length) {
+    initOrUpdateGlobe(currentGlobeBaseItems || []);
+  }
+}
 let seaLayerEnabled = false;
 let currentVesselCatalog = [];
 let seaLayerTimer = null;
@@ -3735,6 +3765,14 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.pointAltitude(0);
       intelGlobe.pointResolution(12);
       intelGlobe.pointsMerge(false);
+      // Satellite custom layer — Three.js spheres at orbital altitude
+      // Uses THREE from ESM bridge (window.THREE set by module script in index.html)
+      intelGlobe.customLayerData([]);
+      if (window.THREE) {
+        setupSatelliteCustomLayer();
+      } else {
+        window.addEventListener('three-ready', () => setupSatelliteCustomLayer(), { once: true });
+      }
       intelGlobe.onPointClick(point => {
         if (point && point.raw) openIntelDrawer(point.raw);
       });
@@ -3869,12 +3907,17 @@ function initOrUpdateGlobe(items = []) {
     raw: a, color: '#ffdd44', radius: 0.2, altitude: 0
   })) : [];
 
-  // Satellite points (computed from TLE data) — flat dots, no altitude columns
+  // Satellite points removed from pointsData — rendered via customLayerData (Three.js spheres)
   const satGlobeElements = getSatelliteGlobeElements();
-  const satPoints = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
+
+  // Build custom layer data for satellites (Three.js spheres at orbital altitude)
+  const satCustomData = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
     lat: s.lat, lng: s.lng, label: s.label,
-    raw: s.raw, color: s.raw.orbitClass === 'GEO' ? '#ff4444' : s.raw.orbitClass === 'MEO' ? '#44ddff' : '#44ff44',
-    radius: 0.25, altitude: 0  // Flat on surface (globe.gl renders altitude as vertical columns)
+    raw: s.raw,
+    orbitClass: s.raw.orbitClass || 'LEO',
+    alt: 0.12,  // Orbital altitude ratio (floats above globe surface, no columns)
+    size: s.raw.orbitClass === 'GEO' ? 0.6 : s.raw.orbitClass === 'MEO' ? 0.45 : 0.35,
+    color: s.raw.orbitClass === 'GEO' ? 0xff4444 : s.raw.orbitClass === 'MEO' ? 0x44ddff : 0x44ff44
   }));
 
   // Notable satellite HTML markers — top 3 per orbit class with glow
@@ -3901,8 +3944,8 @@ function initOrUpdateGlobe(items = []) {
     raw: t, color: '#ff2222', radius: 0.3, altitude: 0
   })) : [];
 
-  // Combine all point layers
-  const allPoints = [...cityPoints, ...airPoints, ...satPoints, ...seaPoints, ...threatPoints];
+  // Combine all point layers (no satellites — those use customLayerData)
+  const allPoints = [...cityPoints, ...airPoints, ...seaPoints, ...threatPoints];
 
   // HTML element markers: city tooltips + notable satellite glow markers
   const htmlCityMarkers = cityPoints.filter(p => p.lat && p.lng).map(p => ({
@@ -3966,6 +4009,12 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.pathColor(d => d.color);
     intelGlobe.pathPointAlt(d => d.isOrbit ? 0 : (d.alt || 0));
     intelGlobe.pathStroke(0.5);
+    // Satellite custom layer (Three.js spheres at orbital altitude)
+    if (satelliteLayerEnabled && satCustomData.length && _satCustomLayerSetup) {
+      intelGlobe.customLayerData(satCustomData);
+    } else {
+      intelGlobe.customLayerData([]);
+    }
   } catch(e) { console.error('[Intel] Globe data error:', e); }
 
   // Hover guard

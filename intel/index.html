@@ -11,6 +11,15 @@
   <link rel="stylesheet" href="styles.css?v=0.010.07">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/globe.gl@2.46.1/dist/globe.gl.min.js"></script>
+  <!-- Three.js global bridge: loads ESM module and exposes as window.THREE -->
+  <script type="importmap">
+  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js" } }
+  </script>
+  <script type="module">
+  import * as THREE from 'three';
+  window.THREE = THREE;
+  window.dispatchEvent(new Event('three-ready'));
+  </script>
   <!-- Leaflet + heatmap loaded async for mobile performance -->
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script defer src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
@@ -239,6 +248,6 @@
     </main>
   </div>
 
-  <script src="shell.js?v=0.009.15"></script>
+  <script src="shell.js?v=0.009.16"></script>
 </body>
 </html>
