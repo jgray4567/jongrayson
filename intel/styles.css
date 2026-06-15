@@ -1217,7 +1217,7 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   font-size: 11px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  border-radius: 2px;
+  border-radius: 999px;
 }
 
 .stage-card {
