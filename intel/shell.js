@@ -3728,21 +3728,21 @@ function initOrUpdateGlobe(items = []) {
 
     // Create globe.gl instance
     try {
-      intelGlobe = GlobeLib()(globeContainer)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-      .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-      .backgroundColor('#050505')
-      .showAtmosphere(true)
-      .atmosphereColor('#4488ff')
-      .atmosphereAltitude(0.12)
-      .showGraticules(false)
-      .pointAltitude(0)
-      .pointRadius(0.25)
-      .pointsMerge(false)
-      .onPointClick(point => {
+      intelGlobe = GlobeLib()(globeContainer);
+      intelGlobe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+      intelGlobe.backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png');
+      intelGlobe.backgroundColor('#050505');
+      intelGlobe.showAtmosphere(true);
+      intelGlobe.atmosphereColor('#4488ff');
+      intelGlobe.atmosphereAltitude(0.12);
+      intelGlobe.showGraticules(false);
+      intelGlobe.pointAltitude(0);
+      intelGlobe.pointRadius(0.25);
+      intelGlobe.pointsMerge(false);
+      intelGlobe.onPointClick(point => {
         if (point && point.raw) openIntelDrawer(point.raw);
-      })
-      .onPointHover(point => {
+      });
+      intelGlobe.onPointHover(point => {
         const label = globeContainer.querySelector('.globe-hover-label');
         if (label) label.remove();
         if (point) {
@@ -3753,6 +3753,7 @@ function initOrUpdateGlobe(items = []) {
           globeContainer.appendChild(el);
         }
       });
+      console.log('[Intel] Globe constructor OK');
 
     // Handle resize
     window.addEventListener('resize', () => {
@@ -3885,29 +3886,29 @@ function initOrUpdateGlobe(items = []) {
   if (allPoints.length === 0) { console.warn('[Intel] WARNING: 0 points to render'); }
   if (allPoints.length > 0) { console.log('[Intel] First point:', JSON.stringify(allPoints[0])); }
   try {
-  intelGlobe
-    .pointsData(allPoints)
-    .pointColor(d => d.color)
-    .pointRadius(d => d.radius)
-    .pointAltitude(d => d.altitude || 0)
-    .pointsMerge(false)
-    .labelsData([])
-    .htmlElementsData(overlayElements || [])
-    .arcsData(threatArcData)
-    .arcColor(d => d.color)
-    .arcStroke(0.5)
-    .arcAltitude(d => d.arcAlt || 0.3)
-    .ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints)
-    .ringColor(d => d.ringColor || '#ff4444')
-    .ringMaxRadius(d => d.ringMaxRadius || 1)
-    .ringPropagationSpeed(1)
-    .ringRepeatPeriod(2000)
-    .pathsData(overlayPaths)
-    .pathPoints(d => d.coords)
-    .pathColor(d => d.color)
-    .pathPointAlt(d => d.alt)
-    .pathStroke(1);
-  console.log('[Intel] Globe data applied successfully');
+    intelGlobe.pointsData(allPoints);
+    intelGlobe.pointColor(d => d.color);
+    intelGlobe.pointRadius(d => d.radius);
+    intelGlobe.pointAltitude(d => d.altitude || 0);
+    intelGlobe.pointsMerge(false);
+    console.log('[Intel] Points applied:', allPoints.length);
+    intelGlobe.labelsData([]);
+    intelGlobe.htmlElementsData(overlayElements || []);
+    intelGlobe.arcsData(threatArcData);
+    intelGlobe.arcColor(d => d.color);
+    intelGlobe.arcStroke(0.5);
+    intelGlobe.arcAltitude(d => d.arcAlt || 0.3);
+    intelGlobe.ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints);
+    intelGlobe.ringColor(d => d.ringColor || '#ff4444');
+    intelGlobe.ringMaxRadius(d => d.ringMaxRadius || 1);
+    intelGlobe.ringPropagationSpeed(1);
+    intelGlobe.ringRepeatPeriod(2000);
+    intelGlobe.pathsData(overlayPaths);
+    intelGlobe.pathPoints(d => d.coords);
+    intelGlobe.pathColor(d => d.color);
+    intelGlobe.pathPointAlt(d => d.alt);
+    intelGlobe.pathStroke(1);
+    console.log('[Intel] Globe data applied successfully');
   } catch(e) { console.error('[Intel] Globe chain error:', e); }
 
   // Hover guard
