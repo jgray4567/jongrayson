@@ -3728,8 +3728,8 @@ function initOrUpdateGlobe(items = []) {
       .backgroundColor('#050505')
       .showAtmosphere(true)
       .showGraticules(false)
-      .pointAltitude(0.25)
-      .pointRadius(0.5)
+      .pointAltitude(0)
+      .pointRadius(0.25)
       .pointsMerge(false)
       .onPointClick(point => {
         if (point && point.raw) openIntelDrawer(point.raw);
@@ -3799,8 +3799,8 @@ function initOrUpdateGlobe(items = []) {
       label: item.locationName || 'Unknown',
       raw: item,
       color: stateColors[structuralState] || stateColors['neutral'] || '#00e676',
-      radius: 0.6 * touchBoost,
-      altitude: 0.25
+      radius: 0.25 * touchBoost,
+      altitude: 0
     };
   });
 
@@ -3836,27 +3836,27 @@ function initOrUpdateGlobe(items = []) {
   // Air traffic points
   const airPoints = airLayerEnabled ? currentAirTrafficItems.filter(a => a.lat && a.lng).map(a => ({
     lat: a.lat, lng: a.lng, label: a.callsign || 'Aircraft',
-    raw: a, color: '#ffdd44', radius: 0.4, altitude: 0.3
+    raw: a, color: '#ffdd44', radius: 0.2, altitude: 0
   })) : [];
 
   // Satellite points
   const satPoints = satelliteLayerEnabled ? currentSatelliteCatalog.filter(s => s.lat && s.lng).map(s => ({
     lat: s.lat, lng: s.lng, label: `${s.name} · ${s.network} · ${s.orbitClass || 'LEO'}`,
     raw: s, color: s.orbitClass === 'GEO' ? '#ff4444' : s.orbitClass === 'MEO' ? '#44ddff' : '#44ff44',
-    radius: 0.35, altitude: 0.4
+    radius: 0.2, altitude: 0.05
   })) : [];
 
   // Sea vessel points
   const seaPoints = seaLayerEnabled ? currentVesselCatalog.filter(v => v.lat && v.lng).map(v => ({
     lat: v.lat, lng: v.lng, label: v.name || 'Vessel',
     raw: v, color: (v.type === 'Tanker' || v.type === 'LNG Carrier') ? '#ff8844' : '#4488ff',
-    radius: 0.35, altitude: 0.1
+    radius: 0.2, altitude: 0
   })) : [];
 
   // Threat hotspot points
   const threatPoints = threatLayerEnabled ? threatHotspots.filter(t => t.lat && t.lng).map(t => ({
     lat: t.lat, lng: t.lng, label: t.description || 'Threat Hotspot',
-    raw: t, color: '#ff2222', radius: 0.6, altitude: 0.15
+    raw: t, color: '#ff2222', radius: 0.3, altitude: 0
   })) : [];
 
   // Combine all point layers
@@ -3870,7 +3870,7 @@ function initOrUpdateGlobe(items = []) {
     .pointsData(allPoints)
     .pointColor(d => d.color)
     .pointRadius(d => d.radius)
-    .pointAltitude(d => d.altitude || 0.25)
+    .pointAltitude(d => d.altitude || 0)
     .pointsMerge(false)
     .labelsData([])
     .htmlElementsData(overlayElements || [])
