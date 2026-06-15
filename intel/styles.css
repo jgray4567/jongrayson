@@ -375,7 +375,6 @@ body {
   justify-content: center;
 }
 #intel-globe canvas {
-  margin-top: 12vh;
 }
 #intel-map-stage {
   position: relative;
@@ -1255,7 +1254,6 @@ body[data-interaction-mode="mobile"] .map-hover-card {
     height: 100vh;
   }
   #intel-globe canvas {
-    margin-top: 8vh;
   }
   .thin-intel-panel {
     top: calc(env(safe-area-inset-top, 8px) + 8px);
