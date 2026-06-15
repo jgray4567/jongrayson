@@ -1,7 +1,3 @@
-// ── Intel shell.js v0.008.61 ──
-window.addEventListener('error', (e) => console.error('[Intel] Uncaught error:', e.message, e.filename, e.lineno));
-window.addEventListener('unhandledrejection', (e) => console.error('[Intel] Unhandled promise:', e.reason));
-
 // ── Dynamic lazy-loaders for heavy dependencies ──
 let _satelliteLoadPromise = null;
 let _forceGraphLoadPromise = null;
@@ -1545,7 +1541,6 @@ syncTimelineWindowButtons();
 syncSeverityFilterButtons();
 syncFeedViewButtons();
 syncBaselineControls();
-console.log('[Intel] shell.js v0.008.60 loaded');
 renderBaselineHistory();
 initializeCommandSurface();
 loadIntel().then(() => startAutoRefresh());
@@ -3863,9 +3858,6 @@ function initOrUpdateGlobe(items = []) {
   const allPoints = [...cityPoints, ...airPoints, ...satPoints, ...seaPoints, ...threatPoints];
 
   // Update globe data
-  console.log('[Intel] Globe data update:', allPoints.length, 'points,', threatArcData.length, 'arcs, validItems:', validItems.length, 'from', items.length, 'items');
-  if (allPoints.length === 0 && validItems.length === 0) console.warn('[Intel] No valid items with lat/lng found in data:', items);
-  try {
   intelGlobe
     .pointsData(allPoints)
     .pointColor(d => d.color)
@@ -3887,7 +3879,6 @@ function initOrUpdateGlobe(items = []) {
     .pathColor(d => d.color)
     .pathPointAlt(d => d.alt)
     .pathStroke(1);
-  } catch(e) { console.error('[Intel] Globe data update error:', e); }
 
   // Hover guard
   if (!globeContainer.dataset.hoverGuardBound) {
@@ -4144,7 +4135,6 @@ document.head.appendChild(style);
 
 async function loadIntel() {
   try {
-    console.log('[Intel] loadIntel starting...');
     syncUrlState();
     const params = buildFeedParams();
 
@@ -4154,8 +4144,7 @@ async function loadIntel() {
     ]);
 
     renderTimelineViews(timelineViews.items || []);
-    const globeSeed = await fetchJson('data/globe-demo-locations.json').catch((e) => { console.warn('[Intel] Failed to load globe data:', e); return { items: [] }; });
-    console.log('[Intel] Globe data loaded:', (globeSeed.items || []).length, 'items');
+    const globeSeed = await fetchJson('data/globe-demo-locations.json').catch(() => ({ items: [] }));
     
     currentPriorityItems = globeSeed.items || [];
     currentGlobeBaseItems = currentPriorityItems;
@@ -4164,12 +4153,7 @@ async function loadIntel() {
     await refreshSatelliteCatalog();
     renderCommandBar(currentPriorityItems);
     
-    if (typeof initOrUpdateGlobe === "function") {
-      console.log('[Intel] Calling initOrUpdateGlobe with', (currentGlobeBaseItems || []).length, 'items');
-      initOrUpdateGlobe(currentGlobeBaseItems);
-    } else {
-      console.error('[Intel] initOrUpdateGlobe is not a function!');
-    }
+    if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems);
     if (typeof updateDataPanel === 'function') updateDataPanel();
     
     renderTimelineFocus(signals.items || []);
