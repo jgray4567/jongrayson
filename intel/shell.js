@@ -3722,8 +3722,6 @@ function initOrUpdateGlobe(items = []) {
       .pointAltitude(0.01)
       .pointRadius(0.4)
       .pointsMerge(false)
-      .arcsMerge(false)
-      .ringsMerge(false)
       .onPointClick(point => {
         if (point && point.raw) openIntelDrawer(point.raw);
       })
@@ -3868,7 +3866,6 @@ function initOrUpdateGlobe(items = []) {
     .arcColor(d => d.color)
     .arcStroke(0.5)
     .arcAltitude(d => d.arcAlt || 0.3)
-    .arcsMerge(false)
     .ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints)
     .ringColor(d => d.ringColor || '#ff4444')
     .ringMaxRadius(d => d.ringMaxRadius || 1)
