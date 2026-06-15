@@ -3854,6 +3854,8 @@ function initOrUpdateGlobe(items = []) {
   const allPoints = [...cityPoints, ...airPoints, ...satPoints, ...seaPoints, ...threatPoints];
 
   // Update globe data
+  console.log('[Intel] Globe data update:', allPoints.length, 'points,', threatArcData.length, 'arcs');
+  if (allPoints.length && !allPoints[0].lat && !allPoints[0].lng) console.warn('[Intel] First point missing coords:', allPoints[0]);
   intelGlobe
     .pointsData(allPoints)
     .pointColor(d => d.color)
