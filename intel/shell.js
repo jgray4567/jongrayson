@@ -3732,7 +3732,7 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.atmosphereAltitude(0.12);
       intelGlobe.showGraticules(false);
       intelGlobe.pointRadius(0.25);
-      intelGlobe.pointAltitude(0.05);
+      intelGlobe.pointAltitude(0);
       intelGlobe.pointResolution(12);
       intelGlobe.pointsMerge(false);
       intelGlobe.onPointClick(point => {
