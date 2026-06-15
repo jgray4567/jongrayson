@@ -3768,8 +3768,10 @@ function initOrUpdateGlobe(items = []) {
     }
   } catch(e) {
     console.error('[Intel] Globe creation failed:', e);
-    // Show error in container instead of hanging
-    globeContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#e8eaed;font-family:Google Sans,Roboto,sans-serif;font-size:14px;">Globe failed to load. <a href="javascript:location.reload()" style="color:#00e676;margin-left:8px;">Retry</a></div>';
+    // Show error details in container
+    const errMsg = e.message || e.toString();
+    const errStack = (e.stack || '').split('\n').slice(0, 3).join('\n');
+    globeContainer.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#e8eaed;font-family:monospace;font-size:12px;padding:20px;text-align:center;"><div style="color:#ff4444;font-size:16px;margin-bottom:12px;">Globe failed to load</div><div style="color:#aaa;margin-bottom:12px;">Error: ' + errMsg + '</div><pre style="color:#666;font-size:10px;max-width:90%;overflow:auto;">' + errStack + '</pre><a href="javascript:location.reload()" style="color:#00e676;margin-top:12px;">Retry</a></div>';
     return;
   }
   }
