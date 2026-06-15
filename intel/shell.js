@@ -3733,6 +3733,8 @@ function initOrUpdateGlobe(items = []) {
       .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
       .backgroundColor('#050505')
       .showAtmosphere(true)
+      .atmosphereColor('#4488ff')
+      .atmosphereAltitude(0.12)
       .showGraticules(false)
       .pointAltitude(0)
       .pointRadius(0.25)
@@ -3838,6 +3840,14 @@ function initOrUpdateGlobe(items = []) {
       color: p.color || '#4488ff'
     })));
   }
+  // Add live satellite orbit paths from TLE data
+  const satOrbitPaths = getSatelliteOrbitPaths();
+  if (satOrbitPaths.length) {
+    overlayPaths.push(...satOrbitPaths.map(p => ({
+      coords: p.points,
+      color: p.color
+    })));
+  }
 
   // Air traffic points
   const airPoints = airLayerEnabled ? currentAirTrafficItems.filter(a => a.lat && a.lng).map(a => ({
@@ -3845,12 +3855,13 @@ function initOrUpdateGlobe(items = []) {
     raw: a, color: '#ffdd44', radius: 0.2, altitude: 0
   })) : [];
 
-  // Satellite points
-  const satPoints = satelliteLayerEnabled ? currentSatelliteCatalog.filter(s => s.lat && s.lng).map(s => ({
-    lat: s.lat, lng: s.lng, label: `${s.name} · ${s.network} · ${s.orbitClass || 'LEO'}`,
-    raw: s, color: s.orbitClass === 'GEO' ? '#ff4444' : s.orbitClass === 'MEO' ? '#44ddff' : '#44ff44',
-    radius: 0.2, altitude: 0.05
-  })) : [];
+  // Satellite points (computed from TLE data)
+  const satGlobeElements = getSatelliteGlobeElements();
+  const satPoints = satGlobeElements.filter(s => s.lat && s.lng).map(s => ({
+    lat: s.lat, lng: s.lng, label: s.label,
+    raw: s.raw, color: s.raw.orbitClass === 'GEO' ? '#ff4444' : s.raw.orbitClass === 'MEO' ? '#44ddff' : '#44ff44',
+    radius: 0.2, altitude: s.altitude || 0.05
+  }));
 
   // Sea vessel points
   const seaPoints = seaLayerEnabled ? currentVesselCatalog.filter(v => v.lat && v.lng).map(v => ({
@@ -3887,6 +3898,7 @@ function initOrUpdateGlobe(items = []) {
     .ringPropagationSpeed(1)
     .ringRepeatPeriod(2000)
     .pathsData(overlayPaths)
+    .pathPoints(d => d.coords)
     .pathColor(d => d.color)
     .pathPointAlt(d => d.alt)
     .pathStroke(1);
