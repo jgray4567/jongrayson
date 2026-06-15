@@ -90,28 +90,40 @@ let satelliteLayerEnabled = false;
 
 // Set up satellite custom layer with Three.js spheres
 let _satCustomLayerSetup = false;
+
 function setupSatelliteCustomLayer() {
-  if (_satCustomLayerSetup || !window.THREE || !intelGlobe) return;
+  if (_satCustomLayerSetup || !intelGlobe) return;
+  if (!window.THREE) {
+    // THREE not loaded yet — listen for the three-ready event
+    console.log('[Intel] Waiting for THREE.js global bridge...');
+    window.addEventListener('three-ready', () => {
+      console.log('[Intel] THREE.js global bridge ready');
+      setupSatelliteCustomLayer();
+    }, { once: true });
+    return;
+  }
   _satCustomLayerSetup = true;
+  const T = window.THREE;
+  console.log('[Intel] Setting up satellite custom layer with THREE', T.REVISION);
+  
   intelGlobe
     .customThreeObject(d => {
       const sz = Math.max(0.01, d.size || 0.35);
-      const group = new window.THREE.Group();
+      const group = new T.Group();
       // Core bright sphere
-      const geo = new window.THREE.SphereGeometry(sz, 8, 6);
-      const mat = new window.THREE.MeshBasicMaterial({ color: d.color || 0x44ff44, transparent: true, opacity: 0.95 });
-      const mesh = new window.THREE.Mesh(geo, mat);
-      group.add(mesh);
+      const geo = new T.SphereGeometry(sz, 8, 6);
+      const mat = new T.MeshBasicMaterial({ color: d.color || 0x44ff44, transparent: true, opacity: 0.95 });
+      group.add(new T.Mesh(geo, mat));
       // Outer glow shell
-      const glowGeo = new window.THREE.SphereGeometry(sz * 2.5, 8, 6);
-      const glowMat = new window.THREE.MeshBasicMaterial({ color: d.color || 0x44ff44, transparent: true, opacity: 0.12 });
-      const glow = new window.THREE.Mesh(glowGeo, glowMat);
-      group.add(glow);
+      const glowGeo = new T.SphereGeometry(sz * 2.5, 8, 6);
+      const glowMat = new T.MeshBasicMaterial({ color: d.color || 0x44ff44, transparent: true, opacity: 0.12 });
+      group.add(new T.Mesh(glowGeo, glowMat));
       return group;
     })
     .customThreeObjectUpdate((obj, d) => {
       Object.assign(obj.position, intelGlobe.getCoords(d.lat, d.lng, d.alt));
     });
+  
   // Re-render with current data if SAT is already enabled
   if (satelliteLayerEnabled && currentSatelliteCatalog.length) {
     initOrUpdateGlobe(currentGlobeBaseItems || []);
@@ -2561,6 +2573,7 @@ function computeSatelliteLiveState(satItem, date = new Date()) {
     const lat = window.satellite.radiansToDegrees(geodetic.latitude);
     const lng = window.satellite.radiansToDegrees(geodetic.longitude);
     const altitudeKm = Math.max(0, geodetic.height || satItem.altitudeKm || 0);
+    if (!isFinite(lat) || !isFinite(lng) || !isFinite(altitudeKm)) return null;
     return {
       lat,
       lng,
@@ -3766,13 +3779,8 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.pointResolution(12);
       intelGlobe.pointsMerge(false);
       // Satellite custom layer — Three.js spheres at orbital altitude
-      // Uses THREE from ESM bridge (window.THREE set by module script in index.html)
       intelGlobe.customLayerData([]);
-      if (window.THREE) {
-        setupSatelliteCustomLayer();
-      } else {
-        window.addEventListener('three-ready', () => setupSatelliteCustomLayer(), { once: true });
-      }
+      setupSatelliteCustomLayer(); // Will wait for THREE if not ready
       intelGlobe.onPointClick(point => {
         if (point && point.raw) openIntelDrawer(point.raw);
       });
