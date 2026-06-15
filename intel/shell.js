@@ -2583,7 +2583,7 @@ function getSatelliteOrbitPaths() {
     }).filter(Boolean);
     if (points.length < 2) return null;
     return {
-      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', 0.18),
+      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', 0.5),
       points
     };
   }).filter(Boolean);
@@ -3846,7 +3846,7 @@ function initOrUpdateGlobe(items = []) {
   const satOrbitPaths = getSatelliteOrbitPaths();
   if (satOrbitPaths.length) {
     overlayPaths.push(...satOrbitPaths.map(p => ({
-      coords: p.points,
+      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: 0.15 })),
       color: p.color
     })));
   }
@@ -3862,7 +3862,7 @@ function initOrUpdateGlobe(items = []) {
   const satPoints = satGlobeElements.filter(s => s.lat && s.lng).map(s => ({
     lat: s.lat, lng: s.lng, label: s.label,
     raw: s.raw, color: s.raw.orbitClass === 'GEO' ? '#ff4444' : s.raw.orbitClass === 'MEO' ? '#44ddff' : '#44ff44',
-    radius: 0.35, altitude: s.altitude || 0.08
+    radius: 0.35, altitude: 0.15  // Fixed altitude for visibility (TLE ratio is too low)
   }));
 
   // Sea vessel points
