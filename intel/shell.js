@@ -1,3 +1,7 @@
+// ── Intel shell.js v0.008.60 ──
+window.addEventListener('error', (e) => console.error('[Intel] Uncaught error:', e.message, e.filename, e.lineno));
+window.addEventListener('unhandledrejection', (e) => console.error('[Intel] Unhandled promise:', e.reason));
+
 // ── Dynamic lazy-loaders for heavy dependencies ──
 let _satelliteLoadPromise = null;
 let _forceGraphLoadPromise = null;
@@ -1541,6 +1545,7 @@ syncTimelineWindowButtons();
 syncSeverityFilterButtons();
 syncFeedViewButtons();
 syncBaselineControls();
+console.log('[Intel] shell.js v0.008.60 loaded');
 renderBaselineHistory();
 initializeCommandSurface();
 loadIntel().then(() => startAutoRefresh());
