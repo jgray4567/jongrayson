@@ -3881,11 +3881,19 @@ function initOrUpdateGlobe(items = []) {
   // Combine all point layers
   const allPoints = [...cityPoints, ...airPoints, ...satPoints, ...seaPoints, ...threatPoints];
 
-  // HTML element markers for satellites only (DOM fallback for iOS Safari WebGL issues)
-  const htmlSatMarkers = satPoints.filter(p => p.lat && p.lng).map(p => ({
-    lat: p.lat, lng: p.lng, altitude: p.altitude || 0.05,
-    color: p.color, label: p.label, raw: p.raw
-  }));
+  // HTML element markers: city tooltips + satellite dots (DOM overlay, works on all browsers)
+  const htmlMarkers = [
+    // City data pops — tooltip style with label
+    ...cityPoints.filter(p => p.lat && p.lng).map(p => ({
+      lat: p.lat, lng: p.lng, altitude: 0.01,
+      type: 'city', color: p.color, label: p.label, raw: p.raw
+    })),
+    // Satellite markers with glow
+    ...satPoints.filter(p => p.lat && p.lng).map(p => ({
+      lat: p.lat, lng: p.lng, altitude: p.altitude || 0.05,
+      type: 'sat', color: p.color, label: p.label, raw: p.raw
+    }))
+  ];
 
   // Update globe data
   try {
@@ -3894,9 +3902,19 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.pointRadius(d => d.radius);
     intelGlobe.pointAltitude(d => d.altitude || 0);
     intelGlobe.pointsMerge(false);
-    // Satellite HTML markers (DOM overlay, works on all browsers)
-    intelGlobe.htmlElementsData(htmlSatMarkers);
+    // HTML element markers (DOM overlay for city tooltips + satellite dots)
+    intelGlobe.htmlElementsData(htmlMarkers);
     intelGlobe.htmlElement(d => {
+      if (d.type === 'city') {
+        const el = document.createElement('div');
+        const stateColor = d.color || '#00e676';
+        const name = (d.raw && (d.raw.locationName || d.label)) || '';
+        el.style.cssText = `position:relative;transform:translate(-50%,-100%);cursor:pointer;pointer-events:auto;white-space:nowrap;`;
+        el.innerHTML = `<div style="display:flex;align-items:center;gap:4px;background:rgba(10,11,14,0.92);border:1px solid ${stateColor};border-radius:4px;padding:2px 7px 2px 5px;font-size:11px;color:#e8eaed;pointer-events:auto;"><span style="width:6px;height:6px;border-radius:50%;background:${stateColor};flex-shrink:0;"></span>${name}</div>`;
+        el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
+        return el;
+      }
+      // Satellite marker — glowing dot
       const el = document.createElement('div');
       const orbitColor = d.raw?.orbitClass === 'GEO' ? '#ff4444' : d.raw?.orbitClass === 'MEO' ? '#44ddff' : '#44ff44';
       el.style.cssText = `width:8px;height:8px;border-radius:50%;background:${orbitColor};box-shadow:0 0 8px ${orbitColor},0 0 3px ${orbitColor};transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;`;
@@ -3904,8 +3922,8 @@ function initOrUpdateGlobe(items = []) {
       el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
       return el;
     });
-    intelGlobe.htmlElementAltitude(d => d.altitude || 0.05);
-    intelGlobe.htmlElementVisibilityModifier((el, isVisible) => { el.style.opacity = isVisible ? '1' : '0.15'; });
+    intelGlobe.htmlElementAltitude(d => d.altitude || 0.01);
+    intelGlobe.htmlElementVisibilityModifier((el, isVisible) => { el.style.opacity = isVisible ? '1' : '0.1'; });
     intelGlobe.arcsData(threatArcData);
     intelGlobe.arcColor(d => d.color);
     intelGlobe.arcStroke(0.5);
