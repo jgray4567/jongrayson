@@ -2894,10 +2894,6 @@ function syncGlobeControls(container, enabled) {
   if (!allowControls) container.style.cursor = 'default';
 }
 
-  // Rotation removed per user request
-  if (button) button.style.display = 'none';
-}
-
 function updateGlobeTexture() {
   if (!intelGlobe) return;
   const nightUrl = '//unpkg.com/three-globe/example/img/earth-night.jpg';
