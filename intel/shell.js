@@ -1536,14 +1536,19 @@ effectivenessList?.addEventListener('click', async (event) => {
   setSelected(item);
 });
 
-initializeStateFromUrl();
-syncTimelineWindowButtons();
-syncSeverityFilterButtons();
-syncFeedViewButtons();
-syncBaselineControls();
-renderBaselineHistory();
-initializeCommandSurface();
-loadIntel().then(() => startAutoRefresh());
+// ── Boot sequence ──
+function safeCall(fn, label) {
+  try { fn(); console.log('[Intel] ✅', label); }
+  catch(e) { console.error('[Intel] ❌', label, e.message); }
+}
+safeCall(initializeStateFromUrl, 'initializeStateFromUrl');
+safeCall(syncTimelineWindowButtons, 'syncTimelineWindowButtons');
+safeCall(syncSeverityFilterButtons, 'syncSeverityFilterButtons');
+safeCall(syncFeedViewButtons, 'syncFeedViewButtons');
+safeCall(syncBaselineControls, 'syncBaselineControls');
+safeCall(renderBaselineHistory, 'renderBaselineHistory');
+safeCall(initializeCommandSurface, 'initializeCommandSurface');
+loadIntel().then(() => startAutoRefresh()).catch(e => console.error('[Intel] loadIntel failed:', e));
 
 function getStructuralStateCounts(items = []) {
   return items.reduce((acc, item) => {
