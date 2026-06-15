@@ -3768,6 +3768,11 @@ function initOrUpdateGlobe(items = []) {
         intelGlobe.pointAltitude(d => d.altitude);
         console.log('[Intel] TEST POINTS applied:', testPts.length);
       } catch(e) { console.error('[Intel] TEST POINTS error:', e); }
+      
+      // Set initial dimensions
+      intelGlobe.width(globeContainer.clientWidth || window.innerWidth);
+      intelGlobe.height(globeContainer.clientHeight || window.innerHeight * 0.6);
+      console.log('[Intel] Globe sized:', globeContainer.clientWidth, 'x', globeContainer.clientHeight);
 
     // Handle resize
     window.addEventListener('resize', () => {
