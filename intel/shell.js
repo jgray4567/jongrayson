@@ -82,6 +82,7 @@ let selectedAirIcao24 = null;
 let selectedAirRegion = null;
 let selectedAirCategory = null;
 let hoveredCityLabel = null;
+let hoveredCity = null;
 let satelliteLayerEnabled = false;
 let seaLayerEnabled = false;
 let currentVesselCatalog = [];
