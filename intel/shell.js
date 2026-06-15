@@ -3754,6 +3754,20 @@ function initOrUpdateGlobe(items = []) {
         }
       });
       console.log('[Intel] Globe constructor OK');
+      
+      // TEST: Hardcode visible test points directly after constructor
+      try {
+        const testPts = [
+          { lat: 33.73, lng: -118.26, label: 'TEST LA', color: '#00ff00', radius: 1.0, altitude: 0.05, raw: {} },
+          { lat: 40.71, lng: -74.01, label: 'TEST NYC', color: '#00ff00', radius: 1.0, altitude: 0.05, raw: {} },
+          { lat: 51.51, lng: -0.13, label: 'TEST LONDON', color: '#00ff00', radius: 1.0, altitude: 0.05, raw: {} }
+        ];
+        intelGlobe.pointsData(testPts);
+        intelGlobe.pointColor(d => d.color);
+        intelGlobe.pointRadius(d => d.radius);
+        intelGlobe.pointAltitude(d => d.altitude);
+        console.log('[Intel] TEST POINTS applied:', testPts.length);
+      } catch(e) { console.error('[Intel] TEST POINTS error:', e); }
 
     // Handle resize
     window.addEventListener('resize', () => {
