@@ -112,11 +112,11 @@ function setupSatelliteCustomLayer() {
       const group = new T.Group();
       // Core bright sphere
       const geo = new T.SphereGeometry(sz, 8, 6);
-      const mat = new T.MeshBasicMaterial({ color: d.color || 0x44ff44, transparent: true, opacity: 0.95 });
+      const mat = new T.MeshBasicMaterial({ color: d.color || 0x00ff44, transparent: true, opacity: 0.95 });
       group.add(new T.Mesh(geo, mat));
       // Outer glow shell
       const glowGeo = new T.SphereGeometry(sz * 2.5, 8, 6);
-      const glowMat = new T.MeshBasicMaterial({ color: d.color || 0x44ff44, transparent: true, opacity: 0.12 });
+      const glowMat = new T.MeshBasicMaterial({ color: d.color || 0x00ff44, transparent: true, opacity: 0.12 });
       glowMat.userData = { isGlow: true };
       const glowMesh = new T.Mesh(glowGeo, glowMat);
       group.add(glowMesh);
@@ -2603,9 +2603,9 @@ function computeSatelliteLiveState(satItem, date = new Date()) {
 }
 
 function satelliteOrbitColor(orbitClass, alpha) {
-  if (orbitClass === 'LEO') return `rgba(0,229,100,${alpha})`;
-  if (orbitClass === 'GEO') return `rgba(255,60,60,${alpha})`;
-  return `rgba(0,229,255,${alpha})`;
+  if (orbitClass === 'LEO') return `rgba(0,255,68,${alpha})`;
+  if (orbitClass === 'GEO') return `rgba(255,238,0,${alpha})`;
+  return `rgba(255,136,0,${alpha})`;
 }
 
 function getSatelliteGlobeElements() {
@@ -3846,7 +3846,7 @@ function initOrUpdateGlobe(items = []) {
           if (point.raw && point.raw.kind === 'satellite') {
             const sat = point.raw;
             el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(10,11,14,0.92);color:#e8eaed;padding:6px 12px;border-radius:6px;font-size:11px;font-family:Google Sans,Roboto,sans-serif;z-index:10;transform:translate(-50%,-100%);margin-top:-12px;border:1px solid rgba(68,255,68,0.3);max-width:220px;';
-            const orbitColor = sat.orbitClass === 'GEO' ? '#ff4444' : sat.orbitClass === 'MEO' ? '#44ddff' : '#44ff44';
+            const orbitColor = sat.orbitClass === 'GEO' ? '#ffee00' : sat.orbitClass === 'MEO' ? '#ff8800' : '#00ff44';
             el.innerHTML = `<div style="font-weight:600;color:${orbitColor};margin-bottom:2px;">${sat.name || 'Sat'}</div><div style="opacity:0.8;line-height:1.4;">${sat.network || ''} · ${sat.orbitClass || 'LEO'}</div><div style="opacity:0.6;font-size:10px;">${sat.altitudeKm ? Math.round(sat.altitudeKm) + ' km' : ''} · ${sat.periodMinutes ? Math.round(sat.periodMinutes) + ' min' : ''}</div>`;
           } else {
             el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(32,33,36,0.85);color:#e8eaed;padding:4px 10px;border-radius:6px;font-size:12px;font-family:Google Sans,Roboto,sans-serif;white-space:nowrap;z-index:10;transform:translate(-50%,-100%);margin-top:-8px;';
@@ -3982,7 +3982,7 @@ function initOrUpdateGlobe(items = []) {
     orbitClass: s.raw.orbitClass || 'LEO',
     alt: 0.12,
     size: s.raw.orbitClass === 'GEO' ? 0.6 : s.raw.orbitClass === 'MEO' ? 0.45 : 0.35,
-    color: s.raw.orbitClass === 'GEO' ? 0xff4444 : s.raw.orbitClass === 'MEO' ? 0x44ddff : 0x44ff44
+    color: s.raw.orbitClass === 'GEO' ? 0xffee00 : s.raw.orbitClass === 'MEO' ? 0xff8800 : 0x00ff44
   }));
   const notableSats = [];
   const orbitClasses = ['LEO', 'MEO', 'GEO'];
@@ -4017,7 +4017,7 @@ function initOrUpdateGlobe(items = []) {
   }));
   const htmlSatMarkers = notableSats.filter(s => s.lat && s.lng).map(s => ({
     lat: s.lat, lng: s.lng, altitude: 0.005,
-    type: 'sat', color: s.raw.orbitClass === 'GEO' ? '#ff4444' : s.raw.orbitClass === 'MEO' ? '#44ddff' : '#44ff44',
+    type: 'sat', color: s.raw.orbitClass === 'GEO' ? '#ffee00' : s.raw.orbitClass === 'MEO' ? '#ff8800' : '#00ff44',
     label: s.label, raw: s.raw
   }));
 
