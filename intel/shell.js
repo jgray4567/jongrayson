@@ -3826,7 +3826,7 @@ function initOrUpdateGlobe(items = []) {
             const hdgStr = fl.heading != null ? Math.round(fl.heading) + '°' : 'n/a';
             tip.innerHTML = `
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                <div id="flight-tip-logo" style="width:32px;height:32px;border-radius:4px;background:rgba(255,221,68,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">✈</div>
+                <div id="flight-tip-logo" style="width:32px;height:32px;border-radius:4px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;border-radius:4px;">✈</div>
                 <div style="flex:1;min-width:0;">
                   <div style="font-weight:700;font-size:15px;color:#ffdd44;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fl.callsign || 'Unknown Flight'}</div>
                   <div style="opacity:0.7;font-size:11px;">${fl.country || 'Public air traffic'}</div>
@@ -4120,6 +4120,11 @@ function initOrUpdateGlobe(items = []) {
     type: 'sat', color: s.raw.orbitClass === 'GEO' ? '#ffee00' : s.raw.orbitClass === 'MEO' ? '#ff8800' : '#00ff44',
     label: s.label, raw: s.raw
   }));
+  // Air traffic HTML markers with generous touch targets for easy tapping
+  const htmlAirMarkers = airLayerEnabled ? currentAirTrafficItems.filter(a => a.lat && a.lng).map(a => ({
+    lat: a.lat, lng: a.lng, altitude: 0.002,
+    type: 'air', color: '#ffdd44', label: a.callsign || 'Aircraft', raw: { ...a, kind: 'air' }
+  })) : [];
 
   // Update globe data
   try {
@@ -4129,7 +4134,7 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.pointAltitude(d => d.altitude || 0);
     intelGlobe.pointsMerge(false);
     // City tooltip + notable satellite HTML elements
-    intelGlobe.htmlElementsData([...htmlCityMarkers, ...htmlSatMarkers]);
+    intelGlobe.htmlElementsData([...htmlCityMarkers, ...htmlSatMarkers, ...htmlAirMarkers]);
     intelGlobe.htmlElement(d => {
       const el = document.createElement('div');
       const stateColor = d.color || '#00e676';
@@ -4140,6 +4145,17 @@ function initOrUpdateGlobe(items = []) {
         el.style.cssText = `position:relative;transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;`;
         el.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:${stateColor};box-shadow:0 0 6px ${stateColor},0 0 2px ${stateColor};animation:satPulse 2s ease-in-out infinite;"></div>`;
         el.title = d.label || 'Satellite';
+        el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
+        return el;
+      }
+      if (d.type === 'air') {
+        // Air traffic marker — large transparent touch target with visible dot
+        const isTouch = 'ontouchstart' in window;
+        const hitSize = isTouch ? 44 : 32;
+        el.setAttribute('data-globe-marker', 'air');
+        el.setAttribute('data-label', d.label || 'Aircraft');
+        el.style.cssText = `position:relative;transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;width:${hitSize}px;height:${hitSize}px;display:flex;align-items:center;justify-content:center;`;
+        el.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:#ffdd44;box-shadow:0 0 6px #ffdd44,0 0 2px #ffdd44;"></div>`;
         el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
         return el;
       }
