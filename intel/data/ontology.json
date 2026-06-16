@@ -149,18 +149,18 @@
     {
       "id": "sig_10",
       "group": 2,
-      "label": "Trump may release US-Iran deal before Friday, Vance says",
+      "label": "Iran deal presents political nightmare for Netanyahu",
       "size": 12,
-      "url": "https://www.bbc.com/news/articles/ce8mv6l6eezo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/c3f0/live/f7f57fb0-6944-11f1-b8da-53bba3cad46c.jpg"
+      "url": "https://www.bbc.com/news/articles/cj4gnqw8j52o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/ee5d/live/2f08dc10-6961-11f1-8e1d-bbbb1017d210.jpg"
     },
     {
       "id": "sig_11",
       "group": 2,
-      "label": "Iran deal presents political nightmare for Netanyahu",
+      "label": "Russian artist and Putin critic shot dead in Poland",
       "size": 12,
-      "url": "https://www.bbc.com/news/articles/cj4gnqw8j52o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1bf4/live/a0647af0-68f2-11f1-8e1d-bbbb1017d210.jpg"
+      "url": "https://www.bbc.com/news/articles/clyrzd5g6k2o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/802d/live/a26f4a30-6962-11f1-9f4a-21531e88e991.jpg"
     },
     {
       "id": "sig_12",
@@ -173,45 +173,13 @@
     {
       "id": "sig_13",
       "group": 2,
-      "label": "Japan raises interest rate to highest since 1995",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/cjdgl213dpzo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3a76/live/d7e33c30-6872-11f1-8d7f-231b457c3604.jpg"
-    },
-    {
-      "id": "sig_14",
-      "group": 2,
       "label": "California's Gavin Newsom alleges justice department is investigating his wife and ex-staff",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/c3vyw7021r0o?at_medium=RSS&amp;at_campaign=rss",
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/88d0/live/06baa470-6919-11f1-b1db-af71d47507d6.jpg"
     },
     {
-      "id": "sig_15",
-      "group": 2,
-      "label": "Married at First Sight Australia allegations 'disturbing', says country's watchdog",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/c4gyp099vl7o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/2961/live/b6042340-68e5-11f1-8e1d-bbbb1017d210.jpg"
-    },
-    {
-      "id": "sig_16",
-      "group": 2,
-      "label": "VAR official says hand gesture was 'involuntary, subconscious twitch'",
-      "size": 12,
-      "url": "https://www.bbc.com/sport/football/articles/c0ryzjl1jlyo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/8f73/live/314f8770-6903-11f1-9f9e-71137dc50e9c.jpg"
-    },
-    {
-      "id": "sig_17",
-      "group": 2,
-      "label": "'Greatest feeling ever': Cape Verdeans tell BBC of joy at holding Spain to draw",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/clyer09rd1ro?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/830b/live/fa8d8a20-690c-11f1-9db7-8df355e9939d.jpg"
-    },
-    {
-      "id": "sig_18",
+      "id": "sig_14",
       "group": 2,
       "label": "'Dancing girl's' bare torso restored in Indian textbook after backlash",
       "size": 12,
@@ -219,12 +187,44 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/4be3/live/3aa49d90-6946-11f1-b8da-53bba3cad46c.jpg"
     },
     {
+      "id": "sig_15",
+      "group": 2,
+      "label": "Cuba tourism collapses as US pressure campaign bites",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/ckg8zrm20jjo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5724/live/1d7d1180-6972-11f1-8cc2-edef34f05c3f.jpg"
+    },
+    {
+      "id": "sig_16",
+      "group": 2,
+      "label": "Japan raises interest rate to highest for 31 years",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/cjdgl213dpzo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3a76/live/d7e33c30-6872-11f1-8d7f-231b457c3604.jpg"
+    },
+    {
+      "id": "sig_17",
+      "group": 2,
+      "label": "India temporarily bans Telegram over exam paper leak concerns ",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/cn074j04l3eo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/4759/live/948671f0-695d-11f1-b208-61bbe9701388.jpg"
+    },
+    {
+      "id": "sig_18",
+      "group": 2,
+      "label": "Tunisia sack head coach just one game into World Cup",
+      "size": 12,
+      "url": "https://www.bbc.com/sport/football/articles/cp8rldpky7wo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1e22/live/ff8e8a90-695e-11f1-8546-8f19e4fe30f4.jpg"
+    },
+    {
       "id": "sig_19",
       "group": 2,
-      "label": "Australia to probe assault claims by Gaza flotilla activists against Israeli forces",
+      "label": "Married at First Sight Australia allegations 'disturbing', says country's watchdog",
       "size": 12,
-      "url": "https://www.bbc.com/news/articles/clyx4eny41zo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/edba/live/92f58070-6957-11f1-8e1d-bbbb1017d210.jpg"
+      "url": "https://www.bbc.com/news/articles/c4gyp099vl7o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/2961/live/b6042340-68e5-11f1-8e1d-bbbb1017d210.jpg"
     },
     {
       "id": "sig_20",
@@ -389,98 +389,98 @@
     {
       "id": "sig_40",
       "group": 2,
-      "label": "Japan’s central bank raises interest rates to highest level since 1995",
+      "label": "Messi, Argentina begin World Cup title defence against Algeria: All to know",
       "size": 12,
-      "url": "https://www.aljazeera.com/economy/2026/6/16/japans-central-bank-raises-interest-rates-to-highest-level-since-1995?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/16/messi-argentina-begin-world-cup-title-defence-against-algeria-all-to-know?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_41",
       "group": 2,
-      "label": "Venezuela signs power deal with US energy giant",
+      "label": "Trump warns ‘all hell will rain down’ if Iran tries to get a nuclear weapon",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/venezuela-signs-power-deal-with-us-energy-giant?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/16/trump-warns-all-hell-will-rain-down-if-iran-tries-to-get-a-nuclear-weapon?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_42",
       "group": 2,
-      "label": "Football upstages politics as Iranians rally behind their team at World Cup",
+      "label": "Will a US-Iran deal unlock $300bn in investment fund for Tehran?",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/16/football-upstages-politics-as-iranians-rally-behind-their-team-at-world-cup?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/16/will-a-us-iran-deal-unlock-300bn-in-investment-fund-for-tehran?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_43",
       "group": 2,
-      "label": "UK seizes Russian ‘shadow fleet’ tanker – what that means",
+      "label": "Trump says ‘hell will rain down’ if Iran gets nuclear weapons",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/16/uk-seizes-russian-shadow-fleet-tanker-what-that-means?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/trump-says-hell-will-rain-down-if-iran-gets-nuclear-weapons?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_44",
       "group": 2,
-      "label": "US says Iran nuclear talks begin after framework deal signing",
+      "label": "Qatar’s Emir hails Iran deal and touts US investments in Trump meeting",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/us-says-iran-nuclear-talks-begin-after-framework-deal-signing?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/qatars-emir-hails-iran-deal-and-touts-us-investments-in-trump-meeting?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_45",
       "group": 2,
-      "label": "Iran draw 2-2 with New Zealand in politically charged World Cup match",
+      "label": "Australia warns El Nino weather pattern set to be strongest in decades",
       "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/16/iran-draw-2-2-with-new-zealand-in-politically-charged-world-cup-match?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/16/australia-warns-el-nino-weather-pattern-set-to-be-strongest-in-decades?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_46",
       "group": 2,
-      "label": "Ukraine starts negotiations to join EU",
+      "label": "China offers staunch support to Myanmar president during his state visit",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/ukraine-starts-negotiations-to-join-eu?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/16/china-offers-staunch-support-to-myanmar-president-during-his-state-visit?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_47",
       "group": 2,
-      "label": "Who is Vozinha, Cape Verde’s viral goalkeeper at the World Cup?",
+      "label": "World Cup: Can Senegal stun France again? Predictions, schedule on Day 6",
       "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/16/who-is-vozinha-cape-verdes-viral-goalkeeper-at-the-world-cup?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/16/world-cup-can-senegal-stun-france-again-predictions-schedule-on-day-6?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_48",
       "group": 2,
-      "label": "US stock market jumps as US-Iran deal stirs hopes for end to energy turmoil",
+      "label": "Iran says Israeli occupation in Lebanon would breach US deal",
       "size": 12,
-      "url": "https://www.aljazeera.com/economy/2026/6/16/us-stock-market-climbs-as-us-iran-deal-stirs-hopes-for-end-to-energy-chaos?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/iran-says-israeli-occupation-in-lebanon-would-breach-us-deal?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_49",
       "group": 2,
-      "label": "Saudi Arabia draw 1–1 against Uruguay in World Cup opening game",
+      "label": "G7 leaders meet in France with Iran and Ukraine high on agenda",
       "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/16/saudi-arabia-draw-1-1-against-uruguay-in-world-cup-opening?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/16/g7-leaders-meet-in-france-with-iran-and-ukraine-high-on-agenda?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_50",
       "group": 2,
-      "label": "'First line of defence' has collapsed in biggest ever outbreak of rare Ebola strain",
+      "label": "Iran deal is tacit admission of strategic defeat by Trump administration",
       "size": 12,
-      "url": "https://news.sky.com/story/ebola-largest-ever-outbreak-of-rare-strain-likely-even-greater-and-the-first-line-of-defence-has-collapsed-13554337",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-oxfam-ebola-congo_7274312.jpg?20260615172513"
+      "url": "https://news.sky.com/story/trumps-iran-war-is-one-of-the-greatest-strategic-blunders-in-us-history-13554425",
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-donald-trump-trump_7274358.jpg?20260615181656"
     },
     {
       "id": "sig_51",
       "group": 2,
-      "label": "Trump has admitted defeat on Iran war after historic blunder",
+      "label": "'First line of defence' has collapsed in biggest ever outbreak of rare Ebola strain",
       "size": 12,
-      "url": "https://news.sky.com/story/trumps-iran-war-is-one-of-the-greatest-strategic-blunders-in-us-history-13554425",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-donald-trump-trump_7274358.jpg?20260615181656"
+      "url": "https://news.sky.com/story/ebola-largest-ever-outbreak-of-rare-strain-likely-even-greater-and-the-first-line-of-defence-has-collapsed-13554337",
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-oxfam-ebola-congo_7274312.jpg?20260615172513"
     },
     {
       "id": "sig_52",
@@ -521,14 +521,6 @@
       "size": 12,
       "url": "https://news.sky.com/story/trump-marks-80th-birthday-with-cage-fighting-on-white-house-lawn-hours-after-us-and-iran-agree-peace-deal-13554201",
       "image": "https://e3.365dm.com/26/06/1920x1080/skynews-donald-trump-white-house_7273754.jpg?20260615073358"
-    },
-    {
-      "id": "sig_57",
-      "group": 2,
-      "label": "Oil prices drop and stocks enjoy cautious rally on US-Iran peace progress",
-      "size": 12,
-      "url": "https://news.sky.com/story/oil-prices-drop-and-stocks-enjoy-cautious-rally-on-us-iran-peace-progress-13554196",
-      "image": "https://e3.365dm.com/26/05/1920x1080/skynews-odessa-crude-tanker_7242171.jpg?20260508071824"
     }
   ],
   "links": [
@@ -673,18 +665,8 @@
       "value": 1
     },
     {
-      "source": "sig_3",
-      "target": "sig_2",
-      "value": 1
-    },
-    {
       "source": "sig_4",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_4",
-      "target": "sig_3",
       "value": 1
     },
     {
@@ -696,6 +678,11 @@
       "source": "sig_5",
       "target": "theme_cyber",
       "value": 2
+    },
+    {
+      "source": "sig_5",
+      "target": "sig_4",
+      "value": 1
     },
     {
       "source": "sig_6",
@@ -733,8 +720,8 @@
       "value": 1
     },
     {
-      "source": "sig_10",
-      "target": "reg_na",
+      "source": "sig_9",
+      "target": "sig_8",
       "value": 1
     },
     {
@@ -744,7 +731,12 @@
     },
     {
       "source": "sig_11",
-      "target": "reg_me",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_11",
+      "target": "reg_eu",
       "value": 1
     },
     {
@@ -753,18 +745,18 @@
       "value": 1
     },
     {
-      "source": "sig_12",
-      "target": "sig_11",
+      "source": "sig_13",
+      "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_13",
+      "source": "sig_14",
       "target": "reg_asia",
       "value": 1
     },
     {
       "source": "sig_14",
-      "target": "reg_na",
+      "target": "sig_13",
       "value": 1
     },
     {
@@ -773,33 +765,33 @@
       "value": 1
     },
     {
+      "source": "sig_15",
+      "target": "sig_14",
+      "value": 1
+    },
+    {
       "source": "sig_16",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_17",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_18",
       "target": "reg_asia",
       "value": 1
     },
     {
-      "source": "sig_19",
+      "source": "sig_17",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_18",
       "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_19",
-      "target": "reg_me",
+      "source": "sig_18",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_19",
-      "target": "sig_18",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -825,6 +817,11 @@
     {
       "source": "sig_22",
       "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_22",
+      "target": "sig_21",
       "value": 1
     },
     {
@@ -863,11 +860,6 @@
       "value": 1
     },
     {
-      "source": "sig_26",
-      "target": "sig_25",
-      "value": 1
-    },
-    {
       "source": "sig_27",
       "target": "reg_na",
       "value": 1
@@ -883,18 +875,23 @@
       "value": 1
     },
     {
+      "source": "sig_27",
+      "target": "sig_26",
+      "value": 1
+    },
+    {
       "source": "sig_28",
       "target": "theme_geo",
       "value": 1
     },
     {
-      "source": "sig_29",
-      "target": "theme_geo",
+      "source": "sig_28",
+      "target": "sig_27",
       "value": 1
     },
     {
       "source": "sig_29",
-      "target": "sig_28",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -918,6 +915,11 @@
       "value": 1
     },
     {
+      "source": "sig_31",
+      "target": "sig_30",
+      "value": 1
+    },
+    {
       "source": "sig_32",
       "target": "reg_na",
       "value": 1
@@ -933,11 +935,6 @@
       "value": 1
     },
     {
-      "source": "sig_33",
-      "target": "sig_32",
-      "value": 1
-    },
-    {
       "source": "sig_34",
       "target": "reg_na",
       "value": 1
@@ -945,6 +942,11 @@
     {
       "source": "sig_34",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_34",
+      "target": "sig_33",
       "value": 1
     },
     {
@@ -968,6 +970,11 @@
       "value": 1
     },
     {
+      "source": "sig_36",
+      "target": "sig_35",
+      "value": 1
+    },
+    {
       "source": "sig_37",
       "target": "reg_na",
       "value": 1
@@ -975,6 +982,11 @@
     {
       "source": "sig_37",
       "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_37",
+      "target": "sig_36",
       "value": 1
     },
     {
@@ -1004,7 +1016,12 @@
     },
     {
       "source": "sig_40",
-      "target": "reg_asia",
+      "target": "reg_sa",
+      "value": 1
+    },
+    {
+      "source": "sig_40",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -1013,13 +1030,23 @@
       "value": 1
     },
     {
-      "source": "sig_42",
+      "source": "sig_41",
       "target": "reg_me",
       "value": 1
     },
     {
+      "source": "sig_41",
+      "target": "sig_40",
+      "value": 1
+    },
+    {
       "source": "sig_42",
-      "target": "theme_sport",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_42",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1029,7 +1056,7 @@
     },
     {
       "source": "sig_43",
-      "target": "reg_eu",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1043,18 +1070,23 @@
       "value": 1
     },
     {
-      "source": "sig_45",
-      "target": "reg_me",
+      "source": "sig_44",
+      "target": "sig_43",
       "value": 1
     },
     {
       "source": "sig_45",
-      "target": "theme_sport",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_45",
+      "target": "sig_44",
       "value": 1
     },
     {
       "source": "sig_46",
-      "target": "reg_eu",
+      "target": "reg_asia",
       "value": 1
     },
     {
@@ -1064,7 +1096,17 @@
     },
     {
       "source": "sig_47",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_47",
       "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_47",
+      "target": "sig_46",
       "value": 1
     },
     {
@@ -1078,18 +1120,13 @@
       "value": 1
     },
     {
-      "source": "sig_48",
-      "target": "theme_econ",
-      "value": 1
-    },
-    {
-      "source": "sig_48",
-      "target": "sig_47",
+      "source": "sig_49",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_49",
-      "target": "theme_sport",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1099,22 +1136,17 @@
     },
     {
       "source": "sig_50",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_50",
-      "target": "sig_49",
-      "value": 1
-    },
-    {
-      "source": "sig_51",
       "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_51",
+      "source": "sig_50",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_51",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -1128,6 +1160,11 @@
       "value": 1
     },
     {
+      "source": "sig_52",
+      "target": "sig_51",
+      "value": 1
+    },
+    {
       "source": "sig_53",
       "target": "reg_me",
       "value": 1
@@ -1135,11 +1172,6 @@
     {
       "source": "sig_54",
       "target": "reg_afr",
-      "value": 1
-    },
-    {
-      "source": "sig_54",
-      "target": "sig_53",
       "value": 1
     },
     {
@@ -1155,21 +1187,6 @@
     {
       "source": "sig_56",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_57",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_57",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_57",
-      "target": "theme_econ",
       "value": 1
     }
   ]
