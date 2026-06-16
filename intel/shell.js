@@ -94,12 +94,25 @@ let _satCustomLayerSetup = false;
 function setupSatelliteCustomLayer() {
   if (_satCustomLayerSetup || !intelGlobe) return;
   if (!window.THREE) {
-    // THREE not loaded yet — listen for the three-ready event
+    // THREE not loaded yet — listen for event AND poll as fallback
     console.log('[Intel] Waiting for THREE.js global bridge...');
     window.addEventListener('three-ready', () => {
-      console.log('[Intel] THREE.js global bridge ready');
+      console.log('[Intel] THREE.js ready via event');
       setupSatelliteCustomLayer();
     }, { once: true });
+    // Polling fallback in case event already fired
+    let polls = 0;
+    const poll = setInterval(() => {
+      polls++;
+      if (window.THREE) {
+        clearInterval(poll);
+        console.log('[Intel] THREE.js ready via poll (attempt ' + polls + ')');
+        setupSatelliteCustomLayer();
+      } else if (polls > 50) { // 5 seconds
+        clearInterval(poll);
+        console.error('[Intel] THREE.js never loaded');
+      }
+    }, 100);
     return;
   }
   _satCustomLayerSetup = true;
