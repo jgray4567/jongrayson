@@ -3960,6 +3960,15 @@ function initOrUpdateGlobe(items = []) {
 
   // Overlay paths (flight paths, orbits)
   const overlayPaths = [];
+  // Air traffic flight trails
+  const airPaths = getAirTrafficPaths();
+  if (airPaths.length) {
+    overlayPaths.push(...airPaths.map(p => ({
+      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng)),
+      color: p.color,
+      isAir: true
+    })).filter(p => p.coords.length >= 2));
+  }
   if (overlayFlightPaths && overlayFlightPaths.length) {
     overlayPaths.push(...overlayFlightPaths.filter(p => p.coords && p.coords.length >= 2).map(p => ({
       coords: p.coords.map(c => ({ lat: c.lat, lng: c.lng, alt: c.alt || 0.05 })),
@@ -3985,7 +3994,7 @@ function initOrUpdateGlobe(items = []) {
   // Air traffic points
   const airPoints = airLayerEnabled ? currentAirTrafficItems.filter(a => a.lat && a.lng).map(a => ({
     lat: a.lat, lng: a.lng, label: a.callsign || 'Aircraft',
-    raw: a, color: '#ffdd44', radius: 0.2, altitude: 0
+    raw: { ...a, kind: 'air' }, color: '#ffdd44', radius: 0.2, altitude: getAircraftAltitudeRatio(a.altitude || 0)
   })) : [];
 
   // Satellite points removed from pointsData — rendered via customLayerData (Three.js spheres)
