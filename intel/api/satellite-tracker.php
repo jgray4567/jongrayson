@@ -69,12 +69,24 @@ foreach ($groups as $group) {
         : 'https://celestrak.org/NORAD/elements/gp.php?GROUP=' . rawurlencode($group['slug']) . '&FORMAT=tle';
     [$raw, $httpCode, $error] = $fetch($url);
 
-    // CelesTrak returns 403 "not modified" for rate-limited groups — use cached data for those
-    if ($httpCode === 403 && $cached && isset($cached['items'])) {
-        $cachedGroupItems = array_filter($cached['items'], fn($i) => $i['network'] === $group['network']);
-        if (count($cachedGroupItems) > 0) {
-            $items = array_merge($items, array_slice(array_values($cachedGroupItems), 0, intval($group['limit'])));
-            continue;
+    // CelesTrak returns 403 for rate-limited groups — fall back to seed file for Starlink
+    if ($httpCode === 403) {
+        $seedPath = __DIR__ . '/../data/starlink-seed.json';
+        if ($group['slug'] === 'starlink' && file_exists($seedPath)) {
+            $seedData = json_decode(file_get_contents($seedPath), true);
+            if (is_array($seedData) && isset($seedData['items'])) {
+                $seedItems = array_slice($seedData['items'], 0, intval($group['limit']));
+                $items = array_merge($items, $seedItems);
+                continue;
+            }
+        }
+        // Try cached data for other 403 groups
+        if ($cached && isset($cached['items'])) {
+            $cachedGroupItems = array_filter($cached['items'], fn($i) => $i['network'] === $group['network']);
+            if (count($cachedGroupItems) > 0) {
+                $items = array_merge($items, array_slice(array_values($cachedGroupItems), 0, intval($group['limit'])));
+                continue;
+            }
         }
     }
     if ($raw === false || $httpCode >= 400 || trim((string) $raw) === '') {
