@@ -3822,6 +3822,8 @@ function initOrUpdateGlobe(items = []) {
           } else if (point.raw.kind === 'air') {
             const fl = point.raw;
             tip.innerHTML = `<div style="font-weight:700;font-size:14px;color:#ffdd44;margin-bottom:4px;">✈ ${fl.callsign || 'Unknown Flight'}</div><div style="opacity:0.85;margin-bottom:2px;">${fl.country || 'Unknown'}</div><div style="opacity:0.6;font-size:11px;">${fl.altitude ? Math.round(fl.altitude) + ' m alt' : ''}${fl.velocity ? ' · ' + Math.round(fl.velocity * 3.6) + ' km/h' : ''}${fl.heading ? ' · ' + Math.round(fl.heading) + '°' : ''}</div><div style="margin-top:8px;display:flex;gap:8px;"><button style="background:rgba(0,255,68,0.15);border:1px solid rgba(0,255,68,0.4);color:#00ff44;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;" onclick="this.closest('.globe-click-tooltip').remove()">Close</button></div>`;
+            // Open the side drawer with flight details
+            if (typeof openIntelDrawer === 'function') openIntelDrawer({ kind: 'air', callsign: fl.callsign, country: fl.country, altitude: fl.altitude, velocity: fl.velocity, heading: fl.heading, icao24: fl.icao24, raw: fl });
           } else {
             const name = point.label || point.locationName || 'Unknown';
             tip.innerHTML = `<div style="font-weight:600;font-size:14px;">📍 ${name}</div><div style="margin-top:8px;display:flex;gap:8px;"><button style="background:rgba(0,255,68,0.15);border:1px solid rgba(0,255,68,0.4);color:#00ff44;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;" onclick="this.closest('.globe-click-tooltip').remove()">Close</button></div>`;
