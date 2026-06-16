@@ -4112,7 +4112,11 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.ringPropagationSpeed(1);
     intelGlobe.ringRepeatPeriod(2000);
     console.log('[Intel] Paths:', overlayPaths.length, 'orbit:', satOrbitPaths?.length || 0, 'air:', airPaths?.length || 0);
-    console.log('[Intel] Sample orbit path:', satOrbitPaths?.[0]);
+    if (satOrbitPaths?.length) {
+      const sample = satOrbitPaths[0];
+      console.log('[Intel] Sample orbit:', sample.orbitClass, 'points:', sample.points?.length, 'color:', sample.color, 'coords sample:', sample.points?.[0]);
+      console.log('[Intel] Sample overlay path:', overlayPaths.find(p => !p.isAir)?.coords?.slice(0,2));
+    }
     intelGlobe.pathsData(overlayPaths);
     intelGlobe.pathPoints(d => d.coords);
     intelGlobe.pathPointLat(d => d.lat);
