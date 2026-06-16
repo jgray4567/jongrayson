@@ -3924,7 +3924,7 @@ function initOrUpdateGlobe(items = []) {
 
   // ── DATA RENDERING ────────────────────────────────────────
   // Skip redundant updates only when satellite/air/threat layer state hasn't changed
-  const layerStateHash = [satelliteLayerEnabled, airLayerEnabled, seaLayerEnabled, threatLayerEnabled, currentSatelliteCatalog?.length || 0, currentAirTrafficItems?.length || 0].join(',');
+  const layerStateHash = [satelliteLayerEnabled, airLayerEnabled, seaLayerEnabled, threatLayerEnabled, currentSatelliteCatalog?.length || 0, currentAirTrafficItems?.length || 0, highlightedOrbitClass].join(',');
   const dataHash = items.length + ':' + (items[0]?.locationName || '') + ':' + (items[items.length-1]?.locationName || '') + ':' + layerStateHash;
   if (dataHash === _lastGlobeDataHash && intelGlobe) return; // No change, skip
   _lastGlobeDataHash = dataHash;
