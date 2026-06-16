@@ -2490,7 +2490,7 @@ async function refreshMaritimeCatalog(zoomToRegion = false) {
     if (zoomToRegion && typeof intelGlobe !== 'undefined' && intelGlobe) {
         const targetLat = seaRegion === 'hormuz' ? 26.5 : 25.0;
         const targetLng = seaRegion === 'hormuz' ? 56.2 : -90.0;
-        intelGlobe.pointOfView({ lat: targetLat, lng: targetLng, altitude: 1.5 }, 2000);
+        intelGlobe.pointOfView({ lat: targetLat, lng: targetLng, altitude: 2.5 }, 2000);
         setTimeout(() => {
             if (typeof showMapStage === 'function') {
                 showMapStage({
@@ -2687,14 +2687,14 @@ function initializeCommandSurface() {
         const region = regionBtn.dataset.airRegion;
         if (selectedAirRegion === region) {
           selectedAirRegion = null;
-          if (typeof intelGlobe !== 'undefined' && intelGlobe) intelGlobe.pointOfView({ lat: 39.0, lng: -98.0, altitude: 1.7 }, 1800);
+          if (typeof intelGlobe !== 'undefined' && intelGlobe) intelGlobe.pointOfView({ lat: 39.0, lng: -98.0, altitude: 2.8 }, 1800);
         } else {
           selectedAirRegion = region;
           const regionalFlights = currentAirTrafficItems.filter(f => f.country === region);
           if (typeof intelGlobe !== 'undefined' && intelGlobe && regionalFlights.length > 0) {
              const avgLat = regionalFlights.reduce((sum, f) => sum + f.lat, 0) / regionalFlights.length;
              const avgLng = regionalFlights.reduce((sum, f) => sum + f.lng, 0) / regionalFlights.length;
-             intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 1.5 }, 1800);
+             intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 2.5 }, 1800);
           }
         }
         
@@ -3805,25 +3805,23 @@ function initOrUpdateGlobe(items = []) {
       setupSatelliteCustomLayer(); // Will wait for THREE if not ready
       intelGlobe.onPointClick(point => {
         if (point && point.raw) {
+          // On click/tap, show tooltip at center of globe
+          const existingTip = globeContainer.querySelector('.globe-click-tooltip');
+          if (existingTip) existingTip.remove();
+          const tip = document.createElement('div');
+          tip.className = 'globe-click-tooltip';
+          tip.style.cssText = 'position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(10,11,14,0.95);color:#e8eaed;padding:10px 16px;border-radius:8px;font-size:13px;font-family:Google Sans,Roboto,sans-serif;z-index:20;max-width:280px;box-shadow:0 4px 20px rgba(0,0,0,0.5);backdrop-filter:blur(8px);';
           if (point.raw.kind === 'satellite') {
-            // Open satellite info drawer
             const sat = point.raw;
-            openIntelDrawer({
-              kind: 'satellite',
-              name: sat.name,
-              network: sat.network,
-              orbitClass: sat.orbitClass,
-              altitudeKm: sat.altitudeKm,
-              periodMinutes: sat.periodMinutes,
-              inclination: sat.inclination,
-              noradId: sat.noradId,
-              lat: sat.lat,
-              lng: sat.lng,
-              raw: sat
-            });
+            const orbitColor = sat.orbitClass === 'GEO' ? '#ffee00' : sat.orbitClass === 'MEO' ? '#ff8800' : '#00ff44';
+            tip.innerHTML = `<div style="font-weight:700;font-size:14px;color:${orbitColor};margin-bottom:4px;">🛰 ${sat.name || 'Satellite'}</div><div style="opacity:0.85;margin-bottom:2px;">${sat.network || 'Unknown'} · ${sat.orbitClass || 'LEO'}</div><div style="opacity:0.6;font-size:11px;">${sat.altitudeKm ? Math.round(sat.altitudeKm) + ' km altitude' : ''}${sat.periodMinutes ? ' · ' + Math.round(sat.periodMinutes) + ' min orbit' : ''}${sat.inclination ? ' · ' + sat.inclination.toFixed(1) + '° incl' : ''}</div><div style="margin-top:8px;display:flex;gap:8px;"><button style="background:rgba(0,255,68,0.15);border:1px solid rgba(0,255,68,0.4);color:#00ff44;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;" onclick="this.closest('.globe-click-tooltip').remove()">Close</button></div>`;
           } else {
-            openIntelDrawer(point.raw);
+            const name = point.label || point.locationName || 'Unknown';
+            tip.innerHTML = `<div style="font-weight:600;font-size:14px;">📍 ${name}</div><div style="margin-top:8px;display:flex;gap:8px;"><button style="background:rgba(0,255,68,0.15);border:1px solid rgba(0,255,68,0.4);color:#00ff44;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;" onclick="this.closest('.globe-click-tooltip').remove()">Close</button></div>`;
           }
+          globeContainer.appendChild(tip);
+          // Auto-dismiss after 5 seconds
+          setTimeout(() => { if (tip.parentNode) tip.remove(); }, 5000);
         }
       });
       intelGlobe.onPointHover(point => {
@@ -3840,21 +3838,46 @@ function initOrUpdateGlobe(items = []) {
               m.style.pointerEvents = 'auto';
             }
           });
+          // Tooltip will be positioned by mousemove/touchmove handler below
+          _hoveredPoint = point;
+        } else {
+          _hoveredPoint = null;
+        }
+      });
+
+      // Position tooltip near cursor on mouse/touch move
+      let _hoveredPoint = null;
+      const _tooltipMoveHandler = (e) => {
+        const label = globeContainer.querySelector('.globe-hover-label');
+        if (!_hoveredPoint) { if (label) label.remove(); return; }
+        const clientX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY);
+        if (clientX == null || clientY == null) return;
+        const rect = globeContainer.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        if (!label) {
           const el = document.createElement('div');
           el.className = 'globe-hover-label';
-          // Show detailed tooltip for satellites
-          if (point.raw && point.raw.kind === 'satellite') {
-            const sat = point.raw;
-            el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(10,11,14,0.92);color:#e8eaed;padding:6px 12px;border-radius:6px;font-size:11px;font-family:Google Sans,Roboto,sans-serif;z-index:10;transform:translate(-50%,-100%);margin-top:-12px;border:1px solid rgba(68,255,68,0.3);max-width:220px;';
+          if (_hoveredPoint.raw && _hoveredPoint.raw.kind === 'satellite') {
+            const sat = _hoveredPoint.raw;
+            el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(10,11,14,0.92);color:#e8eaed;padding:6px 12px;border-radius:6px;font-size:11px;font-family:Google Sans,Roboto,sans-serif;z-index:10;border:1px solid rgba(0,255,68,0.3);max-width:220px;line-height:1.3;';
             const orbitColor = sat.orbitClass === 'GEO' ? '#ffee00' : sat.orbitClass === 'MEO' ? '#ff8800' : '#00ff44';
-            el.innerHTML = `<div style="font-weight:600;color:${orbitColor};margin-bottom:2px;">${sat.name || 'Sat'}</div><div style="opacity:0.8;line-height:1.4;">${sat.network || ''} · ${sat.orbitClass || 'LEO'}</div><div style="opacity:0.6;font-size:10px;">${sat.altitudeKm ? Math.round(sat.altitudeKm) + ' km' : ''} · ${sat.periodMinutes ? Math.round(sat.periodMinutes) + ' min' : ''}</div>`;
+            el.innerHTML = `<div style="font-weight:600;color:${orbitColor};margin-bottom:2px;">${sat.name || 'Sat'}</div><div style="opacity:0.8;">${sat.network || ''} · ${sat.orbitClass || 'LEO'}</div><div style="opacity:0.6;font-size:10px;">${sat.altitudeKm ? Math.round(sat.altitudeKm) + ' km' : ''} · ${sat.periodMinutes ? Math.round(sat.periodMinutes) + ' min' : ''}</div>`;
           } else {
-            el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(32,33,36,0.85);color:#e8eaed;padding:4px 10px;border-radius:6px;font-size:12px;font-family:Google Sans,Roboto,sans-serif;white-space:nowrap;z-index:10;transform:translate(-50%,-100%);margin-top:-8px;';
-            el.textContent = point.label || point.locationName || 'Unknown';
+            el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(32,33,36,0.9);color:#e8eaed;padding:4px 10px;border-radius:6px;font-size:12px;font-family:Google Sans,Roboto,sans-serif;white-space:nowrap;z-index:10;';
+            el.textContent = _hoveredPoint.label || _hoveredPoint.locationName || 'Unknown';
           }
           globeContainer.appendChild(el);
         }
-      });
+        const tip = globeContainer.querySelector('.globe-hover-label');
+        if (tip) {
+          tip.style.left = (x + 12) + 'px';
+          tip.style.top = (y - 12) + 'px';
+        }
+      };
+      globeContainer.addEventListener('mousemove', _tooltipMoveHandler);
+      globeContainer.addEventListener('touchmove', _tooltipMoveHandler);
       console.log('[Intel] Globe constructor OK');
       
       // Set initial dimensions
@@ -4104,9 +4127,9 @@ function initOrUpdateGlobe(items = []) {
     if (cityPoints.length > 0) {
       const avgLat = cityPoints.reduce((sum, point) => sum + point.lat, 0) / cityPoints.length;
       const avgLng = cityPoints.reduce((sum, point) => sum + point.lng, 0) / cityPoints.length;
-      intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 1.7 }, 1800);
+      intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 2.8 }, 1800);
     } else {
-      intelGlobe.pointOfView({ lat: 39.0, lng: -98.0, altitude: 1.7 }, 1800);
+      intelGlobe.pointOfView({ lat: 39.0, lng: -98.0, altitude: 2.8 }, 1800);
     }
     globeContainer.dataset.initialViewLocked = '1';
   }
