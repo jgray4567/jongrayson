@@ -3804,7 +3804,27 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.customLayerData([]);
       setupSatelliteCustomLayer(); // Will wait for THREE if not ready
       intelGlobe.onPointClick(point => {
-        if (point && point.raw) openIntelDrawer(point.raw);
+        if (point && point.raw) {
+          if (point.raw.kind === 'satellite') {
+            // Open satellite info drawer
+            const sat = point.raw;
+            openIntelDrawer({
+              kind: 'satellite',
+              name: sat.name,
+              network: sat.network,
+              orbitClass: sat.orbitClass,
+              altitudeKm: sat.altitudeKm,
+              periodMinutes: sat.periodMinutes,
+              inclination: sat.inclination,
+              noradId: sat.noradId,
+              lat: sat.lat,
+              lng: sat.lng,
+              raw: sat
+            });
+          } else {
+            openIntelDrawer(point.raw);
+          }
+        }
       });
       intelGlobe.onPointHover(point => {
         const label = globeContainer.querySelector('.globe-hover-label');
@@ -3822,8 +3842,16 @@ function initOrUpdateGlobe(items = []) {
           });
           const el = document.createElement('div');
           el.className = 'globe-hover-label';
-          el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(32,33,36,0.85);color:#e8eaed;padding:4px 10px;border-radius:6px;font-size:12px;font-family:Google Sans,Roboto,sans-serif;white-space:nowrap;z-index:10;transform:translate(-50%,-100%);margin-top:-8px;';
-          el.textContent = point.label || point.locationName || 'Unknown';
+          // Show detailed tooltip for satellites
+          if (point.raw && point.raw.kind === 'satellite') {
+            const sat = point.raw;
+            el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(10,11,14,0.92);color:#e8eaed;padding:6px 12px;border-radius:6px;font-size:11px;font-family:Google Sans,Roboto,sans-serif;z-index:10;transform:translate(-50%,-100%);margin-top:-12px;border:1px solid rgba(68,255,68,0.3);max-width:220px;';
+            const orbitColor = sat.orbitClass === 'GEO' ? '#ff4444' : sat.orbitClass === 'MEO' ? '#44ddff' : '#44ff44';
+            el.innerHTML = `<div style="font-weight:600;color:${orbitColor};margin-bottom:2px;">${sat.name || 'Sat'}</div><div style="opacity:0.8;line-height:1.4;">${sat.network || ''} · ${sat.orbitClass || 'LEO'}</div><div style="opacity:0.6;font-size:10px;">${sat.altitudeKm ? Math.round(sat.altitudeKm) + ' km' : ''} · ${sat.periodMinutes ? Math.round(sat.periodMinutes) + ' min' : ''}</div>`;
+          } else {
+            el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(32,33,36,0.85);color:#e8eaed;padding:4px 10px;border-radius:6px;font-size:12px;font-family:Google Sans,Roboto,sans-serif;white-space:nowrap;z-index:10;transform:translate(-50%,-100%);margin-top:-8px;';
+            el.textContent = point.label || point.locationName || 'Unknown';
+          }
           globeContainer.appendChild(el);
         }
       });
@@ -3941,16 +3969,21 @@ function initOrUpdateGlobe(items = []) {
   const satGlobeElements = getSatelliteGlobeElements();
 
   // Build custom layer data for satellites (Three.js spheres at orbital altitude)
+  // Invisible satellite click targets (for onPointClick detection)
+  const satClickTargets = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
+    lat: s.lat, lng: s.lng, label: s.label,
+    raw: s.raw, color: 'rgba(0,0,0,0)', radius: 0.3, altitude: 0  // Click target (invisible but clickable)
+  }));
+
+  // Custom layer data for satellite spheres (Three.js objects at orbital altitude)
   const satCustomData = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
     lat: s.lat, lng: s.lng, label: s.label,
     raw: s.raw,
     orbitClass: s.raw.orbitClass || 'LEO',
-    alt: 0.12,  // Orbital altitude ratio (floats above globe surface, no columns)
+    alt: 0.12,
     size: s.raw.orbitClass === 'GEO' ? 0.6 : s.raw.orbitClass === 'MEO' ? 0.45 : 0.35,
     color: s.raw.orbitClass === 'GEO' ? 0xff4444 : s.raw.orbitClass === 'MEO' ? 0x44ddff : 0x44ff44
   }));
-
-  // Notable satellite HTML markers — top 3 per orbit class with glow
   const notableSats = [];
   const orbitClasses = ['LEO', 'MEO', 'GEO'];
   orbitClasses.forEach(oc => {
@@ -3975,7 +4008,7 @@ function initOrUpdateGlobe(items = []) {
   })) : [];
 
   // Combine all point layers (no satellites — those use customLayerData)
-  const allPoints = [...cityPoints, ...airPoints, ...seaPoints, ...threatPoints];
+  const allPoints = [...cityPoints, ...airPoints, ...satClickTargets, ...seaPoints, ...threatPoints];
 
   // HTML element markers: city tooltips + notable satellite glow markers
   const htmlCityMarkers = cityPoints.filter(p => p.lat && p.lng).map(p => ({
