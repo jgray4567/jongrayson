@@ -3969,10 +3969,14 @@ function initOrUpdateGlobe(items = []) {
   const satGlobeElements = getSatelliteGlobeElements();
 
   // Build custom layer data for satellites (Three.js spheres at orbital altitude)
-  // Invisible satellite click targets (for onPointClick detection)
+  // Satellite click targets (for onPointClick/onPointHover detection)
+  // Small colored dots at altitude 0 — same lat/lng as custom spheres but clickable
   const satClickTargets = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
     lat: s.lat, lng: s.lng, label: s.label,
-    raw: s.raw, color: 'rgba(0,0,0,0)', radius: 0.3, altitude: 0  // Click target (invisible but clickable)
+    raw: s.raw,
+    color: s.raw.orbitClass === 'GEO' ? '#ffee00' : s.raw.orbitClass === 'MEO' ? '#ff8800' : '#00ff44',
+    radius: 0.35,
+    altitude: 0
   }));
 
   // Custom layer data for satellite spheres (Three.js objects at orbital altitude)
