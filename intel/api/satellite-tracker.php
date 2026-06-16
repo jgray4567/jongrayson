@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 header('Cache-Control: no-store');
 
-$cachePath = dirname(__DIR__) . '/data/satellite-tracker-cache.json';
+$cachePath = __DIR__ . '/../data/satellite-tracker-cache.json';
 $cacheTtlSeconds = 1800;
 $maxItems = 500;
 $groups = [
