@@ -157,13 +157,45 @@
     {
       "id": "sig_11",
       "group": 2,
+      "label": "Fragile quiet in Lebanon as US-Iran truce leaves unanswered questions",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/cvgepl5gdp1o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/16f0/live/d36dc9e0-6994-11f1-b1db-af71d47507d6.jpg"
+    },
+    {
+      "id": "sig_12",
+      "group": 2,
+      "label": "UK investigating reports Russian warship fired warning shots near yacht in English Channel",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/c20yzm84r7lo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/9b77/live/208679c0-699a-11f1-9685-4f5a66750059.jpg"
+    },
+    {
+      "id": "sig_13",
+      "group": 2,
       "label": "Russian artist and Putin critic shot dead in Poland",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/clyrzd5g6k2o?at_medium=RSS&amp;at_campaign=rss",
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/802d/live/a26f4a30-6962-11f1-9f4a-21531e88e991.jpg"
     },
     {
-      "id": "sig_12",
+      "id": "sig_14",
+      "group": 2,
+      "label": "German broadcaster removes TV intro after Elon Musk takes legal action",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/c0jyzp9z9deo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/c8f4/live/3b494590-6994-11f1-a716-b5396926119a.jpg"
+    },
+    {
+      "id": "sig_15",
+      "group": 2,
+      "label": "Hundreds of cats stolen for food in Vietnam rescued by police, welfare group says",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/c20yzm58vk3o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/a76d/live/c145dbd0-69a4-11f1-8546-8f19e4fe30f4.jpg"
+    },
+    {
+      "id": "sig_16",
       "group": 2,
       "label": "France's oldest female detainee, 79, goes on trial for in-law's grisly murder",
       "size": 12,
@@ -171,7 +203,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/2a49/live/29c3a640-6989-11f1-bf78-b9ee73ed2967.png"
     },
     {
-      "id": "sig_13",
+      "id": "sig_17",
       "group": 2,
       "label": "Venezuela signs deal with US energy giant to rebuild power grid",
       "size": 12,
@@ -179,7 +211,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/206d/live/4711bd90-6993-11f1-bf78-b9ee73ed2967.jpg"
     },
     {
-      "id": "sig_14",
+      "id": "sig_18",
       "group": 2,
       "label": "Eight dead after US Air Force B-52 bomber crashes in California",
       "size": 12,
@@ -187,23 +219,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3e43/live/732b1820-6945-11f1-8e1d-bbbb1017d210.jpg"
     },
     {
-      "id": "sig_15",
-      "group": 2,
-      "label": "Cuba tourism collapses as US pressure campaign bites",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/ckg8zrm20jjo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5724/live/1d7d1180-6972-11f1-8cc2-edef34f05c3f.jpg"
-    },
-    {
-      "id": "sig_16",
-      "group": 2,
-      "label": "Hungary's MPs block return of Orbán, limiting rule of PM to eight years",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/c621zplqrrno?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/b138/live/13ff5dc0-697c-11f1-a63b-a7cb529e1ca8.jpg"
-    },
-    {
-      "id": "sig_17",
+      "id": "sig_19",
       "group": 2,
       "label": "'Dancing girl's' bare torso restored in Indian textbook after backlash",
       "size": 12,
@@ -211,25 +227,9 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/4be3/live/3aa49d90-6946-11f1-b8da-53bba3cad46c.jpg"
     },
     {
-      "id": "sig_18",
-      "group": 2,
-      "label": "Somaliland opens Jerusalem embassy after Israel's recognition of its independence",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/cj4gn4d54y0o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1f4f/live/5af064b0-6975-11f1-a610-610c6ec6d3a5.jpg"
-    },
-    {
-      "id": "sig_19",
-      "group": 2,
-      "label": "FBI thwarted plot targeting White House UFC event, Patel says",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/cqx10xlje1lo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/76bb/live/f3fbc9c0-6979-11f1-a63b-a7cb529e1ca8.jpg"
-    },
-    {
       "id": "sig_20",
       "group": 2,
-      "label": "Iran War Live Updates: U.S. and Iran Look Ahead to Next Round of Talks",
+      "label": "Iran War Live Updates: Trump Says He Hopes to Put War in ‘Rearview Mirror’",
       "size": 12,
       "url": "https://www.nytimes.com/live/2026/06/16/world/iran-war-trump-us-deal",
       "image": ""
@@ -237,9 +237,9 @@
     {
       "id": "sig_21",
       "group": 2,
-      "label": "Live Updates: At G7 Summit, Trump Says Ukraine War Has ‘No Impact’ on U.S.",
+      "label": "After a Bitter Split, European Leaders Play Nice With Trump",
       "size": 12,
-      "url": "https://www.nytimes.com/live/2026/06/16/world/g7-summit-conference-trump-france",
+      "url": "https://www.nytimes.com/2026/06/16/world/europe/trump-g7-leaders-europe.html",
       "image": ""
     },
     {
@@ -277,33 +277,33 @@
     {
       "id": "sig_26",
       "group": 2,
-      "label": "Why Team Iran Is in a Tough Spot at the World Cup",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/16/world/middleeast/world-cup-iran-new-zealand-protests.html",
-      "image": ""
-    },
-    {
-      "id": "sig_27",
-      "group": 2,
       "label": "Iran Will Enter Nuclear Talks With the Trump Administration Feeling Emboldened",
       "size": 12,
       "url": "https://www.nytimes.com/2026/06/16/world/middleeast/iran-us-deal-nuclear-talks.html",
       "image": ""
     },
     {
+      "id": "sig_27",
+      "group": 2,
+      "label": "Ebola Outbreak Could Become Worst on Record, Africa C.D.C. Chief Warns",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/16/world/africa/ebola-outbreak-congo.html",
+      "image": ""
+    },
+    {
       "id": "sig_28",
       "group": 2,
-      "label": "Europe Union Lawmakers Approve Much-Delayed Trade Deal With U.S.",
+      "label": "Russian Navy Ship Accused of Firing Warning Shots at U.K. Yacht",
       "size": 12,
-      "url": "https://www.nytimes.com/2026/06/16/world/europe/eu-us-trade-trump.html",
+      "url": "https://www.nytimes.com/2026/06/16/world/europe/russian-navy-english-channel-yacht-uk.html",
       "image": ""
     },
     {
       "id": "sig_29",
       "group": 2,
-      "label": "After Russia Attacks Kyiv With Missiles and Drones, Historic Orthodox Cathedral Burns",
+      "label": "‘Hockey Night in Canada,’ a Saturday Night Ritual on the CBC, Is No More",
       "size": 12,
-      "url": "https://www.nytimes.com/2026/06/15/world/europe/ukraine-kyiv-russia-attack-orthodox-cathedral.html",
+      "url": "https://www.nytimes.com/2026/06/16/world/canada/hockey-night-in-canada-cbc-rogers.html",
       "image": ""
     },
     {
@@ -389,81 +389,81 @@
     {
       "id": "sig_40",
       "group": 2,
-      "label": "A Mexican citizen died in ICE custody. Now his family is demanding answers",
+      "label": "US judge upholds conviction of ex-judge who helped man evade federal agents",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/longform/2026/6/16/a-mexican-citizen-died-in-ice-custody-now-his-family-is-demanding-answers?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/16/us-judge-upholds-conviction-of-ex-judge-who-helped-man-evade-federal-agents?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_41",
       "group": 2,
-      "label": "Optics of peace first, details later: The US-Iran 60-day challenge",
+      "label": "What has Iran won and lost from this war?",
       "size": 12,
-      "url": "https://www.aljazeera.com/features/2026/6/16/optics-of-peace-first-details-later-the-us-iran-60-day-challenge?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/inside-story/2026/6/16/what-has-iran-won-and-lost-from-this-war?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_42",
       "group": 2,
-      "label": "Ukrainian drone detonates near Moscow",
+      "label": "‘I know what you’ve been through’: FIFA president visits Iran team",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/ukrainian-drone-detonates-near-moscow?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/i-know-what-youve-been-through-fifa-president-visits-iran-team?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_43",
       "group": 2,
-      "label": "France vs Senegal live: World Cup 2026",
+      "label": "Ohio Governor Mike DeWine opposes death penalty, reversing past support",
       "size": 12,
-      "url": "https://www.aljazeera.com/sports/liveblog/2026/6/16/france-vs-senegal-live-world-cup-2026-group-i?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/16/ohio-governor-mike-dewine-opposes-death-penalty-reversing-past-support?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_44",
       "group": 2,
-      "label": "From JCPOA exit to the 2026 deal: How US-Iran ties soured under Trump",
+      "label": "Repairs begin at 1,000-year-old Kyiv monastery after Russian attack",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/16/from-jcpoa-exit-to-the-2026-deal-how-us-iran-ties-soured-under-trump?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/repairs-begin-at-1000-year-old-kyiv-monastery-after-russian-attack?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_45",
       "group": 2,
-      "label": "With Israel unleashed, there can be no peace in the Middle East",
+      "label": "Israeli strikes kill four in southern Lebanon amid ceasefire talks",
       "size": 12,
-      "url": "https://www.aljazeera.com/opinions/2026/6/16/with-israel-unleashed-there-can-be-no-peace-in-the-middle-east?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/16/israeli-strikes-kill-four-in-southern-lebanon-amid-ceasefire-talks?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_46",
       "group": 2,
-      "label": "FBI says it foiled ‘planned attacks’ targeting White House UFC event",
+      "label": "Robinhood slashes workforce by 10 percent amid restructuring",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/16/fbi-says-it-foiled-planned-attacks-targeting-white-house-ufc-event?traffic_source=rss",
+      "url": "https://www.aljazeera.com/economy/2026/6/16/robinhood-slashes-workforce-by-10-percent-amid-restructuring?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_47",
       "group": 2,
-      "label": "Gaza’s football fans follow World Cup matches despite hardships",
+      "label": "Israel seizes power over occupied West Bank mosque from Palestinians",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/gazas-football-fans-follow-world-cup-matches-despite-hardships?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/16/israel-seizes-power-over-occupied-west-bank-mosque-from-palestinians?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_48",
       "group": 2,
-      "label": "Hardliners and moderates: What do Iran’s factions think of deal with US?",
+      "label": "Ronaldo’s last dance as Portugal face DR Congo in World Cup: All to know",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/16/hardliners-and-moderates-what-do-irans-factions-think-of-deal-with-us?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/16/ronaldos-last-dance-as-portugal-face-dr-congo-in-world-cup?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_49",
       "group": 2,
-      "label": "Brazil police arrest bungee jumping operators after woman dies",
+      "label": "Trump slams Israeli attacks on Lebanon at G7 summit",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/brazil-police-arrest-bungee-jumping-operators-after-woman-dies?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/16/trump-slams-israeli-attacks-on-lebanon-at-g7-summit?traffic_source=rss",
       "image": ""
     },
     {
@@ -485,13 +485,21 @@
     {
       "id": "sig_52",
       "group": 2,
+      "label": "Russian artist who criticised Putin is shot dead",
+      "size": 12,
+      "url": "https://news.sky.com/story/russian-artist-who-criticised-putin-shot-dead-near-home-in-poland-13554708",
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-semyon-skrepetsk-berlin_7275025.jpg?20260616153341"
+    },
+    {
+      "id": "sig_53",
+      "group": 2,
       "label": "Stepson of Norway's crown prince jailed for two rapes",
       "size": 12,
       "url": "https://news.sky.com/story/crown-prince-of-norways-stepson-jailed-for-four-years-over-two-rapes-13554218",
       "image": "https://e3.365dm.com/26/06/1920x1080/skynews-marius-borg-hoiby-norway_7273846.jpg?20260615090421"
     },
     {
-      "id": "sig_53",
+      "id": "sig_54",
       "group": 2,
       "label": "Homes in illegal Israeli settlements promoted at London property show",
       "size": 12,
@@ -499,7 +507,7 @@
       "image": "https://e3.365dm.com/26/06/1920x1080/skynews-property-show-israel_7274316.jpg?20260615172813"
     },
     {
-      "id": "sig_54",
+      "id": "sig_55",
       "group": 2,
       "label": "Drone strikes in Sudan killed over 1,000 people in five months, says UN",
       "size": 12,
@@ -624,11 +632,6 @@
       "value": 2
     },
     {
-      "source": "sig_1",
-      "target": "sig_0",
-      "value": 1
-    },
-    {
       "source": "sig_2",
       "target": "reg_na",
       "value": 1
@@ -654,18 +657,8 @@
       "value": 1
     },
     {
-      "source": "sig_3",
-      "target": "sig_2",
-      "value": 1
-    },
-    {
       "source": "sig_4",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_4",
-      "target": "sig_3",
       "value": 1
     },
     {
@@ -677,11 +670,6 @@
       "source": "sig_5",
       "target": "theme_cyber",
       "value": 2
-    },
-    {
-      "source": "sig_5",
-      "target": "sig_4",
-      "value": 1
     },
     {
       "source": "sig_6",
@@ -706,6 +694,11 @@
     {
       "source": "sig_8",
       "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_8",
+      "target": "sig_7",
       "value": 1
     },
     {
@@ -740,7 +733,12 @@
     },
     {
       "source": "sig_11",
-      "target": "reg_eu",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_12",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -749,43 +747,38 @@
       "value": 1
     },
     {
+      "source": "sig_12",
+      "target": "sig_11",
+      "value": 1
+    },
+    {
       "source": "sig_13",
       "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_14",
-      "target": "reg_na",
+      "source": "sig_13",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_14",
-      "target": "sig_13",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_15",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_16",
       "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_16",
-      "target": "sig_15",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_17",
-      "target": "reg_asia",
-      "value": 1
-    },
-    {
-      "source": "sig_17",
-      "target": "sig_16",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -794,12 +787,12 @@
       "value": 1
     },
     {
-      "source": "sig_18",
-      "target": "reg_me",
+      "source": "sig_19",
+      "target": "reg_asia",
       "value": 1
     },
     {
-      "source": "sig_19",
+      "source": "sig_20",
       "target": "reg_na",
       "value": 1
     },
@@ -839,38 +832,38 @@
       "value": 1
     },
     {
-      "source": "sig_24",
-      "target": "sig_23",
-      "value": 1
-    },
-    {
       "source": "sig_25",
       "target": "reg_eu",
       "value": 1
     },
     {
-      "source": "sig_26",
-      "target": "reg_me",
+      "source": "sig_25",
+      "target": "sig_24",
       "value": 1
     },
     {
       "source": "sig_26",
-      "target": "theme_sport",
-      "value": 1
-    },
-    {
-      "source": "sig_26",
-      "target": "sig_25",
-      "value": 1
-    },
-    {
-      "source": "sig_27",
       "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_27",
+      "source": "sig_26",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_27",
+      "target": "reg_afr",
+      "value": 1
+    },
+    {
+      "source": "sig_27",
+      "target": "sig_26",
+      "value": 1
+    },
+    {
+      "source": "sig_28",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -879,23 +872,13 @@
       "value": 1
     },
     {
-      "source": "sig_28",
-      "target": "theme_econ",
-      "value": 1
-    },
-    {
-      "source": "sig_28",
-      "target": "sig_27",
+      "source": "sig_29",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_29",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_29",
-      "target": "reg_eu",
+      "target": "sig_28",
       "value": 1
     },
     {
@@ -904,6 +887,11 @@
       "value": 1
     },
     {
+      "source": "sig_30",
+      "target": "sig_29",
+      "value": 1
+    },
+    {
       "source": "sig_31",
       "target": "reg_na",
       "value": 1
@@ -914,11 +902,6 @@
       "value": 1
     },
     {
-      "source": "sig_31",
-      "target": "sig_30",
-      "value": 1
-    },
-    {
       "source": "sig_32",
       "target": "reg_na",
       "value": 1
@@ -926,6 +909,11 @@
     {
       "source": "sig_32",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_32",
+      "target": "sig_31",
       "value": 1
     },
     {
@@ -951,11 +939,6 @@
     {
       "source": "sig_35",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_35",
-      "target": "sig_34",
       "value": 1
     },
     {
@@ -1000,32 +983,37 @@
     },
     {
       "source": "sig_40",
-      "target": "reg_asia",
+      "target": "sig_39",
       "value": 1
     },
     {
       "source": "sig_41",
-      "target": "reg_na",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_41",
+      "target": "sig_40",
+      "value": 1
+    },
+    {
+      "source": "sig_42",
       "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_42",
-      "target": "reg_eu",
+      "target": "sig_41",
       "value": 1
     },
     {
       "source": "sig_43",
-      "target": "reg_eu",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_43",
-      "target": "theme_sport",
+      "target": "sig_42",
       "value": 1
     },
     {
@@ -1035,12 +1023,7 @@
     },
     {
       "source": "sig_44",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_44",
-      "target": "reg_asia",
+      "target": "reg_eu",
       "value": 1
     },
     {
@@ -1060,22 +1043,17 @@
     },
     {
       "source": "sig_46",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_46",
-      "target": "theme_econ",
+      "target": "sig_45",
       "value": 1
     },
     {
       "source": "sig_47",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_47",
-      "target": "theme_sport",
       "value": 1
     },
     {
@@ -1085,22 +1063,17 @@
     },
     {
       "source": "sig_48",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_48",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_48",
-      "target": "sig_47",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_49",
-      "target": "reg_sa",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_49",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1124,13 +1097,23 @@
       "value": 1
     },
     {
+      "source": "sig_51",
+      "target": "sig_50",
+      "value": 1
+    },
+    {
       "source": "sig_52",
-      "target": "theme_geo",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_52",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_53",
-      "target": "reg_me",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -1140,12 +1123,17 @@
     },
     {
       "source": "sig_54",
-      "target": "reg_afr",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_54",
       "target": "sig_53",
+      "value": 1
+    },
+    {
+      "source": "sig_55",
+      "target": "reg_afr",
       "value": 1
     }
   ]
