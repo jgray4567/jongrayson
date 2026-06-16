@@ -54,7 +54,8 @@ $fetch = function ($url) {
 };
 
 $cached = $readCache();
-if ($cached && isset($cached['fetchedAt']) && (time() - intval($cached['fetchedAt'])) < $cacheTtlSeconds) {
+$bypassCache = isset($_GET['nocache']) || isset($_GET['refresh']);
+if (!$bypassCache && $cached && isset($cached['fetchedAt']) && (time() - intval($cached['fetchedAt'])) < $cacheTtlSeconds) {
     $emit($cached);
 }
 
