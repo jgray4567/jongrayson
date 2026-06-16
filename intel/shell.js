@@ -3800,7 +3800,7 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.atmosphereColor('#6ab0ff');
       intelGlobe.atmosphereAltitude(0.25);
       intelGlobe.showGraticules(false);
-      intelGlobe.pointRadius(0.25);
+      intelGlobe.pointRadius(0.3);
       intelGlobe.pointAltitude(0);
       intelGlobe.pointResolution(12);
       intelGlobe.pointsMerge(false);
@@ -4058,7 +4058,7 @@ function initOrUpdateGlobe(items = []) {
   // Air traffic points
   const airPoints = airLayerEnabled ? currentAirTrafficItems.filter(a => a.lat && a.lng).map(a => ({
     lat: a.lat, lng: a.lng, label: a.callsign || 'Aircraft',
-    raw: { ...a, kind: 'air' }, color: '#ffdd44', radius: 0.2, altitude: 0
+    raw: { ...a, kind: 'air' }, color: '#ffdd44', radius: 0.4 * touchBoost, altitude: 0
   })) : [];
 
   // Satellite points removed from pointsData — rendered via customLayerData (Three.js spheres)
@@ -4098,7 +4098,7 @@ function initOrUpdateGlobe(items = []) {
   const seaPoints = seaLayerEnabled ? currentVesselCatalog.filter(v => v.lat && v.lng).map(v => ({
     lat: v.lat, lng: v.lng, label: v.name || 'Vessel',
     raw: v, color: (v.type === 'Tanker' || v.type === 'LNG Carrier') ? '#ff8844' : '#4488ff',
-    radius: 0.2, altitude: 0
+    radius: 0.35, altitude: 0
   })) : [];
 
   // Threat hotspot points
