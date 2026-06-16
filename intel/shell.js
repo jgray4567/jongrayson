@@ -3814,23 +3814,76 @@ function initOrUpdateGlobe(items = []) {
           if (existingTip) existingTip.remove();
           const tip = document.createElement('div');
           tip.className = 'globe-click-tooltip';
-          tip.style.cssText = 'position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(10,11,14,0.95);color:#e8eaed;padding:10px 16px;border-radius:8px;font-size:13px;font-family:Google Sans,Roboto,sans-serif;z-index:20;max-width:280px;box-shadow:0 4px 20px rgba(0,0,0,0.5);backdrop-filter:blur(8px);';
+          tip.style.cssText = 'position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(10,11,14,0.96);color:#e8eaed;padding:14px 18px;border-radius:10px;font-size:13px;font-family:Google Sans,Roboto,sans-serif;z-index:30;max-width:340px;min-width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.6);backdrop-filter:blur(12px);border:1px solid rgba(255,221,68,0.15);';
           if (point.raw.kind === 'satellite') {
             const sat = point.raw;
             const orbitColor = sat.orbitClass === 'GEO' ? '#ffee00' : sat.orbitClass === 'MEO' ? '#ff8800' : '#00ff44';
             tip.innerHTML = `<div style="font-weight:700;font-size:14px;color:${orbitColor};margin-bottom:4px;">🛰 ${sat.name || 'Satellite'}</div><div style="opacity:0.85;margin-bottom:2px;">${sat.network || 'Unknown'} · ${sat.orbitClass || 'LEO'}</div><div style="opacity:0.6;font-size:11px;">${sat.altitudeKm ? Math.round(sat.altitudeKm) + ' km altitude' : ''}${sat.periodMinutes ? ' · ' + Math.round(sat.periodMinutes) + ' min orbit' : ''}${sat.inclination ? ' · ' + sat.inclination.toFixed(1) + '° incl' : ''}</div><div style="margin-top:8px;display:flex;gap:8px;"><button style="background:rgba(0,255,68,0.15);border:1px solid rgba(0,255,68,0.4);color:#00ff44;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;" onclick="this.closest('.globe-click-tooltip').remove()">Close</button></div>`;
           } else if (point.raw.kind === 'air') {
             const fl = point.raw;
-            tip.innerHTML = `<div style="font-weight:700;font-size:14px;color:#ffdd44;margin-bottom:4px;">✈ ${fl.callsign || 'Unknown Flight'}</div><div style="opacity:0.85;margin-bottom:2px;">${fl.country || 'Unknown'}</div><div style="opacity:0.6;font-size:11px;">${fl.altitude ? Math.round(fl.altitude) + ' m alt' : ''}${fl.velocity ? ' · ' + Math.round(fl.velocity * 3.6) + ' km/h' : ''}${fl.heading ? ' · ' + Math.round(fl.heading) + '°' : ''}</div><div style="margin-top:8px;display:flex;gap:8px;"><button style="background:rgba(0,255,68,0.15);border:1px solid rgba(0,255,68,0.4);color:#00ff44;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;" onclick="this.closest('.globe-click-tooltip').remove()">Close</button></div>`;
-            // Open the side drawer with flight details
-            if (typeof openIntelDrawer === 'function') openIntelDrawer({ kind: 'air', callsign: fl.callsign, country: fl.country, altitude: fl.altitude, velocity: fl.velocity, heading: fl.heading, icao24: fl.icao24, raw: fl });
+            const altStr = fl.altitude ? Math.round(fl.altitude) + ' m' : 'n/a';
+            const spdStr = fl.velocity ? Math.round(fl.velocity * 3.6) + ' km/h' : 'n/a';
+            const hdgStr = fl.heading != null ? Math.round(fl.heading) + '°' : 'n/a';
+            tip.innerHTML = `
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                <div id="flight-tip-logo" style="width:32px;height:32px;border-radius:4px;background:rgba(255,221,68,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">✈</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-weight:700;font-size:15px;color:#ffdd44;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fl.callsign || 'Unknown Flight'}</div>
+                  <div style="opacity:0.7;font-size:11px;">${fl.country || 'Public air traffic'}</div>
+                </div>
+                <button style="background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:2px 4px;line-height:1;" onclick="this.closest('.globe-click-tooltip').remove()">✕</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:11px;margin-bottom:8px;">
+                <div><span style="opacity:0.5;">ALT</span><br><span style="color:#e8eaed;">${altStr}</span></div>
+                <div><span style="opacity:0.5;">SPD</span><br><span style="color:#e8eaed;">${spdStr}</span></div>
+                <div><span style="opacity:0.5;">HDG</span><br><span style="color:#e8eaed;">${hdgStr}</span></div>
+                <div><span style="opacity:0.5;">ICAO</span><br><span style="color:#e8eaed;">${fl.icao24 || 'n/a'}</span></div>
+              </div>
+              <div id="flight-tip-detail" style="border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;font-size:11px;color:#888;">Loading route info…</div>
+            `;
+            // Fetch enriched flight detail (airline, route, times)
+            fetchFlightDetail(fl.callsign).then(detail => {
+              const detailEl = tip.querySelector('#flight-tip-detail');
+              if (!detailEl || !tip.parentNode) return;
+              if (!detail) { detailEl.textContent = 'Route info unavailable'; return; }
+              const dep = [detail.departure?.iata, detail.departure?.location].filter(Boolean).join(' · ') || 'Unknown';
+              const dest = [detail.destination?.iata, detail.destination?.location].filter(Boolean).join(' · ') || 'Unknown';
+              const depTime = detail.times?.departureEstimated || detail.times?.departureScheduled || detail.times?.departureActual || '';
+              const arrTime = detail.times?.arrivalEstimated || detail.times?.arrivalScheduled || detail.times?.arrivalActual || '';
+              detailEl.innerHTML = `
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                  <span style="font-weight:600;color:#e8eaed;font-size:13px;">${detail.flightNumber || fl.callsign || ''}</span>
+                  <span style="opacity:0.6;">${detail.airline || ''}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <div style="text-align:center;"><div style="font-weight:600;color:#ffdd44;font-size:14px;">${detail.departure?.iata || '—'}</div><div style="font-size:10px;">${dep}</div></div>
+                  <div style="flex:1;border-top:1px dashed rgba(255,221,68,0.3);margin:0 8px;position:relative;"><div style="position:absolute;top:-4px;left:50%;transform:translateX(-50%);font-size:10px;color:#ffdd44;">→</div></div>
+                  <div style="text-align:center;"><div style="font-weight:600;color:#ffdd44;font-size:14px;">${detail.destination?.iata || '—'}</div><div style="font-size:10px;">${dest}</div></div>
+                </div>
+                ${(depTime || arrTime) ? `<div style="display:flex;justify-content:space-between;font-size:10px;opacity:0.6;"><span>Dep: ${depTime || '—'}</span><span>Arr: ${arrTime || '—'}</span></div>` : ''}
+                ${detail.aircraftType ? `<div style="font-size:10px;opacity:0.5;margin-top:2px;">${detail.aircraftType}</div>` : ''}
+              `;
+              // Load airline logo
+              const logoEl = tip.querySelector('#flight-tip-logo');
+              if (logoEl && detail.airline) {
+                fetch(`api/airline-logos.php?callsign=${encodeURIComponent(fl.callsign || '')}&airline=${encodeURIComponent(detail.airline)}&w=120&h=48`)
+                  .then(r => r.json()).then(logoData => {
+                    if (logoData?.logoUrl && tip.parentNode) {
+                      logoEl.innerHTML = `<img src="${logoData.logoUrl}" style="width:32px;height:32px;object-fit:contain;" onerror="this.parentElement.innerHTML='✈'">`;
+                    }
+                  }).catch(() => {});
+              }
+            }).catch(() => {
+              const detailEl = tip.querySelector('#flight-tip-detail');
+              if (detailEl) detailEl.textContent = 'Route info unavailable';
+            });
           } else {
             const name = point.label || point.locationName || 'Unknown';
             tip.innerHTML = `<div style="font-weight:600;font-size:14px;">📍 ${name}</div><div style="margin-top:8px;display:flex;gap:8px;"><button style="background:rgba(0,255,68,0.15);border:1px solid rgba(0,255,68,0.4);color:#00ff44;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;" onclick="this.closest('.globe-click-tooltip').remove()">Close</button></div>`;
           }
           globeContainer.appendChild(tip);
           // Auto-dismiss after 5 seconds
-          setTimeout(() => { if (tip.parentNode) tip.remove(); }, 5000);
+          setTimeout(() => { if (tip.parentNode) tip.remove(); }, 15000);
         }
       });
       intelGlobe.onPointHover(point => {
