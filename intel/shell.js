@@ -3807,6 +3807,20 @@ function initOrUpdateGlobe(items = []) {
       // Satellite custom layer — Three.js spheres at orbital altitude
       intelGlobe.customLayerData([]);
       setupSatelliteCustomLayer(); // Will wait for THREE if not ready
+      // Clear flight/sat selection when clicking globe background
+      const globeCanvas = globeContainer.querySelector('canvas');
+      if (globeCanvas && !globeCanvas._intelBgClickBound) {
+        globeCanvas.addEventListener('click', (e) => {
+          // Only clear if the click wasn't on an HTML overlay element
+          if (e.target === globeCanvas) {
+            if (selectedAirIcao24) {
+              selectedAirIcao24 = null;
+              if (typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
+            }
+          }
+        });
+        globeCanvas._intelBgClickBound = true;
+      }
       intelGlobe.onPointClick(point => {
         if (point && point.raw) {
           // On click/tap, show tooltip at center of globe
@@ -4026,13 +4040,29 @@ function initOrUpdateGlobe(items = []) {
 
   // Overlay paths (flight paths, orbits)
   const overlayPaths = [];
-  // Air traffic flight trails
-  const airPaths = getAirTrafficPaths();
-  if (airPaths.length) {
-    overlayPaths.push(...airPaths.map(p => ({
-      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: pt.alt || 0.01 })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng)),
-      color: p.color
-    })).filter(p => p.coords.length >= 2));
+  // Air traffic flight trail — only for selected flight
+  if (selectedAirIcao24) {
+    const selectedFlight = currentAirTrafficItems.find(f => f.icao24 === selectedAirIcao24);
+    if (selectedFlight && selectedFlight.lat && selectedFlight.lng) {
+      // Draw path from departure → current position → destination
+      const selPaths = getAirTrafficPaths().filter((p, i) => currentAirTrafficItems[i]?.icao24 === selectedAirIcao24);
+      if (selPaths.length) {
+        overlayPaths.push(...selPaths.map(p => ({
+          coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: pt.alt || 0.01 })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng)),
+          color: '#d2ff54'
+        })).filter(p => p.coords.length >= 2));
+      } else {
+        // Fallback: short trail from the selected aircraft's position
+        const heading = selectedFlight.heading || 0;
+        const fwd = projectPointFromBearing(selectedFlight.lat, selectedFlight.lng, heading, 120);
+        const bck = projectPointFromBearing(selectedFlight.lat, selectedFlight.lng, heading + 180, 80);
+        const alt = getAircraftAltitudeRatio(selectedFlight.altitude || 0);
+        overlayPaths.push({
+          coords: [{ lat: bck.lat, lng: bck.lng, alt }, { lat: selectedFlight.lat, lng: selectedFlight.lng, alt }, { lat: fwd.lat, lng: fwd.lng, alt }],
+          color: '#d2ff54'
+        });
+      }
+    }
   }
   if (overlayFlightPaths && overlayFlightPaths.length) {
     overlayPaths.push(...overlayFlightPaths.filter(p => p.coords && p.coords.length >= 2).map(p => ({
@@ -4046,13 +4076,18 @@ function initOrUpdateGlobe(items = []) {
       color: p.color || '#4488ff'
     })));
   }
-  // Add live satellite orbit paths from TLE data
-  const satOrbitPaths = getSatelliteOrbitPaths();
-  if (satOrbitPaths.length) {
-    overlayPaths.push(...satOrbitPaths.map(p => ({
-      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: 0.005 })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
-      color: p.color
-    })).filter(p => p.coords.length >= 2));
+  // Satellite orbit trail — only for selected satellite
+  if (selectedSatOrbit || selectedSatNetwork) {
+    const satOrbitPaths = getSatelliteOrbitPaths().filter(p => {
+      if (selectedSatNetwork) return true; // show all orbits in selected network
+      return p.orbitClass === selectedSatOrbit;
+    });
+    if (satOrbitPaths.length) {
+      overlayPaths.push(...satOrbitPaths.map(p => ({
+        coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: 0.005 })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
+        color: p.color.replace(/[\d.]+\)$/, '0.6)') // brighter than default
+      })).filter(p => p.coords.length >= 2));
+    }
   }
 
   // Air traffic points
@@ -4145,7 +4180,12 @@ function initOrUpdateGlobe(items = []) {
         el.style.cssText = `position:relative;transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;`;
         el.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:${stateColor};box-shadow:0 0 6px ${stateColor},0 0 2px ${stateColor};animation:satPulse 2s ease-in-out infinite;"></div>`;
         el.title = d.label || 'Satellite';
-        el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
+        el.addEventListener('click', () => {
+          if (d.raw) {
+            selectedSatOrbit = null; selectedSatNetwork = null;
+            openIntelDrawer(d.raw);
+          }
+        });
         return el;
       }
       if (d.type === 'air') {
@@ -4156,7 +4196,13 @@ function initOrUpdateGlobe(items = []) {
         el.setAttribute('data-label', d.label || 'Aircraft');
         el.style.cssText = `position:relative;transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;width:${hitSize}px;height:${hitSize}px;display:flex;align-items:center;justify-content:center;`;
         el.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:#ffdd44;box-shadow:0 0 6px #ffdd44,0 0 2px #ffdd44;"></div>`;
-        el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
+        // Set selection and show flight path
+        const prevIcao = selectedAirIcao24;
+        selectedAirIcao24 = d.raw.icao24 || null;
+        selectedSatOrbit = null; selectedSatNetwork = null;
+        if (selectedAirIcao24 !== prevIcao && typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
+        if (d.raw) openIntelDrawer(d.raw);
+      });
         return el;
       }
       // City tooltip marker
