@@ -4,10 +4,10 @@ header('Cache-Control: no-store');
 
 $cachePath = dirname(__DIR__) . '/data/satellite-tracker-cache.json';
 $cacheTtlSeconds = 1800;
-$maxItems = 400;
+$maxItems = 500;
 $groups = [
     ['slug' => 'stations', 'network' => 'Crewed / Stations', 'limit' => 20],
-    ['slug' => 'starlink', 'network' => 'SpaceX Starlink', 'limit' => 120],
+    ['slug' => 'starlink', 'network' => 'SpaceX Starlink', 'limit' => 120, 'query' => 'NAME=starlink'],
     ['slug' => 'oneweb', 'network' => 'OneWeb', 'limit' => 50],
     ['slug' => 'gps-ops', 'network' => 'GPS', 'limit' => 35],
     ['slug' => 'galileo', 'network' => 'Galileo', 'limit' => 35],
@@ -41,7 +41,7 @@ $fetch = function ($url) {
     curl_setopt_array($curl, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT => 20,
+        CURLOPT_TIMEOUT => 30,
         CURLOPT_USERAGENT => 'Mozilla/5.0 (Intel Satellite Tracker)',
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2
@@ -64,9 +64,19 @@ $items = [];
 $errors = [];
 
 foreach ($groups as $group) {
-    $url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=' . rawurlencode($group['slug']) . '&FORMAT=tle';
+    $url = isset($group['query'])
+        ? 'https://celestrak.org/NORAD/elements/gp.php?' . $group['query'] . '&FORMAT=tle'
+        : 'https://celestrak.org/NORAD/elements/gp.php?GROUP=' . rawurlencode($group['slug']) . '&FORMAT=tle';
     [$raw, $httpCode, $error] = $fetch($url);
 
+    // CelesTrak returns 403 "not modified" for rate-limited groups — use cached data for those
+    if ($httpCode === 403 && $cached && isset($cached['items'])) {
+        $cachedGroupItems = array_filter($cached['items'], fn($i) => $i['network'] === $group['network']);
+        if (count($cachedGroupItems) > 0) {
+            $items = array_merge($items, array_slice(array_values($cachedGroupItems), 0, intval($group['limit'])));
+            continue;
+        }
+    }
     if ($raw === false || $httpCode >= 400 || trim((string) $raw) === '') {
         $errors[] = [
             'group' => $group['slug'],
