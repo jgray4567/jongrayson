@@ -2634,7 +2634,8 @@ function getSatelliteGlobeElements() {
 
 function getSatelliteOrbitPaths() {
   if (!satelliteLayerEnabled || !currentSatelliteCatalog.length || !window.satellite) return [];
-  const offsetsMinutes = [-30, -20, -10, 0, 10, 20, 30];
+  // More points for longer arcs: LEO ~95min orbit, MEO ~12hr, GEO ~24hr
+  const offsetsMinutes = [-45, -35, -25, -15, -5, 0, 5, 15, 25, 35, 45];
   return currentSatelliteCatalog.filter((satItem) => visibleSatelliteOrbits.has(satItem.orbitClass || 'LEO')).map((satItem) => {
     const points = offsetsMinutes.map((offsetMinutes) => {
       const state = computeSatelliteLiveState(satItem, new Date(Date.now() + (offsetMinutes * 60000)));
@@ -2644,7 +2645,7 @@ function getSatelliteOrbitPaths() {
     if (points.length < 2) return null;
     return {
       orbitClass: satItem.orbitClass || 'LEO',
-      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', 0.2),
+      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', (!highlightedOrbitClass || satItem.orbitClass === highlightedOrbitClass) ? 0.35 : 0.1),
       points
     };
   }).filter(Boolean);
@@ -3993,7 +3994,7 @@ function initOrUpdateGlobe(items = []) {
   if (satOrbitPaths.length) {
     overlayPaths.push(...satOrbitPaths.map(p => ({
       coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
-      color: satelliteOrbitColor(p.orbitClass || 'LEO', (!highlightedOrbitClass || p.orbitClass === highlightedOrbitClass) ? 0.2 : 0.08),
+      color: p.color,
       isOrbit: true
     })).filter(p => p.coords.length >= 2));
   }
@@ -4114,7 +4115,7 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.pathPoints(d => d.coords);
     intelGlobe.pathColor(d => d.color);
     intelGlobe.pathPointAlt(d => d.isOrbit ? 0 : (d.alt || 0));
-    intelGlobe.pathStroke(0.5);
+    intelGlobe.pathStroke(d => d.isOrbit ? 1.2 : 0.8);
     // Satellite custom layer (Three.js spheres at orbital altitude)
     if (satelliteLayerEnabled && satCustomData.length && _satCustomLayerSetup) {
       intelGlobe.customLayerData(satCustomData);
