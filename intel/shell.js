@@ -2309,7 +2309,7 @@ function getThreatHotspotPoints() {
       ringRepeatPeriod: 800,
       label: `<div style="text-align:center;color:#ff3333"><strong>${hs.name}</strong><br/>${hs.count} threats</div>`,
       shortLabel: hs.name,
-      raw: { kind: 'threat', type: 'Hotspot', country: hs.name, count: hs.count }
+      raw: { kind: 'threat', type: 'Hotspot', country: hs.name, count: hs.count, arcs: threatArcData.filter(a => a.srcCountry === hs.name) }
     });
   });
   // Small steady dots at every unique arc origin so arcs always start from a visible point
@@ -2330,7 +2330,7 @@ function getThreatHotspotPoints() {
       ringRepeatPeriod: 0,
       label: `<div style="text-align:center;color:#ff6644"><strong>${arc.srcCountry}</strong><br/>${arc.type}</div>`,
       shortLabel: arc.srcCountry,
-      raw: { kind: 'threat', type: arc.type, country: arc.srcCountry, count: 1 }
+      raw: { kind: 'threat', type: arc.type, country: arc.srcCountry, count: 1, arcs: threatArcData.filter(a => a.srcLat === arc.srcLat && a.srcLng === arc.srcLng) }
     });
   });
   return points;
@@ -3889,6 +3889,49 @@ function initOrUpdateGlobe(items = []) {
               const detailEl = tip.querySelector('#flight-tip-detail');
               if (detailEl) detailEl.textContent = 'Route info unavailable';
             });
+          } else if (point.raw.kind === 'threat') {
+            const t = point.raw;
+            const arcs = t.arcs || [];
+            const countryName = t.country || 'Unknown';
+            const countryCode = arcs.length ? (arcs[0].srcCountryCode || '') : '';
+            const flagUrl = countryCode ? `https://flagcdn.com/w80/${countryCode.toLowerCase()}.png` : '';
+            const typeEmoji = { 'SSH Brute Force': '🔐', 'DDoS': '💥', 'Malware C2': '🦠', 'Ransomware Probe': '🔒', 'Port Scan': '🔍', 'Web Exploit': '🕸️' };
+            // Group arcs by type
+            const typeCounts = {};
+            arcs.forEach(a => { typeCounts[a.type] = (typeCounts[a.type] || 0) + 1; });
+            const typeEntries = Object.entries(typeCounts).sort((a,b) => b[1] - a[1]);
+            // Top targets
+            const targetCounts = {};
+            arcs.forEach(a => { targetCounts[a.tgtName] = (targetCounts[a.tgtName] || 0) + 1; });
+            const targetEntries = Object.entries(targetCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            // Avg intensity
+            const avgIntensity = arcs.length ? (arcs.reduce((s,a) => s + a.intensity, 0) / arcs.length) : 0;
+            const intensityPct = Math.round(avgIntensity * 100);
+            const intensityColor = avgIntensity >= 0.8 ? '#ff2222' : avgIntensity >= 0.6 ? '#ff8844' : '#ffcc00';
+            tip.innerHTML = `
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;position:relative;">
+                ${flagUrl ? `<img src="${flagUrl}" style="width:48px;height:32px;object-fit:cover;border-radius:3px;border:1px solid rgba(255,255,255,0.1);" onerror="this.style.display='none'">` : '<span style="font-size:28px;">🔴</span>'}
+                <div style="flex:1;">
+                  <div style="font-weight:700;font-size:15px;color:#ff4444;">${countryName}</div>
+                  <div style="opacity:0.6;font-size:11px;">${t.type === 'Hotspot' ? 'Threat Hotspot' : t.type}</div>
+                </div>
+                <button style="position:absolute;top:-4px;right:-4px;background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:2px 4px;line-height:1;" onclick="this.closest('.globe-click-tooltip').remove()">✕</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:11px;margin-bottom:8px;">
+                <div><span style="opacity:0.5;">THREATS</span><br><span style="color:#ff4444;font-weight:600;">${t.count || arcs.length}</span></div>
+                <div><span style="opacity:0.5;">INTENSITY</span><br><span style="color:${intensityColor};font-weight:600;">${intensityPct}%</span></div>
+              </div>
+              ${typeEntries.length ? `
+              <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;margin-bottom:8px;">
+                <div style="opacity:0.5;font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Attack Types</div>
+                ${typeEntries.map(([type, cnt]) => `<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;"><span>${typeEmoji[type] || '⚠️'} ${type}</span><span style="opacity:0.7;">${cnt}</span></div>`).join('')}
+              </div>` : ''}
+              ${targetEntries.length ? `
+              <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;">
+                <div style="opacity:0.5;font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Top Targets</div>
+                ${targetEntries.map(([tgt, cnt]) => `<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;"><span>🎯 ${tgt}</span><span style="opacity:0.7;">${cnt}</span></div>`).join('')}
+              </div>` : ''}
+            `;
           } else {
             const name = point.label || point.locationName || 'Unknown';
             tip.innerHTML = `<div style="font-weight:600;font-size:14px;">📍 ${name}</div><div style="margin-top:8px;display:flex;gap:8px;"><button style="background:rgba(0,255,68,0.15);border:1px solid rgba(0,255,68,0.4);color:#00ff44;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;" onclick="this.closest('.globe-click-tooltip').remove()">Close</button></div>`;
