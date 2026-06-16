@@ -4156,7 +4156,7 @@ function initOrUpdateGlobe(items = []) {
     lat: s.lat, lng: s.lng, label: s.label,
     raw: s.raw,
     orbitClass: s.raw.orbitClass || 'LEO',
-    alt: s.raw.orbitClass === 'GEO' ? 0.25 : s.raw.orbitClass === 'MEO' ? 0.15 : 0.07,
+    alt: s.raw.orbitClass === 'GEO' ? 0.55 : s.raw.orbitClass === 'MEO' ? 0.35 : 0.15,
     size: s.raw.orbitClass === 'GEO' ? 0.6 : s.raw.orbitClass === 'MEO' ? 0.45 : 0.35,
     color: s.raw.orbitClass === 'GEO' ? 0xffee00 : s.raw.orbitClass === 'MEO' ? 0xff8800 : 0x00ff44
   }));
