@@ -3974,9 +3974,8 @@ function initOrUpdateGlobe(items = []) {
   const airPaths = getAirTrafficPaths();
   if (airPaths.length) {
     overlayPaths.push(...airPaths.map(p => ({
-      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng)),
-      color: p.color,
-      isAir: true
+      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: pt.alt || 0.01 })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng)),
+      color: p.color
     })).filter(p => p.coords.length >= 2));
   }
   if (overlayFlightPaths && overlayFlightPaths.length) {
@@ -3995,16 +3994,15 @@ function initOrUpdateGlobe(items = []) {
   const satOrbitPaths = getSatelliteOrbitPaths();
   if (satOrbitPaths.length) {
     overlayPaths.push(...satOrbitPaths.map(p => ({
-      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
-      color: p.color,
-      isOrbit: true
+      coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: 0.005 })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
+      color: p.color
     })).filter(p => p.coords.length >= 2));
   }
 
   // Air traffic points
   const airPoints = airLayerEnabled ? currentAirTrafficItems.filter(a => a.lat && a.lng).map(a => ({
     lat: a.lat, lng: a.lng, label: a.callsign || 'Aircraft',
-    raw: { ...a, kind: 'air' }, color: '#ffdd44', radius: 0.2, altitude: getAircraftAltitudeRatio(a.altitude || 0)
+    raw: { ...a, kind: 'air' }, color: '#ffdd44', radius: 0.2, altitude: 0
   })) : [];
 
   // Satellite points removed from pointsData — rendered via customLayerData (Three.js spheres)
@@ -4113,12 +4111,14 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.ringMaxRadius(d => d.ringMaxRadius || 1);
     intelGlobe.ringPropagationSpeed(1);
     intelGlobe.ringRepeatPeriod(2000);
+    console.log('[Intel] Paths:', overlayPaths.length, 'orbit:', satOrbitPaths?.length || 0, 'air:', airPaths?.length || 0);
+    console.log('[Intel] Sample orbit path:', satOrbitPaths?.[0]);
     intelGlobe.pathsData(overlayPaths);
     intelGlobe.pathPoints(d => d.coords);
     intelGlobe.pathPointLat(d => d.lat);
     intelGlobe.pathPointLng(d => d.lng);
     intelGlobe.pathColor(d => d.color);
-    intelGlobe.pathPointAlt(d => d.isOrbit ? 0.005 : (d.alt || 0.01));
+    intelGlobe.pathPointAlt(d => d.alt || 0.005);
     intelGlobe.pathStroke(null); // null = simple 1px line; FatLines don't support rgba
     // Satellite custom layer (Three.js spheres at orbital altitude)
     if (satelliteLayerEnabled && satCustomData.length && _satCustomLayerSetup) {
