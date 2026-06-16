@@ -4146,8 +4146,8 @@ function initOrUpdateGlobe(items = []) {
   const satClickTargets = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
     lat: s.lat, lng: s.lng, label: s.label,
     raw: s.raw,
-    color: s.raw.orbitClass === 'GEO' ? '#ffee00' : s.raw.orbitClass === 'MEO' ? '#ff8800' : '#00ff44',
-    radius: 0.35,
+    color: 'rgba(0,0,0,0)',
+    radius: 0.01,
     altitude: 0
   }));
 
@@ -4192,7 +4192,7 @@ function initOrUpdateGlobe(items = []) {
     type: 'city', color: p.color, label: p.label, raw: p.raw
   }));
   const htmlSatMarkers = notableSats.filter(s => s.lat && s.lng).map(s => ({
-    lat: s.lat, lng: s.lng, altitude: 0.005,
+    lat: s.lat, lng: s.lng, altitude: s.raw.orbitClass === 'GEO' ? 0.55 : s.raw.orbitClass === 'MEO' ? 0.35 : 0.15,
     type: 'sat', color: s.raw.orbitClass === 'GEO' ? '#ffee00' : s.raw.orbitClass === 'MEO' ? '#ff8800' : '#00ff44',
     label: s.label, raw: s.raw
   }));
