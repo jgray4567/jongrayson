@@ -4196,13 +4196,14 @@ function initOrUpdateGlobe(items = []) {
         el.setAttribute('data-label', d.label || 'Aircraft');
         el.style.cssText = `position:relative;transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;width:${hitSize}px;height:${hitSize}px;display:flex;align-items:center;justify-content:center;`;
         el.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:#ffdd44;box-shadow:0 0 6px #ffdd44,0 0 2px #ffdd44;"></div>`;
-        // Set selection and show flight path
-        const prevIcao = selectedAirIcao24;
-        selectedAirIcao24 = d.raw.icao24 || null;
-        selectedSatOrbit = null; selectedSatNetwork = null;
-        if (selectedAirIcao24 !== prevIcao && typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
-        if (d.raw) openIntelDrawer(d.raw);
-      });
+        el.addEventListener('click', () => {
+          // Set selection and show flight path
+          const prevIcao = selectedAirIcao24;
+          selectedAirIcao24 = d.raw.icao24 || null;
+          selectedSatOrbit = null; selectedSatNetwork = null;
+          if (selectedAirIcao24 !== prevIcao && typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
+          if (d.raw) openIntelDrawer(d.raw);
+        });
         return el;
       }
       // City tooltip marker
