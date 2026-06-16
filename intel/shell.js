@@ -3839,12 +3839,16 @@ function initOrUpdateGlobe(items = []) {
             const spdStr = fl.velocity ? Math.round(fl.velocity * 3.6) + ' km/h' : 'n/a';
             const hdgStr = fl.heading != null ? Math.round(fl.heading) + '°' : 'n/a';
             tip.innerHTML = `
-              <div style="position:relative;margin-bottom:8px;">
-                <div id="flight-tip-logo" style="width:100%;height:48px;border-radius:6px 6px 0 0;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;">✈</div>
-                <button style="position:absolute;top:4px;right:4px;background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:2px 4px;line-height:1;" onclick="this.closest('.globe-click-tooltip').remove()">✕</button>
+              <div style="position:relative;">
+                <button style="position:absolute;top:0;right:0;background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:2px 4px;line-height:1;z-index:2;" onclick="this.closest('.globe-click-tooltip').remove()">✕</button>
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                  <div id="flight-tip-logo" style="width:64px;height:48px;min-width:64px;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;">✈</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-weight:700;font-size:15px;color:#ffdd44;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fl.callsign || 'Unknown Flight'}</div>
+                    <div style="opacity:0.7;font-size:11px;">${fl.country || 'Public air traffic'}</div>
+                  </div>
+                </div>
               </div>
-              <div style="font-weight:700;font-size:15px;color:#ffdd44;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;">${fl.callsign || 'Unknown Flight'}</div>
-              <div style="opacity:0.7;font-size:11px;text-align:center;margin-bottom:8px;">${fl.country || 'Public air traffic'}</div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:11px;margin-bottom:8px;">
                 <div><span style="opacity:0.5;">ALT</span><br><span style="color:#e8eaed;">${altStr}</span></div>
                 <div><span style="opacity:0.5;">SPD</span><br><span style="color:#e8eaed;">${spdStr}</span></div>
@@ -3881,7 +3885,7 @@ function initOrUpdateGlobe(items = []) {
                 fetch(`api/airline-logos.php?callsign=${encodeURIComponent(fl.callsign || '')}&airline=${encodeURIComponent(detail.airline)}&w=120&h=120`)
                   .then(r => r.json()).then(logoData => {
                     if (logoData?.logoUrl && tip.parentNode) {
-                      logoEl.innerHTML = `<img src="${logoData.logoUrl}" style="width:100%;height:48px;object-fit:contain;" onerror="this.parentElement.innerHTML='✈'">`;
+                      logoEl.innerHTML = `<img src="${logoData.logoUrl}" style="width:64px;height:48px;object-fit:contain;" onerror="this.parentElement.innerHTML='✈'">`;
                     }
                   }).catch(() => {});
               }
