@@ -2464,7 +2464,7 @@ function getAirTrafficPaths() {
     const alpha = getFlightAlpha(flight, true);
     const altitude = getAircraftAltitudeRatio(flight.altitude || 0);
     return {
-      color: `rgba(210,255,84,${alpha})`,
+      color: '#d2ff54',
       points: [
         { lat: trailingPoint.lat, lng: trailingPoint.lng, alt: altitude },
         { lat: flight.lat, lng: flight.lng, alt: altitude },
@@ -2603,9 +2603,11 @@ function computeSatelliteLiveState(satItem, date = new Date()) {
 }
 
 function satelliteOrbitColor(orbitClass, alpha) {
-  if (orbitClass === 'LEO') return `rgba(0,255,68,${alpha})`;
-  if (orbitClass === 'GEO') return `rgba(255,238,0,${alpha})`;
-  return `rgba(255,136,0,${alpha})`;
+  // Return hex color (alpha not supported with simple lines)
+  if (orbitClass === 'LEO') return '#00ff44';
+  if (orbitClass === 'GEO') return '#ffee00';
+  return '#ff8800';
+}
 }
 
 function getSatelliteGlobeElements() {
@@ -4113,9 +4115,11 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.ringRepeatPeriod(2000);
     intelGlobe.pathsData(overlayPaths);
     intelGlobe.pathPoints(d => d.coords);
+    intelGlobe.pathPointLat(d => d.lat);
+    intelGlobe.pathPointLng(d => d.lng);
     intelGlobe.pathColor(d => d.color);
-    intelGlobe.pathPointAlt(d => d.isOrbit ? 0 : (d.alt || 0));
-    intelGlobe.pathStroke(d => d.isOrbit ? 1.2 : 0.8);
+    intelGlobe.pathPointAlt(d => d.isOrbit ? 0.005 : (d.alt || 0.01));
+    intelGlobe.pathStroke(null); // null = simple 1px line; FatLines don't support rgba
     // Satellite custom layer (Three.js spheres at orbital altitude)
     if (satelliteLayerEnabled && satCustomData.length && _satCustomLayerSetup) {
       intelGlobe.customLayerData(satCustomData);
