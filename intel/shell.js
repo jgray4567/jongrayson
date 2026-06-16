@@ -2608,7 +2608,6 @@ function satelliteOrbitColor(orbitClass, alpha) {
   if (orbitClass === 'GEO') return '#ffee00';
   return '#ff8800';
 }
-}
 
 function getSatelliteGlobeElements() {
   if (!satelliteLayerEnabled || !currentSatelliteCatalog.length || !window.satellite) return [];
