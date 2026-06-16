@@ -1416,3 +1416,439 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   0%, 100% { opacity: 0.7; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.3); }
 }
+
+/* =============================================
+   PALANTIR-STYLE CRIME INTELLIGENCE UI
+   ============================================= */
+
+/* Top Stats Ribbon */
+.palantir-stats-ribbon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  gap: 1px;
+  background: rgba(0,0,0,0.85);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 0;
+  backdrop-filter: blur(8px);
+}
+.palantir-stat {
+  flex: 1;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.palantir-stat:last-child { border-right: none; }
+.palantir-stat-label {
+  color: var(--muted);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+.palantir-stat-value {
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+}
+.palantir-stat-value.violent { color: #ff1744; }
+.palantir-stat-value.property { color: #2979ff; }
+.palantir-stat-value.drug { color: #00e676; }
+.palantir-stat-value.threats { color: #ff9100; }
+.palantir-stat-value.hotspots { color: #ffea00; }
+
+/* Left Rail Filter Panel */
+.palantir-left-rail {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  bottom: 60px;
+  width: 220px;
+  z-index: 1000;
+  background: rgba(10,10,14,0.92);
+  border-right: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+.palantir-left-rail.collapsed {
+  transform: translateX(-220px);
+}
+.palantir-rail-section {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.palantir-rail-title {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.palantir-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  margin: 2px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  transition: all 0.15s;
+}
+.palantir-filter-chip.active { border-color: var(--chip-color, var(--lime)); background: rgba(255,255,255,0.08); }
+.palantir-filter-chip .chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.palantir-filter-chip:hover { background: rgba(255,255,255,0.1); }
+.palantir-date-range {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.palantir-date-range input[type="date"] {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 4px 6px;
+  border-radius: 3px;
+  outline: none;
+}
+.palantir-date-range input[type="date"]:focus { border-color: var(--lime); }
+.palantir-zone-select {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 4px 6px;
+  border-radius: 3px;
+  outline: none;
+}
+.palantir-zone-select option { background: #1a1a1e; }
+
+/* Severity Toggle */
+.palantir-severity-toggle {
+  display: flex;
+  gap: 4px;
+}
+.palantir-severity-btn {
+  flex: 1;
+  padding: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-align: center;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+.palantir-severity-btn.active { color: var(--text); background: rgba(255,255,255,0.1); }
+.palantir-severity-btn:hover { background: rgba(255,255,255,0.08); }
+
+/* Incident Detail Drawer (Right) */
+.palantir-drawer {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  bottom: 60px;
+  width: 340px;
+  z-index: 1000;
+  background: rgba(10,10,14,0.95);
+  border-left: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  overflow-y: auto;
+  transform: translateX(340px);
+  transition: transform 0.3s ease;
+}
+.palantir-drawer.open { transform: translateX(0); }
+.palantir-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.palantir-drawer-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.palantir-drawer-close {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.palantir-drawer-close:hover { color: var(--text); border-color: var(--text); }
+.palantir-drawer-body { padding: 14px 16px; }
+.palantir-drawer-section {
+  margin-bottom: 16px;
+}
+.palantir-drawer-section-title {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.palantir-drawer-field {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.palantir-drawer-field .label { color: var(--muted); }
+.palantir-drawer-field .value { color: var(--text); font-weight: 500; }
+.palantir-drawer-related {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.palantir-related-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.palantir-related-item:hover { background: rgba(255,255,255,0.08); }
+.palantir-related-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+/* Pattern Detection Panel */
+.palantir-pattern-panel {
+  max-height: 200px;
+  overflow-y: auto;
+}
+.palantir-pattern-item {
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 3px;
+  border-left: 3px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.palantir-pattern-item:hover { background: rgba(255,255,255,0.06); }
+.palantir-pattern-item.pattern-volatile { border-left-color: #ff1744; }
+.palantir-pattern-item.pattern-rising { border-left-color: #ff9100; }
+.palantir-pattern-item.pattern-stable { border-left-color: #00e676; }
+.palantir-pattern-type {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.palantir-pattern-desc {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text);
+  margin-top: 2px;
+}
+.palantir-pattern-meta {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Bottom Timeline Bar */
+.palantir-timeline-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  z-index: 1000;
+  background: rgba(10,10,14,0.92);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: stretch;
+}
+.palantir-timeline-controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 12px;
+  border-right: 1px solid var(--border);
+  min-width: 140px;
+}
+.palantir-timeline-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.palantir-timeline-range {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text);
+  margin-top: 2px;
+}
+.palantir-timeline-chart {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+.palantir-timeline-chart canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Watchlist / Priority Panel */
+.palantir-watchlist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.palantir-watchlist-item:hover { background: rgba(255,255,255,0.08); }
+.palantir-watchlist-star {
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.palantir-watchlist-star.active { color: #ffd600; }
+.palantir-watchlist-star:not(.active) { color: var(--muted); }
+
+/* Analyst Notes */
+.palantir-notes-area {
+  width: 100%;
+  min-height: 60px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 8px;
+  border-radius: 3px;
+  resize: vertical;
+  outline: none;
+}
+.palantir-notes-area:focus { border-color: var(--lime); }
+.palantir-notes-area::placeholder { color: rgba(255,255,255,0.2); }
+
+/* Export Brief Button */
+.palantir-export-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px;
+  background: rgba(0,255,68,0.08);
+  border: 1px solid rgba(0,255,68,0.3);
+  color: var(--lime);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s;
+}
+.palantir-export-btn:hover {
+  background: rgba(0,255,68,0.15);
+  border-color: var(--lime);
+}
+
+/* Rail Toggle Button */
+.palantir-rail-toggle {
+  position: absolute;
+  top: 60px;
+  left: 8px;
+  z-index: 1001;
+  background: rgba(10,10,14,0.85);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  backdrop-filter: blur(8px);
+  transition: all 0.15s;
+}
+.palantir-rail-toggle:hover { background: rgba(255,255,255,0.1); border-color: var(--text); }
+
+/* Glowing crime markers */
+.crime-marker-pulse {
+  animation: crimePulse 2s ease-in-out infinite;
+}
+@keyframes crimePulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .palantir-left-rail { width: 180px; transform: translateX(-180px); }
+  .palantir-left-rail.open { transform: translateX(0); }
+  .palantir-drawer { width: 100%; }
+  .palantir-stat { padding: 4px 6px; }
+  .palantir-stat-value { font-size: 13px; }
+  .palantir-stat-label { font-size: 8px; }
+  .palantir-timeline-controls { min-width: 100px; }
+}
+@media (max-width: 480px) {
+  .palantir-stats-ribbon { flex-wrap: wrap; }
+  .palantir-stat { flex: 0 0 33.33%; }
+  .palantir-left-rail { width: 100%; }
+  .palantir-timeline-bar { height: 50px; }
+}

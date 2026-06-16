@@ -8,7 +8,7 @@
   <meta name="description" content="Intel build 201, Geographic Intel Projection, mapping structural states to global visualization inside jongrayson.com.">
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="dns-prefetch" href="https://unpkg.com">
-  <link rel="stylesheet" href="styles.css?v=0.010.07">
+  <link rel="stylesheet" href="styles.css?v=0.010.08">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/globe.gl@2.46.1/dist/globe.gl.min.js"></script>
   <script type="module" src="three-global.js?v=0.009.16"></script>
@@ -174,7 +174,136 @@
           </div>
         </div>
       </div>
-          <div id="intel-map-stage" style="display:none; height:100%; width:100%; position: relative;"><div id="detail-panel" class="detail-panel"><div class="detail-panel-header"><button id="detail-panel-close" class="detail-panel-close" aria-label="Close">✕</button></div><div id="detail-panel-content" class="detail-panel-content"></div></div></div>
+          <div id="intel-map-stage" style="display:none; height:100%; width:100%; position: relative;">
+            <div id="palantir-stats-ribbon" class="palantir-stats-ribbon" style="display:none;">
+              <div class="palantir-stat"><div class="palantir-stat-label">Total Incidents</div><div class="palantir-stat-value" id="pstat-total">—</div></div>
+              <div class="palantir-stat"><div class="palantir-stat-label">Violent</div><div class="palantir-stat-value violent" id="pstat-violent">—</div></div>
+              <div class="palantir-stat"><div class="palantir-stat-label">Property</div><div class="palantir-stat-value property" id="pstat-property">—</div></div>
+              <div class="palantir-stat"><div class="palantir-stat-label">Drug</div><div class="palantir-stat-value drug" id="pstat-drug">—</div></div>
+              <div class="palantir-stat"><div class="palantir-stat-label">Active Threats</div><div class="palantir-stat-value threats" id="pstat-threats">—</div></div>
+              <div class="palantir-stat"><div class="palantir-stat-label">Hotspots</div><div class="palantir-stat-value hotspots" id="pstat-hotspots">—</div></div>
+            </div>
+
+            <button id="palantir-rail-toggle" class="palantir-rail-toggle" style="display:none;">☰</button>
+            <div id="palantir-left-rail" class="palantir-left-rail collapsed" style="display:none;">
+              <div class="palantir-rail-section">
+                <div class="palantir-rail-title">Crime Categories</div>
+                <div id="palantir-category-filters">
+                  <button class="palantir-filter-chip active" data-category="Violent" style="--chip-color:#ff1744;"><span class="chip-dot" style="background:#ff1744;"></span>Violent</button>
+                  <button class="palantir-filter-chip active" data-category="Property" style="--chip-color:#2979ff;"><span class="chip-dot" style="background:#2979ff;"></span>Property</button>
+                  <button class="palantir-filter-chip active" data-category="Drug" style="--chip-color:#00e676;"><span class="chip-dot" style="background:#00e676;"></span>Drug</button>
+                  <button class="palantir-filter-chip active" data-category="Other" style="--chip-color:#78909c;"><span class="chip-dot" style="background:#78909c;"></span>Other</button>
+                </div>
+              </div>
+              <div class="palantir-rail-section">
+                <div class="palantir-rail-title">Date Range</div>
+                <div class="palantir-date-range">
+                  <input type="date" id="palantir-date-from">
+                  <span style="color:var(--muted);font-family:var(--font-mono);font-size:10px;">→</span>
+                  <input type="date" id="palantir-date-to">
+                </div>
+              </div>
+              <div class="palantir-rail-section">
+                <div class="palantir-rail-title">Zone</div>
+                <select id="palantir-zone-select" class="palantir-zone-select">
+                  <option value="all">All Zones</option>
+                  <option value="1">Zone 1</option>
+                  <option value="2">Zone 2</option>
+                  <option value="3">Zone 3</option>
+                  <option value="4">Zone 4</option>
+                  <option value="5">Zone 5</option>
+                  <option value="6">Zone 6</option>
+                </select>
+              </div>
+              <div class="palantir-rail-section">
+                <div class="palantir-rail-title">Severity</div>
+                <div class="palantir-severity-toggle">
+                  <button class="palantir-severity-btn active" data-severity="all">All</button>
+                  <button class="palantir-severity-btn" data-severity="high">High</button>
+                  <button class="palantir-severity-btn" data-severity="medium">Med</button>
+                  <button class="palantir-severity-btn" data-severity="low">Low</button>
+                </div>
+              </div>
+              <div class="palantir-rail-section">
+                <div class="palantir-rail-title">Overlay</div>
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                  <button id="palantir-toggle-heatmap" class="palantir-filter-chip active" style="width:100%;justify-content:center;--chip-color:#ff6d00;"><span class="chip-dot" style="background:#ff6d00;"></span>Heatmap</button>
+                  <button id="palantir-toggle-clusters" class="palantir-filter-chip" style="width:100%;justify-content:center;--chip-color:#7c4dff;"><span class="chip-dot" style="background:#7c4dff;"></span>Clusters</button>
+                  <button id="palantir-toggle-danger" class="palantir-filter-chip" style="width:100%;justify-content:center;--chip-color:#ff1744;"><span class="chip-dot" style="background:#ff1744;"></span>Threats</button>
+                </div>
+              </div>
+              <div class="palantir-rail-section">
+                <div class="palantir-rail-title">Pattern Detection</div>
+                <div id="palantir-pattern-panel" class="palantir-pattern-panel"></div>
+              </div>
+              <div class="palantir-rail-section">
+                <div class="palantir-rail-title">Watchlist <span id="palantir-watchlist-count" style="color:var(--lime);">0</span></div>
+                <div id="palantir-watchlist-panel"></div>
+              </div>
+              <div class="palantir-rail-section">
+                <div class="palantir-rail-title">Analysis Notes</div>
+                <textarea id="palantir-notes" class="palantir-notes-area" placeholder="Type notes here..."></textarea>
+              </div>
+              <div class="palantir-rail-section">
+                <button id="palantir-export-brief" class="palantir-export-btn">⬇ Export Intelligence Brief</button>
+              </div>
+            </div>
+
+            <div id="palantir-drawer" class="palantir-drawer">
+              <div class="palantir-drawer-header">
+                <div>
+                  <div id="palantir-drawer-category" class="palantir-drawer-category"></div>
+                  <div id="palantir-drawer-title" style="font-family:var(--font-mono);font-size:13px;color:var(--text);margin-top:6px;"></div>
+                </div>
+                <button id="palantir-drawer-close" class="palantir-drawer-close">✕</button>
+              </div>
+              <div id="palantir-drawer-body" class="palantir-drawer-body"></div>
+            </div>
+
+            <div id="palantir-timeline-bar" class="palantir-timeline-bar" style="display:none;">
+              <div class="palantir-timeline-controls">
+                <div class="palantir-timeline-label">Timeline</div>
+                <div id="palantir-timeline-range" class="palantir-timeline-range">—</div>
+              </div>
+              <div class="palantir-timeline-chart"><canvas id="palantir-timeline-canvas"></canvas></div>
+            </div>
+
+            <div id="detail-panel" class="detail-panel"><div class="detail-panel-header"><button id="detail-panel-close" class="detail-panel-close" aria-label="Close">✕</button></div><div id="detail-panel-content" class="detail-panel-content"></div></div>
+          </div>
+              <div class="panel" style="margin: 16px; padding: 16px;">
+                <div class="panel-kicker">Category Filters</div>
+                <div class="filter-row" style="margin-top: 12px; flex-wrap: wrap; gap: 8px;">
+                  <button class="crime-chip active" data-category="Violent" style="--chip-color:#ff1744;">Violent</button>
+                  <button class="crime-chip active" data-category="Property" style="--chip-color:#2979ff;">Property</button>
+                  <button class="crime-chip active" data-category="Drug" style="--chip-color:#00e676;">Drug</button>
+                  <button class="crime-chip active" data-category="Other" style="--chip-color:#78909c;">Other</button>
+                </div>
+                
+                <div class="panel-kicker" style="margin-top: 24px;">Time Range</div>
+                <div style="margin-top: 12px;">
+                  <input type="date" id="date-from" class="map-control-select" style="width: 100%; margin-bottom: 8px;">
+                  <input type="date" id="date-to" class="map-control-select" style="width: 100%;">
+                </div>
+                
+                <div class="panel-kicker" style="margin-top: 24px;">Severity</div>
+                <div class="filter-row" style="margin-top: 12px;">
+                  <button class="ghost-btn" id="toggle-violent-only">Violent Crimes Only</button>
+                </div>
+                
+                <div class="panel-kicker" style="margin-top: 24px;">Zone Selector</div>
+                <div class="filter-row" style="margin-top: 12px; flex-wrap: wrap; gap: 8px;">
+                  <button class="crime-chip" data-zone="1" style="--chip-color:#d32f2f;">Zone 1</button>
+                  <button class="crime-chip" data-zone="2" style="--chip-color:#1976d2;">Zone 2</button>
+                  <button class="crime-chip" data-zone="3" style="--chip-color:#388e3c;">Zone 3</button>
+                  <button class="crime-chip" data-zone="4" style="--chip-color:#f57c00;">Zone 4</button>
+                  <button class="crime-chip" data-zone="5" style="--chip-color:#7b1fa2;">Zone 5</button>
+                  <button class="crime-chip" data-zone="6" style="--chip-color:#c2185b;">Zone 6</button>
+                </div>
+              </div>
+            </div>
+            
+
+          </div>
           <div id="intel-graph-stage" style="display:none; height:100%; width:100%; position: relative; background: var(--surface);"></div>
         </section>
 
@@ -240,6 +369,7 @@
     </main>
   </div>
 
-  <script src="shell.js?v=0.009.31"></script>
+  <script src="shell.js?v=0.009.32"></script>
+  <script src="palantir-crime.js?v=0.001"></script>
 </body>
 </html>

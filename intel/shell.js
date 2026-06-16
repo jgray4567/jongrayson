@@ -3635,6 +3635,8 @@ function renderCityCrimeMap(item = {}) {
       pittsburghSelectedMonth = null; // reset so default kicks in
       syncPittsburghMonthControl(true);
       bindMonthSelect();
+      // Initialize Palantir crime intelligence UI
+      if (typeof initPalantirCrimeUI === 'function') initPalantirCrimeUI();
     }).catch(console.error);
   } else {
     /*
