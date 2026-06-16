@@ -3797,8 +3797,8 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png');
       intelGlobe.backgroundColor('#050505');
       intelGlobe.showAtmosphere(true);
-      intelGlobe.atmosphereColor('#4488ff');
-      intelGlobe.atmosphereAltitude(0.12);
+      intelGlobe.atmosphereColor('#6ab0ff');
+      intelGlobe.atmosphereAltitude(0.25);
       intelGlobe.showGraticules(false);
       intelGlobe.pointRadius(0.25);
       intelGlobe.pointAltitude(0);
