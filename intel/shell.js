@@ -124,12 +124,14 @@ function setupSatelliteCustomLayer() {
     })
     .customThreeObjectUpdate((obj, d) => {
       Object.assign(obj.position, intelGlobe.getCoords(d.lat, d.lng, d.alt));
-      // Highlight/fade based on selected orbit class
+      // Highlight/fade: highlighted satellites turn white, others fade 50%
       const isHighlighted = !highlightedOrbitClass || d.orbitClass === highlightedOrbitClass;
+      const displayColor = isHighlighted ? 0xffffff : d.color; // white when highlighted
       const targetOpacity = isHighlighted ? 0.95 : 0.4; // fade non-highlighted to ~50%
       const targetGlowOpacity = isHighlighted ? 0.12 : 0.05;
       obj.children.forEach(child => {
         if (child.material) {
+          child.material.color.setHex(displayColor);
           child.material.opacity = child.material.userData?.isGlow ? targetGlowOpacity : targetOpacity;
           child.material.needsUpdate = true;
         }
@@ -2250,16 +2252,9 @@ function syncSatelliteToggle() {
       if (btn) {
         const on = visibleSatelliteOrbits.has(cls);
         const highlighted = highlightedOrbitClass === cls;
+        btn.classList.toggle('active', highlighted);
         btn.style.opacity = on ? '1' : '0.35';
         btn.style.textDecoration = on ? 'none' : 'line-through';
-        // Highlighted class gets a glow effect
-        if (highlighted) {
-          btn.style.boxShadow = '0 0 8px 2px currentColor';
-          btn.style.transform = 'scale(1.1)';
-        } else {
-          btn.style.boxShadow = 'none';
-          btn.style.transform = 'scale(1)';
-        }
       }
     });
   }
@@ -3931,7 +3926,7 @@ function initOrUpdateGlobe(items = []) {
   if (satOrbitPaths.length) {
     overlayPaths.push(...satOrbitPaths.map(p => ({
       coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
-      color: satelliteOrbitColor(p.orbitClass || 'LEO', (!highlightedOrbitClass || p.orbitClass === highlightedOrbitClass) ? 0.2 : 0.06),
+      color: satelliteOrbitColor(p.orbitClass || 'LEO', (!highlightedOrbitClass || p.orbitClass === highlightedOrbitClass) ? 0.2 : 0.08),
       isOrbit: true
     })).filter(p => p.coords.length >= 2));
   }
