@@ -46,7 +46,7 @@ function initPalantirCrimeUI() {
   if (notesEl) notesEl.value = palantirNotes;
 
   // Bind category filters
-  document.querySelectorAll('#palantir-category-filters .palantir-filter-chip').forEach(btn => {
+  document.querySelectorAll('#palantir-category-filters .palantir-cat-bar').forEach(btn => {
     btn.addEventListener('click', () => {
       const cat = btn.dataset.category;
       btn.classList.toggle('active');
@@ -205,6 +205,7 @@ function updatePalantirStats(crimes) {
   const violent = crimes.filter(c => c.category === 'Violent').length;
   const property = crimes.filter(c => c.category === 'Property').length;
   const drug = crimes.filter(c => c.category === 'Drug').length;
+  const other = crimes.filter(c => c.category === 'Other').length;
 
   // Count hotspots (grid cells with 5+ incidents)
   const grid = {};
@@ -224,6 +225,35 @@ function updatePalantirStats(crimes) {
   if (el('pstat-drug')) el('pstat-drug').textContent = drug.toLocaleString();
   if (el('pstat-threats')) el('pstat-threats').textContent = threats;
   if (el('pstat-hotspots')) el('pstat-hotspots').textContent = hotspots;
+
+  // Update time
+  const timeEl = el('palantir-update-time');
+  if (timeEl) {
+    const now = new Date();
+    timeEl.textContent = `Updated ${now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'})}`;
+  }
+
+  // Update category bars
+  const maxCat = Math.max(violent, property, drug, other, 1);
+  const barData = [
+    { id: 'pbar-violent', count: violent, pct: (violent / maxCat * 100) },
+    { id: 'pbar-property', count: property, pct: (property / maxCat * 100) },
+    { id: 'pbar-drug', count: drug, pct: (drug / maxCat * 100) },
+    { id: 'pbar-other', count: other, pct: (other / maxCat * 100) }
+  ];
+  barData.forEach(b => {
+    const countEl = el(b.id);
+    if (countEl) countEl.textContent = b.count.toLocaleString();
+    const barBtn = countEl?.closest('.palantir-cat-bar');
+    const fill = barBtn?.querySelector('.palantir-cat-bar-fill');
+    if (fill) fill.style.width = b.pct + '%';
+  });
+
+  // Render donut chart
+  renderPalantirDonut(violent, property, drug, other);
+
+  // Render sparklines
+  renderPalantirSparklines(crimes);
 }
 
 function renderPalantirMarkers(crimes) {
@@ -566,3 +596,95 @@ window.openPalantirDrawer = openPalantirDrawer;
 window.closePalantirDrawer = closePalantirDrawer;
 window.togglePalantirWatchlistItem = togglePalantirWatchlistItem;
 window.exportPalantirBrief = exportPalantirBrief;
+
+// ── Donut Chart ──
+function renderPalantirDonut(violent, property, drug, other) {
+  const svg = document.getElementById('palantir-donut');
+  const legend = document.getElementById('palantir-donut-legend');
+  if (!svg || !legend) return;
+
+  const total = violent + property + drug + other;
+  if (total === 0) {
+    svg.innerHTML = '';
+    legend.innerHTML = '<div style="color:var(--muted);font-family:var(--font-mono);font-size:9px;">No data</div>';
+    return;
+  }
+
+  const segments = [
+    { label: 'Violent', count: violent, color: '#ff1744' },
+    { label: 'Property', count: property, color: '#2979ff' },
+    { label: 'Drug', count: drug, color: '#00e676' },
+    { label: 'Other', count: other, color: '#78909c' }
+  ].filter(s => s.count > 0);
+
+  const cx = 40, cy = 40, r = 28, strokeWidth = 12;
+  const circumference = 2 * Math.PI * r;
+  let offset = 0;
+
+  let paths = '';
+  segments.forEach(s => {
+    const pct = s.count / total;
+    const dashLen = pct * circumference;
+    paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="${strokeWidth}" stroke-dasharray="${dashLen} ${circumference - dashLen}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})" style="transition:stroke-dasharray 0.5s ease,stroke-dashoffset 0.5s ease;"/>`;
+    offset += dashLen;
+  });
+
+  svg.innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="${strokeWidth}"/>${paths}<text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="var(--text)" font-family="var(--font-mono)" font-size="14" font-weight="700">${total.toLocaleString()}</text><text x="${cx}" y="${cy + 10}" text-anchor="middle" fill="var(--muted)" font-family="var(--font-mono)" font-size="7" letter-spacing="0.1em">TOTAL</text>`;
+
+  legend.innerHTML = segments.map(s => `
+    <div style="display:flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:9px;">
+      <span style="width:8px;height:8px;border-radius:50%;background:${s.color};flex-shrink:0;"></span>
+      <span style="color:var(--text);flex:1;">${s.label}</span>
+      <span style="color:var(--muted);font-variant-numeric:tabular-nums;">${s.count}</span>
+    </div>
+  `).join('');
+}
+
+// ── Sparklines ──
+function renderPalantirSparklines(crimes) {
+  // Group crimes by day for last 7 days
+  const now = new Date();
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    days.push(key);
+  }
+
+  const countsByDay = { total: {}, Violent: {}, Property: {}, Drug: {} };
+  days.forEach(d => { countsByDay.total[d] = 0; countsByDay.Violent[d] = 0; countsByDay.Property[d] = 0; countsByDay.Drug[d] = 0; });
+
+  crimes.forEach(c => {
+    if (!c.time) return;
+    const key = c.time.slice(0, 10);
+    if (countsByDay.total[key] !== undefined) {
+      countsByDay.total[key]++;
+      if (countsByDay[c.category]) countsByDay[c.category][key]++;
+    }
+  });
+
+  drawSparkline('spark-total', days.map(d => countsByDay.total[d]), '#e8f4f8');
+  drawSparkline('spark-violent', days.map(d => countsByDay.Violent[d]), '#ff1744');
+  drawSparkline('spark-property', days.map(d => countsByDay.Property[d]), '#2979ff');
+  drawSparkline('spark-drug', days.map(d => countsByDay.Drug[d]), '#00e676');
+}
+
+function drawSparkline(svgId, values, color) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  const w = 60, h = 24, pad = 2;
+  const max = Math.max(...values, 1);
+  const min = 0;
+  const range = max - min || 1;
+  const points = values.map((v, i) => {
+    const x = pad + (i / (values.length - 1 || 1)) * (w - pad * 2);
+    const y = h - pad - ((v - min) / range) * (h - pad * 2);
+    return `${x},${y}`;
+  }).join(' ');
+  const areaPoints = points + ` ${pad + (w - pad * 2)},${h - pad} ${pad},${h - pad}`;
+  svg.innerHTML = `
+    <polygon points="${areaPoints}" fill="${color}" opacity="0.12"/>
+    <polyline points="${points}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+  `;
+}

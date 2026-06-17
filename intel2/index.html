@@ -156,23 +156,78 @@
       </div>
           <div id="intel-map-stage" style="display:none; height:100%; width:100%; position: relative;">
             <div id="palantir-stats-ribbon" class="palantir-stats-ribbon" style="display:none;">
-              <div class="palantir-stat"><div class="palantir-stat-label">Total Incidents</div><div class="palantir-stat-value" id="pstat-total">—</div></div>
-              <div class="palantir-stat"><div class="palantir-stat-label">Violent</div><div class="palantir-stat-value violent" id="pstat-violent">—</div></div>
-              <div class="palantir-stat"><div class="palantir-stat-label">Property</div><div class="palantir-stat-value property" id="pstat-property">—</div></div>
-              <div class="palantir-stat"><div class="palantir-stat-label">Drug</div><div class="palantir-stat-value drug" id="pstat-drug">—</div></div>
-              <div class="palantir-stat"><div class="palantir-stat-label">Active Threats</div><div class="palantir-stat-value threats" id="pstat-threats">—</div></div>
-              <div class="palantir-stat"><div class="palantir-stat-label">Hotspots</div><div class="palantir-stat-value hotspots" id="pstat-hotspots">—</div></div>
+              <div class="palantir-stat palantir-stat-live">
+                <div class="palantir-stat-label"><span class="palantir-live-dot"></span>LIVE FEED</div>
+                <div class="palantir-stat-value" id="pstat-total">—</div>
+                <svg class="palantir-sparkline" id="spark-total" width="60" height="24" viewBox="0 0 60 24"></svg>
+              </div>
+              <div class="palantir-stat">
+                <div class="palantir-stat-label" style="color:#ff1744;">Violent</div>
+                <div class="palantir-stat-value violent" id="pstat-violent">—</div>
+                <svg class="palantir-sparkline" id="spark-violent" width="60" height="24" viewBox="0 0 60 24"></svg>
+              </div>
+              <div class="palantir-stat">
+                <div class="palantir-stat-label" style="color:#2979ff;">Property</div>
+                <div class="palantir-stat-value property" id="pstat-property">—</div>
+                <svg class="palantir-sparkline" id="spark-property" width="60" height="24" viewBox="0 0 60 24"></svg>
+              </div>
+              <div class="palantir-stat">
+                <div class="palantir-stat-label" style="color:#00e676;">Drug</div>
+                <div class="palantir-stat-value drug" id="pstat-drug">—</div>
+                <svg class="palantir-sparkline" id="spark-drug" width="60" height="24" viewBox="0 0 60 24"></svg>
+              </div>
+              <div class="palantir-stat">
+                <div class="palantir-stat-label">Active Threats</div>
+                <div class="palantir-stat-value threats" id="pstat-threats">—</div>
+              </div>
+              <div class="palantir-stat">
+                <div class="palantir-stat-label">Hotspots</div>
+                <div class="palantir-stat-value hotspots" id="pstat-hotspots">—</div>
+              </div>
             </div>
 
             <button id="palantir-rail-toggle" class="palantir-rail-toggle" style="display:none;">☰</button>
-            <div id="palantir-left-rail" class="palantir-left-rail collapsed" style="display:none;">
+            <div id="palantir-left-rail" class="palantir-left-rail open" style="display:none;">
+              <!-- Live Feed Header -->
+              <div class="palantir-rail-section palantir-live-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="palantir-live-dot"></span>
+                  <span style="font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text);">Live Feed</span>
+                </div>
+                <div id="palantir-update-time" style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:4px;">—</div>
+              </div>
+              <!-- Donut Distribution -->
+              <div class="palantir-rail-section">
+                <div class="palantir-rail-title">Distribution</div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <svg id="palantir-donut" width="80" height="80" viewBox="0 0 80 80"></svg>
+                  <div id="palantir-donut-legend" style="flex:1;display:flex;flex-direction:column;gap:3px;"></div>
+                </div>
+              </div>
+              <!-- Category Bars -->
               <div class="palantir-rail-section">
                 <div class="palantir-rail-title">Crime Categories</div>
-                <div id="palantir-category-filters">
-                  <button class="palantir-filter-chip active" data-category="Violent" style="--chip-color:#ff1744;"><span class="chip-dot" style="background:#ff1744;"></span>Violent</button>
-                  <button class="palantir-filter-chip active" data-category="Property" style="--chip-color:#2979ff;"><span class="chip-dot" style="background:#2979ff;"></span>Property</button>
-                  <button class="palantir-filter-chip active" data-category="Drug" style="--chip-color:#00e676;"><span class="chip-dot" style="background:#00e676;"></span>Drug</button>
-                  <button class="palantir-filter-chip active" data-category="Other" style="--chip-color:#78909c;"><span class="chip-dot" style="background:#78909c;"></span>Other</button>
+                <div id="palantir-category-filters" class="palantir-category-bars">
+                  <button class="palantir-cat-bar active" data-category="Violent" style="--cat-color:#ff1744;">
+                    <span class="palantir-cat-bar-fill" style="width:0%;"></span>
+                    <span class="palantir-cat-bar-label"><span class="palantir-cat-dot" style="background:#ff1744;"></span>Violent</span>
+                    <span class="palantir-cat-bar-count" id="pbar-violent">0</span>
+                  </button>
+                  <button class="palantir-cat-bar active" data-category="Property" style="--cat-color:#2979ff;">
+                    <span class="palantir-cat-bar-fill" style="width:0%;"></span>
+                    <span class="palantir-cat-bar-label"><span class="palantir-cat-dot" style="background:#2979ff;"></span>Property</span>
+                    <span class="palantir-cat-bar-count" id="pbar-property">0</span>
+                  </button>
+                  <button class="palantir-cat-bar active" data-category="Drug" style="--cat-color:#00e676;">
+                    <span class="palantir-cat-bar-fill" style="width:0%;"></span>
+                    <span class="palantir-cat-bar-label"><span class="palantir-cat-dot" style="background:#00e676;"></span>Drug</span>
+                    <span class="palantir-cat-bar-count" id="pbar-drug">0</span>
+                  </button>
+                  <button class="palantir-cat-bar active" data-category="Other" style="--cat-color:#78909c;">
+                    <span class="palantir-cat-bar-fill" style="width:0%;"></span>
+                    <span class="palantir-cat-bar-label"><span class="palantir-cat-dot" style="background:#78909c;"></span>Other</span>
+                    <span class="palantir-cat-bar-count" id="pbar-other">0</span>
+                  </button>
                 </div>
               </div>
               <div class="palantir-rail-section">
