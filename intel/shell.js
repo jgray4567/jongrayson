@@ -4135,8 +4135,9 @@ function initOrUpdateGlobe(items = []) {
     })));
   }
   // Satellite orbit trail — only for selected satellite
+  let satOrbitPaths = [];
   if (selectedSatOrbit || selectedSatNetwork) {
-    const satOrbitPaths = getSatelliteOrbitPaths().filter(p => {
+    satOrbitPaths = getSatelliteOrbitPaths().filter(p => {
       if (selectedSatNetwork) return true; // show all orbits in selected network
       return p.orbitClass === selectedSatOrbit;
     });
@@ -4288,7 +4289,7 @@ function initOrUpdateGlobe(items = []) {
     intelGlobe.ringMaxRadius(d => d.ringMaxRadius || 1);
     intelGlobe.ringPropagationSpeed(1);
     intelGlobe.ringRepeatPeriod(2000);
-    console.log('[Intel] Paths:', overlayPaths.length, 'orbit:', satOrbitPaths?.length || 0, 'air:', airPaths?.length || 0);
+    console.log('[Intel] Paths:', overlayPaths.length, 'orbit:', satOrbitPaths.length);
     if (satOrbitPaths?.length) {
       const sample = satOrbitPaths[0];
       console.log('[Intel] Sample orbit:', sample.orbitClass, 'points:', sample.points?.length, 'color:', sample.color, 'coords sample:', sample.points?.[0]);
