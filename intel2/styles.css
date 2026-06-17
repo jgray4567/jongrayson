@@ -2088,17 +2088,61 @@ body[data-interaction-mode="mobile"] .map-hover-card {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
-  .palantir-left-rail { width: 180px; transform: translateX(-180px); }
-  .palantir-left-rail.open { transform: translateX(0); }
-  .palantir-drawer { width: 100%; }
-  .palantir-stat { padding: 4px 6px; }
-  .palantir-stat-value { font-size: 13px; }
+  .palantir-stats-ribbon {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 56px;
+  }
+  .palantir-stat {
+    flex: 0 0 33.33%;
+    padding: 6px 8px;
+  }
+  .palantir-stat-value { font-size: 14px; }
   .palantir-stat-label { font-size: 8px; }
-  .palantir-timeline-controls { min-width: 100px; }
+  .palantir-sparkline { width: 40px; height: 18px; }
+  .palantir-left-rail {
+    width: 100%;
+    bottom: 0;
+    top: auto;
+    height: 50vh;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    transform: translateY(100%);
+    border-radius: 12px 12px 0 0;
+  }
+  .palantir-left-rail.open {
+    transform: translateY(0);
+  }
+  .palantir-left-rail.collapsed {
+    transform: translateY(100%);
+  }
+  .palantir-drawer {
+    width: 100%;
+    top: 56px;
+    bottom: 0;
+  }
+  .palantir-timeline-bar {
+    height: 50px;
+    bottom: 0;
+  }
+  .palantir-timeline-controls { min-width: 80px; }
+  .palantir-donut { width: 60px; height: 60px; }
 }
 @media (max-width: 480px) {
-  .palantir-stats-ribbon { flex-wrap: wrap; }
-  .palantir-stat { flex: 0 0 33.33%; }
-  .palantir-left-rail { width: 100%; }
-  .palantir-timeline-bar { height: 50px; }
+  .palantir-stats-ribbon {
+    flex-wrap: wrap;
+  }
+  .palantir-stat {
+    flex: 0 0 50%;
+    padding: 4px 6px;
+  }
+  .palantir-stat-value { font-size: 13px; }
+  .palantir-sparkline { display: none; }
+  .palantir-left-rail { height: 60vh; }
+  .palantir-drawer { width: 100%; }
+  .palantir-timeline-bar { height: 40px; }
+  .palantir-cat-bar { height: 24px; }
+  .palantir-severity-bar { height: 28px; }
+  .palantir-heat-grid { aspect-ratio: 2.5; }
+  .palantir-node-viz { height: 80px; }
 }
