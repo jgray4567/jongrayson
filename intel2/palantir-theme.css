@@ -1,0 +1,624 @@
+/* ═══════════════════════════════════════════════════════════════
+   PALANTIR FOUNDRY BLACK — Global UI Theme Override
+   Converts entire Intel page to Palantir dark monospace aesthetic
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── ROOT TOKENS ── Override existing vars to Palantir black ── */
+:root {
+  --bg: #030404;
+  --panel: #0a0c0e;
+  --panel-2: #0f1216;
+  --border: rgba(0, 229, 255, 0.18);
+  --border-strong: rgba(0, 229, 255, 0.35);
+  --lime: #00e5ff;
+  --lime-dim: rgba(0, 229, 255, 0.1);
+  --text: #e8f4f8;
+  --muted: rgba(232, 244, 248, 0.55);
+  --chip: rgba(255, 255, 255, 0.03);
+  --font-mono: 'JetBrains Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+  /* Foundry-specific tokens */
+  --foundry-bg: #06080a;
+  --foundry-panel: rgba(8,10,14,0.97);
+  --foundry-border: rgba(0,229,255,0.12);
+  --foundry-border-bright: rgba(0,229,255,0.3);
+  --foundry-text: #c8d6e5;
+  --foundry-muted: rgba(200,214,229,0.5);
+  --foundry-accent: #00e5ff;
+  --foundry-accent-dim: rgba(0,229,255,0.08);
+  --foundry-danger: #ff1744;
+  --foundry-warn: #ff9100;
+  --foundry-success: #00e676;
+}
+
+/* ── GLOBAL FONT ── Everything monospace ── */
+body, .app-shell, .rail, .center-stage, .brand-block, .panel, .stage-card,
+.ghost-btn, .map-control-btn, .map-control-select, .crime-chip, .threat-type-chip,
+.crime-popup, .danger-popup, .zone-popup, .detail-panel, .intel-drawer,
+.intel-modal-card, .signal-item, .signal-title, .signal-meta, .signal-btn,
+.palantir-stats-ribbon, .palantir-left-rail, .palantir-drawer,
+.palantir-timeline-bar, #diagnostics-modal-overlay, .thin-intel-panel {
+  font-family: var(--font-mono) !important;
+}
+
+/* ── LEFT RAIL (Brand + Panels) ── Palantir dark glass ── */
+.left-rail {
+  background: var(--foundry-panel) !important;
+  border-right: 1px solid var(--foundry-border) !important;
+  backdrop-filter: blur(12px);
+}
+
+.brand-block {
+  background: linear-gradient(180deg, rgba(0,229,255,0.04), transparent) !important;
+  border: 1px solid var(--foundry-border) !important;
+  border-radius: 3px !important;
+}
+
+.brand-kicker, .panel-kicker {
+  color: var(--foundry-accent) !important;
+  font-size: 9px !important;
+  letter-spacing: 0.12em !important;
+}
+
+.brand-block h1 {
+  color: var(--text) !important;
+  font-family: var(--font-mono) !important;
+  letter-spacing: -0.02em;
+}
+
+.home-link {
+  color: var(--foundry-accent) !important;
+  opacity: 1 !important;
+}
+
+.panel {
+  background: var(--foundry-panel) !important;
+  border: 1px solid var(--foundry-border) !important;
+  border-radius: 3px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+}
+
+/* Status hero — Palantir dark */
+.status-hero {
+  background: linear-gradient(180deg, rgba(8,10,14,0.96), rgba(6,8,10,0.92)) !important;
+  border: 1px solid var(--foundry-border) !important;
+  border-radius: 3px !important;
+}
+
+.status-label {
+  font-family: var(--font-mono) !important;
+  font-size: 8px !important;
+  letter-spacing: 0.12em !important;
+}
+
+.status-stat strong {
+  font-family: var(--font-mono) !important;
+  letter-spacing: 0.08em !important;
+}
+
+/* ── GLOBE OVERLAY CONTROLS ── Palantir dark glass ── */
+.thin-intel-panel {
+  background: rgba(6,8,10,0.88) !important;
+  backdrop-filter: blur(12px) !important;
+  border-radius: 4px !important;
+}
+
+.thin-intel-title {
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+  letter-spacing: 0.1em !important;
+}
+
+/* ── MAP CONTROL BUTTONS ── Palantir pill buttons ── */
+.map-control-btn,
+.ghost-btn {
+  background: rgba(8,10,14,0.85) !important;
+  border: 1px solid var(--foundry-border-bright) !important;
+  color: var(--foundry-text) !important;
+  border-radius: 999px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  padding: 6px 12px !important;
+  backdrop-filter: blur(8px) !important;
+  transition: all 0.15s ease !important;
+  min-height: 28px !important;
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
+  user-select: none !important;
+}
+
+.map-control-btn:hover,
+.ghost-btn:hover {
+  background: rgba(0,229,255,0.08) !important;
+  border-color: var(--foundry-accent) !important;
+  color: var(--foundry-accent) !important;
+  box-shadow: 0 0 8px rgba(0,229,255,0.15) !important;
+}
+
+.map-control-btn.active {
+  background: rgba(0,229,255,0.15) !important;
+  border-color: var(--foundry-accent) !important;
+  color: var(--foundry-accent) !important;
+  box-shadow: 0 0 12px rgba(0,229,255,0.25) !important;
+}
+
+#toggle-danger-zones.active {
+  background: rgba(255,23,68,0.85) !important;
+  border-color: #ff1744 !important;
+  color: #fff !important;
+  box-shadow: 0 0 12px rgba(255,23,68,0.5) !important;
+}
+
+#toggle-threat-layer.active {
+  background: rgba(255,51,51,0.85) !important;
+  border-color: #ff3333 !important;
+  color: #fff !important;
+  box-shadow: 0 0 12px rgba(255,51,51,0.5) !important;
+}
+
+.map-control-select {
+  background: rgba(8,10,14,0.85) !important;
+  border: 1px solid var(--foundry-border-bright) !important;
+  color: var(--foundry-text) !important;
+  border-radius: 999px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* ── SATELLITE ORBIT ROW ── */
+.sat-orbit-row {
+  background: rgba(6,8,10,0.88) !important;
+  border: 1px solid var(--foundry-border-bright) !important;
+  backdrop-filter: blur(12px) !important;
+  border-radius: 4px !important;
+}
+
+/* ── CRIME CHIP BAR ── Palantir dark glass bar ── */
+.crime-chip-bar {
+  background: rgba(6,8,10,0.92) !important;
+  border: 1px solid var(--foundry-border) !important;
+  border-radius: 4px !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+  padding: 6px 10px !important;
+}
+
+/* ── CRIME CHIPS ── Palantir dark buttons ── */
+.crime-chip {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  color: var(--foundry-muted) !important;
+  border-radius: 3px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  height: 26px !important;
+  padding: 0 10px !important;
+  transition: all 0.15s ease !important;
+}
+
+.crime-chip::before {
+  width: 8px !important;
+  height: 8px !important;
+  pointer-events: none !important;
+}
+
+.crime-chip.active {
+  color: var(--text) !important;
+  background: rgba(255,255,255,0.08) !important;
+  border-color: var(--chip-color, var(--foundry-accent)) !important;
+}
+
+.crime-chip.active::before {
+  opacity: 1 !important;
+}
+
+.crime-chip:hover {
+  background: rgba(255,255,255,0.06) !important;
+}
+
+.crime-chip-divider {
+  background: rgba(255,255,255,0.08) !important;
+  height: 20px !important;
+}
+
+/* ── THREAT TYPE CHIPS ── Same dark glass treatment ── */
+.threat-type-chip {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  color: var(--foundry-muted) !important;
+  border-radius: 3px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  height: 22px !important;
+  padding: 0 8px !important;
+  transition: all 0.15s ease !important;
+}
+
+.threat-type-chip::before {
+  width: 6px !important;
+  height: 6px !important;
+  pointer-events: none !important;
+}
+
+.threat-type-chip.active {
+  color: var(--text) !important;
+  background: rgba(255,255,255,0.08) !important;
+  border-color: var(--chip-color, var(--foundry-accent)) !important;
+}
+
+.threat-type-chip.active::before {
+  opacity: 1 !important;
+}
+
+/* ── CRIME/DANGER/ZONE POPUPS ── Dark glass Palantir style ── */
+.crime-popup,
+.danger-popup,
+.zone-popup {
+  background: rgba(8,10,14,0.97) !important;
+  border: 1px solid var(--foundry-border-bright) !important;
+  border-radius: 4px !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+  color: var(--foundry-text) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.crime-popup-header,
+.danger-popup-header,
+.zone-popup-header {
+  padding: 12px 16px 8px !important;
+}
+
+.crime-popup-cat,
+.danger-popup-badge,
+.zone-popup-sub {
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  color: var(--foundry-muted) !important;
+}
+
+.crime-popup-title,
+.danger-popup-title,
+.zone-popup-title {
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  color: var(--text) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.crime-popup-row,
+.danger-popup-row,
+.zone-popup-row {
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  color: var(--foundry-muted) !important;
+}
+
+.crime-popup-row strong,
+.danger-popup-row strong,
+.zone-popup-row strong {
+  color: var(--foundry-text) !important;
+}
+
+.crime-popup-footer,
+.danger-popup-footer {
+  border-top: 1px solid var(--foundry-border) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+  color: var(--foundry-muted) !important;
+}
+
+.zone-popup-stat {
+  font-family: var(--font-mono) !important;
+  color: var(--foundry-accent) !important;
+}
+
+.danger-popup-badge {
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+  border-radius: 2px !important;
+  padding: 2px 8px !important;
+}
+
+/* ── LEAFLET POPUP OVERRIDE ── Dark glass ── */
+.leaflet-popup-content-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--foundry-muted) !important;
+  font-size: 18px !important;
+  top: 8px !important;
+  right: 8px !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--foundry-accent) !important;
+}
+
+/* ── DETAIL PANEL ── Dark glass ── */
+.detail-panel {
+  background: rgba(8,10,14,0.97) !important;
+  border-left: 1px solid var(--foundry-border) !important;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.5) !important;
+  backdrop-filter: blur(12px) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.detail-panel-close {
+  color: var(--foundry-muted) !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 3px !important;
+}
+
+.detail-panel-close:hover {
+  background: rgba(255,255,255,0.06) !important;
+  color: var(--text) !important;
+}
+
+/* ── INTEL DRAWER ── Dark glass ── */
+.intel-drawer {
+  background: rgba(8,10,14,0.97) !important;
+  border: 1px solid var(--foundry-border-bright) !important;
+  border-radius: 4px !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6) !important;
+}
+
+.intel-drawer-title {
+  font-family: var(--font-mono) !important;
+  color: var(--text) !important;
+  letter-spacing: -0.01em !important;
+}
+
+.intel-state-chip {
+  font-family: var(--font-mono) !important;
+  background: rgba(0,229,255,0.08) !important;
+  border: 1px solid rgba(0,229,255,0.3) !important;
+  color: var(--foundry-accent) !important;
+  border-radius: 3px !important;
+  font-size: 9px !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  box-shadow: 0 0 12px rgba(0,229,255,0.08) !important;
+}
+
+.intel-mini {
+  background: rgba(255,255,255,0.03) !important;
+  border: 1px solid var(--foundry-border) !important;
+  border-radius: 3px !important;
+}
+
+.intel-mini-label {
+  font-family: var(--font-mono) !important;
+  font-size: 8px !important;
+  letter-spacing: 0.1em !important;
+  color: var(--foundry-muted) !important;
+}
+
+.intel-mini-value {
+  font-family: var(--font-mono) !important;
+  color: var(--text) !important;
+}
+
+/* ── DIAGNOSTICS MODAL ── Dark glass ── */
+#diagnostics-modal-overlay {
+  background: rgba(0,0,0,0.9) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+#diagnostics-modal-overlay > div {
+  background: var(--foundry-panel) !important;
+  border: 1px solid var(--foundry-border-bright) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 16px 64px rgba(0,0,0,0.6) !important;
+}
+
+#diagnostics-modal-overlay h2 {
+  font-family: var(--font-mono) !important;
+  color: var(--foundry-accent) !important;
+  font-size: 12px !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+
+/* ── SIGNAL FEED ── Dark monospace ── */
+.signal-item {
+  border-bottom-color: var(--foundry-border) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.signal-meta {
+  font-family: var(--font-mono) !important;
+  font-size: 8px !important;
+  letter-spacing: 0.08em !important;
+}
+
+.signal-title {
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  color: var(--text) !important;
+}
+
+.signal-btn {
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  border: 1px solid var(--foundry-border) !important;
+  background: rgba(255,255,255,0.03) !important;
+  color: var(--foundry-muted) !important;
+  border-radius: 3px !important;
+}
+
+.signal-btn:hover {
+  border-color: var(--foundry-accent) !important;
+  color: var(--foundry-accent) !important;
+  background: var(--foundry-accent-dim) !important;
+}
+
+/* ── STAGE CARDS / PANELS ── Dark glass ── */
+.stage-card {
+  background: var(--foundry-panel) !important;
+  border: 1px solid var(--foundry-border) !important;
+  border-radius: 3px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+}
+
+.big-query {
+  font-family: var(--font-mono) !important;
+  color: var(--foundry-accent) !important;
+  font-size: clamp(1.5rem, 3vw, 2.4rem) !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* ── TAG CHIPS ── Dark pill style ── */
+.tag-chip {
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  letter-spacing: 0.05em !important;
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid var(--foundry-border) !important;
+  color: var(--foundry-text) !important;
+  border-radius: 3px !important;
+}
+
+.tag-chip.active {
+  background: var(--foundry-accent-dim) !important;
+  border-color: var(--foundry-accent) !important;
+  color: var(--foundry-accent) !important;
+}
+
+/* ── ACTIVE LAYER CHIPS ── */
+.active-layer-chip,
+.layer-option {
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  letter-spacing: 0.04em !important;
+  border-radius: 3px !important;
+}
+
+.active-layer-chip {
+  background: var(--foundry-accent) !important;
+  color: var(--foundry-bg) !important;
+}
+
+/* ── TIMELINE CONTAINER ── Dark ── */
+#timeline-container {
+  background: rgba(255,255,255,0.02) !important;
+  border: 1px solid var(--foundry-border) !important;
+  border-radius: 3px !important;
+}
+
+/* ── GLOBE LOADING ── */
+#globe-loading div:first-child {
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+  color: var(--foundry-muted) !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+
+/* ── GLOBAL POSTURE / COUNTERS ── */
+#global-posture {
+  font-family: var(--font-mono) !important;
+  letter-spacing: 0.08em !important;
+}
+
+#terminal-count,
+#fortified-count,
+#reversal-count,
+#status-strip-systems {
+  font-family: var(--font-mono) !important;
+}
+
+/* ── PITT SURGH ZONE LABEL ── Dark glass ── */
+.pittsburgh-zone-label {
+  background: rgba(8,10,14,0.88) !important;
+  color: var(--foundry-accent) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  border-radius: 2px !important;
+  border: 1px solid var(--foundry-border) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* ── MAP HOVER CARD ── Dark glass ── */
+.map-hover-card {
+  background: rgba(8,10,14,0.95) !important;
+  border: 1px solid var(--foundry-border-bright) !important;
+  color: var(--foundry-text) !important;
+  backdrop-filter: blur(12px) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  border-radius: 3px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
+}
+
+/* ── INTEL MODAL ── Dark glass ── */
+.intel-modal {
+  background: rgba(0,0,0,0.9) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.intel-modal-card {
+  background: linear-gradient(180deg, rgba(8,10,14,0.99), rgba(10,12,16,0.99)) !important;
+  border: 1px solid var(--foundry-border-bright) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6) !important;
+}
+
+/* ── LEAFLET CONTROLS ── Dark glass ── */
+.leaflet-control-zoom a {
+  background: rgba(8,10,14,0.88) !important;
+  color: var(--foundry-text) !important;
+  border-color: var(--foundry-border) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--foundry-accent-dim) !important;
+  color: var(--foundry-accent) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(8,10,14,0.7) !important;
+  color: var(--foundry-muted) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 8px !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--foundry-accent) !important;
+}
+
+/* ── SEVERITY COLORS ── */
+.sev-high { color: #ff1744 !important; }
+.sev-medium { color: #ff9100 !important; }
+.sev-low { color: #00e676 !important; }
+
+/* ── RESPONSIVE ── Preserve existing mobile rules ── */
+@media (pointer: coarse) {
+  .map-control-btn,
+  .map-control-select {
+    height: 40px !important;
+    line-height: 40px !important;
+    font-size: 10px !important;
+  }
+}
