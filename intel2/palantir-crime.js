@@ -416,6 +416,7 @@ function openPalantirDrawer(crime) {
         ${generateLeads(crime, related)}
       </div>
     </div>
+    ${buildCrossLayerSection(crime)}
     <div style="margin-top:12px;">
       <button onclick="togglePalantirWatchlistItem(${crime.lat},${crime.lng},'${crime.time?.replace(/'/g, "\\'") || ''}','${crime.incident_type?.replace(/'/g, "\\'") || ''}','${crime.category}')" 
         style="background:${isWatchlisted ? '#ffd60022' : 'rgba(255,255,255,0.04)'};border:1px solid ${isWatchlisted ? '#ffd600' : 'var(--border)'};color:${isWatchlisted ? '#ffd600' : 'var(--muted)'};padding:8px 12px;border-radius:3px;cursor:pointer;font-family:var(--font-mono);font-size:10px;width:100%;text-transform:uppercase;letter-spacing:0.06em;transition:all 0.15s ease;">
@@ -581,6 +582,77 @@ function buildNodeViz(crime, related) {
 
   svg += '</svg>';
   return svg;
+}
+
+// ── Cross-Layer Correlation ──
+function buildCrossLayerSection(crime) {
+  if (!crime || !crime.lat || !crime.lng) return '';
+  
+  const sections = [];
+  
+  // Threat hotspots within 50km
+  if (typeof threatLayerEnabled !== 'undefined' && threatLayerEnabled && typeof threatArcData !== 'undefined' && threatArcData.length > 0) {
+    // Find threat arcs targeting near this location
+    const nearbyThreats = threatArcData.filter(arc => {
+      if (!arc.tgtLat || !arc.tgtLng) return false;
+      const dist = haversineMeters(crime.lat, crime.lng, arc.tgtLat, arc.tgtLng);
+      return dist < 50000; // 50km radius
+    });
+    
+    if (nearbyThreats.length > 0) {
+      // Count by type
+      const typeCounts = {};
+      nearbyThreats.forEach(t => {
+        typeCounts[t.type] = (typeCounts[t.type] || 0) + 1;
+      });
+      
+      const threatColors = {
+        'SSH Brute Force': '#ff8800',
+        'Port Scan': '#ffcc00',
+        'Malware C2': '#aa44ff',
+        'Web Exploit': '#ff4444',
+        'DDoS': '#ff2266',
+        'Ransomware Probe': '#ffdd00'
+      };
+      
+      const typeList = Object.entries(typeCounts).map(([type, count]) => 
+        `<div style="display:flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:10px;"><span style="width:6px;height:6px;border-radius:50%;background:${threatColors[type] || '#78909c'};flex-shrink:0;"></span><span style="color:var(--text);">${count}× ${type}</span></div>`
+      ).join('');
+      
+      sections.push(`
+        <div class="palantir-drawer-section">
+          <div class="palantir-drawer-section-title" style="color:#ff8800;">⚠ Threat Correlation (${nearbyThreats.length} within 50km)</div>
+          ${typeList}
+        </div>
+      `);
+    }
+  }
+  
+  // Air traffic within 50km
+  if (typeof window.airTrafficData !== 'undefined' && window.airTrafficData && window.airTrafficData.length > 0) {
+    const nearbyFlights = window.airTrafficData.filter(f => {
+      if (!f.latitude || !f.longitude) return false;
+      const dist = haversineMeters(crime.lat, crime.lng, f.latitude, f.longitude);
+      return dist < 50000;
+    });
+    
+    if (nearbyFlights.length > 0) {
+      const flightList = nearbyFlights.slice(0, 5).map(f => 
+        `<div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;padding:2px 0;"><span style="color:var(--text);">${f.callsign || f.registration || 'N/A'}</span><span style="color:var(--muted);">${f.altitude ? Math.round(f.altitude * 0.3048) + 'm' : '?'} ${f.speed ? Math.round(f.speed) + 'kts' : ''}</span></div>`
+      ).join('');
+      
+      sections.push(`
+        <div class="palantir-drawer-section">
+          <div class="palantir-drawer-section-title" style="color:#00e676;">✈ Air Traffic (${nearbyFlights.length} within 50km)</div>
+          ${flightList}
+          ${nearbyFlights.length > 5 ? `<div style="color:var(--muted);font-family:var(--font-mono);font-size:9px;margin-top:2px;">+${nearbyFlights.length - 5} more</div>` : ''}
+        </div>
+      `);
+    }
+  }
+  
+  if (sections.length === 0) return '';
+  return sections.join('');
 }
 
 function togglePalantirWatchlistItem(lat, lng, time, name, category) {
