@@ -4152,30 +4152,29 @@ function initOrUpdateGlobe(items = []) {
       color: p.color || '#4488ff'
     })));
   }
-  // Satellite orbit trails - always show when SAT enabled, dim non-highlighted
+  // Satellite orbit trails - only show when an orbit class or constellation is highlighted
   let satOrbitPaths = [];
-  if (satelliteLayerEnabled && currentSatelliteCatalog.length) {
+  if (satelliteLayerEnabled && currentSatelliteCatalog.length && (highlightedOrbitClass || highlightedSatNetwork)) {
     const allOrbitPaths = getSatelliteOrbitPaths();
     satOrbitPaths = allOrbitPaths;
     if (satOrbitPaths.length) {
       overlayPaths.push(...satOrbitPaths.map(p => {
-        // Dim non-highlighted orbit paths
-        // Network highlight: only brighten paths belonging to highlighted network
-        // Orbit class highlight: only brighten matching orbit class paths
-        let isHighlighted = true;
+        // Only show paths for the highlighted orbit class or network
+        let isHighlighted = false;
         if (highlightedSatNetwork) {
           isHighlighted = p.network === highlightedSatNetwork;
         } else if (highlightedOrbitClass) {
           isHighlighted = p.orbitClass === highlightedOrbitClass;
         }
-        const pathColor = satelliteOrbitColor(p.orbitClass, isHighlighted ? 0.6 : 0.1);
+        if (!isHighlighted) return null; // Skip non-highlighted paths entirely
+        const pathColor = satelliteOrbitColor(p.orbitClass, 0.6);
         // Altitude matches satellite altitude by orbit class
         const pathAlt = p.orbitClass === 'GEO' ? 0.55 : p.orbitClass === 'MEO' ? 0.35 : 0.15;
         return {
           coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: pathAlt })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
           color: pathColor
         };
-      }).filter(p => p.coords.length >= 2));
+      }).filter(Boolean).filter(p => p.coords.length >= 2));
     }
   }
 
