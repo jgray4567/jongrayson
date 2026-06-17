@@ -70,7 +70,7 @@ let threatHotspots = [];
 
 function isNightTime() {
   const hour = new Date().getHours();
-  return hour >= 19 || hour < 6; // 7pm–6am
+  return hour >= 19 || hour < 6; // 7pm-6am
 }
 
 let mapHoverCard = null;
@@ -94,7 +94,7 @@ let _satCustomLayerSetup = false;
 function setupSatelliteCustomLayer() {
   if (_satCustomLayerSetup || !intelGlobe) return;
   if (!window.THREE) {
-    // THREE not loaded yet — listen for event AND poll as fallback
+    // THREE not loaded yet - listen for event AND poll as fallback
     console.log('[Intel] Waiting for THREE.js global bridge...');
     window.addEventListener('three-ready', () => {
       console.log('[Intel] THREE.js ready via event');
@@ -118,7 +118,7 @@ function setupSatelliteCustomLayer() {
   _satCustomLayerSetup = true;
   const T = window.THREE;
   console.log('[Intel] Setting up satellite custom layer with THREE', T.REVISION);
-  
+
   intelGlobe
     .customThreeObject(d => {
       const sz = Math.max(0.01, d.size || 0.35);
@@ -137,19 +137,30 @@ function setupSatelliteCustomLayer() {
     })
     .customThreeObjectUpdate((obj, d) => {
       Object.assign(obj.position, intelGlobe.getCoords(d.lat, d.lng, d.alt));
-      // Highlight/fade: highlighted satellites keep their orbit color, non-highlighted dim to 40%
-      const isHighlighted = !highlightedOrbitClass || d.orbitClass === highlightedOrbitClass;
+      // Highlight/fade logic:
+      // - Orbit class highlight: non-matching orbits dim to 40%
+      // - Network highlight: non-matching networks dim to 40%, matching ones turn white
+      // - No highlight: all at full brightness
+      let isHighlighted = true;
+      let useWhite = false;
+      if (highlightedSatNetwork) {
+        isHighlighted = (d.raw?.network === highlightedSatNetwork);
+        useWhite = isHighlighted;
+      } else if (highlightedOrbitClass) {
+        isHighlighted = (d.orbitClass === highlightedOrbitClass);
+      }
       const targetOpacity = isHighlighted ? 0.95 : 0.4;
       const targetGlowOpacity = isHighlighted ? 0.15 : 0.04;
+      const displayColor = useWhite ? 0xffffff : d.color;
       obj.children.forEach(child => {
         if (child.material) {
-          if (!child.material.userData?.isGlow) child.material.color.setHex(d.color);
+          if (!child.material.userData?.isGlow) child.material.color.setHex(displayColor);
           child.material.opacity = child.material.userData?.isGlow ? targetGlowOpacity : targetOpacity;
           child.material.needsUpdate = true;
         }
       });
     });
-  
+
   // Re-render with current data if SAT is already enabled
   if (satelliteLayerEnabled && currentSatelliteCatalog.length) {
     initOrUpdateGlobe(currentGlobeBaseItems || []);
@@ -167,6 +178,7 @@ let selectedSatNetwork = null;
 let selectedSatOrbit = null;
 const visibleSatelliteOrbits = new Set(['LEO', 'MEO', 'GEO']);
 let highlightedOrbitClass = null; // null = no highlight, 'LEO'/'MEO'/'GEO' = highlighted class
+let highlightedSatNetwork = null; // null = no highlight, 'Starlink'/'GPS'/etc = highlighted network
 const cityCrimeScans = {
   'Los Angeles Port': {
     center: [33.739, -118.262],
@@ -1073,7 +1085,7 @@ function strcmpSafe(a, b) {
 function renderSignalFeed(items = []) {
   if (signalFeedList) signalFeedList.innerHTML = items.map(item => {
     const archiveBadge = currentFeedView === 'archived' ? `<span class="muted" style="text-transform:uppercase; font-size:0.7rem; border:1px solid var(--border); padding:2px 6px; border-radius:4px;">${item.status}</span>` : '';
-    
+
     let actionsHtml = '';
     if (currentFeedView === 'active') {
       actionsHtml = `
@@ -1095,7 +1107,7 @@ function renderSignalFeed(items = []) {
     } else {
       actionsHtml = `<button class="signal-btn" data-signal-id="${item.id}" data-signal-action="recover">Recover to Active</button>`;
     }
-      
+
     return `
       <div class="signal-item">
         <div class="signal-meta">
@@ -1538,13 +1550,13 @@ signalFeedList?.addEventListener('click', async (event) => {
   if (scoreBtn) {
     const id = scoreBtn.dataset.signalId;
     const outcome = scoreBtn.dataset.signalScore;
-    
+
     await fetchJson('api/signal-escalation-score.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, outcome })
     });
-    
+
     await loadIntel();
     return;
   }
@@ -1561,13 +1573,13 @@ signalFeedList?.addEventListener('click', async (event) => {
     setSelected({ suggestedQuery: `Signal: ${id}`, topic: source, thirdOrderEscalationAction: 'escalated to focus' });
   if (overviewHeadline) overviewHeadline.textContent = title;
   }
-  
+
   await fetchJson('api/signal-action.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id, action })
   });
-  
+
   await loadIntel();
 });
 
@@ -1733,7 +1745,7 @@ function closeIntelDrawer() {
   drawer.classList.remove('visible');
   drawer.setAttribute('aria-hidden', 'true');
   setDrawerImage(null);
-  
+
   if (selectedAirIcao24) {
       selectedAirIcao24 = null;
       if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems || []);
@@ -1765,9 +1777,9 @@ function openIntelDrawer(item = {}) {
   if (!drawer) return;
 
   const airlineLogoEl = document.getElementById('intel-drawer-airline-logo');
-  if (airlineLogoEl) { 
-      airlineLogoEl.style.display = 'none'; 
-      airlineLogoEl.src = ''; 
+  if (airlineLogoEl) {
+      airlineLogoEl.style.display = 'none';
+      airlineLogoEl.src = '';
       airlineLogoEl.style.borderRadius = '0';
       airlineLogoEl.style.border = 'none';
   }
@@ -1795,7 +1807,7 @@ function openIntelDrawer(item = {}) {
       stateEl.style.color = '#0096ff';
     }
     if (summaryEl) summaryEl.textContent = `Type: ${v.type} | Flag: ${v.flag}`;
-    
+
     if (airlineLogoEl && v.flag) {
         const code = getSeaFlagCode(v.flag);
         if (code) {
@@ -1805,7 +1817,7 @@ function openIntelDrawer(item = {}) {
             airlineLogoEl.style.border = '1px solid rgba(255,255,255,0.1)';
         }
     }
-    
+
     if (mapEl) {
       mapEl.innerHTML = `
         <div style="padding:16px;">
@@ -1828,11 +1840,11 @@ function openIntelDrawer(item = {}) {
        summaryEl.innerHTML = `Graph Entity (Group ${node.group})` + (node.url ? `<br><br><a href="${node.url}" target="_blank" rel="noopener noreferrer" style="color:#00e5ff; text-decoration:underline; font-size:13px; font-weight:bold;">→ View Source Article</a>` : '');
     }
     setDrawerImage(node.image || null, node.label);
-    
+
     if (mapEl) {
       mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Node is currently focused on the Link Graph canvas.</div>`;
     }
-    
+
     if (metricsEl) {
       let relHtml = '';
       if (item.related && item.related.length > 0) {
@@ -1845,17 +1857,17 @@ function openIntelDrawer(item = {}) {
       } else {
         relHtml = '<div class="muted">No direct links found.</div>';
       }
-      
+
       metricsEl.innerHTML = `
         <div style="font-family:var(--font-mono); text-transform:uppercase; font-size:10px; color:var(--lime); margin-bottom:12px; letter-spacing:0.05em; border-bottom:1px solid var(--border); padding-bottom:6px;">Direct Relationships</div>
         ${relHtml}
       `;
     }
-    
+
     if (deepEl) deepEl.innerHTML = '';
     if (selectedQuery) selectedQuery.textContent = node.label || 'Entity Node';
     if (selectedMeta) selectedMeta.textContent = `${item.related?.length || 0} connections established`;
-    
+
     drawer.classList.add('visible');
     drawer.setAttribute('aria-hidden', 'false');
     return;
@@ -1876,11 +1888,11 @@ function openIntelDrawer(item = {}) {
     if (metricsEl) {
   if (metricsEl) metricsEl.innerHTML = [
         ['Flight', aircraftTitle],
-        ['Airline', 'Loading…'],
-        ['Departure', 'Loading…'],
-        ['Destination', 'Loading…'],
-        ['Departure time', 'Loading…'],
-        ['Arrival time', 'Loading…']
+        ['Airline', 'Loading...'],
+        ['Departure', 'Loading...'],
+        ['Destination', 'Loading...'],
+        ['Departure time', 'Loading...'],
+        ['Arrival time', 'Loading...']
       ].map(([label, value]) => `
         <div class="intel-mini">
           <div class="intel-mini-label">${label}</div>
@@ -2270,6 +2282,8 @@ function syncSatelliteToggle() {
       }
     });
   }
+  // Also update data panel to reflect current highlight state
+  if (typeof updateDataPanel === 'function') updateDataPanel();
 }
 
 async function refreshThreatFeed() {
@@ -2659,7 +2673,8 @@ function getSatelliteOrbitPaths() {
     if (points.length < 2) return null;
     return {
       orbitClass: satItem.orbitClass || 'LEO',
-      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', (!highlightedOrbitClass || satItem.orbitClass === highlightedOrbitClass) ? 0.35 : 0.1),
+      network: satItem.network || '',
+      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', 0.35), // default mid alpha, will be overridden in overlay mapping
       points
     };
   }).filter(Boolean);
@@ -2712,7 +2727,7 @@ function initializeCommandSurface() {
              intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 2.5 }, 1800);
           }
         }
-        
+
         if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems || []);
         if (typeof updateDataPanel === "function") updateDataPanel();
       }
@@ -2729,7 +2744,7 @@ function initializeCommandSurface() {
     toggleButton.addEventListener('click', () => setDiagnosticsVisible(!diagnosticsVisible));
     toggleButton.dataset.bound = '1';
   }
-  
+
   const closeModalBtn = document.getElementById('close-diagnostics-modal');
   if (closeModalBtn && !closeModalBtn.dataset.bound) {
     closeModalBtn.addEventListener('click', () => setDiagnosticsVisible(false));
@@ -2807,18 +2822,18 @@ function initializeCommandSurface() {
       seaButton.addEventListener('click', async () => {
           seaLayerEnabled = !seaLayerEnabled;
           seaButton.classList.toggle('active', seaLayerEnabled);
-          
+
           if (seaLayerEnabled) {
               airLayerEnabled = false;
               syncAirToggle();
               satelliteLayerEnabled = false;
               syncSatelliteToggle();
               if (satelliteLayerTimer) { clearInterval(satelliteLayerTimer); satelliteLayerTimer = null; }
-              
+
               seaRegion = null;
               selectedSeaType = null;
               selectedSeaFlag = null;
-              
+
               await refreshMaritimeCatalog(false);
               if (!seaLayerTimer) {
                   seaLayerTimer = setInterval(() => refreshMaritimeCatalog(false), 15000);
@@ -2828,7 +2843,7 @@ function initializeCommandSurface() {
               currentVesselCatalog = [];
               seaRegion = null;
           }
-          
+
           initOrUpdateGlobe(currentGlobeBaseItems || []);
           updateDataPanel();
       });
@@ -2859,8 +2874,11 @@ function initializeCommandSurface() {
       } else {
         highlightedOrbitClass = cls;
       }
+      highlightedSatNetwork = null; // Clear network when orbit is toggled
+      selectedSatNetwork = null;
       syncSatelliteToggle();
       initOrUpdateGlobe(currentGlobeBaseItems || []);
+      if (typeof updateDataPanel === 'function') updateDataPanel();
     });
   });
 
@@ -3061,7 +3079,7 @@ function getPittsburghZoneStats(zone) {
 }
 
 function syncPittsburghYearControl(eligible = false) {
-  // Year selector removed — all data in single month dropdown
+  // Year selector removed - all data in single month dropdown
 }
 
 function getAvailableMonths(crimes) {
@@ -3611,9 +3629,9 @@ function renderCityCrimeMap(item = {}) {
               opacity: 0.8,
               fillOpacity: 0.8
           }).addTo(cityMapInstance);
-          
+
           marker.bindTooltip(`<b>${v.name}</b><br>${v.type} | ${v.speedKnots} kts`);
-          
+
           marker.on('click', (e) => {
              L.DomEvent.stopPropagation(e);
              if (typeof openIntelDrawer === 'function') {
@@ -3763,7 +3781,7 @@ function showGlobeStage() {
   if (threatButton) threatButton.style.display = 'inline-flex';
   const satOrbitFilters = document.getElementById('sat-orbit-filters');
   if (satOrbitFilters && satelliteLayerEnabled) satOrbitFilters.style.display = 'inline-flex';
-  // Rotation removed — globe is static
+  // Rotation removed - globe is static
 }
 
 function _initGlobeVars() {}
@@ -3817,7 +3835,7 @@ function initOrUpdateGlobe(items = []) {
       intelGlobe.pointAltitude(0);
       intelGlobe.pointResolution(12);
       intelGlobe.pointsMerge(false);
-      // Satellite custom layer — Three.js spheres at orbital altitude
+      // Satellite custom layer - Three.js spheres at orbital altitude
       intelGlobe.customLayerData([]);
       setupSatelliteCustomLayer(); // Will wait for THREE if not ready
       // Clear flight/sat selection when clicking globe background
@@ -3868,7 +3886,7 @@ function initOrUpdateGlobe(items = []) {
                 <div><span style="opacity:0.5;">HDG</span><br><span style="color:#e8eaed;">${hdgStr}</span></div>
                 <div><span style="opacity:0.5;">ICAO</span><br><span style="color:#e8eaed;">${fl.icao24 || 'n/a'}</span></div>
               </div>
-              <div id="flight-tip-detail" style="border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;font-size:11px;color:#888;">Loading route info…</div>
+              <div id="flight-tip-detail" style="border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;font-size:11px;color:#888;">Loading route info...</div>
             `;
             // Fetch enriched flight detail (airline, route, times)
             fetchFlightDetail(fl.callsign).then(detail => {
@@ -3885,11 +3903,11 @@ function initOrUpdateGlobe(items = []) {
                   <span style="opacity:0.6;">${detail.airline || ''}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                  <div style="text-align:center;"><div style="font-weight:600;color:#ffdd44;font-size:14px;">${detail.departure?.iata || '—'}</div><div style="font-size:10px;">${dep}</div></div>
+                  <div style="text-align:center;"><div style="font-weight:600;color:#ffdd44;font-size:14px;">${detail.departure?.iata || '-'}</div><div style="font-size:10px;">${dep}</div></div>
                   <div style="flex:1;border-top:1px dashed rgba(255,221,68,0.3);margin:0 8px;position:relative;"><div style="position:absolute;top:-4px;left:50%;transform:translateX(-50%);font-size:10px;color:#ffdd44;">→</div></div>
-                  <div style="text-align:center;"><div style="font-weight:600;color:#ffdd44;font-size:14px;">${detail.destination?.iata || '—'}</div><div style="font-size:10px;">${dest}</div></div>
+                  <div style="text-align:center;"><div style="font-weight:600;color:#ffdd44;font-size:14px;">${detail.destination?.iata || '-'}</div><div style="font-size:10px;">${dest}</div></div>
                 </div>
-                ${(depTime || arrTime) ? `<div style="display:flex;justify-content:space-between;font-size:10px;opacity:0.6;"><span>Dep: ${depTime || '—'}</span><span>Arr: ${arrTime || '—'}</span></div>` : ''}
+                ${(depTime || arrTime) ? `<div style="display:flex;justify-content:space-between;font-size:10px;opacity:0.6;"><span>Dep: ${depTime || '-'}</span><span>Arr: ${arrTime || '-'}</span></div>` : ''}
                 ${detail.aircraftType ? `<div style="font-size:10px;opacity:0.5;margin-top:2px;">${detail.aircraftType}</div>` : ''}
               `;
               // Load airline logo
@@ -4017,7 +4035,7 @@ function initOrUpdateGlobe(items = []) {
       globeContainer.addEventListener('mousemove', _tooltipMoveHandler);
       globeContainer.addEventListener('touchmove', _tooltipMoveHandler);
       console.log('[Intel] Globe constructor OK');
-      
+
       // Set initial dimensions
       intelGlobe.width(globeContainer.clientWidth || window.innerWidth);
       intelGlobe.height(globeContainer.clientHeight || window.innerHeight * 0.6);
@@ -4062,7 +4080,7 @@ function initOrUpdateGlobe(items = []) {
 
   // ── DATA RENDERING ────────────────────────────────────────
   // Skip redundant updates only when satellite/air/threat layer state hasn't changed
-  const layerStateHash = [satelliteLayerEnabled, airLayerEnabled, seaLayerEnabled, threatLayerEnabled, currentSatelliteCatalog?.length || 0, currentAirTrafficItems?.length || 0, highlightedOrbitClass].join(',');
+  const layerStateHash = [satelliteLayerEnabled, airLayerEnabled, seaLayerEnabled, threatLayerEnabled, currentSatelliteCatalog?.length || 0, currentAirTrafficItems?.length || 0, highlightedOrbitClass, highlightedSatNetwork].join(',');
   const dataHash = items.length + ':' + (items[0]?.locationName || '') + ':' + (items[items.length-1]?.locationName || '') + ':' + layerStateHash;
   if (dataHash === _lastGlobeDataHash && intelGlobe) return; // No change, skip
   _lastGlobeDataHash = dataHash;
@@ -4098,7 +4116,7 @@ function initOrUpdateGlobe(items = []) {
 
   // Overlay paths (flight paths, orbits)
   const overlayPaths = [];
-  // Air traffic flight trail — only for selected flight
+  // Air traffic flight trail - only for selected flight
   if (selectedAirIcao24) {
     const selectedFlight = currentAirTrafficItems.find(f => f.icao24 === selectedAirIcao24);
     if (selectedFlight && selectedFlight.lat && selectedFlight.lng) {
@@ -4134,15 +4152,22 @@ function initOrUpdateGlobe(items = []) {
       color: p.color || '#4488ff'
     })));
   }
-  // Satellite orbit trails — always show when SAT enabled, dim non-highlighted
+  // Satellite orbit trails - always show when SAT enabled, dim non-highlighted
   let satOrbitPaths = [];
   if (satelliteLayerEnabled && currentSatelliteCatalog.length) {
     const allOrbitPaths = getSatelliteOrbitPaths();
     satOrbitPaths = allOrbitPaths;
     if (satOrbitPaths.length) {
       overlayPaths.push(...satOrbitPaths.map(p => {
-        // Dim non-highlighted orbit paths to 10% opacity color
-        const isHighlighted = !highlightedOrbitClass || p.orbitClass === highlightedOrbitClass;
+        // Dim non-highlighted orbit paths
+        // Network highlight: only brighten paths belonging to highlighted network
+        // Orbit class highlight: only brighten matching orbit class paths
+        let isHighlighted = true;
+        if (highlightedSatNetwork) {
+          isHighlighted = p.network === highlightedSatNetwork;
+        } else if (highlightedOrbitClass) {
+          isHighlighted = p.orbitClass === highlightedOrbitClass;
+        }
         const pathColor = satelliteOrbitColor(p.orbitClass, isHighlighted ? 0.6 : 0.1);
         // Altitude matches satellite altitude by orbit class
         const pathAlt = p.orbitClass === 'GEO' ? 0.55 : p.orbitClass === 'MEO' ? 0.35 : 0.15;
@@ -4160,12 +4185,12 @@ function initOrUpdateGlobe(items = []) {
     raw: { ...a, kind: 'air' }, color: '#ffdd44', radius: 0.4 * touchBoost, altitude: 0
   })) : [];
 
-  // Satellite points removed from pointsData — rendered via customLayerData (Three.js spheres)
+  // Satellite points removed from pointsData - rendered via customLayerData (Three.js spheres)
   const satGlobeElements = getSatelliteGlobeElements();
 
   // Build custom layer data for satellites (Three.js spheres at orbital altitude)
   // Satellite click targets (for onPointClick/onPointHover detection)
-  // Small colored dots at altitude 0 — same lat/lng as custom spheres but clickable
+  // Small colored dots at altitude 0 - same lat/lng as custom spheres but clickable
   const satClickTargets = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
     lat: s.lat, lng: s.lng, label: s.label,
     raw: s.raw,
@@ -4206,7 +4231,7 @@ function initOrUpdateGlobe(items = []) {
     raw: t, color: '#ff2222', radius: 0.3, altitude: 0
   })) : [];
 
-  // Combine all point layers (no satellites — those use customLayerData)
+  // Combine all point layers (no satellites - those use customLayerData)
   const allPoints = [...cityPoints, ...airPoints, ...satClickTargets, ...seaPoints, ...threatPoints];
 
   // HTML element markers: city tooltips + notable satellite glow markers
@@ -4238,7 +4263,7 @@ function initOrUpdateGlobe(items = []) {
       const el = document.createElement('div');
       const stateColor = d.color || '#00e676';
       if (d.type === 'sat') {
-        // Satellite glow marker — small pulsing dot
+        // Satellite glow marker - small pulsing dot
         el.setAttribute('data-globe-marker', 'sat');
         el.setAttribute('data-label', d.label || '');
         el.style.cssText = `position:relative;transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;`;
@@ -4253,7 +4278,7 @@ function initOrUpdateGlobe(items = []) {
         return el;
       }
       if (d.type === 'air') {
-        // Air traffic marker — large transparent touch target with visible dot
+        // Air traffic marker - large transparent touch target with visible dot
         const isTouch = 'ontouchstart' in window;
         const hitSize = isTouch ? 44 : 32;
         el.setAttribute('data-globe-marker', 'air');
@@ -4347,13 +4372,13 @@ function initOrUpdateGlobe(items = []) {
   const graphStage = document.getElementById('intel-graph-stage');
   const returnButton = document.getElementById('return-to-globe');
   const graphButton = document.getElementById('toggle-ontology-graph');
-  
+
   if (globe) globe.style.display = 'none';
   if (mapStage) mapStage.style.display = 'none';
   if (graphStage) graphStage.style.display = 'block';
   if (returnButton) returnButton.style.display = 'inline-flex';
   if (graphButton) graphButton.style.display = 'none';
-  
+
   updatePrimaryStageHeight();
   console.log("Intel Graph: Toggled visibility, rendering...");
   if (typeof renderOntologyGraph === 'function') renderOntologyGraph();
@@ -4404,7 +4429,7 @@ window.expandedNodes = new Set();
 
 function getVisibleOntology(clickedNode = null) {
     if (!window.fullOntologyData) return { nodes: [], links: [] };
-    
+
     const visibleNodes = new Set();
     // Always show Nexus (0), Regions (3), Themes (4)
     window.fullOntologyData.nodes.forEach(n => {
@@ -4412,7 +4437,7 @@ function getVisibleOntology(clickedNode = null) {
             visibleNodes.add(n.id);
         }
     });
-    
+
     // Add signals connected to expanded hubs
     window.fullOntologyData.links.forEach(l => {
         const sId = typeof l.source === 'object' ? l.source.id : l.source;
@@ -4420,9 +4445,9 @@ function getVisibleOntology(clickedNode = null) {
         if (window.expandedNodes.has(sId)) visibleNodes.add(tId);
         if (window.expandedNodes.has(tId)) visibleNodes.add(sId);
     });
-    
+
     const outNodes = window.fullOntologyData.nodes.filter(n => visibleNodes.has(n.id));
-    
+
     // Spawning animation logic
     if (clickedNode && window.expandedNodes.has(clickedNode.id)) {
         outNodes.forEach(n => {
@@ -4435,27 +4460,27 @@ function getVisibleOntology(clickedNode = null) {
             n._collapsed = false;
         });
     }
-    
+
     // Update collapsed state trackers
     window.fullOntologyData.nodes.forEach(n => {
         n._collapsed = !visibleNodes.has(n.id);
     });
-    
+
     const outLinks = window.fullOntologyData.links.filter(l => {
         const sId = typeof l.source === 'object' ? l.source.id : l.source;
         const tId = typeof l.target === 'object' ? l.target.id : l.target;
         return visibleNodes.has(sId) && visibleNodes.has(tId);
     });
-    
+
     return { nodes: outNodes, links: outLinks };
 }
 
 async function renderOntologyGraph() {
   const container = document.getElementById('intel-graph-stage');
   if (!container) return console.error("Intel Graph Error: #intel-graph-stage not found.");
-  
+
   await ensureForceGraphLib();
-  
+
   if (!graphInstance) {
     console.log("Intel Graph: Fetching ontology.json...");
     fetch('data/ontology.json?v=' + Date.now())
@@ -4467,7 +4492,7 @@ async function renderOntologyGraph() {
         window.fullOntologyData = gData;
         window.expandedNodes = new Set();
         gData.nodes.forEach(n => n._collapsed = true);
-        
+
         console.log("Intel Graph: Rendering with", gData.nodes.length, "nodes");
         container.style.display = 'block'; // Ensure it's not hidden while rendering
         graphInstance = ForceGraph()(container)
@@ -4487,7 +4512,7 @@ async function renderOntologyGraph() {
                  ctx.textAlign = 'center';
                  ctx.textBaseline = 'middle';
                  ctx.fillStyle = node.group === 0 ? 'rgba(0, 229, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)';
-                 
+
                  // Offset the text so it sits just below the node circle
                  const nodeRadius = Math.sqrt(node.size || 10) * 4;
                  ctx.fillText(label, node.x, node.y + nodeRadius + (6/globalScale));
@@ -4523,10 +4548,10 @@ async function renderOntologyGraph() {
                 }
                 graphInstance.graphData(getVisibleOntology(node));
             }
-            
+
             graphInstance.centerAt(node.x, node.y, 1000);
             graphInstance.zoom(2, 2000);
-            
+
             // Query related items against the FULL dataset so everything shows up in the drawer
             const { nodes, links } = window.fullOntologyData;
             const relatedLinks = links.filter(l => {
@@ -4540,7 +4565,7 @@ async function renderOntologyGraph() {
                 const otherId = sId === node.id ? tId : sId;
                 return nodes.find(n => n.id === otherId) || { id: otherId };
             });
-            
+
             if (typeof openIntelDrawer === 'function') {
                 openIntelDrawer({
                     kind: 'graph-node',
@@ -4549,7 +4574,7 @@ async function renderOntologyGraph() {
                 });
             }
           });
-          
+
         graphInstance.d3Force('charge').strength(-600);
         graphInstance.d3Force('link').distance(70);
       })
@@ -4580,23 +4605,23 @@ async function loadIntel() {
 
     renderTimelineViews(timelineViews.items || []);
     const globeSeed = await fetchJson('data/globe-demo-locations.json').catch(() => ({ items: [] }));
-    
+
     currentPriorityItems = globeSeed.items || [];
     currentGlobeBaseItems = currentPriorityItems;
-    
+
     await refreshAirTraffic();
     await refreshSatelliteCatalog();
     renderCommandBar(currentPriorityItems);
-    
+
     if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems);
     if (typeof updateDataPanel === 'function') updateDataPanel();
-    
+
     renderTimelineFocus(signals.items || []);
     renderTimeline(signals.items || []);
     syncTimelineWindowButtons();
     syncSeverityFilterButtons();
     syncFeedViewButtons();
-    
+
     const feedStatus = document.getElementById('feed-status');
     if (feedStatus) {
       feedStatus.innerHTML = '<span class="live-dot">●</span> Live';
@@ -4666,16 +4691,16 @@ function updateDataPanel() {
           <span style="color:var(--lime); font-family:var(--font-mono);">${count}</span>
         </div>
       `;
-      
+
       // If selected, show deep dive
       if (isSelected) {
         const regionalFlights = currentAirTrafficItems.filter(f => f.country === country);
-        
+
         // Count airlines
         const airlines = {};
         let rComm = 0;
         let rPriv = 0;
-        
+
         regionalFlights.forEach(f => {
            let code = f.callsign ? f.callsign.substring(0, 3).toUpperCase() : 'UNK';
            if (/^[A-Z]{3}$/.test(code)) {
@@ -4693,9 +4718,9 @@ function updateDataPanel() {
                rPriv++;
            }
         });
-        
+
         const topAirlines = Object.entries(airlines).sort((a,b)=>b[1]-a[1]).slice(0, 4);
-        
+
         // Mock pseudo-airports based on string length to look realistic but deterministic
         const pseudoAirports = country === 'United States' ? ['JFK', 'LAX', 'ORD', 'DFW', 'ATL', 'SFO', 'MIA'] :
                                country === 'France' ? ['CDG', 'ORY', 'NCE', 'MRS', 'MRS', 'LYS', 'TLS'] :
@@ -4703,14 +4728,14 @@ function updateDataPanel() {
                                country === 'Germany' ? ['FRA', 'MUC', 'BER', 'DUS', 'HAM', 'STR'] :
                                country === 'China' ? ['PEK', 'PVG', 'SHA', 'CAN', 'CTU', 'SZX'] :
                                ['HUB1', 'INTL', 'REG', 'MAIN', 'SEC', 'PORT'];
-                               
+
         const deps = pseudoAirports.slice(0, 5).map((code, idx) => `<div>${idx+1}. ${code} <span class="muted" style="float:right">${Math.floor(regionalFlights.length * (0.3 - idx*0.05))}</span></div>`).join('');
         const arrs = pseudoAirports.slice().reverse().slice(0, 5).map((code, idx) => `<div>${idx+1}. ${code} <span class="muted" style="float:right">${Math.floor(regionalFlights.length * (0.28 - idx*0.05))}</span></div>`).join('');
 
         html += `
           <div style="margin: 4px 0 12px 12px; padding-left: 10px; border-left: 1px solid rgba(210,255,84,0.3);">
              <div style="font-size:10px; margin-bottom: 6px; color:#fff;">REGION METRICS: ${regionalFlights.length} TRACKED</div>
-             
+
              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom: 8px;">
                <div style="background:rgba(0,0,0,0.2); padding: 4px; border-radius: 4px;">
                  <div class="muted" style="font-size:9px;">Commercial</div>
@@ -4726,7 +4751,7 @@ function updateDataPanel() {
              <div style="font-size:10px; color:#ccc; margin-bottom:8px;">
                ${topAirlines.map(a => `<div style="display:flex; justify-content:space-between;"><span>${a[0]}</span><span style="color:var(--lime)">${a[1]}</span></div>`).join('')}
              </div>
-             
+
              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:9px; color:#ccc;">
                <div>
                  <div class="muted" style="text-transform:uppercase; margin-bottom:4px;">Top Departures</div>
@@ -4762,7 +4787,7 @@ function updateDataPanel() {
     container.innerHTML = html;
   } else if (seaLayerEnabled) {
     title.textContent = 'Data Target: MARITIME ZONES';
-    
+
     let html = `
       <div style="margin-bottom: 16px;">
          <div data-sea-select="hormuz" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; border: 1px solid ${seaRegion === 'hormuz' ? 'var(--cyan)' : 'rgba(255,255,255,0.1)'}; background: ${seaRegion === 'hormuz' ? 'rgba(0,150,255,0.15)' : 'rgba(255,255,255,0.02)'}; transition:all 0.2s;">
@@ -4780,18 +4805,18 @@ function updateDataPanel() {
         const total = currentVesselCatalog.length;
         let tankers = 0, cargo = 0;
         const flags = {};
-        
+
         currentVesselCatalog.forEach(v => {
             if (v.type === 'Tanker' || v.type === 'LNG Carrier') tankers++;
             else cargo++;
             const f = v.flag || 'Unknown';
             flags[f] = (flags[f] || 0) + 1;
         });
-        
+
         const topFlags = Object.entries(flags)
             .sort((a,b) => b[1] - a[1])
             .slice(0, 5);
-            
+
         html += `
           <div style="display:flex; justify-content:space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
             <div data-sea-type="all" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${!selectedSeaType ? 'rgba(0,150,255,0.15)' : 'transparent'};">
@@ -4809,7 +4834,7 @@ function updateDataPanel() {
           </div>
           <div style="margin-bottom: 8px; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Vessels by Flag</div>
         `;
-        
+
         topFlags.forEach(([flag, count], i) => {
             const isSelected = selectedSeaFlag === flag;
             html += `
@@ -4822,9 +4847,9 @@ function updateDataPanel() {
     } else if (!seaRegion) {
         html += '<div class="muted" style="font-size:12px; margin-top:16px; padding:12px; border-left:2px solid var(--cyan); background:rgba(0,150,255,0.05);">Awaiting zone selection. Click a maritime region above to initialize live AIS tracking.</div>';
     }
-    
+
     container.innerHTML = html;
-    
+
     if (!container.dataset.seaBound) {
       container.addEventListener('click', (event) => {
         const selBtn = event.target.closest('[data-sea-select]');
@@ -4866,44 +4891,44 @@ function updateDataPanel() {
     const total = currentSatelliteCatalog.length;
     let leo = 0, meo = 0, geo = 0;
     const networks = {};
-    
+
     currentSatelliteCatalog.forEach(sat => {
         if (sat.orbitClass === 'LEO') leo++;
         else if (sat.orbitClass === 'GEO') geo++;
         else meo++;
-        
+
         const net = sat.network || 'Unknown';
         networks[net] = (networks[net] || 0) + 1;
     });
-    
+
     const topNetworks = Object.entries(networks)
         .sort((a,b) => b[1] - a[1])
         .slice(0, 10);
-        
+
     let html = `
       <div style="display:flex; justify-content:space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-        <div data-sat-orbit="all" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${!selectedSatOrbit ? 'rgba(0,229,255,0.15)' : 'transparent'};">
+        <div data-sat-orbit="all" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${!highlightedOrbitClass && !highlightedSatNetwork ? 'rgba(0,229,255,0.15)' : 'transparent'};">
           <div style="color:var(--cyan); font-size:16px; font-weight:600;">${total}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${!selectedSatOrbit ? '#fff' : ''}">Tracked Total</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${!highlightedOrbitClass && !highlightedSatNetwork ? '#fff' : ''}">Tracked Total</div>
         </div>
-        <div data-sat-orbit="LEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSatOrbit === 'LEO' ? 'rgba(0,229,100,0.15)' : 'transparent'};">
+        <div data-sat-orbit="LEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${highlightedOrbitClass === 'LEO' ? 'rgba(0,229,100,0.15)' : 'transparent'};">
           <div style="color:#00e564; font-size:16px; font-weight:600;">${leo}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSatOrbit === 'LEO' ? '#fff' : ''}">LEO</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${highlightedOrbitClass === 'LEO' ? '#fff' : ''}">LEO</div>
         </div>
-        <div data-sat-orbit="MEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSatOrbit === 'MEO' ? 'rgba(0,229,255,0.15)' : 'transparent'};">
+        <div data-sat-orbit="MEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${highlightedOrbitClass === 'MEO' ? 'rgba(0,229,255,0.15)' : 'transparent'};">
           <div style="color:#00e5ff; font-size:16px; font-weight:600;">${meo}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSatOrbit === 'MEO' ? '#fff' : ''}">MEO</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${highlightedOrbitClass === 'MEO' ? '#fff' : ''}">MEO</div>
         </div>
-        <div data-sat-orbit="GEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSatOrbit === 'GEO' ? 'rgba(255,60,60,0.15)' : 'transparent'};">
+        <div data-sat-orbit="GEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${highlightedOrbitClass === 'GEO' ? 'rgba(255,60,60,0.15)' : 'transparent'};">
           <div style="color:#ff3c3c; font-size:16px; font-weight:600;">${geo}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSatOrbit === 'GEO' ? '#fff' : ''}">GEO</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${highlightedOrbitClass === 'GEO' ? '#fff' : ''}">GEO</div>
         </div>
       </div>
       <div style="margin-bottom: 8px; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Top Constellations</div>
     `;
-    
+
     topNetworks.forEach(([net, count], i) => {
-        const isSelected = selectedSatNetwork === net;
+        const isSelected = highlightedSatNetwork === net;
         html += `
         <div data-sat-network="${net}" style="cursor:pointer; display:flex; justify-content:space-between; padding: 6px 4px; font-size: 11px; background: ${isSelected ? 'rgba(0,229,255,0.15)' : 'transparent'}; border-radius: 4px; transition: background 0.2s;">
           <span style="color:${isSelected ? '#fff' : '#ccc'}; font-weight:${isSelected ? 'bold' : 'normal'};">${i+1}. ${net}</span>
@@ -4911,9 +4936,9 @@ function updateDataPanel() {
         </div>
         `;
     });
-    
+
     container.innerHTML = html;
-    
+
     // Bind click events if not already bound via a delegated handler
     if (!container.dataset.satBound) {
       container.addEventListener('click', (event) => {
@@ -4922,26 +4947,35 @@ function updateDataPanel() {
           const orbit = orbitBtn.dataset.satOrbit;
           if (orbit === 'all') {
              selectedSatOrbit = null;
+             highlightedOrbitClass = null;
           } else if (selectedSatOrbit === orbit) {
              selectedSatOrbit = null;
+             highlightedOrbitClass = null;
           } else {
              selectedSatOrbit = orbit;
+             highlightedOrbitClass = orbit;
           }
-          selectedSatNetwork = null; // Clear network when orbit is toggled
+          selectedSatNetwork = null;
+          highlightedSatNetwork = null;
+          syncSatelliteToggle();
           if (typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
           if (typeof updateDataPanel === 'function') updateDataPanel();
           return;
         }
-        
+
         const netBtn = event.target.closest('[data-sat-network]');
         if (netBtn) {
           const net = netBtn.dataset.satNetwork;
           if (selectedSatNetwork === net) {
               selectedSatNetwork = null;
+              highlightedSatNetwork = null;
           } else {
               selectedSatNetwork = net;
+              highlightedSatNetwork = net;
           }
-          selectedSatOrbit = null; // Clear orbit when network is toggled
+          selectedSatOrbit = null;
+          highlightedOrbitClass = null;
+          syncSatelliteToggle();
           if (typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
           if (typeof updateDataPanel === 'function') updateDataPanel();
           return;
