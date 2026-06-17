@@ -4338,6 +4338,10 @@ function initOrUpdateGlobe(items = []) {
     } else {
       intelGlobe.customLayerData([]);
     }
+    // Re-assert atmosphere settings after data update (prevents black atmosphere bug)
+    intelGlobe.showAtmosphere(true);
+    intelGlobe.atmosphereColor('#6ab0ff');
+    intelGlobe.atmosphereAltitude(0.25);
   } catch(e) { console.error('[Intel] Globe data error:', e); }
 
   // Hover guard
