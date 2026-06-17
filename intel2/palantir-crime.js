@@ -621,6 +621,10 @@ function buildPalantirPatternPanel(crimes) {
   `).join('');
 }
 
+let palantirTimelineTooltip = null;
+let palantirTimelineScanX = null;
+let palantirTimelineAnimFrame = null;
+
 function drawPalantirTimeline(crimes) {
   const canvas = document.getElementById('palantir-timeline-canvas');
   const rangeEl = document.getElementById('palantir-timeline-range');
@@ -656,10 +660,22 @@ function drawPalantirTimeline(crimes) {
     rangeEl.textContent = `${dates[0]} → ${dates[dates.length - 1]}`;
   }
 
+  // Store for tooltip
+  canvas._tlDates = dates;
+  canvas._tlDateCounts = dateCounts;
+  canvas._tlMaxCount = maxCount;
+  canvas._tlBarW = Math.max(1, (w - 4) / dates.length);
+  canvas._tlW = w;
+  canvas._tlH = h;
+
   // Draw stacked bars
-  const barW = Math.max(1, (w - 4) / dates.length);
+  const barW = canvas._tlBarW;
   const categories = ['Violent', 'Property', 'Drug', 'Other'];
 
+  // Clear
+  ctx.clearRect(0, 0, w, h);
+
+  // Background scan line position (will be drawn in animation loop)
   dates.forEach((date, i) => {
     const counts = dateCounts[date];
     let y = h - 2;
@@ -672,6 +688,84 @@ function drawPalantirTimeline(crimes) {
       y -= barH;
     });
   });
+
+  // Add tooltip container if not exists
+  if (!palantirTimelineTooltip) {
+    palantirTimelineTooltip = document.createElement('div');
+    palantirTimelineTooltip.style.cssText = 'position:absolute;background:rgba(8,10,14,0.95);border:1px solid var(--border);border-radius:3px;padding:6px 10px;font-family:var(--font-mono);font-size:10px;pointer-events:none;z-index:2000;white-space:nowrap;backdrop-filter:blur(8px);display:none;';
+    canvas.parentElement.style.position = 'relative';
+    canvas.parentElement.appendChild(palantirTimelineTooltip);
+  }
+
+  // Hover handler
+  canvas.onmousemove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const idx = Math.floor((x - 2) / canvas._tlBarW);
+    if (idx >= 0 && idx < canvas._tlDates.length) {
+      const date = canvas._tlDates[idx];
+      const counts = canvas._tlDateCounts[date];
+      palantirTimelineTooltip.innerHTML = `<div style="color:var(--text);font-weight:700;margin-bottom:3px;">${date}</div><div style="color:#ff1744;">Violent: ${counts.Violent}</div><div style="color:#2979ff;">Property: ${counts.Property}</div><div style="color:#00e676;">Drug: ${counts.Drug}</div><div style="color:#78909c;">Other: ${counts.Other}</div><div style="color:var(--text);margin-top:2px;border-top:1px solid rgba(255,255,255,0.1);padding-top:2px;">Total: ${counts.total}</div>`;
+      palantirTimelineTooltip.style.display = 'block';
+      palantirTimelineTooltip.style.left = (x + 10) + 'px';
+      palantirTimelineTooltip.style.top = '-60px';
+    } else {
+      palantirTimelineTooltip.style.display = 'none';
+    }
+  };
+  canvas.onmouseleave = () => {
+    if (palantirTimelineTooltip) palantirTimelineTooltip.style.display = 'none';
+  };
+
+  // Start scan line animation
+  startTimelineScanLine(canvas, ctx, dates, dateCounts, maxCount, categories, w, h);
+}
+
+// ── Timeline Scan Line Animation ──
+function startTimelineScanLine(canvas, ctx, dates, dateCounts, maxCount, categories, w, h) {
+  if (palantirTimelineAnimFrame) cancelAnimationFrame(palantirTimelineAnimFrame);
+  
+  let scanX = 0;
+  const speed = 0.3; // pixels per frame
+  const barW = canvas._tlBarW;
+  
+  function animate() {
+    // Redraw bars
+    ctx.clearRect(0, 0, w, h);
+    dates.forEach((date, i) => {
+      const counts = dateCounts[date];
+      let y = h - 2;
+      categories.forEach(cat => {
+        const count = counts[cat] || 0;
+        if (count === 0) return;
+        const barH = (count / maxCount) * (h - 4);
+        ctx.fillStyle = PALANTIR_COLORS[cat] + '99';
+        ctx.fillRect(2 + i * barW, y - barH, Math.max(1, barW - 1), barH);
+        y -= barH;
+      });
+    });
+    
+    // Draw scan line
+    if (scanX >= w) scanX = 0;
+    ctx.beginPath();
+    ctx.moveTo(scanX, 0);
+    ctx.lineTo(scanX, h);
+    ctx.strokeStyle = 'rgba(0,229,255,0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    // Glow effect
+    const gradient = ctx.createLinearGradient(scanX - 15, 0, scanX, 0);
+    gradient.addColorStop(0, 'rgba(0,229,255,0)');
+    gradient.addColorStop(1, 'rgba(0,229,255,0.06)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(Math.max(0, scanX - 15), 0, 15, h);
+    
+    scanX += speed;
+    palantirTimelineAnimFrame = requestAnimationFrame(animate);
+  }
+  
+  animate();
 }
 
 function exportPalantirBrief() {
