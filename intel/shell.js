@@ -69,6 +69,8 @@ let threatArcData = [];
 let threatHotspots = [];
 let threatFeedStats = null;
 let threatVisibleTypes = new Set(['SSH Brute Force', 'Port Scan', 'Malware C2', 'Web Exploit', 'DDoS', 'Ransomware Probe']);
+let threatArcsVisible = true;
+let threatHotspotsVisible = true;
 
 // Threat attack type colors
 const threatTypeColors = {
@@ -2349,7 +2351,7 @@ async function refreshThreatFeed() {
 }
 
 function getThreatArcElements() {
-  if (!threatLayerEnabled || threatArcData.length === 0) return [];
+  if (!threatLayerEnabled || !threatArcsVisible || threatArcData.length === 0) return [];
   // Convert threat arcs into globe format, colored by attack type
   return threatArcData
     .filter(arc => threatVisibleTypes.has(arc.type))
@@ -2371,6 +2373,7 @@ function getThreatArcElements() {
 function getThreatHotspotPoints() {
   if (!threatLayerEnabled) return [];
   const points = [];
+  if (threatHotspotsVisible) {
   // Pulsing rings for top hotspots — colored by most common attack type from that country
   threatHotspots.forEach(hs => {
     const countryArcs = threatArcData.filter(a => a.srcCountry === hs.name && threatVisibleTypes.has(a.type));
@@ -2417,6 +2420,7 @@ function getThreatHotspotPoints() {
       raw: { kind: 'threat', type: arc.type, country: arc.srcCountry, count: 1, arcs: threatArcData.filter(a => a.srcLat === arc.srcLat && a.srcLng === arc.srcLng && threatVisibleTypes.has(a.type)) }
     });
   });
+  } // end threatHotspotsVisible
   return points;
 }
 
@@ -2940,6 +2944,26 @@ function initializeCommandSurface() {
       initOrUpdateGlobe(currentGlobeBaseItems || []);
     });
   });
+
+  // Threat arcs/hotspots toggle chips
+  const arcsBtn = document.getElementById('toggle-threat-arcs');
+  if (arcsBtn && !arcsBtn.dataset.bound) {
+    arcsBtn.dataset.bound = '1';
+    arcsBtn.addEventListener('click', () => {
+      threatArcsVisible = !threatArcsVisible;
+      arcsBtn.classList.toggle('active', threatArcsVisible);
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    });
+  }
+  const hotspotsBtn = document.getElementById('toggle-threat-hotspots');
+  if (hotspotsBtn && !hotspotsBtn.dataset.bound) {
+    hotspotsBtn.dataset.bound = '1';
+    hotspotsBtn.addEventListener('click', () => {
+      threatHotspotsVisible = !threatHotspotsVisible;
+      hotspotsBtn.classList.toggle('active', threatHotspotsVisible);
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    });
+  }
 
   document.querySelectorAll('[data-orbit]').forEach(btn => {
     if (btn.dataset.bound) return;
@@ -4163,7 +4187,7 @@ function initOrUpdateGlobe(items = []) {
 
   // ── DATA RENDERING ────────────────────────────────────────
   // Skip redundant updates only when satellite/air/threat layer state hasn't changed
-  const layerStateHash = [satelliteLayerEnabled, airLayerEnabled, seaLayerEnabled, threatLayerEnabled, currentSatelliteCatalog?.length || 0, currentAirTrafficItems?.length || 0, highlightedOrbitClass, highlightedSatNetwork, [...threatVisibleTypes].sort().join(',')].join(',');
+  const layerStateHash = [satelliteLayerEnabled, airLayerEnabled, seaLayerEnabled, threatLayerEnabled, currentSatelliteCatalog?.length || 0, currentAirTrafficItems?.length || 0, highlightedOrbitClass, highlightedSatNetwork, [...threatVisibleTypes].sort().join(','), threatArcsVisible, threatHotspotsVisible].join(',');
   const dataHash = items.length + ':' + (items[0]?.locationName || '') + ':' + (items[items.length-1]?.locationName || '') + ':' + layerStateHash;
   if (dataHash === _lastGlobeDataHash && intelGlobe) return; // No change, skip
   _lastGlobeDataHash = dataHash;
@@ -4394,7 +4418,7 @@ function initOrUpdateGlobe(items = []) {
     });
     intelGlobe.arcsData(threatArcData);
     intelGlobe.arcColor(d => d.color);
-    intelGlobe.arcStroke(1);
+    intelGlobe.arcStroke(0.5);
     intelGlobe.arcAltitude(d => d.arcAlt || 0.3);
     intelGlobe.ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints);
     intelGlobe.ringColor(d => d.ringColor || '#ff4444');

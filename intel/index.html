@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <base href="/intel/">
-  <title>Intel, Build 207 | Jon Grayson</title>
+  <title>Intel, Build 208 | Jon Grayson</title>
   <meta name="description" content="Intel build 201, Geographic Intel Projection, mapping structural states to global visualization inside jongrayson.com.">
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="dns-prefetch" href="https://unpkg.com">
@@ -124,6 +124,9 @@
               <button id="toggle-sat-geo" class="ghost-btn map-control-btn" style="background:transparent; border-color:rgba(255,238,0,0.5); color:#ffee00;" data-orbit="GEO">GEO</button>
           </div>
           <div id="threat-chip-bar" class="crime-chip-bar" style="display: none;">
+            <button id="toggle-threat-arcs" class="crime-chip active" style="--chip-color:#ff4444;">Arcs</button>
+            <button id="toggle-threat-hotspots" class="crime-chip active" style="--chip-color:#ff8800;">Hotspots</button>
+            <div class="crime-chip-divider"></div>
             <button class="threat-type-chip active" data-threat-type="SSH Brute Force" style="--chip-color:#ff8800;">SSH Brute</button>
             <button class="threat-type-chip active" data-threat-type="Port Scan" style="--chip-color:#ffcc00;">Port Scan</button>
             <button class="threat-type-chip active" data-threat-type="Malware C2" style="--chip-color:#aa44ff;">Malware C2</button>
@@ -312,7 +315,7 @@
     </main>
   </div>
 
-  <script src="shell.js?v=0.009.38"></script>
+  <script src="shell.js?v=0.009.39"></script>
   <script src="palantir-crime.js?v=0.001"></script>
 </body>
 </html>
