@@ -53,11 +53,11 @@ let currentGlobePointsData = [];
 let cityMapInstance = null;
 let pittsburghHeatLayer = null;
 let pittsburghHeatVisible = true;
-let pittsburghMarkersVisible = false;
+let pittsburghMarkersVisible = true;
 let pittsburghZoneLayer = null;
 let pittsburghZoneGeojsonData = null;
 let pittsburghZoneStatsData = null;
-let pittsburghZonesVisible = true;
+let pittsburghZonesVisible = false;
 let pittsburghCrimesData = [];
 let pittsburghCrimesLayer = null;
 let pittsburghDangerLayer = null;
@@ -3502,7 +3502,7 @@ function syncPittsburghZoneToggle(visible, eligible = false) {
   const button = document.getElementById('toggle-pittsburgh-zones');
   if (button) {
     button.style.display = eligible ? 'inline-flex' : 'none';
-    if (button) button.textContent = visible ? 'Zones' : 'Zones';
+    button.classList.toggle('active', visible);
   }
   const dangerBtn = document.getElementById('toggle-danger-zones');
   if (dangerBtn) dangerBtn.style.display = eligible ? 'inline-flex' : 'none';
@@ -3704,7 +3704,7 @@ function renderCityCrimeMap(item = {}) {
   }
 
   if (item.locationName === 'Pittsburgh, PA USA') {
-    syncPittsburghZoneToggle(true, true);
+    syncPittsburghZoneToggle(false, true);
     renderPittsburghZoneOverlay().catch(() => {
       syncPittsburghZoneToggle(false, false);
     });
@@ -3766,9 +3766,9 @@ function showGlobeStage() {
   pittsburghDangerVisible = false;
   if (pittsburghHeatLayer) { pittsburghHeatLayer = null; }
   pittsburghHeatVisible = true;
-  pittsburghMarkersVisible = false;
+  pittsburghMarkersVisible = true;
   if (mapStage) mapStage.innerHTML = '';
-  syncPittsburghZoneToggle(true, false);
+  syncPittsburghZoneToggle(false, false);
   if (title) {
   if (title) title.textContent = 'Global Operations Projection';
     title.style.color = '';

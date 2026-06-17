@@ -764,6 +764,10 @@ body {
   transition: all 0.15s;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  min-height: 28px;
 }
 
 .map-control-btn:hover, .map-control-select:hover {
@@ -841,6 +845,9 @@ body {
   padding: 3px 8px;
   cursor: pointer;
   transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
 }
 
 .ghost-btn:hover {
