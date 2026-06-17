@@ -1747,19 +1747,22 @@ body[data-interaction-mode="mobile"] .map-hover-card {
 .palantir-severity-btn:hover { background: rgba(255,255,255,0.08); }
 
 /* Incident Detail Drawer (Right) */
+/* Case File Drawer */
 .palantir-drawer {
   position: absolute;
-  top: 52px;
+  top: 56px;
   right: 0;
-  bottom: 60px;
+  bottom: 64px;
   width: 340px;
   z-index: 1000;
-  background: rgba(10,10,14,0.95);
+  background: rgba(8,10,14,0.97);
   border-left: 1px solid var(--border);
   backdrop-filter: blur(12px);
   overflow-y: auto;
   transform: translateX(340px);
   transition: transform 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
 }
 .palantir-drawer.open { transform: translateX(0); }
 .palantir-drawer-header {
@@ -1769,6 +1772,18 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   padding: 14px 16px 10px;
   border-bottom: 1px solid var(--border);
 }
+/* Severity bar — thin colored strip */
+.palantir-severity-bar {
+  width: 3px;
+  height: 36px;
+  border-radius: 2px;
+  background: var(--muted);
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+.palantir-severity-bar.high { background: #ff1744; box-shadow: 0 0 8px rgba(255,23,68,0.4); }
+.palantir-severity-bar.medium { background: #2979ff; }
+.palantir-severity-bar.low { background: #00e676; }
 .palantir-drawer-category {
   display: inline-flex;
   align-items: center;
@@ -1786,11 +1801,13 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   border: 1px solid var(--border);
   color: var(--muted);
   cursor: pointer;
-  font-size: 16px;
-  padding: 2px 8px;
+  font-size: 14px;
+  padding: 4px 10px;
   border-radius: 3px;
+  font-family: var(--font-mono);
+  transition: all 0.15s ease;
 }
-.palantir-drawer-close:hover { color: var(--text); border-color: var(--text); }
+.palantir-drawer-close:hover { color: var(--text); border-color: var(--text); background: rgba(255,255,255,0.04); }
 .palantir-drawer-body { padding: 14px 16px; }
 .palantir-drawer-section {
   margin-bottom: 16px;
@@ -1802,6 +1819,8 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   letter-spacing: 0.1em;
   color: var(--muted);
   margin-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding-bottom: 4px;
 }
 .palantir-drawer-field {
   display: flex;
@@ -1817,19 +1836,52 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   flex-direction: column;
   gap: 4px;
 }
+/* Related items */
 .palantir-related-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 8px;
-  background: rgba(255,255,255,0.04);
+  padding: 5px 8px;
   border-radius: 3px;
+  background: rgba(255,255,255,0.02);
+  cursor: pointer;
+  transition: background 0.15s ease;
   font-family: var(--font-mono);
   font-size: 10px;
-  cursor: pointer;
-  transition: background 0.15s;
 }
-.palantir-related-item:hover { background: rgba(255,255,255,0.08); }
+.palantir-related-item:hover { background: rgba(255,255,255,0.06); }
+/* Heat Grid */
+.palantir-heat-grid {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 1px;
+  width: 100%;
+  aspect-ratio: 3.5;
+  margin-top: 4px;
+}
+.palantir-heat-cell {
+  border-radius: 1px;
+  min-height: 4px;
+  transition: opacity 0.15s ease;
+  cursor: crosshair;
+}
+.palantir-heat-cell:hover { opacity: 0.8; outline: 1px solid rgba(255,255,255,0.3); }
+.palantir-heat-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--muted);
+  text-align: center;
+}
+/* Node Viz */
+.palantir-node-viz {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+.palantir-node-viz svg { width: 100%; height: 100%; }
 .palantir-related-dot {
   width: 6px;
   height: 6px;
@@ -1882,11 +1934,11 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 64px;
   z-index: 1000;
-  background: rgba(10,10,14,0.92);
+  background: rgba(8,10,14,0.96);
   border-top: 1px solid var(--border);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: stretch;
 }

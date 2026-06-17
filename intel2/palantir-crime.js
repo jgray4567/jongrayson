@@ -299,22 +299,41 @@ function openPalantirDrawer(crime) {
   const catEl = document.getElementById('palantir-drawer-category');
   const titleEl = document.getElementById('palantir-drawer-title');
   const bodyEl = document.getElementById('palantir-drawer-body');
+  const sevBar = document.getElementById('palantir-drawer-severity-bar');
+  const caseIdEl = document.getElementById('palantir-drawer-case-id');
 
   if (!drawer || !bodyEl) return;
 
   const color = PALANTIR_COLORS[crime.category] || '#78909c';
+  const severity = PALANTIR_SEVERITY[crime.category] || 'low';
   const isWatchlisted = palantirWatchlist.some(w => w.lat === crime.lat && w.lng === crime.lng && w.time === crime.time);
 
+  // Set severity bar
+  if (sevBar) {
+    sevBar.className = 'palantir-severity-bar ' + severity;
+  }
+
+  // Set category badge
   if (catEl) {
     catEl.style.background = color + '22';
-    catEl.style.borderLeft = `3px solid ${color}`;
+    catEl.style.borderLeft = '3px solid ' + color;
     catEl.style.color = color;
     catEl.textContent = crime.category;
   }
   if (titleEl) titleEl.textContent = crime.incident_type || 'Unknown Incident';
 
+  // Generate case ID
+  const caseId = 'PI-' + (crime.zone || 'X') + '-' + new Date(crime.time || Date.now()).toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.abs(Math.round((crime.lat || 0) * 1000)).toString(36).toUpperCase();
+  if (caseIdEl) caseIdEl.textContent = caseId;
+
   // Find related incidents
   const related = findRelatedIncidents(crime);
+
+  // Build heat grid
+  const heatGrid = buildHeatGrid(crime);
+
+  // Build node visualization
+  const nodeViz = buildNodeViz(crime, related);
 
   bodyEl.innerHTML = `
     <div class="palantir-drawer-section">
@@ -324,15 +343,15 @@ function openPalantirDrawer(crime) {
       <div class="palantir-drawer-field"><span class="label">Zone</span><span class="value">${crime.zone || 'N/A'}</span></div>
       <div class="palantir-drawer-field"><span class="label">Coordinates</span><span class="value">${crime.lat?.toFixed(4)}, ${crime.lng?.toFixed(4)}</span></div>
       <div class="palantir-drawer-field"><span class="label">Time</span><span class="value">${crime.time || 'N/A'}</span></div>
-      <div class="palantir-drawer-field"><span class="label">Severity</span><span class="value">${PALANTIR_SEVERITY[crime.category]?.toUpperCase() || 'LOW'}</span></div>
+      <div class="palantir-drawer-field"><span class="label">Severity</span><span class="value" style="color:${severity === 'high' ? '#ff1744' : severity === 'medium' ? '#2979ff' : '#00e676'}">${severity.toUpperCase()}</span></div>
     </div>
     <div class="palantir-drawer-section">
-      <div class="palantir-drawer-section-title">Temporal Pattern</div>
-      <div class="palantir-drawer-field"><span class="label">Day</span><span class="value">${crime.time ? new Date(crime.time).toLocaleDateString('en-US', {weekday:'long'}) : 'N/A'}</span></div>
-      <div class="palantir-drawer-field"><span class="label">Hour</span><span class="value">${crime.time ? new Date(crime.time).getHours() + ':00' : 'N/A'}</span></div>
+      <div class="palantir-drawer-section-title">Temporal Pattern — 7×24 Heat Grid</div>
+      ${heatGrid}
     </div>
     <div class="palantir-drawer-section">
       <div class="palantir-drawer-section-title">Related Incidents (${related.length})</div>
+      <div class="palantir-node-viz">${nodeViz}</div>
       <div class="palantir-drawer-related">
         ${related.slice(0, 8).map(r => `
           <div class="palantir-related-item" onclick='openPalantirDrawer(${JSON.stringify(r).replace(/'/g, "&#39;")})'>
@@ -344,13 +363,13 @@ function openPalantirDrawer(crime) {
     </div>
     <div class="palantir-drawer-section">
       <div class="palantir-drawer-section-title">Investigative Leads</div>
-      <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);line-height:1.5;">
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);line-height:1.6;">
         ${generateLeads(crime, related)}
       </div>
     </div>
     <div style="margin-top:12px;">
       <button onclick="togglePalantirWatchlistItem(${crime.lat},${crime.lng},'${crime.time?.replace(/'/g, "\\'") || ''}','${crime.incident_type?.replace(/'/g, "\\'") || ''}','${crime.category}')" 
-        style="background:${isWatchlisted ? '#ffd60022' : 'rgba(255,255,255,0.04)'};border:1px solid ${isWatchlisted ? '#ffd600' : 'var(--border)'};color:${isWatchlisted ? '#ffd600' : 'var(--muted)'};padding:6px 12px;border-radius:3px;cursor:pointer;font-family:var(--font-mono);font-size:10px;width:100%;text-transform:uppercase;letter-spacing:0.06em;">
+        style="background:${isWatchlisted ? '#ffd60022' : 'rgba(255,255,255,0.04)'};border:1px solid ${isWatchlisted ? '#ffd600' : 'var(--border)'};color:${isWatchlisted ? '#ffd600' : 'var(--muted)'};padding:8px 12px;border-radius:3px;cursor:pointer;font-family:var(--font-mono);font-size:10px;width:100%;text-transform:uppercase;letter-spacing:0.06em;transition:all 0.15s ease;">
         ${isWatchlisted ? '★ Watchlisted' : '☆ Add to Watchlist'}
       </button>
     </div>
@@ -397,6 +416,122 @@ function generateLeads(crime, related) {
   if (related.filter(r => r.category === 'Violent').length >= 2) leads.push('• Multiple violent incidents nearby — recommend enhanced patrol coverage.');
   if (leads.length === 0) leads.push('• No immediate leads — monitor for pattern emergence.');
   return leads.join('<br>');
+}
+
+// ── 7×24 Heat Grid ──
+function buildHeatGrid(crime) {
+  if (!pittsburghCrimesData || pittsburghCrimesData.length === 0) return '<div style="color:var(--muted);font-family:var(--font-mono);font-size:10px;">No data</div>';
+
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const hours = Array.from({length:24}, (_,i) => i);
+  const grid = {};
+  days.forEach(d => { grid[d] = {}; hours.forEach(h => { grid[d][h] = 0; }); });
+
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  pittsburghCrimesData.forEach(c => {
+    if (!c.time) return;
+    const dt = new Date(c.time);
+    const dayAbbr = days[(dayNames.indexOf(dayNames[dt.getDay()]) + 6) % 7] || days[dt.getDay() === 0 ? 6 : dt.getDay() - 1];
+    const hr = dt.getHours();
+    if (grid[dayAbbr] !== undefined) grid[dayAbbr][hr]++;
+  });
+
+  // Recalculate with correct day mapping
+  Object.keys(grid).forEach(d => hours.forEach(h => { grid[d][h] = 0; }));
+  pittsburghCrimesData.forEach(c => {
+    if (!c.time) return;
+    const dt = new Date(c.time);
+    // JS: 0=Sun, 1=Mon, ... 6=Sat → our grid: 0=Mon, ..., 6=Sun
+    const dayIdx = dt.getDay() === 0 ? 6 : dt.getDay() - 1;
+    const dayAbbr = days[dayIdx];
+    const hr = dt.getHours();
+    if (grid[dayAbbr]) grid[dayAbbr][hr]++;
+  });
+
+  const maxVal = Math.max(1, ...Object.values(grid).flatMap(d => Object.values(d)));
+  const crimeHour = crime.time ? new Date(crime.time).getHours() : -1;
+  const crimeDayIdx = crime.time ? (new Date(crime.time).getDay() === 0 ? 6 : new Date(crime.time).getDay() - 1) : -1;
+  const crimeDay = crimeDayIdx >= 0 ? days[crimeDayIdx] : null;
+
+  // Day labels on left
+  let html = '<div style="display:flex;">';
+  html += '<div style="display:flex;flex-direction:column;gap:1px;padding-right:3px;">';
+  html += '<div style="height:8px;"></div>'; // header spacer
+  days.forEach(d => {
+    html += `<div class="palantir-heat-label" style="height:4px;display:flex;align-items:center;">${d}</div>`;
+  });
+  html += '</div>';
+
+  // Grid cells
+  html += '<div style="flex:1;">';
+  html += '<div class="palantir-heat-grid">';
+  days.forEach(d => {
+    hours.forEach(h => {
+      const val = grid[d][h];
+      const intensity = val / maxVal;
+      const isCrimeCell = (d === crimeDay && h === crimeHour);
+      const color = intensity === 0 ? 'rgba(255,255,255,0.02)' :
+        intensity < 0.25 ? 'rgba(255,23,68,0.15)' :
+        intensity < 0.5 ? 'rgba(255,23,68,0.35)' :
+        intensity < 0.75 ? 'rgba(255,23,68,0.55)' : 'rgba(255,23,68,0.8)';
+      const border = isCrimeCell ? '2px solid #fff' : 'none';
+      html += `<div class="palantir-heat-cell" style="background:${color};${isCrimeCell ? 'border:'+border+';' : ''}" title="${d} ${h}:00 — ${val} incidents"></div>`;
+    });
+  });
+  html += '</div>';
+  // Hour labels
+  html += '<div style="display:flex;gap:1px;">';
+  [0,6,12,18,23].forEach(h => {
+    html += `<div class="palantir-heat-label" style="flex:1;text-align:${h===0?'left':h===23?'right':'center'};">${h}</div>`;
+  });
+  html += '</div>';
+  html += '</div></div>';
+  return html;
+}
+
+// ── Node Visualization ──
+function buildNodeViz(crime, related) {
+  if (!related || related.length === 0) return '';
+
+  const nodes = [{ ...crime, isCenter: true }];
+  related.slice(0, 6).forEach(r => nodes.push({ ...r, isCenter: false }));
+
+  const W = 308, H = 120;
+  const cx = W / 2, cy = H / 2;
+  const radius = 38;
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+
+  // Position center node
+  const centerNode = nodes[0];
+  const centerColor = PALANTIR_COLORS[centerNode.category] || '#78909c';
+
+  // Draw connections first (behind nodes)
+  nodes.slice(1).forEach((n, i) => {
+    const angle = (i / (nodes.length - 1)) * Math.PI * 2 - Math.PI / 2;
+    const nx = cx + radius * 1.8 * Math.cos(angle);
+    const ny = cy + radius * 1.1 * Math.sin(angle);
+    const nodeColor = PALANTIR_COLORS[n.category] || '#78909c';
+    svg += `<line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" stroke="${nodeColor}" stroke-opacity="0.15" stroke-width="1"/>`;
+  });
+
+  // Draw outer nodes
+  nodes.slice(1).forEach((n, i) => {
+    const angle = (i / (nodes.length - 1)) * Math.PI * 2 - Math.PI / 2;
+    const nx = cx + radius * 1.8 * Math.cos(angle);
+    const ny = cy + radius * 1.1 * Math.sin(angle);
+    const nodeColor = PALANTIR_COLORS[n.category] || '#78909c';
+    svg += `<circle cx="${nx}" cy="${ny}" r="4" fill="${nodeColor}" fill-opacity="0.8"/>`;
+    const label = (n.incident_type || 'Incident').substring(0, 12);
+    svg += `<text x="${nx}" y="${ny + 12}" text-anchor="middle" fill="${nodeColor}" fill-opacity="0.6" font-family="var(--font-mono)" font-size="6">${label}</text>`;
+  });
+
+  // Draw center node on top
+  svg += `<circle cx="${cx}" cy="${cy}" r="8" fill="${centerColor}" fill-opacity="0.9"/>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="12" fill="none" stroke="${centerColor}" stroke-opacity="0.3" stroke-width="1"/>`;
+
+  svg += '</svg>';
+  return svg;
 }
 
 function togglePalantirWatchlistItem(lat, lng, time, name, category) {

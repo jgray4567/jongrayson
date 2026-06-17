@@ -284,11 +284,15 @@
               </div>
             </div>
 
-            <div id="palantir-drawer" class="palantir-drawer">
+            <div id="palantir-drawer" class="palantir-drawer palantir-case-file">
               <div class="palantir-drawer-header">
-                <div>
-                  <div id="palantir-drawer-category" class="palantir-drawer-category"></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div id="palantir-drawer-severity-bar" class="palantir-severity-bar"></div>
+                    <div id="palantir-drawer-category" class="palantir-drawer-category"></div>
+                  </div>
                   <div id="palantir-drawer-title" style="font-family:var(--font-mono);font-size:13px;color:var(--text);margin-top:6px;"></div>
+                  <div id="palantir-drawer-case-id" style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:0.08em;"></div>
                 </div>
                 <button id="palantir-drawer-close" class="palantir-drawer-close">✕</button>
               </div>
