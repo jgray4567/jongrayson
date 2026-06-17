@@ -137,14 +137,13 @@ function setupSatelliteCustomLayer() {
     })
     .customThreeObjectUpdate((obj, d) => {
       Object.assign(obj.position, intelGlobe.getCoords(d.lat, d.lng, d.alt));
-      // Highlight/fade: highlighted satellites turn white, others fade 50%
+      // Highlight/fade: highlighted satellites keep their orbit color, non-highlighted dim to 40%
       const isHighlighted = !highlightedOrbitClass || d.orbitClass === highlightedOrbitClass;
-      const displayColor = isHighlighted ? 0xffffff : d.color; // white when highlighted
-      const targetOpacity = isHighlighted ? 0.95 : 0.4; // fade non-highlighted to ~50%
-      const targetGlowOpacity = isHighlighted ? 0.12 : 0.05;
+      const targetOpacity = isHighlighted ? 0.95 : 0.4;
+      const targetGlowOpacity = isHighlighted ? 0.15 : 0.04;
       obj.children.forEach(child => {
         if (child.material) {
-          child.material.color.setHex(displayColor);
+          if (!child.material.userData?.isGlow) child.material.color.setHex(d.color);
           child.material.opacity = child.material.userData?.isGlow ? targetGlowOpacity : targetOpacity;
           child.material.needsUpdate = true;
         }
@@ -2615,11 +2614,12 @@ function computeSatelliteLiveState(satItem, date = new Date()) {
   }
 }
 
-function satelliteOrbitColor(orbitClass, alpha) {
-  // Return hex color (alpha not supported with simple lines)
-  if (orbitClass === 'LEO') return '#00ff44';
-  if (orbitClass === 'GEO') return '#ffee00';
-  return '#ff8800';
+function satelliteOrbitColor(orbitClass, alpha = 1) {
+  // Return rgba color for path rendering (supports alpha)
+  const a = Math.max(0, Math.min(1, alpha));
+  if (orbitClass === 'LEO') return `rgba(0,255,68,${a})`;
+  if (orbitClass === 'GEO') return `rgba(255,238,0,${a})`;
+  return `rgba(255,136,0,${a})`; // MEO
 }
 
 function getSatelliteGlobeElements() {
@@ -2654,7 +2654,7 @@ function getSatelliteOrbitPaths() {
     const points = offsetsMinutes.map((offsetMinutes) => {
       const state = computeSatelliteLiveState(satItem, new Date(Date.now() + (offsetMinutes * 60000)));
       if (!state || !isFinite(state.lat) || !isFinite(state.lng) || Math.abs(state.lat) > 90 || Math.abs(state.lng) > 180) return null;
-      return { lat: state.lat, lng: state.lng, alt: state.altitudeRatio };
+      return { lat: state.lat, lng: state.lng };
     }).filter(Boolean);
     if (points.length < 2) return null;
     return {
@@ -4134,18 +4134,23 @@ function initOrUpdateGlobe(items = []) {
       color: p.color || '#4488ff'
     })));
   }
-  // Satellite orbit trail — only for selected satellite
+  // Satellite orbit trails — always show when SAT enabled, dim non-highlighted
   let satOrbitPaths = [];
-  if (selectedSatOrbit || selectedSatNetwork) {
-    satOrbitPaths = getSatelliteOrbitPaths().filter(p => {
-      if (selectedSatNetwork) return true; // show all orbits in selected network
-      return p.orbitClass === selectedSatOrbit;
-    });
+  if (satelliteLayerEnabled && currentSatelliteCatalog.length) {
+    const allOrbitPaths = getSatelliteOrbitPaths();
+    satOrbitPaths = allOrbitPaths;
     if (satOrbitPaths.length) {
-      overlayPaths.push(...satOrbitPaths.map(p => ({
-        coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: 0.005 })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
-        color: p.color.replace(/[\d.]+\)$/, '0.6)') // brighter than default
-      })).filter(p => p.coords.length >= 2));
+      overlayPaths.push(...satOrbitPaths.map(p => {
+        // Dim non-highlighted orbit paths to 10% opacity color
+        const isHighlighted = !highlightedOrbitClass || p.orbitClass === highlightedOrbitClass;
+        const pathColor = satelliteOrbitColor(p.orbitClass, isHighlighted ? 0.6 : 0.1);
+        // Altitude matches satellite altitude by orbit class
+        const pathAlt = p.orbitClass === 'GEO' ? 0.55 : p.orbitClass === 'MEO' ? 0.35 : 0.15;
+        return {
+          coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: pathAlt })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
+          color: pathColor
+        };
+      }).filter(p => p.coords.length >= 2));
     }
   }
 
