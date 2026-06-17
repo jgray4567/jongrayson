@@ -2064,6 +2064,27 @@ body[data-interaction-mode="mobile"] .map-hover-card {
   0%, 100% { opacity: 0.7; }
   50% { opacity: 1; }
 }
+/* Crime Marker Tooltip */
+.crime-marker-tooltip {
+  background: rgba(8,10,14,0.95) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  line-height: 1.4 !important;
+  padding: 6px 10px !important;
+  border-radius: 3px !important;
+  backdrop-filter: blur(8px) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+}
+.crime-marker-tooltip::before {
+  border-top-color: rgba(8,10,14,0.95) !important;
+}
+/* Watchlist Star */
+.crime-watchlist-star {
+  background: transparent !important;
+  border: none !important;
+}
 
 /* Mobile Responsive */
 @media (max-width: 768px) {

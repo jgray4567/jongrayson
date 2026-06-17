@@ -265,20 +265,69 @@ function renderPalantirMarkers(crimes) {
   }
   pittsburghCrimesLayer = L.layerGroup();
 
-  const useClusters = document.getElementById('palantir-toggle-clusters')?.classList.contains('active');
+  // Build repeat-location map (5+ incidents at same grid cell)
+  const repeatMap = {};
+  crimes.forEach(c => {
+    const key = `${(Math.round(c.lat * 1000) / 1000).toFixed(3)},${(Math.round(c.lng * 1000) / 1000).toFixed(3)}`;
+    if (!repeatMap[key]) repeatMap[key] = [];
+    repeatMap[key].push(c);
+  });
+  const repeatKeys = new Set(Object.keys(repeatMap).filter(k => repeatMap[k].length >= 3));
 
   crimes.forEach((crime) => {
     const color = PALANTIR_COLORS[crime.category] || '#78909c';
     const isViolent = crime.category === 'Violent';
+    const isWatchlisted = palantirWatchlist.some(w => w.lat === crime.lat && w.lng === crime.lng && w.time === crime.time);
+    const locKey = `${(Math.round(crime.lat * 1000) / 1000).toFixed(3)},${(Math.round(crime.lng * 1000) / 1000).toFixed(3)}`;
+    const isRepeat = repeatKeys.has(locKey);
+    const repeatCount = isRepeat ? repeatMap[locKey].length : 1;
 
+    // Base marker
     const marker = L.circleMarker([crime.lat, crime.lng], {
       radius: isViolent ? 5 : 3.5,
-      stroke: isViolent,
-      color: isViolent ? color : 'rgba(255,255,255,0.3)',
-      weight: isViolent ? 1.5 : 0.5,
+      stroke: isViolent || isRepeat,
+      color: isRepeat ? color : (isViolent ? color : 'rgba(255,255,255,0.3)'),
+      weight: isRepeat ? 2 : (isViolent ? 1.5 : 0.5),
       fillOpacity: isViolent ? 0.85 : 0.7,
       fillColor: color,
       className: isViolent ? 'crime-marker-pulse' : ''
+    });
+
+    // Repeat location ring
+    if (isRepeat && repeatCount >= 3) {
+      const ringRadius = 4 + Math.min(repeatCount, 10) * 1.5;
+      const ring = L.circleMarker([crime.lat, crime.lng], {
+        radius: ringRadius,
+        stroke: true,
+        color: color,
+        weight: 1,
+        fillOpacity: 0,
+        opacity: 0.4,
+        dashArray: '2,3'
+      });
+      ring.on('click', () => openPalantirDrawer(crime));
+      pittsburghCrimesLayer.addLayer(ring);
+    }
+
+    // Watchlist star — use DivIcon
+    if (isWatchlisted) {
+      const starIcon = L.divIcon({
+        className: 'crime-watchlist-star',
+        html: '<span style="color:#ffd600;font-size:10px;font-weight:700;text-shadow:0 0 4px rgba(255,214,0,0.6);pointer-events:none;position:absolute;top:-8px;left:-2px;">★</span>',
+        iconSize: [0, 0],
+        iconAnchor: [0, 0]
+      });
+      const starMarker = L.marker([crime.lat, crime.lng], { icon: starIcon, interactive: false });
+      pittsburghCrimesLayer.addLayer(starMarker);
+    }
+
+    // Tooltip on hover
+    const tooltipContent = `\u003cb style="color:${color}">${crime.category}</b><br/>${crime.incident_type || 'Unknown'}<br/><span style="opacity:0.6">${crime.time?.substring(5, 16) || ''}</span>${isRepeat ? '<br/><span style="color:#ff9100;font-size:9px;">Repeat location (' + repeatCount + '×)</span>' : ''}${isWatchlisted ? '<br/><span style="color:#ffd600;font-size:9px;">★ Watchlisted</span>' : ''}`;
+    marker.bindTooltip(tooltipContent, {
+      className: 'crime-marker-tooltip',
+      direction: 'top',
+      offset: [0, -8],
+      opacity: 0.95
     });
 
     marker.on('click', () => openPalantirDrawer(crime));
