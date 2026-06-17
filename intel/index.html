@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <base href="/intel/">
-  <title>Intel, Build 206 | Jon Grayson</title>
+  <title>Intel, Build 207 | Jon Grayson</title>
   <meta name="description" content="Intel build 201, Geographic Intel Projection, mapping structural states to global visualization inside jongrayson.com.">
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="dns-prefetch" href="https://unpkg.com">
@@ -122,6 +122,14 @@
               <button id="toggle-sat-leo" class="ghost-btn map-control-btn" style="background:transparent; border-color:rgba(0,255,68,0.5); color:#00ff44;" data-orbit="LEO">LEO</button>
               <button id="toggle-sat-meo" class="ghost-btn map-control-btn" style="background:transparent; border-color:rgba(255,136,0,0.5); color:#ff8800;" data-orbit="MEO">MEO</button>
               <button id="toggle-sat-geo" class="ghost-btn map-control-btn" style="background:transparent; border-color:rgba(255,238,0,0.5); color:#ffee00;" data-orbit="GEO">GEO</button>
+          </div>
+          <div id="threat-chip-bar" class="crime-chip-bar" style="display: none;">
+            <button class="threat-type-chip active" data-threat-type="SSH Brute Force" style="--chip-color:#ff8800;">SSH Brute</button>
+            <button class="threat-type-chip active" data-threat-type="Port Scan" style="--chip-color:#ffcc00;">Port Scan</button>
+            <button class="threat-type-chip active" data-threat-type="Malware C2" style="--chip-color:#aa44ff;">Malware C2</button>
+            <button class="threat-type-chip active" data-threat-type="Web Exploit" style="--chip-color:#ff4444;">Web Exploit</button>
+            <button class="threat-type-chip active" data-threat-type="DDoS" style="--chip-color:#ff2266;">DDoS</button>
+            <button class="threat-type-chip active" data-threat-type="Ransomware Probe" style="--chip-color:#ffdd00;">Ransomware</button>
           </div>
           <div id="crime-chip-bar" class="crime-chip-bar" style="display: none;">
             <button class="crime-chip active" data-category="Violent" style="--chip-color:#d32f2f;">Violent</button>
@@ -304,7 +312,7 @@
     </main>
   </div>
 
-  <script src="shell.js?v=0.009.37"></script>
+  <script src="shell.js?v=0.009.38"></script>
   <script src="palantir-crime.js?v=0.001"></script>
 </body>
 </html>

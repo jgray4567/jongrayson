@@ -67,6 +67,18 @@ let pittsburghVisibleCategories = new Set(['Violent', 'Property', 'Drug', 'Other
 let threatLayerEnabled = false;
 let threatArcData = [];
 let threatHotspots = [];
+let threatFeedStats = null;
+let threatVisibleTypes = new Set(['SSH Brute Force', 'Port Scan', 'Malware C2', 'Web Exploit', 'DDoS', 'Ransomware Probe']);
+
+// Threat attack type colors
+const threatTypeColors = {
+  'SSH Brute Force': '#ff8800',
+  'Port Scan': '#ffcc00',
+  'Malware C2': '#aa44ff',
+  'Web Exploit': '#ff4444',
+  'DDoS': '#ff2266',
+  'Ransomware Probe': '#ffdd00'
+};
 
 function isNightTime() {
   const hour = new Date().getHours();
@@ -2015,32 +2027,63 @@ function openIntelDrawer(item = {}) {
     const threatType = item.type || 'Cyber Threat';
     const threatCountry = item.country || 'Unknown';
     const threatCount = item.count || 1;
+    const relatedArcs = item.arcs || [];
     if (titleEl) titleEl.textContent = threatCountry;
     if (stateEl) {
-  if (stateEl) stateEl.textContent = 'threat';
+      stateEl.textContent = 'threat';
       stateEl.style.borderColor = '#ff3333';
       stateEl.style.color = '#ff3333';
     }
-    if (summaryEl) summaryEl.textContent = `${threatCount} threat${threatCount > 1 ? 's' : ''} detected originating from ${threatCountry}.`;
+    // Build summary with attack type breakdown
+    let summaryText = `${threatCount} threat${threatCount > 1 ? 's' : ''} detected originating from ${threatCountry}.`;
+    if (relatedArcs.length > 1) {
+      const typeCounts = {};
+      relatedArcs.forEach(a => { typeCounts[a.type] = (typeCounts[a.type] || 0) + 1; });
+      const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([t, c]) => `${t} (${c})`);
+      summaryText += ` Top: ${topTypes.join(', ')}`;
+    }
+    if (summaryEl) summaryEl.textContent = summaryText;
     setDrawerImage(null);
     if (mapEl) {
-  if (mapEl) mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Threat source is highlighted on the globe. Click-and-drag to inspect surrounding threat activity.</div>`;
+      // Show related targets if available
+      let mapContent = '';
+      if (relatedArcs.length > 0) {
+        const targets = [...new Set(relatedArcs.map(a => a.tgtName))].join(', ');
+        mapContent = `<div class="task-focus-meta" style="padding:16px;">
+          <div style="margin-bottom:8px;font-weight:600;color:#ff4444;">Attack Vectors</div>
+          <div style="margin-bottom:8px;color:var(--gmpx-color-on-surface-variant);">Targets: ${targets}</div>
+          <div style="color:var(--gmpx-color-on-surface-variant);font-size:0.75rem;">Click-and-drag globe to inspect surrounding activity.</div>
+        </div>`;
+      } else {
+        mapContent = `<div class="task-focus-meta" style="padding:16px;">Threat source is highlighted on the globe. Click-and-drag to inspect surrounding threat activity.</div>`;
+      }
+      mapEl.innerHTML = mapContent;
     }
-    if (metricsEl) {
-  if (metricsEl) metricsEl.innerHTML = [
-        ['Country', threatCountry],
-        ['Threats', threatCount],
-        ['Source', 'Honeypot Network'],
-        ['Status', 'Active monitoring'],
-        ['Risk Level', threatCount > 10 ? 'High' : threatCount > 5 ? 'Medium' : 'Low']
-      ].map(([label, value]) => `
-        <div class="intel-mini">
-          <div class="intel-mini-label">${label}</div>
-          <div class="intel-mini-value">${value}</div>
-        </div>
-      `).join('');
-    }
-    if (deepEl) deepEl.innerHTML = '';
+    // Build metrics with attack type breakdown
+    const typeColorHTML = relatedArcs.length > 0
+      ? Object.entries(relatedArcs.reduce((acc, a) => { acc[a.type] = (acc[a.type] || 0) + 1; return acc; }, {}))
+          .sort((a, b) => b[1] - a[1])
+          .map(([type, count]) => `<span style="color:${threatTypeColors[type] || '#ff4444'}">${count}× ${type}</span>`)
+          .join(' · ')
+      : '';
+    const totalToday = threatFeedStats?.todayThreats || threatCount;
+    if (metricsEl) metricsEl.innerHTML = [
+      ['Country', threatCountry],
+      ['Threats', threatCount],
+      ['Source', 'Honeypot Network'],
+      ['Status', 'Active monitoring'],
+      ['Risk Level', threatCount > 10 ? 'High' : threatCount > 5 ? 'Medium' : 'Low']
+    ].map(([label, value]) => `
+      <div class="intel-mini">
+        <div class="intel-mini-label">${label}</div>
+        <div class="intel-mini-value">${value}</div>
+      </div>
+    `).join('');
+    // Show attack types in deep section
+    if (deepEl) deepEl.innerHTML = typeColorHTML
+      ? `<div style="padding:8px 0;font-size:0.75rem;color:var(--gmpx-color-on-surface-variant);">${typeColorHTML}</div>
+         <div style="padding:4px 0;font-size:0.7rem;color:var(--text-dim);">${totalToday.toLocaleString()} total threats today</div>`
+      : '';
     if (selectedQuery) if (selectedQuery) selectedQuery.textContent = threatCountry;
     if (selectedMeta) selectedMeta.textContent = `${threatCount} threats · ${threatType}`;
     drawer.classList.add('visible');
@@ -2290,73 +2333,88 @@ async function refreshThreatFeed() {
   if (!threatLayerEnabled) {
     threatArcData = [];
     threatHotspots = [];
+    threatFeedStats = null;
     return;
   }
   try {
     const data = await fetchJson('api/threat-feed.php');
     threatArcData = data.arcs || [];
     threatHotspots = data.hotspots || [];
+    threatFeedStats = data.stats || null;
   } catch {
     threatArcData = [];
     threatHotspots = [];
+    threatFeedStats = null;
   }
 }
 
 function getThreatArcElements() {
   if (!threatLayerEnabled || threatArcData.length === 0) return [];
-  // Convert threat arcs into globe format
-  return threatArcData.map(arc => ({
-    kind: 'threat',
-    srcLat: arc.srcLat,
-    srcLng: arc.srcLng,
-    tgtLat: arc.tgtLat,
-    tgtLng: arc.tgtLng,
-    type: arc.type,
-    intensity: arc.intensity,
-    label: `<div style="text-align:center"><strong>${arc.type}</strong><br/>${arc.srcCountry} → ${arc.tgtName}</div>`,
-    raw: arc
-  }));
+  // Convert threat arcs into globe format, colored by attack type
+  return threatArcData
+    .filter(arc => threatVisibleTypes.has(arc.type))
+    .map(arc => ({
+      kind: 'threat',
+      startLat: arc.srcLat,
+      startLng: arc.srcLng,
+      endLat: arc.tgtLat,
+      endLng: arc.tgtLng,
+      color: threatTypeColors[arc.type] || '#ff4444',
+      arcAlt: 0.15 + (arc.intensity || 0.5) * 0.35,
+      type: arc.type,
+      intensity: arc.intensity,
+      label: `<div style="text-align:center"><strong>${arc.type}</strong><br/>${arc.srcCountry} → ${arc.tgtName}</div>`,
+      raw: arc
+    }));
 }
 
 function getThreatHotspotPoints() {
   if (!threatLayerEnabled) return [];
   const points = [];
-  // Pulsing rings for top hotspots
+  // Pulsing rings for top hotspots — colored by most common attack type from that country
   threatHotspots.forEach(hs => {
+    const countryArcs = threatArcData.filter(a => a.srcCountry === hs.name && threatVisibleTypes.has(a.type));
+    if (countryArcs.length === 0) return;
+    // Determine dominant attack type for color
+    const typeCounts = {};
+    countryArcs.forEach(a => { typeCounts[a.type] = (typeCounts[a.type] || 0) + 1; });
+    const dominantType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0][0];
+    const color = threatTypeColors[dominantType] || '#ff3333';
     points.push({
       kind: 'threat',
       lat: hs.lat,
       lng: hs.lng,
       size: Math.min(1.2, 0.3 + (hs.count * 0.15)),
-      color: '#ff3333',
-      ringColor: '#ff3333',
+      color: color,
+      ringColor: color,
       ringMaxRadius: 2 + hs.count * 0.5,
       ringPropagationSpeed: 2,
       ringRepeatPeriod: 800,
-      label: `<div style="text-align:center;color:#ff3333"><strong>${hs.name}</strong><br/>${hs.count} threats</div>`,
+      label: `<div style="text-align:center;color:${color}"><strong>${hs.name}</strong><br/>${hs.count} threats</div>`,
       shortLabel: hs.name,
-      raw: { kind: 'threat', type: 'Hotspot', country: hs.name, count: hs.count, arcs: threatArcData.filter(a => a.srcCountry === hs.name) }
+      raw: { kind: 'threat', type: 'Hotspot', country: hs.name, count: hs.count, arcs: countryArcs }
     });
   });
   // Small steady dots at every unique arc origin so arcs always start from a visible point
   const seen = new Set();
-  threatArcData.forEach(arc => {
+  threatArcData.filter(arc => threatVisibleTypes.has(arc.type)).forEach(arc => {
     const key = `${arc.srcLat},${arc.srcLng}`;
     if (seen.has(key)) return;
     seen.add(key);
+    const color = threatTypeColors[arc.type] || '#ff6644';
     points.push({
       kind: 'threat',
       lat: arc.srcLat,
       lng: arc.srcLng,
       size: 0.35,
-      color: '#ff6644',
-      ringColor: '#ff6644',
+      color: color,
+      ringColor: color,
       ringMaxRadius: 0,
       ringPropagationSpeed: 0,
       ringRepeatPeriod: 0,
-      label: `<div style="text-align:center;color:#ff6644"><strong>${arc.srcCountry}</strong><br/>${arc.type}</div>`,
+      label: `<div style="text-align:center;color:${color}"><strong>${arc.srcCountry}</strong><br/>${arc.type}</div>`,
       shortLabel: arc.srcCountry,
-      raw: { kind: 'threat', type: arc.type, country: arc.srcCountry, count: 1, arcs: threatArcData.filter(a => a.srcLat === arc.srcLat && a.srcLng === arc.srcLng) }
+      raw: { kind: 'threat', type: arc.type, country: arc.srcCountry, count: 1, arcs: threatArcData.filter(a => a.srcLat === arc.srcLat && a.srcLng === arc.srcLng && threatVisibleTypes.has(a.type)) }
     });
   });
   return points;
@@ -2855,6 +2913,9 @@ function initializeCommandSurface() {
     threatButton.addEventListener('click', async () => {
       threatLayerEnabled = !threatLayerEnabled;
       threatButton.classList.toggle('active', threatLayerEnabled);
+      // Show/hide threat chip bar
+      const threatChipBar = document.getElementById('threat-chip-bar');
+      if (threatChipBar) threatChipBar.style.display = threatLayerEnabled ? 'flex' : 'none';
       if (threatLayerEnabled && threatArcData.length === 0) {
         await refreshThreatFeed();
       }
@@ -2862,6 +2923,23 @@ function initializeCommandSurface() {
     });
     threatButton.dataset.bound = '1';
   }
+
+  // Threat type filter chips
+  document.querySelectorAll('.threat-type-chip').forEach(chip => {
+    if (chip.dataset.bound) return;
+    chip.dataset.bound = '1';
+    chip.addEventListener('click', () => {
+      const type = chip.dataset.threatType;
+      if (threatVisibleTypes.has(type)) {
+        threatVisibleTypes.delete(type);
+        chip.classList.remove('active');
+      } else {
+        threatVisibleTypes.add(type);
+        chip.classList.add('active');
+      }
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    });
+  });
 
   document.querySelectorAll('[data-orbit]').forEach(btn => {
     if (btn.dataset.bound) return;
@@ -3740,6 +3818,8 @@ function showMapStage(item = {}) {
   const seaButton = document.getElementById('toggle-sea-layer');
   if (seaButton) seaButton.style.display = 'none';
   if (threatButton) threatButton.style.display = 'none';
+  const threatChipBar = document.getElementById('threat-chip-bar');
+  if (threatChipBar) threatChipBar.style.display = 'none';
   const satOrbitFilters = document.getElementById('sat-orbit-filters');
   if (satOrbitFilters) satOrbitFilters.style.display = 'none';
 }
@@ -3779,6 +3859,9 @@ function showGlobeStage() {
   const seaButton = document.getElementById('toggle-sea-layer');
   if (seaButton) seaButton.style.display = 'inline-flex';
   if (threatButton) threatButton.style.display = 'inline-flex';
+  // Restore threat chip bar if threat layer is active
+  const threatChipBar = document.getElementById('threat-chip-bar');
+  if (threatChipBar) threatChipBar.style.display = threatLayerEnabled ? 'flex' : 'none';
   const satOrbitFilters = document.getElementById('sat-orbit-filters');
   if (satOrbitFilters && satelliteLayerEnabled) satOrbitFilters.style.display = 'inline-flex';
   // Rotation removed - globe is static
@@ -4080,7 +4163,7 @@ function initOrUpdateGlobe(items = []) {
 
   // ── DATA RENDERING ────────────────────────────────────────
   // Skip redundant updates only when satellite/air/threat layer state hasn't changed
-  const layerStateHash = [satelliteLayerEnabled, airLayerEnabled, seaLayerEnabled, threatLayerEnabled, currentSatelliteCatalog?.length || 0, currentAirTrafficItems?.length || 0, highlightedOrbitClass, highlightedSatNetwork].join(',');
+  const layerStateHash = [satelliteLayerEnabled, airLayerEnabled, seaLayerEnabled, threatLayerEnabled, currentSatelliteCatalog?.length || 0, currentAirTrafficItems?.length || 0, highlightedOrbitClass, highlightedSatNetwork, [...threatVisibleTypes].sort().join(',')].join(',');
   const dataHash = items.length + ':' + (items[0]?.locationName || '') + ':' + (items[items.length-1]?.locationName || '') + ':' + layerStateHash;
   if (dataHash === _lastGlobeDataHash && intelGlobe) return; // No change, skip
   _lastGlobeDataHash = dataHash;

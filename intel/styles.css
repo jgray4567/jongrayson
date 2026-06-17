@@ -588,6 +588,56 @@ body {
   flex-shrink: 0;
 }
 
+/* Threat type filter chips */
+.threat-type-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: var(--gmpx-radius-sm);
+  border: 1px solid var(--gmpx-color-outline-variant);
+  background: transparent;
+  color: var(--gmpx-color-on-surface-variant);
+  font-family: var(--gmpx-font-family-base);
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  white-space: nowrap;
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  position: relative;
+  overflow: hidden;
+}
+.threat-type-chip::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--chip-color, var(--gmpx-color-on-surface-variant));
+  opacity: 0.35;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.threat-type-chip.active {
+  border-color: var(--chip-color, var(--gmpx-color-primary));
+  color: var(--chip-color, var(--gmpx-color-on-surface-variant));
+  background: rgba(var(--chip-rgb, 95,99,104), 0.08);
+}
+.threat-type-chip.active::before {
+  opacity: 1;
+}
+.threat-type-chip:hover {
+  background: rgba(var(--chip-rgb, 95,99,104), 0.06);
+}
+.threat-type-chip.active:hover {
+  background: rgba(var(--chip-rgb, 95,99,104), 0.12);
+}
+
 /* ── CRIME DATA CARD (Google gmpx place-detail spec) ── */
 .crime-popup {
   min-width: 280px;
