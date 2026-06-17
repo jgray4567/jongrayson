@@ -91,7 +91,19 @@ body {
   overflow: hidden;
 }
 
-/* Background grid removed — will revisit later */
+/* Background: subtle radial glow + grid */
+.hud-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(196,214,0,0.03) 0%, transparent 70%),
+    linear-gradient(rgba(196,214,0,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(196,214,0,0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
 
 /* ── Top Bar ────────────────────────────────────────────────── */
 
@@ -305,9 +317,46 @@ body {
   min-height: 300px;
 }
 
-/* Scan-line overlay removed — will revisit later */
+/* Scan-line overlay */
+.hud-globe-area::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(196,214,0,0.008) 2px,
+    rgba(196,214,0,0.008) 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 6px;
+}
 
-/* Globe ring decoration removed — will revisit later */
+/* Rotating ring decoration around globe */
+.hud-globe-area::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(80%, 500px);
+  height: min(80%, 500px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  box-shadow:
+    0 0 40px rgba(196,214,0,0.02),
+    inset 0 0 40px rgba(196,214,0,0.01);
+  pointer-events: none;
+  z-index: 1;
+  animation: ring-rotate 120s linear infinite;
+}
+
+@keyframes ring-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
 
 .hud-globe-label {
   position: absolute;
@@ -715,6 +764,10 @@ body {
   transition: all 0.15s;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  min-height: 28px;
 }
 
 .map-control-btn:hover, .map-control-select:hover {
@@ -792,6 +845,9 @@ body {
   padding: 3px 8px;
   cursor: pointer;
   transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
 }
 
 .ghost-btn:hover {

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intel, Build 113 | Jon Grayson</title>
+  <meta name="description" content="Intel build 113, task signal correlation filtering, inside jongrayson.com.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="rail left-rail">
+      <div class="brand-block">
+        <div class="brand-kicker">jongrayson.com /intel</div>
+        <h1>Intel</h1>
+        <p class="muted">Site-side control surface for the escalation stack.</p>
+        <a class="home-link" href="/">← Back to home</a>
+      </div>
+
+      <div class="panel">
+        <div class="panel-kicker">Build</div>
+        <div class="panel-title">Build 114</div>
+        <div class="muted">Archived feed restoration metrics</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-kicker">Task Signal Correlation</div>
+        <div id="task-signal-correlation-card"></div>
+        <div class="panel-kicker">Task Retention Analytics</div>
+        <div id="task-retention-analytics-card"></div>
+        <div class="panel-kicker">Task Context Analytics</div>
+        <div id="task-context-analytics-card"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-kicker">Signal Action Analytics</div>
+        <div id="signal-action-analytics-card"></div>
+        <div id="signal-recovery-analytics-card" style="margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px;"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-kicker">Signal Escalation Analytics</div>
+        <div id="signal-escalation-analytics-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-kicker">Third-Order Escalation Dashboard</div>
+        <div id="third-order-escalation-dashboard-card"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-kicker">Third-Order Escalation Recommendations</div>
+        <div id="third-order-escalation-recommendations-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-kicker">Third-Order Escalation Analytics</div>
+        <div id="third-order-escalation-analytics-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-kicker">Third-Order Escalation Effectiveness</div>
+        <div id="third-order-escalation-effectiveness-list"></div>
+      </div>
+    </aside>
+
+    <main class="center-stage">
+      <div class="hero-card">
+        <div class="hero-kicker" id="overview-eyebrow">Intel Surface</div>
+        <h2 id="overview-headline">Build 114 is live inside jongrayson.com.</h2>
+        <p>
+          The intel route is now a real site-side shell. Build 114 adds archived feed restoration metrics,
+          giving operators visibility into how often signals are pulled back from the archive into the active feed.
+        </p>
+      </div>
+
+      <div class="stage-grid">
+        <section class="stage-card">
+          <div class="panel-kicker">Selected Query</div>
+          <div id="selected-query" class="big-query">harbor</div>
+          <div id="selected-meta" class="muted">Use the chips on the left to focus a recommendation case.</div>
+        </section>
+
+        <section class="stage-card">
+          <div class="panel-kicker">Current Layer</div>
+          <ul class="plain-list">
+            <li>Third-order escalation recommendations</li>
+            <li>Acceptance tracking</li>
+            <li>Acceptance analytics</li>
+            <li>Effectiveness scoring</li>
+            <li>Operational dashboard</li>
+            <li>Live signal feed</li>
+            <li>Signal triaging</li>
+            <li>Signal escalation</li>
+            <li>Escalation analytics</li>
+            <li>Signal source filtering</li>
+            <li>Signal severity filtering</li>
+            <li>Feed auto-refresh</li>
+            <li>Archived signal recovery</li>
+            <li>Escalation net scoring</li>
+            <li>Signal action analytics</li>
+            <li>Task context analytics</li>
+            <li>Task context filtering</li>
+            <li>Task retention analytics</li>
+            <li>Task signal correlation</li>
+            <li>Task signal filtering</li>
+            <li>Archived feed metrics</li>
+          </ul>
+        </section>
+
+        <section class="stage-card" style="grid-column: 1 / -1;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px;">
+            <div>
+              <div class="panel-kicker">Signal Feed <span id="feed-status" style="margin-left:8px; font-size:0.7rem; color:var(--muted); font-weight:normal; text-transform:none; letter-spacing:normal;">● Live</span></div>
+              <div class="signal-filters" id="signal-view-filters" style="margin-top:10px;">
+                <button class="ghost-btn active" data-feed-view="active">Active</button>
+                <button class="ghost-btn" data-feed-view="archived">Archived</button>
+              </div>
+            </div>
+            <div class="signal-filters" id="signal-severity-filters">
+              <button class="ghost-btn" data-severity="all">All</button>
+              <button class="ghost-btn" data-severity="high">High</button>
+              <button class="ghost-btn" data-severity="medium">Medium</button>
+              <button class="ghost-btn" data-severity="low">Low</button>
+            </div>
+          </div>
+          <div id="signal-feed-list" style="margin-top:14px;"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="shell.js" type="module"></script>
+</body>
+</html>

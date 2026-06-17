@@ -47,14 +47,17 @@ let currentBaselineViewId = '';
 let autoRefreshTimer = null;
 let diagnosticsVisible = false;
 let currentPriorityItems = [];
-let globeAutoRotateEnabled = true;
+
 let currentGlobeBaseItems = [];
 let currentGlobePointsData = [];
 let cityMapInstance = null;
+let pittsburghHeatLayer = null;
+let pittsburghHeatVisible = true;
+let pittsburghMarkersVisible = true;
 let pittsburghZoneLayer = null;
 let pittsburghZoneGeojsonData = null;
 let pittsburghZoneStatsData = null;
-let pittsburghZonesVisible = true;
+let pittsburghZonesVisible = false;
 let pittsburghCrimesData = [];
 let pittsburghCrimesLayer = null;
 let pittsburghDangerLayer = null;
@@ -64,10 +67,24 @@ let pittsburghVisibleCategories = new Set(['Violent', 'Property', 'Drug', 'Other
 let threatLayerEnabled = false;
 let threatArcData = [];
 let threatHotspots = [];
+let threatFeedStats = null;
+let threatVisibleTypes = new Set(['SSH Brute Force', 'Port Scan', 'Malware C2', 'Web Exploit', 'DDoS', 'Ransomware Probe']);
+let threatArcsVisible = true;
+let threatHotspotsVisible = true;
+
+// Threat attack type colors
+const threatTypeColors = {
+  'SSH Brute Force': '#ff8800',
+  'Port Scan': '#ffcc00',
+  'Malware C2': '#aa44ff',
+  'Web Exploit': '#ff4444',
+  'DDoS': '#ff2266',
+  'Ransomware Probe': '#ffdd00'
+};
 
 function isNightTime() {
   const hour = new Date().getHours();
-  return hour >= 19 || hour < 6; // 7pm–6am
+  return hour >= 19 || hour < 6; // 7pm-6am
 }
 
 let mapHoverCard = null;
@@ -79,7 +96,90 @@ let selectedAirIcao24 = null;
 let selectedAirRegion = null;
 let selectedAirCategory = null;
 let hoveredCityLabel = null;
+let hoveredCity = null;
+let overlayFlightPaths = [];
+let overlaySatelliteOrbits = [];
+let overlayElements = [];
 let satelliteLayerEnabled = false;
+
+// Set up satellite custom layer with Three.js spheres
+let _satCustomLayerSetup = false;
+
+function setupSatelliteCustomLayer() {
+  if (_satCustomLayerSetup || !intelGlobe) return;
+  if (!window.THREE) {
+    // THREE not loaded yet - listen for event AND poll as fallback
+    console.log('[Intel] Waiting for THREE.js global bridge...');
+    window.addEventListener('three-ready', () => {
+      console.log('[Intel] THREE.js ready via event');
+      setupSatelliteCustomLayer();
+    }, { once: true });
+    // Polling fallback in case event already fired
+    let polls = 0;
+    const poll = setInterval(() => {
+      polls++;
+      if (window.THREE) {
+        clearInterval(poll);
+        console.log('[Intel] THREE.js ready via poll (attempt ' + polls + ')');
+        setupSatelliteCustomLayer();
+      } else if (polls > 50) { // 5 seconds
+        clearInterval(poll);
+        console.error('[Intel] THREE.js never loaded');
+      }
+    }, 100);
+    return;
+  }
+  _satCustomLayerSetup = true;
+  const T = window.THREE;
+  console.log('[Intel] Setting up satellite custom layer with THREE', T.REVISION);
+
+  intelGlobe
+    .customThreeObject(d => {
+      const sz = Math.max(0.01, d.size || 0.35);
+      const group = new T.Group();
+      // Core bright sphere
+      const geo = new T.SphereGeometry(sz, 8, 6);
+      const mat = new T.MeshBasicMaterial({ color: d.color || 0x00ff44, transparent: true, opacity: 0.95 });
+      group.add(new T.Mesh(geo, mat));
+      // Outer glow shell
+      const glowGeo = new T.SphereGeometry(sz * 2.5, 8, 6);
+      const glowMat = new T.MeshBasicMaterial({ color: d.color || 0x00ff44, transparent: true, opacity: 0.12 });
+      glowMat.userData = { isGlow: true };
+      const glowMesh = new T.Mesh(glowGeo, glowMat);
+      group.add(glowMesh);
+      return group;
+    })
+    .customThreeObjectUpdate((obj, d) => {
+      Object.assign(obj.position, intelGlobe.getCoords(d.lat, d.lng, d.alt));
+      // Highlight/fade logic:
+      // - Orbit class highlight: non-matching orbits dim to 40%
+      // - Network highlight: non-matching networks dim to 40%, matching ones turn white
+      // - No highlight: all at full brightness
+      let isHighlighted = true;
+      let useWhite = false;
+      if (highlightedSatNetwork) {
+        isHighlighted = (d.raw?.network === highlightedSatNetwork);
+        useWhite = isHighlighted;
+      } else if (highlightedOrbitClass) {
+        isHighlighted = (d.orbitClass === highlightedOrbitClass);
+      }
+      const targetOpacity = isHighlighted ? 0.95 : 0.4;
+      const targetGlowOpacity = isHighlighted ? 0.15 : 0.04;
+      const displayColor = useWhite ? 0xffffff : d.color;
+      obj.children.forEach(child => {
+        if (child.material) {
+          if (!child.material.userData?.isGlow) child.material.color.setHex(displayColor);
+          child.material.opacity = child.material.userData?.isGlow ? targetGlowOpacity : targetOpacity;
+          child.material.needsUpdate = true;
+        }
+      });
+    });
+
+  // Re-render with current data if SAT is already enabled
+  if (satelliteLayerEnabled && currentSatelliteCatalog.length) {
+    initOrUpdateGlobe(currentGlobeBaseItems || []);
+  }
+}
 let seaLayerEnabled = false;
 let currentVesselCatalog = [];
 let seaLayerTimer = null;
@@ -91,6 +191,8 @@ let satelliteLayerTimer = null;
 let selectedSatNetwork = null;
 let selectedSatOrbit = null;
 const visibleSatelliteOrbits = new Set(['LEO', 'MEO', 'GEO']);
+let highlightedOrbitClass = null; // null = no highlight, 'LEO'/'MEO'/'GEO' = highlighted class
+let highlightedSatNetwork = null; // null = no highlight, 'Starlink'/'GPS'/etc = highlighted network
 const cityCrimeScans = {
   'Los Angeles Port': {
     center: [33.739, -118.262],
@@ -997,7 +1099,7 @@ function strcmpSafe(a, b) {
 function renderSignalFeed(items = []) {
   if (signalFeedList) signalFeedList.innerHTML = items.map(item => {
     const archiveBadge = currentFeedView === 'archived' ? `<span class="muted" style="text-transform:uppercase; font-size:0.7rem; border:1px solid var(--border); padding:2px 6px; border-radius:4px;">${item.status}</span>` : '';
-    
+
     let actionsHtml = '';
     if (currentFeedView === 'active') {
       actionsHtml = `
@@ -1019,7 +1121,7 @@ function renderSignalFeed(items = []) {
     } else {
       actionsHtml = `<button class="signal-btn" data-signal-id="${item.id}" data-signal-action="recover">Recover to Active</button>`;
     }
-      
+
     return `
       <div class="signal-item">
         <div class="signal-meta">
@@ -1084,7 +1186,7 @@ function startAutoRefresh() {
   if (autoRefreshTimer) clearInterval(autoRefreshTimer);
   autoRefreshTimer = setInterval(() => {
     loadIntel();
-  }, 5000);
+  }, 30000); // 30s refresh, not 5s
 }
 
 signalSeverityFilters?.addEventListener('click', async (event) => {
@@ -1462,13 +1564,13 @@ signalFeedList?.addEventListener('click', async (event) => {
   if (scoreBtn) {
     const id = scoreBtn.dataset.signalId;
     const outcome = scoreBtn.dataset.signalScore;
-    
+
     await fetchJson('api/signal-escalation-score.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, outcome })
     });
-    
+
     await loadIntel();
     return;
   }
@@ -1485,13 +1587,13 @@ signalFeedList?.addEventListener('click', async (event) => {
     setSelected({ suggestedQuery: `Signal: ${id}`, topic: source, thirdOrderEscalationAction: 'escalated to focus' });
   if (overviewHeadline) overviewHeadline.textContent = title;
   }
-  
+
   await fetchJson('api/signal-action.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id, action })
   });
-  
+
   await loadIntel();
 });
 
@@ -1529,14 +1631,20 @@ effectivenessList?.addEventListener('click', async (event) => {
   setSelected(item);
 });
 
-initializeStateFromUrl();
-syncTimelineWindowButtons();
-syncSeverityFilterButtons();
-syncFeedViewButtons();
-syncBaselineControls();
-renderBaselineHistory();
-initializeCommandSurface();
-loadIntel().then(() => startAutoRefresh());
+// ── Boot sequence ──
+function safeCall(fn, label) {
+  try { fn(); console.log('[Intel] ✅', label); }
+  catch(e) { console.error('[Intel] ❌', label, e.message); }
+}
+safeCall(initializeStateFromUrl, 'initializeStateFromUrl');
+safeCall(syncTimelineWindowButtons, 'syncTimelineWindowButtons');
+safeCall(syncSeverityFilterButtons, 'syncSeverityFilterButtons');
+safeCall(syncFeedViewButtons, 'syncFeedViewButtons');
+safeCall(syncBaselineControls, 'syncBaselineControls');
+safeCall(renderBaselineHistory, 'renderBaselineHistory');
+safeCall(initializeCommandSurface, 'initializeCommandSurface');
+
+loadIntel().then(() => startAutoRefresh()).catch(e => console.error('[Intel] loadIntel failed:', e));
 
 function getStructuralStateCounts(items = []) {
   return items.reduce((acc, item) => {
@@ -1651,7 +1759,7 @@ function closeIntelDrawer() {
   drawer.classList.remove('visible');
   drawer.setAttribute('aria-hidden', 'true');
   setDrawerImage(null);
-  
+
   if (selectedAirIcao24) {
       selectedAirIcao24 = null;
       if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems || []);
@@ -1683,9 +1791,9 @@ function openIntelDrawer(item = {}) {
   if (!drawer) return;
 
   const airlineLogoEl = document.getElementById('intel-drawer-airline-logo');
-  if (airlineLogoEl) { 
-      airlineLogoEl.style.display = 'none'; 
-      airlineLogoEl.src = ''; 
+  if (airlineLogoEl) {
+      airlineLogoEl.style.display = 'none';
+      airlineLogoEl.src = '';
       airlineLogoEl.style.borderRadius = '0';
       airlineLogoEl.style.border = 'none';
   }
@@ -1713,7 +1821,7 @@ function openIntelDrawer(item = {}) {
       stateEl.style.color = '#0096ff';
     }
     if (summaryEl) summaryEl.textContent = `Type: ${v.type} | Flag: ${v.flag}`;
-    
+
     if (airlineLogoEl && v.flag) {
         const code = getSeaFlagCode(v.flag);
         if (code) {
@@ -1723,7 +1831,7 @@ function openIntelDrawer(item = {}) {
             airlineLogoEl.style.border = '1px solid rgba(255,255,255,0.1)';
         }
     }
-    
+
     if (mapEl) {
       mapEl.innerHTML = `
         <div style="padding:16px;">
@@ -1746,11 +1854,11 @@ function openIntelDrawer(item = {}) {
        summaryEl.innerHTML = `Graph Entity (Group ${node.group})` + (node.url ? `<br><br><a href="${node.url}" target="_blank" rel="noopener noreferrer" style="color:#00e5ff; text-decoration:underline; font-size:13px; font-weight:bold;">→ View Source Article</a>` : '');
     }
     setDrawerImage(node.image || null, node.label);
-    
+
     if (mapEl) {
       mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Node is currently focused on the Link Graph canvas.</div>`;
     }
-    
+
     if (metricsEl) {
       let relHtml = '';
       if (item.related && item.related.length > 0) {
@@ -1763,17 +1871,17 @@ function openIntelDrawer(item = {}) {
       } else {
         relHtml = '<div class="muted">No direct links found.</div>';
       }
-      
+
       metricsEl.innerHTML = `
         <div style="font-family:var(--font-mono); text-transform:uppercase; font-size:10px; color:var(--lime); margin-bottom:12px; letter-spacing:0.05em; border-bottom:1px solid var(--border); padding-bottom:6px;">Direct Relationships</div>
         ${relHtml}
       `;
     }
-    
+
     if (deepEl) deepEl.innerHTML = '';
     if (selectedQuery) selectedQuery.textContent = node.label || 'Entity Node';
     if (selectedMeta) selectedMeta.textContent = `${item.related?.length || 0} connections established`;
-    
+
     drawer.classList.add('visible');
     drawer.setAttribute('aria-hidden', 'false');
     return;
@@ -1794,11 +1902,11 @@ function openIntelDrawer(item = {}) {
     if (metricsEl) {
   if (metricsEl) metricsEl.innerHTML = [
         ['Flight', aircraftTitle],
-        ['Airline', 'Loading…'],
-        ['Departure', 'Loading…'],
-        ['Destination', 'Loading…'],
-        ['Departure time', 'Loading…'],
-        ['Arrival time', 'Loading…']
+        ['Airline', 'Loading...'],
+        ['Departure', 'Loading...'],
+        ['Destination', 'Loading...'],
+        ['Departure time', 'Loading...'],
+        ['Arrival time', 'Loading...']
       ].map(([label, value]) => `
         <div class="intel-mini">
           <div class="intel-mini-label">${label}</div>
@@ -1921,32 +2029,63 @@ function openIntelDrawer(item = {}) {
     const threatType = item.type || 'Cyber Threat';
     const threatCountry = item.country || 'Unknown';
     const threatCount = item.count || 1;
+    const relatedArcs = item.arcs || [];
     if (titleEl) titleEl.textContent = threatCountry;
     if (stateEl) {
-  if (stateEl) stateEl.textContent = 'threat';
+      stateEl.textContent = 'threat';
       stateEl.style.borderColor = '#ff3333';
       stateEl.style.color = '#ff3333';
     }
-    if (summaryEl) summaryEl.textContent = `${threatCount} threat${threatCount > 1 ? 's' : ''} detected originating from ${threatCountry}.`;
+    // Build summary with attack type breakdown
+    let summaryText = `${threatCount} threat${threatCount > 1 ? 's' : ''} detected originating from ${threatCountry}.`;
+    if (relatedArcs.length > 1) {
+      const typeCounts = {};
+      relatedArcs.forEach(a => { typeCounts[a.type] = (typeCounts[a.type] || 0) + 1; });
+      const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([t, c]) => `${t} (${c})`);
+      summaryText += ` Top: ${topTypes.join(', ')}`;
+    }
+    if (summaryEl) summaryEl.textContent = summaryText;
     setDrawerImage(null);
     if (mapEl) {
-  if (mapEl) mapEl.innerHTML = `<div class="task-focus-meta" style="padding:16px;">Threat source is highlighted on the globe. Click-and-drag to inspect surrounding threat activity.</div>`;
+      // Show related targets if available
+      let mapContent = '';
+      if (relatedArcs.length > 0) {
+        const targets = [...new Set(relatedArcs.map(a => a.tgtName))].join(', ');
+        mapContent = `<div class="task-focus-meta" style="padding:16px;">
+          <div style="margin-bottom:8px;font-weight:600;color:#ff4444;">Attack Vectors</div>
+          <div style="margin-bottom:8px;color:var(--gmpx-color-on-surface-variant);">Targets: ${targets}</div>
+          <div style="color:var(--gmpx-color-on-surface-variant);font-size:0.75rem;">Click-and-drag globe to inspect surrounding activity.</div>
+        </div>`;
+      } else {
+        mapContent = `<div class="task-focus-meta" style="padding:16px;">Threat source is highlighted on the globe. Click-and-drag to inspect surrounding threat activity.</div>`;
+      }
+      mapEl.innerHTML = mapContent;
     }
-    if (metricsEl) {
-  if (metricsEl) metricsEl.innerHTML = [
-        ['Country', threatCountry],
-        ['Threats', threatCount],
-        ['Source', 'Honeypot Network'],
-        ['Status', 'Active monitoring'],
-        ['Risk Level', threatCount > 10 ? 'High' : threatCount > 5 ? 'Medium' : 'Low']
-      ].map(([label, value]) => `
-        <div class="intel-mini">
-          <div class="intel-mini-label">${label}</div>
-          <div class="intel-mini-value">${value}</div>
-        </div>
-      `).join('');
-    }
-    if (deepEl) deepEl.innerHTML = '';
+    // Build metrics with attack type breakdown
+    const typeColorHTML = relatedArcs.length > 0
+      ? Object.entries(relatedArcs.reduce((acc, a) => { acc[a.type] = (acc[a.type] || 0) + 1; return acc; }, {}))
+          .sort((a, b) => b[1] - a[1])
+          .map(([type, count]) => `<span style="color:${threatTypeColors[type] || '#ff4444'}">${count}× ${type}</span>`)
+          .join(' · ')
+      : '';
+    const totalToday = threatFeedStats?.todayThreats || threatCount;
+    if (metricsEl) metricsEl.innerHTML = [
+      ['Country', threatCountry],
+      ['Threats', threatCount],
+      ['Source', 'Honeypot Network'],
+      ['Status', 'Active monitoring'],
+      ['Risk Level', threatCount > 10 ? 'High' : threatCount > 5 ? 'Medium' : 'Low']
+    ].map(([label, value]) => `
+      <div class="intel-mini">
+        <div class="intel-mini-label">${label}</div>
+        <div class="intel-mini-value">${value}</div>
+      </div>
+    `).join('');
+    // Show attack types in deep section
+    if (deepEl) deepEl.innerHTML = typeColorHTML
+      ? `<div style="padding:8px 0;font-size:0.75rem;color:var(--gmpx-color-on-surface-variant);">${typeColorHTML}</div>
+         <div style="padding:4px 0;font-size:0.7rem;color:var(--text-dim);">${totalToday.toLocaleString()} total threats today</div>`
+      : '';
     if (selectedQuery) if (selectedQuery) selectedQuery.textContent = threatCountry;
     if (selectedMeta) selectedMeta.textContent = `${threatCount} threats · ${threatType}`;
     drawer.classList.add('visible');
@@ -2181,86 +2320,107 @@ function syncSatelliteToggle() {
       const btn = filters.querySelector(`[data-orbit="${cls}"]`);
       if (btn) {
         const on = visibleSatelliteOrbits.has(cls);
+        const highlighted = highlightedOrbitClass === cls;
+        btn.classList.toggle('active', highlighted);
         btn.style.opacity = on ? '1' : '0.35';
         btn.style.textDecoration = on ? 'none' : 'line-through';
       }
     });
   }
+  // Also update data panel to reflect current highlight state
+  if (typeof updateDataPanel === 'function') updateDataPanel();
 }
 
 async function refreshThreatFeed() {
   if (!threatLayerEnabled) {
     threatArcData = [];
     threatHotspots = [];
+    threatFeedStats = null;
     return;
   }
   try {
     const data = await fetchJson('api/threat-feed.php');
     threatArcData = data.arcs || [];
     threatHotspots = data.hotspots || [];
+    threatFeedStats = data.stats || null;
   } catch {
     threatArcData = [];
     threatHotspots = [];
+    threatFeedStats = null;
   }
 }
 
 function getThreatArcElements() {
-  if (!threatLayerEnabled || threatArcData.length === 0) return [];
-  // Convert threat arcs into three-globe arc format
-  return threatArcData.map(arc => ({
-    kind: 'threat',
-    srcLat: arc.srcLat,
-    srcLng: arc.srcLng,
-    tgtLat: arc.tgtLat,
-    tgtLng: arc.tgtLng,
-    type: arc.type,
-    intensity: arc.intensity,
-    label: `<div style="text-align:center"><strong>${arc.type}</strong><br/>${arc.srcCountry} → ${arc.tgtName}</div>`,
-    raw: arc
-  }));
+  if (!threatLayerEnabled || !threatArcsVisible || threatArcData.length === 0) return [];
+  // Convert threat arcs into globe format, colored by attack type
+  return threatArcData
+    .filter(arc => threatVisibleTypes.has(arc.type))
+    .map(arc => ({
+      kind: 'threat',
+      startLat: arc.srcLat,
+      startLng: arc.srcLng,
+      endLat: arc.tgtLat,
+      endLng: arc.tgtLng,
+      color: threatTypeColors[arc.type] || '#ff4444',
+      arcAlt: 0.15 + (arc.intensity || 0.5) * 0.35,
+      type: arc.type,
+      intensity: arc.intensity,
+      label: `<div style="text-align:center"><strong>${arc.type}</strong><br/>${arc.srcCountry} → ${arc.tgtName}</div>`,
+      raw: arc
+    }));
 }
 
 function getThreatHotspotPoints() {
   if (!threatLayerEnabled) return [];
   const points = [];
-  // Pulsing rings for top hotspots
+  if (threatHotspotsVisible) {
+  // Pulsing rings for top hotspots — colored by most common attack type from that country
   threatHotspots.forEach(hs => {
+    const countryArcs = threatArcData.filter(a => a.srcCountry === hs.name && threatVisibleTypes.has(a.type));
+    if (countryArcs.length === 0) return;
+    // Determine dominant attack type for color
+    const typeCounts = {};
+    countryArcs.forEach(a => { typeCounts[a.type] = (typeCounts[a.type] || 0) + 1; });
+    const dominantType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0][0];
+    const color = threatTypeColors[dominantType] || '#ff3333';
     points.push({
       kind: 'threat',
       lat: hs.lat,
       lng: hs.lng,
       size: Math.min(1.2, 0.3 + (hs.count * 0.15)),
-      color: '#ff3333',
-      ringColor: '#ff3333',
+      color: color,
+      ringColor: color,
       ringMaxRadius: 2 + hs.count * 0.5,
       ringPropagationSpeed: 2,
       ringRepeatPeriod: 800,
-      label: `<div style="text-align:center;color:#ff3333"><strong>${hs.name}</strong><br/>${hs.count} threats</div>`,
+      label: `<div style="text-align:center;color:${color}"><strong>${hs.name}</strong><br/>${hs.count} threats</div>`,
       shortLabel: hs.name,
-      raw: { kind: 'threat', type: 'Hotspot', country: hs.name, count: hs.count }
+      raw: { kind: 'threat', type: 'Hotspot', country: hs.name, count: hs.count, arcs: countryArcs }
     });
   });
   // Small steady dots at every unique arc origin so arcs always start from a visible point
   const seen = new Set();
-  threatArcData.forEach(arc => {
+  threatArcData.filter(arc => threatVisibleTypes.has(arc.type)).forEach(arc => {
     const key = `${arc.srcLat},${arc.srcLng}`;
     if (seen.has(key)) return;
     seen.add(key);
+    const color = threatTypeColors[arc.type] || '#ff6644';
     points.push({
       kind: 'threat',
       lat: arc.srcLat,
       lng: arc.srcLng,
       size: 0.35,
-      color: '#ff6644',
-      ringColor: '#ff6644',
+      color: color,
+      ringColor: color,
       ringMaxRadius: 0,
       ringPropagationSpeed: 0,
       ringRepeatPeriod: 0,
-      label: `<div style="text-align:center;color:#ff6644"><strong>${arc.srcCountry}</strong><br/>${arc.type}</div>`,
+      label: `<div style="text-align:center;color:${color}"><strong>${arc.srcCountry}</strong><br/>${arc.type}</div>`,
       shortLabel: arc.srcCountry,
-      raw: { kind: 'threat', type: arc.type, country: arc.srcCountry, count: 1 }
+      raw: { kind: 'threat', type: arc.type, country: arc.srcCountry, count: 1, arcs: threatArcData.filter(a => a.srcLat === arc.srcLat && a.srcLng === arc.srcLng && threatVisibleTypes.has(a.type)) }
     });
   });
+  } // end threatHotspotsVisible
   return points;
 }
 
@@ -2392,7 +2552,7 @@ function getAirTrafficPaths() {
     const alpha = getFlightAlpha(flight, true);
     const altitude = getAircraftAltitudeRatio(flight.altitude || 0);
     return {
-      color: `rgba(210,255,84,${alpha})`,
+      color: '#d2ff54',
       points: [
         { lat: trailingPoint.lat, lng: trailingPoint.lng, alt: altitude },
         { lat: flight.lat, lng: flight.lng, alt: altitude },
@@ -2418,8 +2578,7 @@ async function refreshMaritimeCatalog(zoomToRegion = false) {
     if (zoomToRegion && typeof intelGlobe !== 'undefined' && intelGlobe) {
         const targetLat = seaRegion === 'hormuz' ? 26.5 : 25.0;
         const targetLng = seaRegion === 'hormuz' ? 56.2 : -90.0;
-        intelGlobe.pointOfView({ lat: targetLat, lng: targetLng, altitude: 0.8 }, 2000);
-        if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(false);
+        intelGlobe.pointOfView({ lat: targetLat, lng: targetLng, altitude: 2.5 }, 2000);
         setTimeout(() => {
             if (typeof showMapStage === 'function') {
                 showMapStage({
@@ -2519,6 +2678,7 @@ function computeSatelliteLiveState(satItem, date = new Date()) {
     const lat = window.satellite.radiansToDegrees(geodetic.latitude);
     const lng = window.satellite.radiansToDegrees(geodetic.longitude);
     const altitudeKm = Math.max(0, geodetic.height || satItem.altitudeKm || 0);
+    if (!isFinite(lat) || !isFinite(lng) || !isFinite(altitudeKm)) return null;
     return {
       lat,
       lng,
@@ -2530,10 +2690,12 @@ function computeSatelliteLiveState(satItem, date = new Date()) {
   }
 }
 
-function satelliteOrbitColor(orbitClass, alpha) {
-  if (orbitClass === 'LEO') return `rgba(0,229,100,${alpha})`;
-  if (orbitClass === 'GEO') return `rgba(255,60,60,${alpha})`;
-  return `rgba(0,229,255,${alpha})`;
+function satelliteOrbitColor(orbitClass, alpha = 1) {
+  // Return rgba color for path rendering (supports alpha)
+  const a = Math.max(0, Math.min(1, alpha));
+  if (orbitClass === 'LEO') return `rgba(0,255,68,${a})`;
+  if (orbitClass === 'GEO') return `rgba(255,238,0,${a})`;
+  return `rgba(255,136,0,${a})`; // MEO
 }
 
 function getSatelliteGlobeElements() {
@@ -2562,16 +2724,19 @@ function getSatelliteGlobeElements() {
 
 function getSatelliteOrbitPaths() {
   if (!satelliteLayerEnabled || !currentSatelliteCatalog.length || !window.satellite) return [];
-  const offsetsMinutes = [-30, -20, -10, 0, 10, 20, 30];
+  // More points for longer arcs: LEO ~95min orbit, MEO ~12hr, GEO ~24hr
+  const offsetsMinutes = [-45, -35, -25, -15, -5, 0, 5, 15, 25, 35, 45];
   return currentSatelliteCatalog.filter((satItem) => visibleSatelliteOrbits.has(satItem.orbitClass || 'LEO')).map((satItem) => {
     const points = offsetsMinutes.map((offsetMinutes) => {
       const state = computeSatelliteLiveState(satItem, new Date(Date.now() + (offsetMinutes * 60000)));
-      if (!state) return null;
-      return { lat: state.lat, lng: state.lng, alt: state.altitudeRatio };
+      if (!state || !isFinite(state.lat) || !isFinite(state.lng) || Math.abs(state.lat) > 90 || Math.abs(state.lng) > 180) return null;
+      return { lat: state.lat, lng: state.lng };
     }).filter(Boolean);
     if (points.length < 2) return null;
     return {
-      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', 0.18),
+      orbitClass: satItem.orbitClass || 'LEO',
+      network: satItem.network || '',
+      color: satelliteOrbitColor(satItem.orbitClass || 'LEO', 0.35), // default mid alpha, will be overridden in overlay mapping
       points
     };
   }).filter(Boolean);
@@ -2614,19 +2779,17 @@ function initializeCommandSurface() {
         const region = regionBtn.dataset.airRegion;
         if (selectedAirRegion === region) {
           selectedAirRegion = null;
-          if (typeof intelGlobe !== 'undefined' && intelGlobe) intelGlobe.pointOfView({ altitude: 1.7 }, 1800);
-          if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(true);
+          if (typeof intelGlobe !== 'undefined' && intelGlobe) intelGlobe.pointOfView({ lat: 39.0, lng: -98.0, altitude: 2.8 }, 1800);
         } else {
           selectedAirRegion = region;
           const regionalFlights = currentAirTrafficItems.filter(f => f.country === region);
           if (typeof intelGlobe !== 'undefined' && intelGlobe && regionalFlights.length > 0) {
              const avgLat = regionalFlights.reduce((sum, f) => sum + f.lat, 0) / regionalFlights.length;
              const avgLng = regionalFlights.reduce((sum, f) => sum + f.lng, 0) / regionalFlights.length;
-             intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 0.6 }, 1800);
-             if (typeof setGlobeAutoRotate === 'function') setGlobeAutoRotate(false);
+             intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 2.5 }, 1800);
           }
         }
-        
+
         if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems || []);
         if (typeof updateDataPanel === "function") updateDataPanel();
       }
@@ -2643,7 +2806,7 @@ function initializeCommandSurface() {
     toggleButton.addEventListener('click', () => setDiagnosticsVisible(!diagnosticsVisible));
     toggleButton.dataset.bound = '1';
   }
-  
+
   const closeModalBtn = document.getElementById('close-diagnostics-modal');
   if (closeModalBtn && !closeModalBtn.dataset.bound) {
     closeModalBtn.addEventListener('click', () => setDiagnosticsVisible(false));
@@ -2721,18 +2884,18 @@ function initializeCommandSurface() {
       seaButton.addEventListener('click', async () => {
           seaLayerEnabled = !seaLayerEnabled;
           seaButton.classList.toggle('active', seaLayerEnabled);
-          
+
           if (seaLayerEnabled) {
               airLayerEnabled = false;
               syncAirToggle();
               satelliteLayerEnabled = false;
               syncSatelliteToggle();
               if (satelliteLayerTimer) { clearInterval(satelliteLayerTimer); satelliteLayerTimer = null; }
-              
+
               seaRegion = null;
               selectedSeaType = null;
               selectedSeaFlag = null;
-              
+
               await refreshMaritimeCatalog(false);
               if (!seaLayerTimer) {
                   seaLayerTimer = setInterval(() => refreshMaritimeCatalog(false), 15000);
@@ -2742,7 +2905,7 @@ function initializeCommandSurface() {
               currentVesselCatalog = [];
               seaRegion = null;
           }
-          
+
           initOrUpdateGlobe(currentGlobeBaseItems || []);
           updateDataPanel();
       });
@@ -2754,6 +2917,9 @@ function initializeCommandSurface() {
     threatButton.addEventListener('click', async () => {
       threatLayerEnabled = !threatLayerEnabled;
       threatButton.classList.toggle('active', threatLayerEnabled);
+      // Show/hide threat chip bar
+      const threatChipBar = document.getElementById('threat-chip-bar');
+      if (threatChipBar) threatChipBar.style.display = threatLayerEnabled ? 'flex' : 'none';
       if (threatLayerEnabled && threatArcData.length === 0) {
         await refreshThreatFeed();
       }
@@ -2762,15 +2928,59 @@ function initializeCommandSurface() {
     threatButton.dataset.bound = '1';
   }
 
+  // Threat type filter chips
+  document.querySelectorAll('.threat-type-chip').forEach(chip => {
+    if (chip.dataset.bound) return;
+    chip.dataset.bound = '1';
+    chip.addEventListener('click', () => {
+      const type = chip.dataset.threatType;
+      if (threatVisibleTypes.has(type)) {
+        threatVisibleTypes.delete(type);
+        chip.classList.remove('active');
+      } else {
+        threatVisibleTypes.add(type);
+        chip.classList.add('active');
+      }
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    });
+  });
+
+  // Threat arcs/hotspots toggle chips
+  const arcsBtn = document.getElementById('toggle-threat-arcs');
+  if (arcsBtn && !arcsBtn.dataset.bound) {
+    arcsBtn.dataset.bound = '1';
+    arcsBtn.addEventListener('click', () => {
+      threatArcsVisible = !threatArcsVisible;
+      arcsBtn.classList.toggle('active', threatArcsVisible);
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    });
+  }
+  const hotspotsBtn = document.getElementById('toggle-threat-hotspots');
+  if (hotspotsBtn && !hotspotsBtn.dataset.bound) {
+    hotspotsBtn.dataset.bound = '1';
+    hotspotsBtn.addEventListener('click', () => {
+      threatHotspotsVisible = !threatHotspotsVisible;
+      hotspotsBtn.classList.toggle('active', threatHotspotsVisible);
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    });
+  }
+
   document.querySelectorAll('[data-orbit]').forEach(btn => {
     if (btn.dataset.bound) return;
     btn.dataset.bound = '1';
     btn.addEventListener('click', () => {
       const cls = btn.dataset.orbit;
-      if (visibleSatelliteOrbits.has(cls)) visibleSatelliteOrbits.delete(cls);
-      else visibleSatelliteOrbits.add(cls);
+      // Toggle highlight: tap to highlight that class, tap again to un-highlight
+      if (highlightedOrbitClass === cls) {
+        highlightedOrbitClass = null;
+      } else {
+        highlightedOrbitClass = cls;
+      }
+      highlightedSatNetwork = null; // Clear network when orbit is toggled
+      selectedSatNetwork = null;
       syncSatelliteToggle();
       initOrUpdateGlobe(currentGlobeBaseItems || []);
+      if (typeof updateDataPanel === 'function') updateDataPanel();
     });
   });
 
@@ -2795,6 +3005,47 @@ function initializeCommandSurface() {
   if (dangerBtn && !dangerBtn.dataset.bound) {
     dangerBtn.addEventListener('click', toggleDangerZones);
     dangerBtn.dataset.bound = '1';
+  }
+
+  // Map/Satellite toggle
+  const mapStyleBtn = document.getElementById('toggle-map-style');
+  if (mapStyleBtn && !mapStyleBtn.dataset.bound) {
+    mapStyleBtn.addEventListener('click', () => {
+      const isSatellite = mapStyleBtn.textContent.trim() === 'Satellite';
+      mapStyleBtn.textContent = isSatellite ? 'Map' : 'Satellite';
+      // Toggle globe.gl imagery
+      if (typeof intelGlobe !== 'undefined' && intelGlobe && intelGlobe.globeImageUrl) {
+        if (isSatellite) {
+          // Switch to map
+          intelGlobe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png');
+        } else {
+          // Switch back to satellite
+          intelGlobe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+        }
+      }
+      // Toggle Leaflet city map tiles
+      if (cityMapInstance && cityMapInstance._satelliteTile && cityMapInstance._labelTile) {
+        if (isSatellite) {
+          cityMapInstance.removeLayer(cityMapInstance._satelliteTile);
+          cityMapInstance._osmTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(cityMapInstance);
+          if (cityMapInstance._labelTile) cityMapInstance.removeLayer(cityMapInstance._labelTile);
+          cityMapInstance._labelTile = null;
+        } else {
+          if (cityMapInstance._osmTile) cityMapInstance.removeLayer(cityMapInstance._osmTile);
+          cityMapInstance._osmTile = null;
+          cityMapInstance._satelliteTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }).addTo(cityMapInstance);
+          cityMapInstance._labelTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', { maxZoom: 19, opacity: 0.8, subdomains: 'abcd' }).addTo(cityMapInstance);
+        }
+      }
+    });
+    mapStyleBtn.dataset.bound = '1';
+  }
+
+  // Detail panel close button
+  const detailCloseBtn = document.getElementById('detail-panel-close');
+  if (detailCloseBtn && !detailCloseBtn.dataset.bound) {
+    detailCloseBtn.addEventListener('click', closeDetailPanel);
+    detailCloseBtn.dataset.bound = '1';
   }
 
   if (baselineRecommendationActions && !baselineRecommendationActions.dataset.drawerBound) {
@@ -2853,20 +3104,6 @@ function syncGlobeControls(container, enabled) {
   if (!allowControls) container.style.cursor = 'default';
 }
 
-function setGlobeAutoRotate(enabled) {
-  globeAutoRotateEnabled = enabled;
-  if (intelGlobe?.controls) {
-    intelGlobe.controls().autoRotate = enabled;
-    intelGlobe.controls().autoRotateSpeed = 0.5;
-  }
-  const button = document.getElementById('toggle-globe-rotation');
-  if (button) {
-    button.style.display = enabled ? 'none' : 'inline-flex';
-  if (button) button.textContent = enabled ? 'Pause rotation' : 'Rotate';
-  }
-  setGlobeOverlayVisibility(enabled);
-}
-
 function updateGlobeTexture() {
   if (!intelGlobe) return;
   const nightUrl = '//unpkg.com/three-globe/example/img/earth-night.jpg';
@@ -2898,6 +3135,7 @@ function buildMapEmbedUrl(lat, lng) {
 }
 
 function destroyCityMap() {
+  closeDetailPanel();
   if (pittsburghZoneLayer && cityMapInstance) {
     cityMapInstance.removeLayer(pittsburghZoneLayer);
   }
@@ -2943,7 +3181,7 @@ function getPittsburghZoneStats(zone) {
 }
 
 function syncPittsburghYearControl(eligible = false) {
-  // Year selector removed — all data in single month dropdown
+  // Year selector removed - all data in single month dropdown
 }
 
 function getAvailableMonths(crimes) {
@@ -2962,6 +3200,24 @@ function filterCrimesByMonth(crimes, monthKey) {
   return filtered.filter((c) => pittsburghVisibleCategories.has(c.category));
 }
 
+let detailPanelOpen = false;
+
+function openDetailPanel(html) {
+  const panel = document.getElementById('detail-panel');
+  const content = document.getElementById('detail-panel-content');
+  if (!panel || !content) return;
+  content.innerHTML = html;
+  panel.classList.add('open');
+  detailPanelOpen = true;
+}
+
+function closeDetailPanel() {
+  const panel = document.getElementById('detail-panel');
+  if (!panel) return;
+  panel.classList.remove('open');
+  detailPanelOpen = false;
+}
+
 function renderCrimeMarkers(crimes) {
   if (pittsburghCrimesLayer) {
     cityMapInstance.removeLayer(pittsburghCrimesLayer);
@@ -2974,30 +3230,106 @@ function renderCrimeMarkers(crimes) {
     else if (crime.category === 'Drug') color = '#388e3c';
 
     const marker = L.circleMarker([crime.lat, crime.lng], {
-      radius: 8,
+      radius: 4,
       stroke: true,
       color: '#fff',
-      weight: 1,
-      fillOpacity: 0.8,
+      weight: 2,
+      fillOpacity: 0.9,
       fillColor: color
     });
-    marker.bindPopup(`
-      <div style="min-width:200px; color:#111;">
-        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">${crime.category} Crime</div>
-        <div style="font-size:1rem; font-weight:700; margin-top:6px;">${crime.incident_type}</div>
-        <div style="margin-top:8px; font-size:0.85rem;">Zone: ${crime.zone}</div>
-        <div style="margin-top:4px; font-size:0.85rem;">Time: ${crime.time}</div>
+    const popupHtml = `
+      <div class="crime-popup">
+        <div class="crime-popup-header">
+          <div class="crime-popup-dot" style="background:${color};"></div>
+          <div class="crime-popup-cat">${crime.category} Crime</div>
+        </div>
+        <div class="crime-popup-body">
+          <div class="crime-popup-title">${crime.incident_type}</div>
+          <div class="crime-popup-row"><span>Zone</span><strong>${crime.zone}</strong></div>
+          <div class="crime-popup-row"><span>Time</span><strong>${crime.time}</strong></div>
+        </div>
+        <div class="crime-popup-footer">Pittsburgh Bureau of Police</div>
       </div>
-    `);
+    `;
+    const isNarrow = window.innerWidth < 700;
+    if (isNarrow) {
+      marker.bindPopup(popupHtml, { className: '', maxWidth: 300, closeButton: true });
+    }
     marker.on('click', (event) => {
       if (event.originalEvent && typeof L !== 'undefined') {
         L.DomEvent.stop(event.originalEvent);
       }
-      marker.openPopup();
+      if (isNarrow) {
+        marker.openPopup();
+      } else {
+        openDetailPanel(popupHtml);
+      }
     });
     pittsburghCrimesLayer.addLayer(marker);
   });
   pittsburghCrimesLayer.addTo(cityMapInstance);
+
+  // Sync marker visibility with toggle state
+  if (!pittsburghMarkersVisible) {
+    cityMapInstance.removeLayer(pittsburghCrimesLayer);
+  }
+}
+
+function renderCrimeHeatmap(crimes) {
+  if (pittsburghHeatLayer) {
+    cityMapInstance.removeLayer(pittsburghHeatLayer);
+  }
+  if (typeof L.heatLayer === 'undefined') return;
+  const points = crimes.map(c => [c.lat, c.lng, categoryIntensity(c.category)]);
+  pittsburghHeatLayer = L.heatLayer(points, {
+    radius: 30,
+    blur: 24,
+    maxZoom: 16,
+    minOpacity: 0.2,
+    gradient: {
+      0.1: 'rgba(52,168,83,0.3)',
+      0.3: 'rgba(251,188,4,0.5)',
+      0.5: 'rgba(255,167,38,0.65)',
+      0.7: 'rgba(234,67,53,0.78)',
+      1.0: 'rgba(154,0,0,0.9)'
+    }
+  });
+  pittsburghHeatLayer.addTo(cityMapInstance);
+
+  if (!pittsburghHeatVisible) {
+    cityMapInstance.removeLayer(pittsburghHeatLayer);
+  }
+}
+
+function categoryIntensity(cat) {
+  if (cat === 'Violent') return 0.9;
+  if (cat === 'Property') return 0.6;
+  if (cat === 'Drug') return 0.45;
+  return 0.25;
+}
+
+function toggleCrimeHeatmap() {
+  if (!cityMapInstance) return;
+  pittsburghHeatVisible = !pittsburghHeatVisible;
+  if (pittsburghHeatVisible && pittsburghHeatLayer) {
+    pittsburghHeatLayer.addTo(cityMapInstance);
+  } else if (pittsburghHeatLayer) {
+    cityMapInstance.removeLayer(pittsburghHeatLayer);
+  }
+  const btn = document.getElementById('toggle-heatmap');
+  if (btn) btn.classList.toggle('active', pittsburghHeatVisible);
+}
+
+function toggleCrimeMarkers() {
+  if (!cityMapInstance) return;
+  pittsburghMarkersVisible = !pittsburghMarkersVisible;
+  if (pittsburghMarkersVisible && pittsburghCrimesLayer) {
+    pittsburghCrimesLayer.addTo(cityMapInstance);
+  } else if (pittsburghCrimesLayer) {
+    cityMapInstance.removeLayer(pittsburghCrimesLayer);
+  }
+  const btn = document.getElementById('toggle-markers');
+  if (btn) btn.classList.toggle('active', pittsburghMarkersVisible);
 }
 
 function renderDangerZones(predictions) {
@@ -3008,8 +3340,9 @@ function renderDangerZones(predictions) {
   predictions.forEach((pred) => {
     const radius = pred.threatLevel === 'high' ? 22 : pred.threatLevel === 'medium' ? 16 : 10;
     const fillColor = pred.threatLevel === 'high' ? '#ff1744' : pred.threatLevel === 'medium' ? '#ff9100' : '#ffea00';
-    const fillOpacity = pred.threatLevel === 'high' ? 0.45 : pred.threatLevel === 'medium' ? 0.35 : 0.25;
-    const pulse = pred.threatLevel === 'high' ? '<style>.danger-pulse{animation:dpulse 2s ease-in-out infinite}@keyframes dpulse{0%,100%{opacity:0.45}50%{opacity:0.7}}</style>' : '';
+    const fillOpacity = pred.threatLevel === 'high' ? 0.35 : pred.threatLevel === 'medium' ? 0.25 : 0.18;
+    const badgeColor = pred.threatLevel === 'high' ? 'background:#d32f2f;' : pred.threatLevel === 'medium' ? 'background:#e65100;' : 'background:#f9a825;color:#333;';
+
     const marker = L.circleMarker([pred.lat, pred.lng], {
       radius,
       stroke: true,
@@ -3019,29 +3352,35 @@ function renderDangerZones(predictions) {
       fillColor,
       className: pred.threatLevel === 'high' ? 'danger-pulse' : ''
     });
-    marker.bindPopup(`
-      <div style="min-width:220px; color:#111;">
-        ${pulse}
-        <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">Predicted Danger Zone</div>
-        <div style="font-size:1rem; font-weight:700; margin-top:6px; color:${fillColor};">${pred.threatLevel.toUpperCase()} RISK</div>
-        <div style="font-size:0.92rem; font-weight:600; margin-top:4px;">Danger Score: ${pred.dangerScore}/100</div>
-        <div style="margin-top:8px; font-size:0.85rem;">
-          <div>Active incidents: ${pred.incidentsNow} (${pred.violentNow} violent)</div>
-          <div>Today's total: ${pred.incidentsToday}</div>
-          <div>Peak hour: ${String(pred.peakHour).padStart(2, '0')}:00</div>
-          <div>Top category: ${pred.topCategory}</div>
-          <div>Window: ${pred.hourWindow || 'current'}</div>
+    const popupHtml = `
+      <div class="danger-popup">
+        <div class="danger-popup-header">
+          <div class="danger-popup-badge" style="${badgeColor}">${pred.threatLevel} risk</div>
         </div>
-        <div style="margin-top:8px; font-size:0.75rem; opacity:0.6; border-top:1px solid rgba(0,0,0,0.1); padding-top:6px;">
-          Based on ${pred.dow} historical patterns ±2hrs
+        <div class="danger-popup-body">
+          <div class="danger-popup-title">Predicted Danger Zone</div>
+          <div class="danger-popup-row"><span>Danger Score</span><strong>${pred.dangerScore}/100</strong></div>
+          <div class="danger-popup-row"><span>Active incidents</span><strong>${pred.incidentsNow} (${pred.violentNow} violent)</strong></div>
+          <div class="danger-popup-row"><span>Today's total</span><strong>${pred.incidentsToday}</strong></div>
+          <div class="danger-popup-row"><span>Peak hour</span><strong>${String(pred.peakHour).padStart(2, '0')}:00</strong></div>
+          <div class="danger-popup-row"><span>Top category</span><strong>${pred.topCategory}</strong></div>
         </div>
+        <div class="danger-popup-footer">Based on ${pred.dow} historical patterns ±2hrs</div>
       </div>
-    `);
+    `;
+    const isNarrow = window.innerWidth < 700;
+    if (isNarrow) {
+      marker.bindPopup(popupHtml, { className: '', maxWidth: 320, closeButton: true });
+    }
     marker.on('click', (event) => {
       if (event.originalEvent && typeof L !== 'undefined') {
         L.DomEvent.stop(event.originalEvent);
       }
-      marker.openPopup();
+      if (isNarrow) {
+        marker.openPopup();
+      } else {
+        openDetailPanel(popupHtml);
+      }
     });
     pittsburghDangerLayer.addLayer(marker);
   });
@@ -3071,17 +3410,17 @@ function toggleDangerZones() {
 
 function syncPittsburghMonthControl(eligible = false) {
   const monthSelect = document.getElementById('pittsburgh-month-select');
-  const legend = document.getElementById('crime-legend');
+  const chipBar = document.getElementById('crime-chip-bar');
   if (!monthSelect) return;
   if (!eligible || !pittsburghCrimesData.length) {
     monthSelect.style.display = 'none';
-    if (legend) legend.style.display = 'none';
+    if (chipBar) chipBar.style.display = 'none';
     return;
   }
   const months = getAvailableMonths(pittsburghCrimesData);
   if (!months.length) {
     monthSelect.style.display = 'none';
-    if (legend) legend.style.display = 'none';
+    if (chipBar) chipBar.style.display = 'none';
     return;
   }
 
@@ -3101,57 +3440,53 @@ function syncPittsburghMonthControl(eligible = false) {
   monthSelect.value = pittsburghSelectedMonth;
   monthSelect.style.display = 'inline-flex';
 
-  if (legend) {
+  // Show chip bar
+  if (chipBar) {
+    chipBar.style.display = 'flex';
     const mapStage = document.getElementById('intel-map-stage');
-    if (mapStage && !mapStage.contains(legend)) {
-      mapStage.appendChild(legend);
+    if (mapStage && !mapStage.contains(chipBar)) {
+      mapStage.appendChild(chipBar);
     }
-    const isExpanded = window.pittsburghLegendExpanded === true;
-    const getStyle = (cat) => pittsburghVisibleCategories.has(cat) ? 'opacity:1;text-decoration:none;' : 'opacity:0.35;text-decoration:line-through;';
-  if (legend) legend.innerHTML = `
-      <div class="legend-header" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; font-size:0.72rem; opacity:0.9;">
-        <span>Crime Legend</span>
-        <svg class="legend-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; margin-left: 12px; transform: ${isExpanded ? 'rotate(0deg)' : 'rotate(180deg)'};"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
-      <div class="legend-content" style="display:${isExpanded ? 'flex' : 'none'}; flex-wrap: wrap; gap: 0 14px; margin-top:8px;">
-        <div class="legend-item legend-toggle" data-category="Violent" style="cursor:pointer; ${getStyle('Violent')}"><span class="legend-dot" style="background:#d32f2f;"></span> Violent</div>
-        <div class="legend-item legend-toggle" data-category="Property" style="cursor:pointer; ${getStyle('Property')}"><span class="legend-dot" style="background:#1976d2;"></span> Property</div>
-        <div class="legend-item legend-toggle" data-category="Drug" style="cursor:pointer; ${getStyle('Drug')}"><span class="legend-dot" style="background:#388e3c;"></span> Drug</div>
-        <div class="legend-item legend-toggle" data-category="Other" style="cursor:pointer; ${getStyle('Other')}"><span class="legend-dot" style="background:#757575;"></span> Other</div>
-      </div>
-    `;
-    legend.style.display = 'block';
 
-    const legendHeader = legend.querySelector('.legend-header');
-    const legendContent = legend.querySelector('.legend-content');
-    const chevron = legend.querySelector('.legend-chevron');
-    
-    legendHeader.addEventListener('click', () => {
-      window.pittsburghLegendExpanded = legendContent.style.display !== 'flex';
-      legendContent.style.display = window.pittsburghLegendExpanded ? 'flex' : 'none';
-      chevron.style.transform = window.pittsburghLegendExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+    // Sync chip active states
+    chipBar.querySelectorAll('.crime-chip[data-category]').forEach((chip) => {
+      const cat = chip.dataset.category;
+      chip.classList.toggle('active', pittsburghVisibleCategories.has(cat));
+      // remove old listeners
+      chip.replaceWith(chip.cloneNode(true));
     });
-
-    legend.querySelectorAll('.legend-toggle').forEach((item) => {
-      item.addEventListener('click', () => {
-        const cat = item.dataset.category;
+    chipBar.querySelectorAll('.crime-chip[data-category]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const cat = chip.dataset.category;
         if (pittsburghVisibleCategories.has(cat)) {
           pittsburghVisibleCategories.delete(cat);
-          item.style.opacity = '0.35';
-          item.style.textDecoration = 'line-through';
+          chip.classList.remove('active');
         } else {
           pittsburghVisibleCategories.add(cat);
-          item.style.opacity = '1';
-          item.style.textDecoration = 'none';
+          chip.classList.add('active');
         }
         const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth);
         renderCrimeMarkers(filtered);
+        renderCrimeHeatmap(filtered);
       });
     });
+
+    // Heatmap toggle
+    const heatBtn = document.getElementById('toggle-heatmap');
+    const markBtn = document.getElementById('toggle-markers');
+    if (heatBtn) {
+      heatBtn.classList.toggle('active', pittsburghHeatVisible);
+      heatBtn.onclick = () => toggleCrimeHeatmap();
+    }
+    if (markBtn) {
+      markBtn.classList.toggle('active', pittsburghMarkersVisible);
+      markBtn.onclick = () => toggleCrimeMarkers();
+    }
   }
 
   const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth);
   renderCrimeMarkers(filtered);
+  renderCrimeHeatmap(filtered);
 }
 
 function bindMonthSelect() {
@@ -3161,6 +3496,7 @@ function bindMonthSelect() {
       pittsburghSelectedMonth = monthSelect.value;
       const filtered = filterCrimesByMonth(pittsburghCrimesData, pittsburghSelectedMonth);
       renderCrimeMarkers(filtered);
+      renderCrimeHeatmap(filtered);
     });
     monthSelect.dataset.bound = '1';
   }
@@ -3205,18 +3541,19 @@ function updatePittsburghZoneLabelInteractivity() {
 
 function buildZonePopupHtml(zone, stats = {}) {
   const offenseRows = (stats.topOffenseTypes || []).slice(0, 5).map(([name, total]) => `
-    <div style="display:flex; justify-content:space-between; gap:16px; margin-top:4px;">
-      <span>${name}</span>
-      <strong>${total}</strong>
-    </div>
-  `).join('') || '<div style="margin-top:6px;">No offense totals available.</div>';
+    <div class="zone-popup-row"><span>${name}</span><strong>${total}</strong></div>
+  `).join('') || '<div style="font-size:12px;color:#5f6368;margin-top:6px;">No offense data available.</div>';
 
   return `
-    <div style="min-width:240px; color:#111;">
-      <div style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; opacity:0.65;">Pittsburgh Police Zone</div>
-      <div style="font-size:1rem; font-weight:700; margin-top:6px;">Zone ${zone}</div>
-      <div style="margin-top:8px; font-size:0.86rem;">Total incidents <strong>${stats.incidentCount || 0}</strong></div>
-      <div style="margin-top:10px; border-top:1px solid rgba(0,0,0,0.12); padding-top:8px;">
+    <div class="zone-popup">
+      <div class="zone-popup-header">
+        <div class="zone-popup-title">Zone ${zone}</div>
+        <div class="zone-popup-sub">Pittsburgh Bureau of Police</div>
+      </div>
+      <div class="zone-popup-body">
+        <div class="zone-popup-stat">${(stats.incidentCount || 0).toLocaleString()}</div>
+        <div class="zone-popup-stat-label">Total incidents</div>
+        <div class="zone-popup-divider"></div>
         ${offenseRows}
       </div>
     </div>
@@ -3267,16 +3604,18 @@ function syncPittsburghZoneToggle(visible, eligible = false) {
   const button = document.getElementById('toggle-pittsburgh-zones');
   if (button) {
     button.style.display = eligible ? 'inline-flex' : 'none';
-  if (button) button.textContent = visible ? 'Zones On' : 'Zones Off';
+    button.classList.toggle('active', visible);
   }
   const dangerBtn = document.getElementById('toggle-danger-zones');
   if (dangerBtn) dangerBtn.style.display = eligible ? 'inline-flex' : 'none';
+  const mapStyleBtn = document.getElementById('toggle-map-style');
+  // map-style toggle is always visible (works on both globe and city map)
   syncPittsburghYearControl(eligible);
   if (!eligible) {
     const ms = document.getElementById('pittsburgh-month-select');
-    const cl = document.getElementById('crime-legend');
+    const cb = document.getElementById('crime-chip-bar');
     if (ms) ms.style.display = 'none';
-    if (cl) cl.style.display = 'none';
+    if (cb) cb.style.display = 'none';
   }
   updatePittsburghZoneLabelInteractivity();
 }
@@ -3367,8 +3706,17 @@ function renderCityCrimeMap(item = {}) {
     setMapHoverCard('', false);
   });
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
+  // Satellite-first tile layer (Google-style)
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+    subdomains: []
+  }).addTo(cityMapInstance);
+
+  // Optional labels overlay for road/city names (dark pills on satellite)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    opacity: 0.8,
+    subdomains: 'abcd'
   }).addTo(cityMapInstance);
 
   if (isSeaRegion && typeof currentVesselCatalog !== 'undefined') {
@@ -3383,9 +3731,9 @@ function renderCityCrimeMap(item = {}) {
               opacity: 0.8,
               fillOpacity: 0.8
           }).addTo(cityMapInstance);
-          
+
           marker.bindTooltip(`<b>${v.name}</b><br>${v.type} | ${v.speedKnots} kts`);
-          
+
           marker.on('click', (e) => {
              L.DomEvent.stopPropagation(e);
              if (typeof openIntelDrawer === 'function') {
@@ -3419,6 +3767,8 @@ function renderCityCrimeMap(item = {}) {
       pittsburghSelectedMonth = null; // reset so default kicks in
       syncPittsburghMonthControl(true);
       bindMonthSelect();
+      // Initialize Palantir crime intelligence UI
+      if (typeof initPalantirCrimeUI === 'function') initPalantirCrimeUI();
     }).catch(console.error);
   } else {
     /*
@@ -3456,7 +3806,7 @@ function renderCityCrimeMap(item = {}) {
   }
 
   if (item.locationName === 'Pittsburgh, PA USA') {
-    syncPittsburghZoneToggle(true, true);
+    syncPittsburghZoneToggle(false, true);
     renderPittsburghZoneOverlay().catch(() => {
       syncPittsburghZoneToggle(false, false);
     });
@@ -3471,7 +3821,6 @@ function showMapStage(item = {}) {
   const globe = document.getElementById('intel-globe');
   const mapStage = document.getElementById('intel-map-stage');
   const returnButton = document.getElementById('return-to-globe');
-  const rotationButton = document.getElementById('toggle-globe-rotation');
   const airButton = document.getElementById('toggle-air-layer');
   const satelliteButton = document.getElementById('toggle-satellite-layer');
   const threatButton = document.getElementById('toggle-threat-layer');
@@ -3488,12 +3837,13 @@ function showMapStage(item = {}) {
     title.style.color = '#000';
   }
   if (returnButton) returnButton.style.display = 'inline-flex';
-  if (rotationButton) rotationButton.style.display = 'none';
   if (airButton) airButton.style.display = 'none';
   if (satelliteButton) satelliteButton.style.display = 'none';
   const seaButton = document.getElementById('toggle-sea-layer');
   if (seaButton) seaButton.style.display = 'none';
   if (threatButton) threatButton.style.display = 'none';
+  const threatChipBar = document.getElementById('threat-chip-bar');
+  if (threatChipBar) threatChipBar.style.display = 'none';
   const satOrbitFilters = document.getElementById('sat-orbit-filters');
   if (satOrbitFilters) satOrbitFilters.style.display = 'none';
 }
@@ -3518,8 +3868,11 @@ function showGlobeStage() {
   destroyCityMap();
   if (pittsburghDangerLayer) { cityMapInstance?.removeLayer(pittsburghDangerLayer); pittsburghDangerLayer = null; }
   pittsburghDangerVisible = false;
+  if (pittsburghHeatLayer) { pittsburghHeatLayer = null; }
+  pittsburghHeatVisible = true;
+  pittsburghMarkersVisible = true;
   if (mapStage) mapStage.innerHTML = '';
-  syncPittsburghZoneToggle(true, false);
+  syncPittsburghZoneToggle(false, false);
   if (title) {
   if (title) title.textContent = 'Global Operations Projection';
     title.style.color = '';
@@ -3530,17 +3883,17 @@ function showGlobeStage() {
   const seaButton = document.getElementById('toggle-sea-layer');
   if (seaButton) seaButton.style.display = 'inline-flex';
   if (threatButton) threatButton.style.display = 'inline-flex';
+  // Restore threat chip bar if threat layer is active
+  const threatChipBar = document.getElementById('threat-chip-bar');
+  if (threatChipBar) threatChipBar.style.display = threatLayerEnabled ? 'flex' : 'none';
   const satOrbitFilters = document.getElementById('sat-orbit-filters');
   if (satOrbitFilters && satelliteLayerEnabled) satOrbitFilters.style.display = 'inline-flex';
-  if (!globeAutoRotateEnabled) {
-    const rotationButton = document.getElementById('toggle-globe-rotation');
-    if (rotationButton) rotationButton.style.display = 'inline-flex';
-  }
-  setGlobeOverlayVisibility(globeAutoRotateEnabled);
+  // Rotation removed - globe is static
 }
 
 function _initGlobeVars() {}
-let intelGlobe = null;
+let intelGlobe = null; // globe.gl instance
+let _lastGlobeDataHash = ''; // Skip redundant data updates
 const stateColors = {
   'terminal': '#ff3366',
   'compromised': '#ff9933',
@@ -3551,330 +3904,565 @@ const stateColors = {
   'neutral': '#666666'
 };
 
+// Globe data layers
+
 function initOrUpdateGlobe(items = []) {
   applyInteractionMode();
   const globeContainer = document.getElementById('intel-globe');
-  if (!globeContainer || typeof Globe === 'undefined') return;
+  if (!globeContainer) return;
 
   updatePrimaryStageHeight();
 
-  const validItems = items.filter(i => i.lat !== undefined && i.lng !== undefined);
-  const touchBoost = hasCoarsePointer() ? 0.35 : 0;
-  const cityPoints = validItems.map(i => {
-    const structuralState = i.recoveryTrustDriverTransitionBalanceStructuralState || 'neutral';
-    return {
-      kind: 'city',
-      lat: i.lat,
-      lng: i.lng,
-      size: Math.max(0.3, Math.min(1.95, ((i.priorityScore || 50) / 60) + touchBoost)),
-      color: stateColors[structuralState] || stateColors['neutral'],
-      ringColor: stateColors[structuralState] || stateColors['neutral'],
-      ringMaxRadius: 4.2,
-      ringPropagationSpeed: 1.2,
-      ringRepeatPeriod: 1400,
-      label: `<div><strong>${i.locationName || 'Unknown'}</strong></div><div>${i.action}</div><div>${structuralState}</div>`,
-      shortLabel: i.locationName || i.action,
-      raw: i
-    };
-  });
-  const airElements = getAirTrafficGlobeElements();
-  const airPaths = getAirTrafficPaths();
-  const satelliteElements = getSatelliteGlobeElements();
-  const satellitePaths = getSatelliteOrbitPaths();
-  const overlayElements = [...airElements, ...satelliteElements];
-  const overlayPaths = [...airPaths, ...satellitePaths];
-  const hoveredCityPoints = hoveredCityLabel ? cityPoints.filter((point) => point.shortLabel === hoveredCityLabel) : [];
-  const seaElements = seaLayerEnabled ? currentVesselCatalog.map(v => ({
-    lat: v.lat,
-    lng: v.lng,
-    size: 0.15,
-    kind: 'sea',
-    raw: v,
-    label: v.name
-  })) : [];
-  const pointsData = [...cityPoints, ...airElements.filter(a => a.opacity > 0).map(a => ({ ...a, kind: 'air', raw: a.raw || a })), ...satelliteElements.map(s => ({ ...s, kind: 'satellite', raw: s.raw || s })), ...seaElements, ...getThreatHotspotPoints()];
-
-  currentGlobePointsData = cityPoints;
-
+  // Initialize globe.gl if not already done
   if (!intelGlobe) {
+    // Wait for Globe library to load (may be deferred or slow CDN)
+    if (typeof window.Globe === 'undefined' && typeof Globe === 'undefined') {
+      console.warn('[Intel] Globe library not loaded, retrying in 500ms...');
+      setTimeout(() => initOrUpdateGlobe(items), 500);
+      return;
+    }
+    const GlobeLib = window.Globe || Globe;
+    console.log('[Intel] Initializing globe with', GlobeLib.name || 'Globe');
+
     // Hide loading skeleton
     const loadEl = document.getElementById('globe-loading');
     if (loadEl) loadEl.remove();
-    intelGlobe = Globe()(globeContainer)
-      .globeImageUrl(isNightTime() ? '//unpkg.com/three-globe/example/img/earth-night.jpg' : '//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-      .backgroundColor('rgba(0,0,0,0)')
-      .pointLat('lat')
-      .pointLng('lng')
-      .pointColor((point) => point.color || (point.kind === 'air' ? 'rgba(210,255,84,0.01)' : point.kind === 'satellite' ? 'rgba(0,229,255,0.01)' : '#00e5ff'))
-      .pointRadius((point) => {
-        if (point.kind === 'air' || point.kind === 'satellite') return hasCoarsePointer() ? 0.6 : 0.15;
-        if (point.kind === 'threat') return point.size || 0.35;
-        return point.size || 0.25;
-      })
-      .pointAltitude((point) => point.altitude ?? 0.01)
-      .pointLabel('label')
-      .ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints)
-      .ringLat('lat')
-      .ringLng('lng')
-      .ringColor('ringColor')
-      .ringMaxRadius('ringMaxRadius')
-      .ringPropagationSpeed('ringPropagationSpeed')
-      .ringRepeatPeriod('ringRepeatPeriod')
-      .labelsData([])
-      .labelLat('lat')
-      .labelLng('lng')
-      .labelText('shortLabel')
-      .labelSize(1.3)
-      .labelAltitude(0.22)
-      .labelDotRadius(0.36)
-      .labelColor('color')
-      .htmlElementsData(overlayElements)
-      .htmlLat('lat')
-      .htmlLng('lng')
-      .htmlAltitude('altitude')
-      .htmlElement((item) => {
-        const el = document.createElement('div');
-        const coarsePointer = hasCoarsePointer();
-        el.style.pointerEvents = 'auto';
-        el.style.cursor = 'pointer';
-        el.style.display = 'grid';
-        el.style.placeItems = 'center';
-        if (item.kind === 'air') {
-          el.style.width = coarsePointer ? '44px' : '18px';
-          el.style.height = coarsePointer ? '44px' : '18px';
-          el.style.opacity = String(item.opacity ?? 1);
-          if ((item.opacity ?? 1) <= 0) el.style.display = 'none';
-          const isCommercial = item.raw?.callsign && /^[A-Z]{3}[A-Z0-9]{1,5}$/i.test(item.raw.callsign.trim());
-          el.innerHTML = buildPlaneSvg(item.heading || 0, selectedAirIcao24 === item.raw?.icao24, isCommercial);
-          el.title = item.label || 'Tracked aircraft';
-          if (coarsePointer) {
-            el.addEventListener('click', (event) => {
-              event.stopPropagation();
-              selectedAirIcao24 = item.raw?.icao24 || null;
-              openIntelDrawer(item.raw || {});
-              initOrUpdateGlobe(currentGlobeBaseItems || []);
-            });
-          } else {
-            el.addEventListener('mouseenter', () => {
-              el.style.opacity = '1';
-            });
-            el.addEventListener('mouseleave', () => {
-              el.style.opacity = String(item.opacity ?? 1);
-          if ((item.opacity ?? 1) <= 0) el.style.display = 'none';
-            });
-            el.addEventListener('click', (event) => {
-              event.stopPropagation();
-              selectedAirIcao24 = item.raw?.icao24 || null;
-              openIntelDrawer(item.raw || {});
-              initOrUpdateGlobe(currentGlobeBaseItems || []);
-            });
-          }
-          return el;
-        }
-        const satOrbitClass = item.raw?.orbitClass || 'LEO';
-        let satDotColor = satOrbitClass === 'LEO' ? '0,229,100' : satOrbitClass === 'GEO' ? '255,60,60' : '0,229,255';
-        
-        const opacity = getSatAlpha(item.raw || {});
-        
-        // If a specific network or orbit is selected and this satellite is selected (opacity == 1), turn it white
-        if ((selectedSatOrbit || selectedSatNetwork) && opacity === 1) {
-            satDotColor = '255,255,255';
-        }
 
-        el.style.width = '10px';
-        el.style.height = '10px';
-        el.style.borderRadius = '999px';
-        el.style.opacity = String(opacity);
-        el.style.background = `rgba(${satDotColor},0.98)`;
-        el.style.boxShadow = `0 0 10px rgba(${satDotColor},0.68)`;
-        if (coarsePointer) {
-          // Keep visual dot at 10px, expand tap area to 44px
-          el.style.width = '44px';
-          el.style.height = '44px';
-          el.style.display = 'flex';
-          el.style.alignItems = 'center';
-          el.style.justifyContent = 'center';
-          el.style.background = 'transparent';
-          el.style.borderRadius = '999px';
-          el.style.boxShadow = 'none';
-          const innerDot = document.createElement('div');
-          innerDot.style.width = '10px';
-          innerDot.style.height = '10px';
-          innerDot.style.borderRadius = '999px';
-          innerDot.style.background = `rgba(${satDotColor},0.98)`;
-          innerDot.style.boxShadow = `0 0 10px rgba(${satDotColor},0.68)`;
-          innerDot.style.pointerEvents = 'none';
-          el.appendChild(innerDot);
-        }
-        el.title = item.label || 'Tracked satellite';
-        el.addEventListener('click', (event) => {
-          event.stopPropagation();
-          event.preventDefault();
-          openIntelDrawer(item.raw || {});
+    // Create globe.gl instance
+    try {
+      intelGlobe = GlobeLib()(globeContainer);
+      intelGlobe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+      intelGlobe.backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png');
+      intelGlobe.backgroundColor('#050505');
+      intelGlobe.showAtmosphere(true);
+      intelGlobe.atmosphereColor('#6ab0ff');
+      intelGlobe.atmosphereAltitude(0.25);
+      intelGlobe.showGraticules(false);
+      intelGlobe.pointRadius(0.3);
+      intelGlobe.pointAltitude(0);
+      intelGlobe.pointResolution(12);
+      intelGlobe.pointsMerge(false);
+      // Satellite custom layer - Three.js spheres at orbital altitude
+      intelGlobe.customLayerData([]);
+      setupSatelliteCustomLayer(); // Will wait for THREE if not ready
+      // Clear flight/sat selection when clicking globe background
+      const globeCanvas = globeContainer.querySelector('canvas');
+      if (globeCanvas && !globeCanvas._intelBgClickBound) {
+        globeCanvas.addEventListener('click', (e) => {
+          // Only clear if the click wasn't on an HTML overlay element
+          if (e.target === globeCanvas) {
+            if (selectedAirIcao24) {
+              selectedAirIcao24 = null;
+              if (typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
+            }
+          }
         });
-        if (hasCoarsePointer()) {
-          el.addEventListener('touchend', (event) => {
-            event.stopPropagation();
-            event.preventDefault();
-            openIntelDrawer(item.raw || {});
-          }, { passive: false });
-        }
-        return el;
-      })
-      .arcsData(threatLayerEnabled ? getThreatArcElements() : [])
-      .arcStartLat('srcLat')
-      .arcStartLng('srcLng')
-      .arcEndLat('tgtLat')
-      .arcEndLng('tgtLng')
-      .arcColor(arc => {
-        const typeColors = {
-          'SSH Brute Force': '#ff4444',
-          'Port Scan': '#ff8833',
-          'Malware C2': '#ff33ff',
-          'Web Exploit': '#ff5544',
-          'DDoS': '#ffcc00',
-          'Ransomware Probe': '#ff0066'
-        };
-        return typeColors[arc.type] || '#ff3333';
-      })
-      .arcStroke(0.15)
-      .arcAltitude(0.25)
-      .arcDashLength(0.4)
-      .arcDashGap(0.2)
-      .arcDashAnimateTime(2000)
-      .pathsData(overlayPaths)
-      .pathPoints('points')
-      .pathPointLat('lat')
-      .pathPointLng('lng')
-      .pathPointAlt('alt')
-      .pathColor('color')
-      .pathStroke(() => null)
-      .pathResolution(() => 2)
-      .onPointClick((point) => {
-        if (point?.kind === 'city' || point?.kind === 'satellite' || point?.kind === 'air' || point?.kind === 'threat') {
-          if (point.kind === 'air') {
-            selectedAirIcao24 = point.raw?.icao24 || null;
+        globeCanvas._intelBgClickBound = true;
+      }
+      intelGlobe.onPointClick(point => {
+        if (point && point.raw) {
+          // On click/tap, show tooltip at center of globe
+          const existingTip = globeContainer.querySelector('.globe-click-tooltip');
+          if (existingTip) existingTip.remove();
+          const tip = document.createElement('div');
+          tip.className = 'globe-click-tooltip';
+          tip.style.cssText = 'position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(10,11,14,0.96);color:#e8eaed;padding:14px 18px;border-radius:10px;font-size:13px;font-family:Google Sans,Roboto,sans-serif;z-index:30;max-width:340px;min-width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.6);backdrop-filter:blur(12px);border:1px solid rgba(255,221,68,0.15);';
+          if (point.raw.kind === 'satellite') {
+            const sat = point.raw;
+            const orbitColor = sat.orbitClass === 'GEO' ? '#ffee00' : sat.orbitClass === 'MEO' ? '#ff8800' : '#00ff44';
+            tip.innerHTML = `<div style="font-weight:700;font-size:14px;color:${orbitColor};margin-bottom:4px;">🛰 ${sat.name || 'Satellite'}</div><div style="opacity:0.85;margin-bottom:2px;">${sat.network || 'Unknown'} · ${sat.orbitClass || 'LEO'}</div><div style="opacity:0.6;font-size:11px;">${sat.altitudeKm ? Math.round(sat.altitudeKm) + ' km altitude' : ''}${sat.periodMinutes ? ' · ' + Math.round(sat.periodMinutes) + ' min orbit' : ''}${sat.inclination ? ' · ' + sat.inclination.toFixed(1) + '° incl' : ''}</div><div style="margin-top:8px;display:flex;gap:8px;"><button style="background:rgba(0,255,68,0.15);border:1px solid rgba(0,255,68,0.4);color:#00ff44;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;" onclick="this.closest('.globe-click-tooltip').remove()">Close</button></div>`;
+          } else if (point.raw.kind === 'air') {
+            const fl = point.raw;
+            const altStr = fl.altitude ? Math.round(fl.altitude) + ' m' : 'n/a';
+            const spdStr = fl.velocity ? Math.round(fl.velocity * 3.6) + ' km/h' : 'n/a';
+            const hdgStr = fl.heading != null ? Math.round(fl.heading) + '°' : 'n/a';
+            tip.innerHTML = `
+              <div style="position:relative;">
+                <button style="position:absolute;top:0;right:0;background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:2px 4px;line-height:1;z-index:2;" onclick="this.closest('.globe-click-tooltip').remove()">✕</button>
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                  <div id="flight-tip-logo" style="width:128px;height:96px;min-width:128px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:36px;">✈</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-weight:700;font-size:15px;color:#ffdd44;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fl.callsign || 'Unknown Flight'}</div>
+                    <div style="opacity:0.7;font-size:11px;">${fl.country || 'Public air traffic'}</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:11px;margin-bottom:8px;">
+                <div><span style="opacity:0.5;">ALT</span><br><span style="color:#e8eaed;">${altStr}</span></div>
+                <div><span style="opacity:0.5;">SPD</span><br><span style="color:#e8eaed;">${spdStr}</span></div>
+                <div><span style="opacity:0.5;">HDG</span><br><span style="color:#e8eaed;">${hdgStr}</span></div>
+                <div><span style="opacity:0.5;">ICAO</span><br><span style="color:#e8eaed;">${fl.icao24 || 'n/a'}</span></div>
+              </div>
+              <div id="flight-tip-detail" style="border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;font-size:11px;color:#888;">Loading route info...</div>
+            `;
+            // Fetch enriched flight detail (airline, route, times)
+            fetchFlightDetail(fl.callsign).then(detail => {
+              const detailEl = tip.querySelector('#flight-tip-detail');
+              if (!detailEl || !tip.parentNode) return;
+              if (!detail) { detailEl.textContent = 'Route info unavailable'; return; }
+              const dep = [detail.departure?.iata, detail.departure?.location].filter(Boolean).join(' · ') || 'Unknown';
+              const dest = [detail.destination?.iata, detail.destination?.location].filter(Boolean).join(' · ') || 'Unknown';
+              const depTime = detail.times?.departureEstimated || detail.times?.departureScheduled || detail.times?.departureActual || '';
+              const arrTime = detail.times?.arrivalEstimated || detail.times?.arrivalScheduled || detail.times?.arrivalActual || '';
+              detailEl.innerHTML = `
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                  <span style="font-weight:600;color:#e8eaed;font-size:13px;">${detail.flightNumber || fl.callsign || ''}</span>
+                  <span style="opacity:0.6;">${detail.airline || ''}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <div style="text-align:center;"><div style="font-weight:600;color:#ffdd44;font-size:14px;">${detail.departure?.iata || '-'}</div><div style="font-size:10px;">${dep}</div></div>
+                  <div style="flex:1;border-top:1px dashed rgba(255,221,68,0.3);margin:0 8px;position:relative;"><div style="position:absolute;top:-4px;left:50%;transform:translateX(-50%);font-size:10px;color:#ffdd44;">→</div></div>
+                  <div style="text-align:center;"><div style="font-weight:600;color:#ffdd44;font-size:14px;">${detail.destination?.iata || '-'}</div><div style="font-size:10px;">${dest}</div></div>
+                </div>
+                ${(depTime || arrTime) ? `<div style="display:flex;justify-content:space-between;font-size:10px;opacity:0.6;"><span>Dep: ${depTime || '-'}</span><span>Arr: ${arrTime || '-'}</span></div>` : ''}
+                ${detail.aircraftType ? `<div style="font-size:10px;opacity:0.5;margin-top:2px;">${detail.aircraftType}</div>` : ''}
+              `;
+              // Load airline logo
+              const logoEl = tip.querySelector('#flight-tip-logo');
+              if (logoEl && detail.airline) {
+                fetch(`api/airline-logos.php?callsign=${encodeURIComponent(fl.callsign || '')}&airline=${encodeURIComponent(detail.airline)}&w=120&h=120`)
+                  .then(r => r.json()).then(logoData => {
+                    if (logoData?.logoUrl && tip.parentNode) {
+                      logoEl.innerHTML = `<img src="${logoData.logoUrl}" style="width:128px;height:96px;object-fit:contain;" onerror="this.parentElement.innerHTML='✈'">`;
+                    }
+                  }).catch(() => {});
+              }
+            }).catch(() => {
+              const detailEl = tip.querySelector('#flight-tip-detail');
+              if (detailEl) detailEl.textContent = 'Route info unavailable';
+            });
+          } else if (point.raw.kind === 'threat') {
+            const t = point.raw;
+            const arcs = t.arcs || [];
+            const countryName = t.country || 'Unknown';
+            const countryCode = arcs.length ? (arcs[0].srcCountryCode || '') : '';
+            const flagUrl = countryCode ? `https://flagcdn.com/w80/${countryCode.toLowerCase()}.png` : '';
+            const typeEmoji = { 'SSH Brute Force': '🔐', 'DDoS': '💥', 'Malware C2': '🦠', 'Ransomware Probe': '🔒', 'Port Scan': '🔍', 'Web Exploit': '🕸️' };
+            // Group arcs by type
+            const typeCounts = {};
+            arcs.forEach(a => { typeCounts[a.type] = (typeCounts[a.type] || 0) + 1; });
+            const typeEntries = Object.entries(typeCounts).sort((a,b) => b[1] - a[1]);
+            // Top targets
+            const targetCounts = {};
+            arcs.forEach(a => { targetCounts[a.tgtName] = (targetCounts[a.tgtName] || 0) + 1; });
+            const targetEntries = Object.entries(targetCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            // Avg intensity
+            const avgIntensity = arcs.length ? (arcs.reduce((s,a) => s + a.intensity, 0) / arcs.length) : 0;
+            const intensityPct = Math.round(avgIntensity * 100);
+            const intensityColor = avgIntensity >= 0.8 ? '#ff2222' : avgIntensity >= 0.6 ? '#ff8844' : '#ffcc00';
+            tip.innerHTML = `
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;position:relative;">
+                ${flagUrl ? `<img src="${flagUrl}" style="width:48px;height:32px;object-fit:cover;border-radius:3px;border:1px solid rgba(255,255,255,0.1);" onerror="this.style.display='none'">` : '<span style="font-size:28px;">🔴</span>'}
+                <div style="flex:1;">
+                  <div style="font-weight:700;font-size:15px;color:#ff4444;">${countryName}</div>
+                  <div style="opacity:0.6;font-size:11px;">${t.type === 'Hotspot' ? 'Threat Hotspot' : t.type}</div>
+                </div>
+                <button style="position:absolute;top:-4px;right:-4px;background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:2px 4px;line-height:1;" onclick="this.closest('.globe-click-tooltip').remove()">✕</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:11px;margin-bottom:8px;">
+                <div><span style="opacity:0.5;">THREATS</span><br><span style="color:#ff4444;font-weight:600;">${t.count || arcs.length}</span></div>
+                <div><span style="opacity:0.5;">INTENSITY</span><br><span style="color:${intensityColor};font-weight:600;">${intensityPct}%</span></div>
+              </div>
+              ${typeEntries.length ? `
+              <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;margin-bottom:8px;">
+                <div style="opacity:0.5;font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Attack Types</div>
+                ${typeEntries.map(([type, cnt]) => `<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;"><span>${typeEmoji[type] || '⚠️'} ${type}</span><span style="opacity:0.7;">${cnt}</span></div>`).join('')}
+              </div>` : ''}
+              ${targetEntries.length ? `
+              <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;">
+                <div style="opacity:0.5;font-size:10px;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Top Targets</div>
+                ${targetEntries.map(([tgt, cnt]) => `<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;"><span>🎯 ${tgt}</span><span style="opacity:0.7;">${cnt}</span></div>`).join('')}
+              </div>` : ''}
+            `;
+          } else {
+            const name = point.label || point.locationName || 'Unknown';
+            tip.innerHTML = `<div style="font-weight:600;font-size:14px;">📍 ${name}</div><div style="margin-top:8px;display:flex;gap:8px;"><button style="background:rgba(0,255,68,0.15);border:1px solid rgba(0,255,68,0.4);color:#00ff44;padding:4px 12px;border-radius:4px;font-size:11px;cursor:pointer;" onclick="this.closest('.globe-click-tooltip').remove()">Close</button></div>`;
           }
-          openIntelDrawer(point.raw || {});
-          if (point.kind === 'air') {
-            initOrUpdateGlobe(currentGlobeBaseItems || []);
-          }
+          globeContainer.appendChild(tip);
+          // Auto-dismiss after 5 seconds
+          setTimeout(() => { if (tip.parentNode) tip.remove(); }, 15000);
         }
-      })
-      .onPointHover((point) => {
-        hoveredCityLabel = point?.kind === 'city' ? point.shortLabel : null;
-        globeContainer.style.cursor = point ? 'crosshair' : 'grab';
-        if (intelGlobe) {
-          const hoveredRings = hoveredCityLabel ? currentGlobePointsData.filter((entry) => entry.shortLabel === hoveredCityLabel) : [];
-          const threatRings = threatLayerEnabled ? getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0) : [];
-          intelGlobe.ringsData([...hoveredRings, ...threatRings]);
-        }
-      })
-      .pointsTransitionDuration(1500)
-      .width(globeContainer.clientWidth || window.innerWidth - 24)
-      .height(globeContainer.clientHeight || 600);
-      
-      setGlobeAutoRotate(true);
-
-      window.addEventListener('resize', () => {
-        applyInteractionMode();
-        updatePrimaryStageHeight();
       });
+      intelGlobe.onPointHover(point => {
+        const label = globeContainer.querySelector('.globe-hover-label');
+        if (label) label.remove();
+        // Show/hide city HTML markers on hover
+        const htmlMarkers = globeContainer.querySelectorAll('[data-globe-marker]');
+        htmlMarkers.forEach(m => { m.style.opacity = '0'; m.style.pointerEvents = 'none'; });
+        if (point) {
+          // Find the matching HTML marker for this point
+          htmlMarkers.forEach(m => {
+            if (m.dataset.label === (point.label || point.locationName)) {
+              m.style.opacity = '1';
+              m.style.pointerEvents = 'auto';
+            }
+          });
+          // Tooltip will be positioned by mousemove/touchmove handler below
+          _hoveredPoint = point;
+        } else {
+          _hoveredPoint = null;
+        }
+      });
+
+      // Position tooltip near cursor on mouse/touch move
+      let _hoveredPoint = null;
+      const _tooltipMoveHandler = (e) => {
+        const label = globeContainer.querySelector('.globe-hover-label');
+        if (!_hoveredPoint) { if (label) label.remove(); return; }
+        const clientX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY);
+        if (clientX == null || clientY == null) return;
+        const rect = globeContainer.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        if (!label) {
+          const el = document.createElement('div');
+          el.className = 'globe-hover-label';
+          if (_hoveredPoint.raw && _hoveredPoint.raw.kind === 'satellite') {
+            const sat = _hoveredPoint.raw;
+            el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(10,11,14,0.92);color:#e8eaed;padding:6px 12px;border-radius:6px;font-size:11px;font-family:Google Sans,Roboto,sans-serif;z-index:10;border:1px solid rgba(0,255,68,0.3);max-width:220px;line-height:1.3;';
+            const orbitColor = sat.orbitClass === 'GEO' ? '#ffee00' : sat.orbitClass === 'MEO' ? '#ff8800' : '#00ff44';
+            el.innerHTML = `<div style="font-weight:600;color:${orbitColor};margin-bottom:2px;">${sat.name || 'Sat'}</div><div style="opacity:0.8;">${sat.network || ''} · ${sat.orbitClass || 'LEO'}</div><div style="opacity:0.6;font-size:10px;">${sat.altitudeKm ? Math.round(sat.altitudeKm) + ' km' : ''} · ${sat.periodMinutes ? Math.round(sat.periodMinutes) + ' min' : ''}</div>`;
+          } else if (_hoveredPoint.raw && _hoveredPoint.raw.kind === 'air') {
+            const fl = _hoveredPoint.raw;
+            el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(10,11,14,0.92);color:#e8eaed;padding:6px 12px;border-radius:6px;font-size:11px;font-family:Google Sans,Roboto,sans-serif;z-index:10;border:1px solid rgba(255,221,68,0.3);max-width:220px;line-height:1.3;';
+            el.innerHTML = `<div style="font-weight:600;color:#ffdd44;margin-bottom:2px;">✈ ${fl.callsign || 'N/A'}</div><div style="opacity:0.8;">${fl.country || 'Unknown'}</div><div style="opacity:0.6;font-size:10px;">${fl.altitude ? Math.round(fl.altitude) + ' m' : ''}${fl.velocity ? ' · ' + Math.round(fl.velocity * 3.6) + ' km/h' : ''}${fl.heading ? ' · ' + Math.round(fl.heading) + '°' : ''}</div>`;
+          } else {
+            el.style.cssText = 'position:absolute;pointer-events:none;background:rgba(32,33,36,0.9);color:#e8eaed;padding:4px 10px;border-radius:6px;font-size:12px;font-family:Google Sans,Roboto,sans-serif;white-space:nowrap;z-index:10;';
+            el.textContent = _hoveredPoint.label || _hoveredPoint.locationName || 'Unknown';
+          }
+          globeContainer.appendChild(el);
+        }
+        const tip = globeContainer.querySelector('.globe-hover-label');
+        if (tip) {
+          tip.style.left = (x + 12) + 'px';
+          tip.style.top = (y - 12) + 'px';
+        }
+      };
+      globeContainer.addEventListener('mousemove', _tooltipMoveHandler);
+      globeContainer.addEventListener('touchmove', _tooltipMoveHandler);
+      console.log('[Intel] Globe constructor OK');
+
+      // Set initial dimensions
+      intelGlobe.width(globeContainer.clientWidth || window.innerWidth);
+      intelGlobe.height(globeContainer.clientHeight || window.innerHeight * 0.6);
+      console.log('[Intel] Globe sized:', globeContainer.clientWidth, 'x', globeContainer.clientHeight);
+
+    // Handle resize
+    window.addEventListener('resize', () => {
+      applyInteractionMode();
+      updatePrimaryStageHeight();
+      if (intelGlobe && intelGlobe.width && intelGlobe.height) {
+        intelGlobe.width(globeContainer.clientWidth);
+        intelGlobe.height(globeContainer.clientHeight);
+      }
+    });
+
+    // Wire Map/Satellite toggle for globe view
+    const mapStyleBtn = document.getElementById('toggle-map-style');
+    if (mapStyleBtn && !mapStyleBtn.dataset.bound) {
+      mapStyleBtn.addEventListener('click', () => {
+        const isSatellite = mapStyleBtn.textContent.trim() === 'Satellite';
+        if (isSatellite) {
+          // Switch to map
+          intelGlobe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png');
+          mapStyleBtn.textContent = 'Map';
+        } else {
+          // Switch to satellite
+          intelGlobe.globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+          mapStyleBtn.textContent = 'Satellite';
+        }
+      });
+      mapStyleBtn.dataset.bound = '1';
+    }
+  } catch(e) {
+    console.error('[Intel] Globe creation failed:', e);
+    // Show error details in container with readable font size
+    const errMsg = e.message || e.toString();
+    const errStack = (e.stack || '').split('\n').slice(0, 3).join('\n');
+    globeContainer.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px 20px;text-align:center;font-family:monospace;"><div style="color:#ff4444;font-size:20px;margin-bottom:16px;">⚠ Globe Error</div><div style="color:#e8eaed;font-size:14px;margin-bottom:8px;word-break:break-all;">${errMsg}</div><div style="color:#888;font-size:11px;margin-bottom:20px;word-break:break-all;">${errStack}</div><button onclick="location.reload()" style="background:#00e676;color:#000;border:none;padding:12px 24px;border-radius:8px;font-size:16px;cursor:pointer;">Retry</button></div>`;
+    return;
+  }
   }
 
-  if (!globeContainer.dataset.hoverGuardBound) {
-    syncGlobeControls(globeContainer, false);
+  // ── DATA RENDERING ────────────────────────────────────────
+  // Skip redundant updates only when satellite/air/threat layer state hasn't changed
+  const layerStateHash = [satelliteLayerEnabled, airLayerEnabled, seaLayerEnabled, threatLayerEnabled, currentSatelliteCatalog?.length || 0, currentAirTrafficItems?.length || 0, highlightedOrbitClass, highlightedSatNetwork, [...threatVisibleTypes].sort().join(','), threatArcsVisible, threatHotspotsVisible].join(',');
+  const dataHash = items.length + ':' + (items[0]?.locationName || '') + ':' + (items[items.length-1]?.locationName || '') + ':' + layerStateHash;
+  if (dataHash === _lastGlobeDataHash && intelGlobe) return; // No change, skip
+  _lastGlobeDataHash = dataHash;
 
-    globeContainer.addEventListener('pointerdown', (event) => {
-      if (event.pointerType === 'touch') {
-        syncGlobeControls(globeContainer, true);
-        setGlobeAutoRotate(false);
-        setGlobeOverlayVisibility(false);
+  const validItems = (items || []).filter(i => i.lat !== undefined && i.lng !== undefined);
+  const touchBoost = ('ontouchstart' in window) ? 1.5 : 1;
+  const cityPoints = validItems.map(item => {
+    const structuralState = item.recoveryTrustDriverTransitionBalanceStructuralState || 'neutral';
+    return {
+      lat: item.lat,
+      lng: item.lng,
+      label: item.locationName || 'Unknown',
+      raw: item,
+      color: stateColors[structuralState] || stateColors['neutral'] || '#00e676',
+      radius: 0.25 * touchBoost,
+      altitude: 0
+    };
+  });
+
+  // Hovered city ring points
+  const hoveredCityPoints = (hoveredCity && hoveredCity.lat && hoveredCity.lng)
+    ? [{ lat: hoveredCity.lat, lng: hoveredCity.lng, ringMaxRadius: 2, ringColor: hoveredCity.color || '#00ff88', ringPropagationTime: 3 }]
+    : [];
+
+  // Threat layer data
+  const threatArcElements = threatLayerEnabled ? getThreatArcElements() : [];
+  const threatArcData = threatArcElements.map(a => ({
+    startLat: a.startLat, startLng: a.startLng,
+    endLat: a.endLat, endLng: a.endLng,
+    color: a.color || '#ff4444',
+    arcAlt: a.arcAlt || 0.3
+  }));
+
+  // Overlay paths (flight paths, orbits)
+  const overlayPaths = [];
+  // Air traffic flight trail - only for selected flight
+  if (selectedAirIcao24) {
+    const selectedFlight = currentAirTrafficItems.find(f => f.icao24 === selectedAirIcao24);
+    if (selectedFlight && selectedFlight.lat && selectedFlight.lng) {
+      // Draw path from departure → current position → destination
+      const selPaths = getAirTrafficPaths().filter((p, i) => currentAirTrafficItems[i]?.icao24 === selectedAirIcao24);
+      if (selPaths.length) {
+        overlayPaths.push(...selPaths.map(p => ({
+          coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: pt.alt || 0.01 })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng)),
+          color: '#d2ff54'
+        })).filter(p => p.coords.length >= 2));
+      } else {
+        // Fallback: short trail from the selected aircraft's position
+        const heading = selectedFlight.heading || 0;
+        const fwd = projectPointFromBearing(selectedFlight.lat, selectedFlight.lng, heading, 120);
+        const bck = projectPointFromBearing(selectedFlight.lat, selectedFlight.lng, heading + 180, 80);
+        const alt = getAircraftAltitudeRatio(selectedFlight.altitude || 0);
+        overlayPaths.push({
+          coords: [{ lat: bck.lat, lng: bck.lng, alt }, { lat: selectedFlight.lat, lng: selectedFlight.lng, alt }, { lat: fwd.lat, lng: fwd.lng, alt }],
+          color: '#d2ff54'
+        });
       }
-    }, { passive: true, capture: true });
-
-    globeContainer.addEventListener('mousemove', (event) => {
-      syncGlobeControls(globeContainer, isInsideGlobeHitArea(event, globeContainer));
-      updateGlobeLabelVisibility();
-  if (typeof updateDataPanel === 'function') updateDataPanel();
-    });
-
-    globeContainer.addEventListener('mousedown', (event) => {
-      if (!isInsideGlobeHitArea(event, globeContainer)) {
-        event.preventDefault();
-        syncGlobeControls(globeContainer, false);
-        return;
-      }
-      syncGlobeControls(globeContainer, true);
-      setGlobeAutoRotate(false);
-      setGlobeOverlayVisibility(false);
-    });
-
-    globeContainer.addEventListener('wheel', (event) => {
-      const inside = isInsideGlobeHitArea(event, globeContainer);
-      syncGlobeControls(globeContainer, inside);
-      if (inside) {
-        setGlobeAutoRotate(false);
-        setGlobeOverlayVisibility(false);
-      }
-      updateGlobeLabelVisibility();
-  if (typeof updateDataPanel === 'function') updateDataPanel();
-    }, { passive: true });
-
-    globeContainer.addEventListener('touchstart', (event) => {
-      const inside = isInsideGlobeHitArea(event, globeContainer);
-      syncGlobeControls(globeContainer, inside);
-      if (inside) {
-        event.preventDefault();
-        setGlobeAutoRotate(false);
-        setGlobeOverlayVisibility(false);
-      }
-    }, { passive: false });
-
-    globeContainer.addEventListener('touchmove', (event) => {
-      const inside = isInsideGlobeHitArea(event, globeContainer);
-      syncGlobeControls(globeContainer, inside);
-      if (inside) {
-        event.preventDefault();
-        setGlobeAutoRotate(false);
-        setGlobeOverlayVisibility(false);
-      }
-      updateGlobeLabelVisibility();
-  if (typeof updateDataPanel === 'function') updateDataPanel();
-    }, { passive: false });
-
-    globeContainer.addEventListener('touchend', () => {
-      syncGlobeControls(globeContainer, false);
-    }, { passive: true });
-
-    globeContainer.addEventListener('mouseleave', () => {
-      syncGlobeControls(globeContainer, false);
-    });
-
-    const rotationButton = document.getElementById('toggle-globe-rotation');
-    if (rotationButton && !rotationButton.dataset.bound) {
-      rotationButton.addEventListener('click', () => setGlobeAutoRotate(true));
-      rotationButton.dataset.bound = '1';
     }
+  }
+  if (overlayFlightPaths && overlayFlightPaths.length) {
+    overlayPaths.push(...overlayFlightPaths.filter(p => p.coords && p.coords.length >= 2).map(p => ({
+      coords: p.coords.map(c => ({ lat: c.lat, lng: c.lng, alt: c.alt || 0.05 })),
+      color: p.color || '#00ff88'
+    })));
+  }
+  if (overlaySatelliteOrbits && overlaySatelliteOrbits.length) {
+    overlayPaths.push(...overlaySatelliteOrbits.filter(p => p.coords && p.coords.length >= 2).map(p => ({
+      coords: p.coords.map(c => ({ lat: c.lat, lng: c.lng, alt: c.alt || 0.2 })),
+      color: p.color || '#4488ff'
+    })));
+  }
+  // Satellite orbit trails - only show when an orbit class or constellation is highlighted
+  let satOrbitPaths = [];
+  if (satelliteLayerEnabled && currentSatelliteCatalog.length && (highlightedOrbitClass || highlightedSatNetwork)) {
+    const allOrbitPaths = getSatelliteOrbitPaths();
+    satOrbitPaths = allOrbitPaths;
+    if (satOrbitPaths.length) {
+      overlayPaths.push(...satOrbitPaths.map(p => {
+        // Only show paths for the highlighted orbit class or network
+        let isHighlighted = false;
+        if (highlightedSatNetwork) {
+          isHighlighted = p.network === highlightedSatNetwork;
+        } else if (highlightedOrbitClass) {
+          isHighlighted = p.orbitClass === highlightedOrbitClass;
+        }
+        if (!isHighlighted) return null; // Skip non-highlighted paths entirely
+        const pathColor = satelliteOrbitColor(p.orbitClass, 0.6);
+        // Altitude matches satellite altitude by orbit class
+        const pathAlt = p.orbitClass === 'GEO' ? 0.55 : p.orbitClass === 'MEO' ? 0.35 : 0.15;
+        return {
+          coords: p.points.map(pt => ({ lat: pt.lat, lng: pt.lng, alt: pathAlt })).filter(pt => isFinite(pt.lat) && isFinite(pt.lng) && Math.abs(pt.lat) <= 90 && Math.abs(pt.lng) <= 180),
+          color: pathColor
+        };
+      }).filter(Boolean).filter(p => p.coords.length >= 2));
+    }
+  }
 
+  // Air traffic points
+  const airPoints = airLayerEnabled ? currentAirTrafficItems.filter(a => a.lat && a.lng).map(a => ({
+    lat: a.lat, lng: a.lng, label: a.callsign || 'Aircraft',
+    raw: { ...a, kind: 'air' }, color: '#ffdd44', radius: 0.4 * touchBoost, altitude: 0
+  })) : [];
+
+  // Satellite points removed from pointsData - rendered via customLayerData (Three.js spheres)
+  const satGlobeElements = getSatelliteGlobeElements();
+
+  // Build custom layer data for satellites (Three.js spheres at orbital altitude)
+  // Satellite click targets (for onPointClick/onPointHover detection)
+  // Small colored dots at altitude 0 - same lat/lng as custom spheres but clickable
+  const satClickTargets = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
+    lat: s.lat, lng: s.lng, label: s.label,
+    raw: s.raw,
+    color: 'rgba(0,0,0,0)',
+    radius: 0.01,
+    altitude: 0
+  }));
+
+  // Custom layer data for satellite spheres (Three.js objects at orbital altitude)
+  const satCustomData = satGlobeElements.filter(s => s.lat && s.lng && isFinite(s.lat) && isFinite(s.lng)).map(s => ({
+    lat: s.lat, lng: s.lng, label: s.label,
+    raw: s.raw,
+    orbitClass: s.raw.orbitClass || 'LEO',
+    alt: s.raw.orbitClass === 'GEO' ? 0.55 : s.raw.orbitClass === 'MEO' ? 0.35 : 0.15,
+    size: s.raw.orbitClass === 'GEO' ? 0.6 : s.raw.orbitClass === 'MEO' ? 0.45 : 0.35,
+    color: s.raw.orbitClass === 'GEO' ? 0xffee00 : s.raw.orbitClass === 'MEO' ? 0xff8800 : 0x00ff44
+  }));
+  const notableSats = [];
+  const orbitClasses = ['LEO', 'MEO', 'GEO'];
+  orbitClasses.forEach(oc => {
+    const classSats = satGlobeElements.filter(s => s.raw.orbitClass === oc && s.lat && s.lng);
+    // Pick up to 5 notable ones (ISS, GPS, Galileo, etc.)
+    const notable = classSats.filter(s => s.label && (s.label.includes('ISS') || s.label.includes('GPS') || s.label.includes('Galileo') || s.label.includes('Hubble') || s.label.includes('Starlink') || s.label.includes('GOES') || s.label.includes('Iridium') || s.label.includes('CSS')));
+    if (notable.length) notableSats.push(...notable.slice(0, 3));
+    else if (classSats.length) notableSats.push(classSats[0]); // fallback: first in class
+  });
+
+  // Sea vessel points
+  const seaPoints = seaLayerEnabled ? currentVesselCatalog.filter(v => v.lat && v.lng).map(v => ({
+    lat: v.lat, lng: v.lng, label: v.name || 'Vessel',
+    raw: v, color: (v.type === 'Tanker' || v.type === 'LNG Carrier') ? '#ff8844' : '#4488ff',
+    radius: 0.35, altitude: 0
+  })) : [];
+
+  // Threat hotspot points
+  const threatPoints = threatLayerEnabled ? threatHotspots.filter(t => t.lat && t.lng).map(t => ({
+    lat: t.lat, lng: t.lng, label: t.description || 'Threat Hotspot',
+    raw: t, color: '#ff2222', radius: 0.3, altitude: 0
+  })) : [];
+
+  // Combine all point layers (no satellites - those use customLayerData)
+  const allPoints = [...cityPoints, ...airPoints, ...satClickTargets, ...seaPoints, ...threatPoints];
+
+  // HTML element markers: city tooltips + notable satellite glow markers
+  const htmlCityMarkers = cityPoints.filter(p => p.lat && p.lng).map(p => ({
+    lat: p.lat, lng: p.lng, altitude: 0.01,
+    type: 'city', color: p.color, label: p.label, raw: p.raw
+  }));
+  const htmlSatMarkers = notableSats.filter(s => s.lat && s.lng).map(s => ({
+    lat: s.lat, lng: s.lng, altitude: s.raw.orbitClass === 'GEO' ? 0.55 : s.raw.orbitClass === 'MEO' ? 0.35 : 0.15,
+    type: 'sat', color: s.raw.orbitClass === 'GEO' ? '#ffee00' : s.raw.orbitClass === 'MEO' ? '#ff8800' : '#00ff44',
+    label: s.label, raw: s.raw
+  }));
+  // Air traffic HTML markers with generous touch targets for easy tapping
+  const htmlAirMarkers = airLayerEnabled ? currentAirTrafficItems.filter(a => a.lat && a.lng).map(a => ({
+    lat: a.lat, lng: a.lng, altitude: 0.002,
+    type: 'air', color: '#ffdd44', label: a.callsign || 'Aircraft', raw: { ...a, kind: 'air' }
+  })) : [];
+
+  // Update globe data
+  try {
+    intelGlobe.pointsData(allPoints);
+    intelGlobe.pointColor(d => d.color);
+    intelGlobe.pointRadius(d => d.radius);
+    intelGlobe.pointAltitude(d => d.altitude || 0);
+    intelGlobe.pointsMerge(false);
+    // City tooltip + notable satellite HTML elements
+    intelGlobe.htmlElementsData([...htmlCityMarkers, ...htmlSatMarkers, ...htmlAirMarkers]);
+    intelGlobe.htmlElement(d => {
+      const el = document.createElement('div');
+      const stateColor = d.color || '#00e676';
+      if (d.type === 'sat') {
+        // Satellite glow marker - small pulsing dot
+        el.setAttribute('data-globe-marker', 'sat');
+        el.setAttribute('data-label', d.label || '');
+        el.style.cssText = `position:relative;transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;`;
+        el.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:${stateColor};box-shadow:0 0 6px ${stateColor},0 0 2px ${stateColor};animation:satPulse 2s ease-in-out infinite;"></div>`;
+        el.title = d.label || 'Satellite';
+        el.addEventListener('click', () => {
+          if (d.raw) {
+            selectedSatOrbit = null; selectedSatNetwork = null;
+            openIntelDrawer(d.raw);
+          }
+        });
+        return el;
+      }
+      if (d.type === 'air') {
+        // Air traffic marker - large transparent touch target with visible dot
+        const isTouch = 'ontouchstart' in window;
+        const hitSize = isTouch ? 44 : 32;
+        el.setAttribute('data-globe-marker', 'air');
+        el.setAttribute('data-label', d.label || 'Aircraft');
+        el.style.cssText = `position:relative;transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto;width:${hitSize}px;height:${hitSize}px;display:flex;align-items:center;justify-content:center;`;
+        el.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:#ffdd44;box-shadow:0 0 6px #ffdd44,0 0 2px #ffdd44;"></div>`;
+        el.addEventListener('click', () => {
+          // Set selection and show flight path
+          const prevIcao = selectedAirIcao24;
+          selectedAirIcao24 = d.raw.icao24 || null;
+          selectedSatOrbit = null; selectedSatNetwork = null;
+          if (selectedAirIcao24 !== prevIcao && typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
+          if (d.raw) openIntelDrawer(d.raw);
+        });
+        return el;
+      }
+      // City tooltip marker
+      const name = (d.raw && (d.raw.locationName || d.label)) || '';
+      el.setAttribute('data-globe-marker', 'city');
+      el.setAttribute('data-label', name);
+      el.style.cssText = `position:relative;transform:translate(-50%,-100%);cursor:pointer;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity 0.15s;`;
+      el.innerHTML = `<div style="display:flex;align-items:center;gap:4px;background:rgba(10,11,14,0.92);border:1px solid ${stateColor};border-radius:4px;padding:2px 7px 2px 5px;font-size:11px;color:#e8eaed;pointer-events:auto;"><span style="width:6px;height:6px;border-radius:50%;background:${stateColor};flex-shrink:0;"></span>${name}</div>`;
+      el.addEventListener('click', () => { if (d.raw) openIntelDrawer(d.raw); });
+      return el;
+    });
+    intelGlobe.htmlAltitude(d => d.altitude || 0.01);
+    intelGlobe.htmlElementVisibilityModifier((el, isVisible) => {
+      // Hide city labels by default; they're shown via onPointHover
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
+    });
+    intelGlobe.arcsData(threatArcData);
+    intelGlobe.arcColor(d => d.color);
+    intelGlobe.arcStroke(0.5);
+    intelGlobe.arcAltitude(d => d.arcAlt || 0.3);
+    intelGlobe.ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints);
+    intelGlobe.ringColor(d => d.ringColor || '#ff4444');
+    intelGlobe.ringMaxRadius(d => d.ringMaxRadius || 1);
+    intelGlobe.ringPropagationSpeed(1);
+    intelGlobe.ringRepeatPeriod(2000);
+    console.log('[Intel] Paths:', overlayPaths.length, 'orbit:', satOrbitPaths.length);
+    if (satOrbitPaths?.length) {
+      const sample = satOrbitPaths[0];
+      console.log('[Intel] Sample orbit:', sample.orbitClass, 'points:', sample.points?.length, 'color:', sample.color, 'coords sample:', sample.points?.[0]);
+      console.log('[Intel] Sample overlay path:', overlayPaths.find(p => !p.isAir)?.coords?.slice(0,2));
+    }
+    intelGlobe.pathsData(overlayPaths);
+    intelGlobe.pathPoints(d => d.coords);
+    intelGlobe.pathPointLat(d => d.lat);
+    intelGlobe.pathPointLng(d => d.lng);
+    intelGlobe.pathColor(d => d.color);
+    intelGlobe.pathPointAlt(d => d.alt || 0.005);
+    intelGlobe.pathStroke(null); // null = simple 1px line; FatLines don't support rgba
+    // Satellite custom layer (Three.js spheres at orbital altitude)
+    if (satelliteLayerEnabled && satCustomData.length && _satCustomLayerSetup) {
+      intelGlobe.customLayerData(satCustomData);
+    } else {
+      intelGlobe.customLayerData([]);
+    }
+    // Re-assert atmosphere settings after data update (prevents black atmosphere bug)
+    intelGlobe.showAtmosphere(true);
+    intelGlobe.atmosphereColor('#6ab0ff');
+    intelGlobe.atmosphereAltitude(0.25);
+  } catch(e) { console.error('[Intel] Globe data error:', e); }
+
+  // Hover guard
+  if (!globeContainer.dataset.hoverGuardBound) {
+    globeContainer.addEventListener('pointermove', () => {
+      const label = globeContainer.querySelector('.globe-hover-label');
+      if (label) label.remove();
+    });
+    globeContainer.addEventListener('pointerleave', () => {
+      const label = globeContainer.querySelector('.globe-hover-label');
+      if (label) label.remove();
+    });
     globeContainer.dataset.hoverGuardBound = '1';
   }
-  
-  intelGlobe.pointsData(pointsData);
-  intelGlobe.ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints);
-  intelGlobe.labelsData([]);
-  intelGlobe.htmlElementsData(overlayElements);
-  intelGlobe.arcsData(threatLayerEnabled ? getThreatArcElements() : []);
-  intelGlobe.pathsData(overlayPaths);
-  updateGlobeLabelVisibility();
-  if (typeof updateDataPanel === 'function') updateDataPanel();
 
-  intelGlobe.pointsData(pointsData);
-  intelGlobe.ringsData(threatLayerEnabled ? [...hoveredCityPoints, ...getThreatHotspotPoints().filter(p => p.ringMaxRadius > 0)] : hoveredCityPoints);
-  intelGlobe.labelsData([]);
-  intelGlobe.htmlElementsData(overlayElements);
-  intelGlobe.arcsData(threatLayerEnabled ? getThreatArcElements() : []);
-  intelGlobe.pathsData(overlayPaths);
   updateGlobeLabelVisibility();
   if (typeof updateDataPanel === 'function') updateDataPanel();
 
@@ -3882,26 +4470,25 @@ function initOrUpdateGlobe(items = []) {
     if (cityPoints.length > 0) {
       const avgLat = cityPoints.reduce((sum, point) => sum + point.lat, 0) / cityPoints.length;
       const avgLng = cityPoints.reduce((sum, point) => sum + point.lng, 0) / cityPoints.length;
-      intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 1.7 }, 1800);
+      intelGlobe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 2.8 }, 1800);
     } else {
-      intelGlobe.pointOfView({ lat: 39.0, lng: -98.0, altitude: 1.7 }, 1800);
+      intelGlobe.pointOfView({ lat: 39.0, lng: -98.0, altitude: 2.8 }, 1800);
     }
     globeContainer.dataset.initialViewLocked = '1';
   }
-}
-function showGraphStage() {
+}function showGraphStage() {
   const globe = document.getElementById('intel-globe');
   const mapStage = document.getElementById('intel-map-stage');
   const graphStage = document.getElementById('intel-graph-stage');
   const returnButton = document.getElementById('return-to-globe');
   const graphButton = document.getElementById('toggle-ontology-graph');
-  
+
   if (globe) globe.style.display = 'none';
   if (mapStage) mapStage.style.display = 'none';
   if (graphStage) graphStage.style.display = 'block';
   if (returnButton) returnButton.style.display = 'inline-flex';
   if (graphButton) graphButton.style.display = 'none';
-  
+
   updatePrimaryStageHeight();
   console.log("Intel Graph: Toggled visibility, rendering...");
   if (typeof renderOntologyGraph === 'function') renderOntologyGraph();
@@ -3923,11 +4510,11 @@ function updatePrimaryStageHeight() {
 
   let targetHeight;
   if (window.innerWidth <= 920) {
-    targetHeight = Math.max(300, window.innerHeight * 0.5);
+    targetHeight = window.innerHeight; // Full viewport on mobile
   } else {
     const top = card.getBoundingClientRect().top;
-    const reservedBelow = 150;
-    targetHeight = Math.max(360, window.innerHeight - top - reservedBelow);
+    const reservedBelow = 32; // Minimal bottom padding
+    targetHeight = Math.max(400, window.innerHeight - top - reservedBelow);
   }
 
   card.style.height = `${targetHeight}px`;
@@ -3935,9 +4522,14 @@ function updatePrimaryStageHeight() {
   mapStage.style.height = `${targetHeight}px`;
   if (graphStage) graphStage.style.height = `${targetHeight}px`;
 
-  if (typeof intelGlobe !== 'undefined' && intelGlobe && intelGlobe.height && intelGlobe.width) {
-    intelGlobe.height(targetHeight);
-    intelGlobe.width(globe.clientWidth || window.innerWidth - 24);
+
+  // globe.gl resize via width/height
+  if (intelGlobe && typeof intelGlobe.width === 'function') {
+    const gc = document.getElementById('intel-globe');
+    if (gc) {
+      intelGlobe.width(gc.clientWidth);
+      intelGlobe.height(gc.clientHeight);
+    }
   }
 }
 let graphInstance = null;
@@ -3947,7 +4539,7 @@ window.expandedNodes = new Set();
 
 function getVisibleOntology(clickedNode = null) {
     if (!window.fullOntologyData) return { nodes: [], links: [] };
-    
+
     const visibleNodes = new Set();
     // Always show Nexus (0), Regions (3), Themes (4)
     window.fullOntologyData.nodes.forEach(n => {
@@ -3955,7 +4547,7 @@ function getVisibleOntology(clickedNode = null) {
             visibleNodes.add(n.id);
         }
     });
-    
+
     // Add signals connected to expanded hubs
     window.fullOntologyData.links.forEach(l => {
         const sId = typeof l.source === 'object' ? l.source.id : l.source;
@@ -3963,9 +4555,9 @@ function getVisibleOntology(clickedNode = null) {
         if (window.expandedNodes.has(sId)) visibleNodes.add(tId);
         if (window.expandedNodes.has(tId)) visibleNodes.add(sId);
     });
-    
+
     const outNodes = window.fullOntologyData.nodes.filter(n => visibleNodes.has(n.id));
-    
+
     // Spawning animation logic
     if (clickedNode && window.expandedNodes.has(clickedNode.id)) {
         outNodes.forEach(n => {
@@ -3978,27 +4570,27 @@ function getVisibleOntology(clickedNode = null) {
             n._collapsed = false;
         });
     }
-    
+
     // Update collapsed state trackers
     window.fullOntologyData.nodes.forEach(n => {
         n._collapsed = !visibleNodes.has(n.id);
     });
-    
+
     const outLinks = window.fullOntologyData.links.filter(l => {
         const sId = typeof l.source === 'object' ? l.source.id : l.source;
         const tId = typeof l.target === 'object' ? l.target.id : l.target;
         return visibleNodes.has(sId) && visibleNodes.has(tId);
     });
-    
+
     return { nodes: outNodes, links: outLinks };
 }
 
 async function renderOntologyGraph() {
   const container = document.getElementById('intel-graph-stage');
   if (!container) return console.error("Intel Graph Error: #intel-graph-stage not found.");
-  
+
   await ensureForceGraphLib();
-  
+
   if (!graphInstance) {
     console.log("Intel Graph: Fetching ontology.json...");
     fetch('data/ontology.json?v=' + Date.now())
@@ -4010,7 +4602,7 @@ async function renderOntologyGraph() {
         window.fullOntologyData = gData;
         window.expandedNodes = new Set();
         gData.nodes.forEach(n => n._collapsed = true);
-        
+
         console.log("Intel Graph: Rendering with", gData.nodes.length, "nodes");
         container.style.display = 'block'; // Ensure it's not hidden while rendering
         graphInstance = ForceGraph()(container)
@@ -4030,7 +4622,7 @@ async function renderOntologyGraph() {
                  ctx.textAlign = 'center';
                  ctx.textBaseline = 'middle';
                  ctx.fillStyle = node.group === 0 ? 'rgba(0, 229, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)';
-                 
+
                  // Offset the text so it sits just below the node circle
                  const nodeRadius = Math.sqrt(node.size || 10) * 4;
                  ctx.fillText(label, node.x, node.y + nodeRadius + (6/globalScale));
@@ -4066,10 +4658,10 @@ async function renderOntologyGraph() {
                 }
                 graphInstance.graphData(getVisibleOntology(node));
             }
-            
+
             graphInstance.centerAt(node.x, node.y, 1000);
             graphInstance.zoom(2, 2000);
-            
+
             // Query related items against the FULL dataset so everything shows up in the drawer
             const { nodes, links } = window.fullOntologyData;
             const relatedLinks = links.filter(l => {
@@ -4083,7 +4675,7 @@ async function renderOntologyGraph() {
                 const otherId = sId === node.id ? tId : sId;
                 return nodes.find(n => n.id === otherId) || { id: otherId };
             });
-            
+
             if (typeof openIntelDrawer === 'function') {
                 openIntelDrawer({
                     kind: 'graph-node',
@@ -4092,7 +4684,7 @@ async function renderOntologyGraph() {
                 });
             }
           });
-          
+
         graphInstance.d3Force('charge').strength(-600);
         graphInstance.d3Force('link').distance(70);
       })
@@ -4123,23 +4715,23 @@ async function loadIntel() {
 
     renderTimelineViews(timelineViews.items || []);
     const globeSeed = await fetchJson('data/globe-demo-locations.json').catch(() => ({ items: [] }));
-    
+
     currentPriorityItems = globeSeed.items || [];
     currentGlobeBaseItems = currentPriorityItems;
-    
+
     await refreshAirTraffic();
     await refreshSatelliteCatalog();
     renderCommandBar(currentPriorityItems);
-    
+
     if (typeof initOrUpdateGlobe === "function") initOrUpdateGlobe(currentGlobeBaseItems);
     if (typeof updateDataPanel === 'function') updateDataPanel();
-    
+
     renderTimelineFocus(signals.items || []);
     renderTimeline(signals.items || []);
     syncTimelineWindowButtons();
     syncSeverityFilterButtons();
     syncFeedViewButtons();
-    
+
     const feedStatus = document.getElementById('feed-status');
     if (feedStatus) {
       feedStatus.innerHTML = '<span class="live-dot">●</span> Live';
@@ -4209,16 +4801,16 @@ function updateDataPanel() {
           <span style="color:var(--lime); font-family:var(--font-mono);">${count}</span>
         </div>
       `;
-      
+
       // If selected, show deep dive
       if (isSelected) {
         const regionalFlights = currentAirTrafficItems.filter(f => f.country === country);
-        
+
         // Count airlines
         const airlines = {};
         let rComm = 0;
         let rPriv = 0;
-        
+
         regionalFlights.forEach(f => {
            let code = f.callsign ? f.callsign.substring(0, 3).toUpperCase() : 'UNK';
            if (/^[A-Z]{3}$/.test(code)) {
@@ -4236,9 +4828,9 @@ function updateDataPanel() {
                rPriv++;
            }
         });
-        
+
         const topAirlines = Object.entries(airlines).sort((a,b)=>b[1]-a[1]).slice(0, 4);
-        
+
         // Mock pseudo-airports based on string length to look realistic but deterministic
         const pseudoAirports = country === 'United States' ? ['JFK', 'LAX', 'ORD', 'DFW', 'ATL', 'SFO', 'MIA'] :
                                country === 'France' ? ['CDG', 'ORY', 'NCE', 'MRS', 'MRS', 'LYS', 'TLS'] :
@@ -4246,14 +4838,14 @@ function updateDataPanel() {
                                country === 'Germany' ? ['FRA', 'MUC', 'BER', 'DUS', 'HAM', 'STR'] :
                                country === 'China' ? ['PEK', 'PVG', 'SHA', 'CAN', 'CTU', 'SZX'] :
                                ['HUB1', 'INTL', 'REG', 'MAIN', 'SEC', 'PORT'];
-                               
+
         const deps = pseudoAirports.slice(0, 5).map((code, idx) => `<div>${idx+1}. ${code} <span class="muted" style="float:right">${Math.floor(regionalFlights.length * (0.3 - idx*0.05))}</span></div>`).join('');
         const arrs = pseudoAirports.slice().reverse().slice(0, 5).map((code, idx) => `<div>${idx+1}. ${code} <span class="muted" style="float:right">${Math.floor(regionalFlights.length * (0.28 - idx*0.05))}</span></div>`).join('');
 
         html += `
           <div style="margin: 4px 0 12px 12px; padding-left: 10px; border-left: 1px solid rgba(210,255,84,0.3);">
              <div style="font-size:10px; margin-bottom: 6px; color:#fff;">REGION METRICS: ${regionalFlights.length} TRACKED</div>
-             
+
              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom: 8px;">
                <div style="background:rgba(0,0,0,0.2); padding: 4px; border-radius: 4px;">
                  <div class="muted" style="font-size:9px;">Commercial</div>
@@ -4269,7 +4861,7 @@ function updateDataPanel() {
              <div style="font-size:10px; color:#ccc; margin-bottom:8px;">
                ${topAirlines.map(a => `<div style="display:flex; justify-content:space-between;"><span>${a[0]}</span><span style="color:var(--lime)">${a[1]}</span></div>`).join('')}
              </div>
-             
+
              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:9px; color:#ccc;">
                <div>
                  <div class="muted" style="text-transform:uppercase; margin-bottom:4px;">Top Departures</div>
@@ -4305,7 +4897,7 @@ function updateDataPanel() {
     container.innerHTML = html;
   } else if (seaLayerEnabled) {
     title.textContent = 'Data Target: MARITIME ZONES';
-    
+
     let html = `
       <div style="margin-bottom: 16px;">
          <div data-sea-select="hormuz" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; border: 1px solid ${seaRegion === 'hormuz' ? 'var(--cyan)' : 'rgba(255,255,255,0.1)'}; background: ${seaRegion === 'hormuz' ? 'rgba(0,150,255,0.15)' : 'rgba(255,255,255,0.02)'}; transition:all 0.2s;">
@@ -4323,18 +4915,18 @@ function updateDataPanel() {
         const total = currentVesselCatalog.length;
         let tankers = 0, cargo = 0;
         const flags = {};
-        
+
         currentVesselCatalog.forEach(v => {
             if (v.type === 'Tanker' || v.type === 'LNG Carrier') tankers++;
             else cargo++;
             const f = v.flag || 'Unknown';
             flags[f] = (flags[f] || 0) + 1;
         });
-        
+
         const topFlags = Object.entries(flags)
             .sort((a,b) => b[1] - a[1])
             .slice(0, 5);
-            
+
         html += `
           <div style="display:flex; justify-content:space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
             <div data-sea-type="all" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${!selectedSeaType ? 'rgba(0,150,255,0.15)' : 'transparent'};">
@@ -4352,7 +4944,7 @@ function updateDataPanel() {
           </div>
           <div style="margin-bottom: 8px; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Vessels by Flag</div>
         `;
-        
+
         topFlags.forEach(([flag, count], i) => {
             const isSelected = selectedSeaFlag === flag;
             html += `
@@ -4365,9 +4957,9 @@ function updateDataPanel() {
     } else if (!seaRegion) {
         html += '<div class="muted" style="font-size:12px; margin-top:16px; padding:12px; border-left:2px solid var(--cyan); background:rgba(0,150,255,0.05);">Awaiting zone selection. Click a maritime region above to initialize live AIS tracking.</div>';
     }
-    
+
     container.innerHTML = html;
-    
+
     if (!container.dataset.seaBound) {
       container.addEventListener('click', (event) => {
         const selBtn = event.target.closest('[data-sea-select]');
@@ -4409,44 +5001,44 @@ function updateDataPanel() {
     const total = currentSatelliteCatalog.length;
     let leo = 0, meo = 0, geo = 0;
     const networks = {};
-    
+
     currentSatelliteCatalog.forEach(sat => {
         if (sat.orbitClass === 'LEO') leo++;
         else if (sat.orbitClass === 'GEO') geo++;
         else meo++;
-        
+
         const net = sat.network || 'Unknown';
         networks[net] = (networks[net] || 0) + 1;
     });
-    
+
     const topNetworks = Object.entries(networks)
         .sort((a,b) => b[1] - a[1])
         .slice(0, 10);
-        
+
     let html = `
       <div style="display:flex; justify-content:space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-        <div data-sat-orbit="all" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${!selectedSatOrbit ? 'rgba(0,229,255,0.15)' : 'transparent'};">
+        <div data-sat-orbit="all" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${!highlightedOrbitClass && !highlightedSatNetwork ? 'rgba(0,229,255,0.15)' : 'transparent'};">
           <div style="color:var(--cyan); font-size:16px; font-weight:600;">${total}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${!selectedSatOrbit ? '#fff' : ''}">Tracked Total</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${!highlightedOrbitClass && !highlightedSatNetwork ? '#fff' : ''}">Tracked Total</div>
         </div>
-        <div data-sat-orbit="LEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSatOrbit === 'LEO' ? 'rgba(0,229,100,0.15)' : 'transparent'};">
+        <div data-sat-orbit="LEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${highlightedOrbitClass === 'LEO' ? 'rgba(0,229,100,0.15)' : 'transparent'};">
           <div style="color:#00e564; font-size:16px; font-weight:600;">${leo}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSatOrbit === 'LEO' ? '#fff' : ''}">LEO</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${highlightedOrbitClass === 'LEO' ? '#fff' : ''}">LEO</div>
         </div>
-        <div data-sat-orbit="MEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSatOrbit === 'MEO' ? 'rgba(0,229,255,0.15)' : 'transparent'};">
+        <div data-sat-orbit="MEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${highlightedOrbitClass === 'MEO' ? 'rgba(0,229,255,0.15)' : 'transparent'};">
           <div style="color:#00e5ff; font-size:16px; font-weight:600;">${meo}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSatOrbit === 'MEO' ? '#fff' : ''}">MEO</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${highlightedOrbitClass === 'MEO' ? '#fff' : ''}">MEO</div>
         </div>
-        <div data-sat-orbit="GEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${selectedSatOrbit === 'GEO' ? 'rgba(255,60,60,0.15)' : 'transparent'};">
+        <div data-sat-orbit="GEO" style="cursor:pointer; padding: 4px 6px; border-radius: 4px; background: ${highlightedOrbitClass === 'GEO' ? 'rgba(255,60,60,0.15)' : 'transparent'};">
           <div style="color:#ff3c3c; font-size:16px; font-weight:600;">${geo}</div>
-          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${selectedSatOrbit === 'GEO' ? '#fff' : ''}">GEO</div>
+          <div class="muted" style="font-size:9px; text-transform:uppercase; color:${highlightedOrbitClass === 'GEO' ? '#fff' : ''}">GEO</div>
         </div>
       </div>
       <div style="margin-bottom: 8px; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">Top Constellations</div>
     `;
-    
+
     topNetworks.forEach(([net, count], i) => {
-        const isSelected = selectedSatNetwork === net;
+        const isSelected = highlightedSatNetwork === net;
         html += `
         <div data-sat-network="${net}" style="cursor:pointer; display:flex; justify-content:space-between; padding: 6px 4px; font-size: 11px; background: ${isSelected ? 'rgba(0,229,255,0.15)' : 'transparent'}; border-radius: 4px; transition: background 0.2s;">
           <span style="color:${isSelected ? '#fff' : '#ccc'}; font-weight:${isSelected ? 'bold' : 'normal'};">${i+1}. ${net}</span>
@@ -4454,9 +5046,9 @@ function updateDataPanel() {
         </div>
         `;
     });
-    
+
     container.innerHTML = html;
-    
+
     // Bind click events if not already bound via a delegated handler
     if (!container.dataset.satBound) {
       container.addEventListener('click', (event) => {
@@ -4465,26 +5057,35 @@ function updateDataPanel() {
           const orbit = orbitBtn.dataset.satOrbit;
           if (orbit === 'all') {
              selectedSatOrbit = null;
+             highlightedOrbitClass = null;
           } else if (selectedSatOrbit === orbit) {
              selectedSatOrbit = null;
+             highlightedOrbitClass = null;
           } else {
              selectedSatOrbit = orbit;
+             highlightedOrbitClass = orbit;
           }
-          selectedSatNetwork = null; // Clear network when orbit is toggled
+          selectedSatNetwork = null;
+          highlightedSatNetwork = null;
+          syncSatelliteToggle();
           if (typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
           if (typeof updateDataPanel === 'function') updateDataPanel();
           return;
         }
-        
+
         const netBtn = event.target.closest('[data-sat-network]');
         if (netBtn) {
           const net = netBtn.dataset.satNetwork;
           if (selectedSatNetwork === net) {
               selectedSatNetwork = null;
+              highlightedSatNetwork = null;
           } else {
               selectedSatNetwork = net;
+              highlightedSatNetwork = net;
           }
-          selectedSatOrbit = null; // Clear orbit when network is toggled
+          selectedSatOrbit = null;
+          highlightedOrbitClass = null;
+          syncSatelliteToggle();
           if (typeof initOrUpdateGlobe === 'function') initOrUpdateGlobe(currentGlobeBaseItems || []);
           if (typeof updateDataPanel === 'function') updateDataPanel();
           return;
@@ -4510,6 +5111,20 @@ function updateDataPanel() {
        html = '<div class="muted">No active zones detected.</div>';
     }
     container.innerHTML = html;
+  }
+}
+
+// ── Boot: ensure globe initializes after DOM + scripts ready ──
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!intelGlobe && typeof (window.Globe || Globe) !== 'undefined') {
+      initOrUpdateGlobe(currentGlobeBaseItems || []);
+    }
+  });
+} else {
+  // DOM already parsed
+  if (!intelGlobe && typeof (window.Globe || Globe) !== 'undefined') {
+    setTimeout(() => initOrUpdateGlobe(currentGlobeBaseItems || []), 100);
   }
 }
 

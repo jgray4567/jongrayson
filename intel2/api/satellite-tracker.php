@@ -2,12 +2,12 @@
 header('Content-Type: application/json');
 header('Cache-Control: no-store');
 
-$cachePath = dirname(__DIR__) . '/data/satellite-tracker-cache.json';
+$cachePath = __DIR__ . '/../data/satellite-tracker-cache.json';
 $cacheTtlSeconds = 1800;
-$maxItems = 400;
+$maxItems = 500;
 $groups = [
     ['slug' => 'stations', 'network' => 'Crewed / Stations', 'limit' => 20],
-    ['slug' => 'starlink', 'network' => 'SpaceX Starlink', 'limit' => 120],
+    ['slug' => 'starlink', 'network' => 'SpaceX Starlink', 'limit' => 120, 'query' => 'NAME=starlink'],
     ['slug' => 'oneweb', 'network' => 'OneWeb', 'limit' => 50],
     ['slug' => 'gps-ops', 'network' => 'GPS', 'limit' => 35],
     ['slug' => 'galileo', 'network' => 'Galileo', 'limit' => 35],
@@ -41,7 +41,7 @@ $fetch = function ($url) {
     curl_setopt_array($curl, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT => 20,
+        CURLOPT_TIMEOUT => 30,
         CURLOPT_USERAGENT => 'Mozilla/5.0 (Intel Satellite Tracker)',
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2
@@ -54,7 +54,8 @@ $fetch = function ($url) {
 };
 
 $cached = $readCache();
-if ($cached && isset($cached['fetchedAt']) && (time() - intval($cached['fetchedAt'])) < $cacheTtlSeconds) {
+$bypassCache = isset($_GET['nocache']) || isset($_GET['refresh']);
+if (!$bypassCache && $cached && isset($cached['fetchedAt']) && (time() - intval($cached['fetchedAt'])) < $cacheTtlSeconds) {
     $emit($cached);
 }
 
@@ -64,9 +65,31 @@ $items = [];
 $errors = [];
 
 foreach ($groups as $group) {
-    $url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=' . rawurlencode($group['slug']) . '&FORMAT=tle';
+    $url = isset($group['query'])
+        ? 'https://celestrak.org/NORAD/elements/gp.php?' . $group['query'] . '&FORMAT=tle'
+        : 'https://celestrak.org/NORAD/elements/gp.php?GROUP=' . rawurlencode($group['slug']) . '&FORMAT=tle';
     [$raw, $httpCode, $error] = $fetch($url);
 
+    // CelesTrak returns 403 for rate-limited groups — fall back to seed file for Starlink
+    if ($httpCode === 403) {
+        $seedPath = __DIR__ . '/../data/starlink-seed.json';
+        if ($group['slug'] === 'starlink' && file_exists($seedPath)) {
+            $seedData = json_decode(file_get_contents($seedPath), true);
+            if (is_array($seedData) && isset($seedData['items'])) {
+                $seedItems = array_slice($seedData['items'], 0, intval($group['limit']));
+                $items = array_merge($items, $seedItems);
+                continue;
+            }
+        }
+        // Try cached data for other 403 groups
+        if ($cached && isset($cached['items'])) {
+            $cachedGroupItems = array_filter($cached['items'], fn($i) => $i['network'] === $group['network']);
+            if (count($cachedGroupItems) > 0) {
+                $items = array_merge($items, array_slice(array_values($cachedGroupItems), 0, intval($group['limit'])));
+                continue;
+            }
+        }
+    }
     if ($raw === false || $httpCode >= 400 || trim((string) $raw) === '') {
         $errors[] = [
             'group' => $group['slug'],
