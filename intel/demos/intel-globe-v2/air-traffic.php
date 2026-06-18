@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 header('Cache-Control: no-store, max-age=0');
 header('Access-Control-Allow-Origin: *');
 
-$cachePath = dirname(__DIR__) . '/data/air-traffic-cache.json';
+$cachePath = dirname(__DIR__, 2) . '/data/air-traffic-cache.json';
 $cacheTtl = 300; // 5 min cache — OpenSky rate limits anonymous requests
 
 $emit = function ($payload) {

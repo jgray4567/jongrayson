@@ -1325,7 +1325,7 @@ function buildHotspots() {
     pctx.fillStyle = '#ffffff';
     pctx.fill();
     const pinTex = new THREE.CanvasTexture(pinCanvas);
-    const pinMat = new THREE.SpriteMaterial({ map: pinTex, transparent: true, opacity: 0.9, depthTest: false });
+    const pinMat = new THREE.SpriteMaterial({ map: pinTex, transparent: true, opacity: 0.9, depthTest: true });
     const pinSprite = new THREE.Sprite(pinMat);
     pinSprite.position.copy(pos);
     pinSprite.scale.set(0.18, 0.18, 0.18);
