@@ -531,7 +531,7 @@
   </label>
 
   <label class="layer-toggle">
-    <input type="checkbox" class="lt-checkbox" id="layer-satellites">
+    <input type="checkbox" class="lt-checkbox" id="layer-satellites" checked>
     <div class="lt-icon">🛰</div>
     <div class="lt-info"><div class="lt-name">Satellites</div><div class="lt-desc">Live orbit tracking</div></div>
     <div class="lt-count" id="count-satellites">OFF</div>
@@ -776,7 +776,7 @@ let flightPaths = [];
 
 const layers = {
   flights: true, daynight: true, borders: false,
-  cities: true, hotspots: true,
+  cities: true, hotspots: true, satellites: true,
   autorotate: false, atmosphere: true, stars: true
 };
 
@@ -853,10 +853,12 @@ async function init() {
   buildDayNight();
   setLoadProgress(94, 'Finalizing...');
   await buildBorders();
-  // Satellites load on demand when toggled
+  // Satellites — load and enable by default
   satelliteGroup = new THREE.Group();
-  satelliteGroup.visible = false;
+  satelliteGroup.visible = true;
   scene.add(satelliteGroup);
+  await fetchSatellites();
+  satelliteOrbitInterval = setInterval(fetchSatellites, 30000);
   setupUI();
 
   setLoadProgress(100, 'Ready');
