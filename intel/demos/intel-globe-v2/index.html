@@ -598,7 +598,7 @@ const TICKER = [
 // ═══════════════════════════════════════════════════════════════════
 
 let scene, camera, renderer, controls;
-let earth, atmosphere, starField;
+let earth, atmosphere, starField, clouds;
 let flightGroup, cityGroup, hotspotGroup, borderGroup, nightGroup, dayNightMesh;
 let raycaster, mouse;
 let hoveredCity = null;
@@ -698,83 +698,43 @@ function init() {
 // ═══════════════════════════════════════════════════════════════════
 
 function buildEarth() {
-  // Create procedural Earth texture with canvas
-  const canvas = document.createElement('canvas');
-  canvas.width = 2048; canvas.height = 1024;
-  const ctx = canvas.getContext('2d');
+  // Use real Earth textures from three.js examples CDN
+  const loader = new THREE.TextureLoader();
+  loader.setCrossOrigin('anonymous');
 
-  // Ocean base
-  const oceanGrad = ctx.createLinearGradient(0, 0, 0, 1024);
-  oceanGrad.addColorStop(0, '#2a5a8a');
-  oceanGrad.addColorStop(0.5, '#2a6a9a');
-  oceanGrad.addColorStop(1, '#2a5a8a');
-  ctx.fillStyle = oceanGrad;
-  ctx.fillRect(0, 0, 2048, 1024);
+  // NASA Blue Marble textures from three.js repo
+  const earthDay = loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_atmos_2048.jpg');
+  earthDay.colorSpace = THREE.SRGBColorSpace;
 
-  // Simplified continents (noise-based blobs)
-  const continents = [
-    // North America
-    {x:300,y:250,w:350,h:200}, {x:280,y:180,w:200,h:100},
-    // South America
-    {x:450,y:550,w:180,h:250},
-    // Europe
-    {x:950,y:250,w:200,h:120},
-    // Africa
-    {x:980,y:400,w:200,h:280},
-    // Asia
-    {x:1200,y:200,w:400,h:250}, {x:1300,y:350,w:200,h:150},
-    // Australia
-    {x:1550,y:600,w:200,h:120},
-    // Greenland
-    {x:600,y:100,w:150,h:100},
-    // Antarctica strip
-    {x:0,y:920,w:2048,h:104},
-  ];
-
-  const landGrad = ctx.createLinearGradient(0, 0, 0, 1024);
-  landGrad.addColorStop(0, '#5a7a3a');
-  landGrad.addColorStop(0.3, '#6a8a4a');
-  landGrad.addColorStop(0.5, '#5a7a2a');
-  landGrad.addColorStop(0.7, '#7a7a4a');
-  landGrad.addColorStop(1, '#3a5a1a');
-
-  for (const c of continents) {
-    ctx.fillStyle = landGrad;
-    ctx.beginPath();
-    ctx.ellipse(c.x + c.w/2, c.y + c.h/2, c.w/2, c.h/2, 0, 0, Math.PI*2);
-    ctx.fill();
-    // Add irregular edges with noise
-    for (let i = 0; i < 30; i++) {
-      const px = c.x + Math.random()*c.w;
-      const py = c.y + Math.random()*c.h;
-      const pr = 5 + Math.random()*25;
-      ctx.fillStyle = `rgba(${20+Math.random()*40},${30+Math.random()*40},${10+Math.random()*20},0.5)`;
-      ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI*2); ctx.fill();
-    }
-  }
-
-  // Add some noise texture
-  const imgData = ctx.getImageData(0, 0, 2048, 1024);
-  for (let i = 0; i < imgData.data.length; i += 4) {
-    const n = (Math.random() - 0.5) * 15;
-    imgData.data[i] = Math.max(0, Math.min(255, imgData.data[i] + n));
-    imgData.data[i+1] = Math.max(0, Math.min(255, imgData.data[i+1] + n));
-    imgData.data[i+2] = Math.max(0, Math.min(255, imgData.data[i+2] + n));
-  }
-  ctx.putImageData(imgData, 0, 0);
-
-  const earthTex = new THREE.CanvasTexture(canvas);
-  earthTex.colorSpace = THREE.SRGBColorSpace;
+  const earthNormal = loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_normal_2048.jpg');
+  const earthSpec = loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_specular_2048.jpg');
 
   const earthGeo = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
   const earthMat = new THREE.MeshStandardMaterial({
-    map: earthTex, roughness: 0.7, metalness: 0.05,
-    emissive: new THREE.Color('#1a3a5a'), emissiveIntensity: 0.3,
+    map: earthDay,
+    normalMap: earthNormal,
+    normalScale: new THREE.Vector2(0.85, 0.85),
+    roughnessMap: earthSpec,
+    roughness: 0.85,
+    metalness: 0.1,
+    emissive: new THREE.Color('#112244'),
+    emissiveIntensity: 0.15,
   });
   earth = new THREE.Mesh(earthGeo, earthMat);
   earth.castShadow = false;
   earth.receiveShadow = false;
   scene.add(earth);
+
+  // Cloud layer
+  const cloudTex = loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_clouds_1024.png');
+  cloudTex.colorSpace = THREE.SRGBColorSpace;
+  const cloudGeo = new THREE.SphereGeometry(EARTH_RADIUS * 1.01, 64, 64);
+  const cloudMat = new THREE.MeshStandardMaterial({
+    map: cloudTex, transparent: true, opacity: 0.35,
+    blending: THREE.NormalBlending, depthWrite: false,
+  });
+  clouds = new THREE.Mesh(cloudGeo, cloudMat);
+  scene.add(clouds);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1227,6 +1187,7 @@ function animate() {
   if (layers.flights) updateFlights();
   if (layers.hotspots) updateHotspots(time);
   if (layers.daynight) updateDayNight();
+  if (clouds) clouds.rotation.y += 0.0003;
 
   // City hover detection
   if (layers.cities) {
