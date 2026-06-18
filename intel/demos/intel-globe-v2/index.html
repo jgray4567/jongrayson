@@ -543,7 +543,7 @@
   </div>
   <div class="collapsible-body" id="globe-controls-body">
     <label class="layer-toggle">
-      <input type="checkbox" class="lt-checkbox" id="toggle-autorotate" checked>
+      <input type="checkbox" class="lt-checkbox" id="toggle-autorotate">
       <div class="lt-icon">⟳</div>
       <div class="lt-info"><div class="lt-name">Auto-Rotate</div><div class="lt-desc">Idle globe spin</div></div>
     </label>
@@ -777,7 +777,7 @@ let flightPaths = [];
 const layers = {
   flights: true, daynight: true, borders: false,
   cities: true, hotspots: true,
-  autorotate: true, atmosphere: true, stars: true
+  autorotate: false, atmosphere: true, stars: true
 };
 
 function latLngTo3D(lat, lng, r) {
@@ -801,7 +801,9 @@ async function init() {
   scene.background = new THREE.Color('#06070a');
 
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(0, 3, 14);
+  // North America default view
+  camera.position.set(-4.5, 2.8, 9);
+  camera.lookAt(0, 0, 0);
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -817,7 +819,7 @@ async function init() {
   controls.maxDistance = 30;
   controls.rotateSpeed = 0.5;
   controls.enablePan = false;
-  controls.autoRotate = true;
+  controls.autoRotate = false;
   controls.autoRotateSpeed = 0.3;
 
   raycaster = new THREE.Raycaster();
