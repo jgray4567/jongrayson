@@ -851,11 +851,11 @@ function buildFlights() {
 
     // Plane icon (arrow shape pointing forward)
     const planeShape = new THREE.Shape();
-    planeShape.moveTo(0.14, 0);       // nose
-    planeShape.lineTo(-0.08, 0.06);   // left wing tip
-    planeShape.lineTo(-0.04, 0);      // left tail
-    planeShape.lineTo(-0.08, -0.06);  // right wing tip
-    planeShape.lineTo(0.14, 0);       // back to nose
+    planeShape.moveTo(0.06, 0);       // nose
+    planeShape.lineTo(-0.035, 0.025); // left wing tip
+    planeShape.lineTo(-0.02, 0);     // left tail
+    planeShape.lineTo(-0.035, -0.025); // right wing tip
+    planeShape.lineTo(0.06, 0);       // back to nose
     const planeGeo = new THREE.ShapeGeometry(planeShape);
     const planeMat = new THREE.MeshBasicMaterial({
       color: 0x88eeff, transparent: true, opacity: 1.0,
@@ -867,7 +867,7 @@ function buildFlights() {
     flightPaths.push({
       points, line, trail, trailPositions, plane,
       progress: Math.random(),
-      speed: 0.00015 + Math.random() * 0.00015,
+      speed: 0.00004 + Math.random() * 0.00004,
       trailLen,
     });
   }
