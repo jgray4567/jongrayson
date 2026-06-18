@@ -795,7 +795,7 @@ function setLoadProgress(pct, msg) {
   if (msg) document.getElementById('load-status').textContent = msg;
 }
 
-function init() {
+async function init() {
   setLoadProgress(10, 'Creating scene...');
   scene = new THREE.Scene();
   scene.background = new THREE.Color('#06070a');
@@ -850,7 +850,7 @@ function init() {
   setLoadProgress(88, 'Calculating day/night...');
   buildDayNight();
   setLoadProgress(94, 'Finalizing...');
-:  buildBorders();
+  await buildBorders();
   // Satellites load on demand when toggled
   satelliteGroup = new THREE.Group();
   satelliteGroup.visible = false;
