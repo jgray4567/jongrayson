@@ -938,21 +938,22 @@ async function fetchRealFlights() {
     // Create shared jet icon geometry (top-down silhouette)
     if (!planeIconGeo) {
       const shape = new THREE.Shape();
-      // Nose
-      shape.moveTo(0.12, 0);
-      // Right side: nose to right wing tip
-      shape.lineTo(0.04, 0.016);
-      shape.lineTo(-0.02, 0.07);  // right wing tip (swept back)
-      // Right wing root to tail
-      shape.lineTo(-0.03, 0.016);
-      shape.lineTo(-0.07, 0.036);  // right horizontal stabilizer
-      shape.lineTo(-0.06, 0.01);
-      // Tail to left side (mirror)
-      shape.lineTo(-0.07, -0.036); // left horizontal stabilizer
-      shape.lineTo(-0.03, -0.016);
-      shape.lineTo(-0.02, -0.07);  // left wing tip (swept back)
-      shape.lineTo(0.04, -0.016);
-      shape.lineTo(0.12, 0);       // back to nose
+      // Airliner silhouette (top-down): long fuselage, swept wings, tail
+           shape.moveTo(0.045, 0);          // nose
+      // Right side
+      shape.lineTo(0.015, 0.004);      // forward fuselage
+      shape.lineTo(-0.005, 0.022);     // right wing root (swept)
+      shape.lineTo(-0.012, 0.020);     // right wing tip
+      shape.lineTo(-0.018, 0.004);     // aft fuselage
+      shape.lineTo(-0.028, 0.010);      // right stabilizer tip
+      shape.lineTo(-0.032, 0.006);      // tail
+      shape.lineTo(-0.032, -0.006);     // tail left
+      shape.lineTo(-0.028, -0.010);     // left stabilizer tip
+      shape.lineTo(-0.018, -0.004);    // aft fuselage
+      shape.lineTo(-0.012, -0.020);     // left wing tip
+      shape.lineTo(-0.005, -0.022);     // left wing root
+      shape.lineTo(0.015, -0.004);      // forward fuselage
+      shape.lineTo(0.045, 0);          // back to nose
       planeIconGeo = new THREE.ShapeGeometry(shape);
     }
     if (!planeIconMat) {
