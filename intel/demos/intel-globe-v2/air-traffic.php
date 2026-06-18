@@ -12,16 +12,6 @@ $emit = function ($payload) {
     exit;
 };
 
-$readCache = function () use ($cachePath) {
-    if (!file_exists($cachePath)) return null;
-    $decoded = json_decode(file_get_contents($cachePath), true);
-    return is_array($decoded) ? $decoded : null;
-};
-
-$writeCache = function ($payload) use ($cachePath) {
-    @file_put_contents($cachePath, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
-};
-
 // Region bounding boxes [minLat, maxLat, minLng, maxLng]
 $regions = [
     'north-america' => [25, 75, -170, -50],
@@ -37,62 +27,51 @@ $regions = [
 // Get requested regions from query param
 $requestedRegions = isset($_GET['regions']) ? explode(',', $_GET['regions']) : ['all'];
 $useAllRegions = in_array('all', $requestedRegions);
-
-// Check cache (keyed by requested regions)
 $cacheKey = implode(',', $requestedRegions);
-$cached = $readCache();
-if ($cached && isset($cached['fetchedAt']) && isset($cached['cacheKey']) && $cached['cacheKey'] === $cacheKey && (time() - intval($cached['fetchedAt'])) < $cacheTtl) {
-    $emit($cached);
-}
 
-// Also check if we have an 'all' cache we can filter from
+// Read cache file (always the 'all' cache)
 $allCache = null;
-if ($cached && isset($cached['cacheKey']) && $cached['cacheKey'] === 'all') {
-    $allCache = $cached;
-} else {
-    // Try reading with 'all' key
-    $allCachePath = dirname(__DIR__) . '/data/air-traffic-cache.json';
-    if (file_exists($allCachePath)) {
-        $decoded = json_decode(file_get_contents($allCachePath), true);
-        if (is_array($decoded) && isset($decoded['cacheKey']) && $decoded['cacheKey'] === 'all') {
-            $allCache = $decoded;
-        }
+if (file_exists($cachePath)) {
+    $decoded = json_decode(file_get_contents($cachePath), true);
+    if (is_array($decoded) && isset($decoded['items'])) {
+        $allCache = $decoded;
     }
 }
-if ($allCache && isset($allCache['fetchedAt']) && (time() - intval($allCache['fetchedAt'])) < $cacheTtl) {
-    // Filter the 'all' cache by requested regions
-    if (!$useAllRegions && isset($allCache['items'])) {
-        $filteredItems = [];
-        foreach ($allCache['items'] as $item) {
-            $lat = $item['lat']; $lng = $item['lng'];
-            foreach ($requestedRegions as $r) {
-                if (isset($regions[$r])) {
-                    $b = $regions[$r];
-                    if ($lat >= $b[0] && $lat <= $b[1] && $lng >= $b[2] && $lng <= $b[3]) {
-                        $filteredItems[] = $item;
-                        break;
-                    }
+
+// 1. If requesting 'all' and cache is fresh, serve it
+if ($useAllRegions && $allCache && isset($allCache['fetchedAt']) && (time() - intval($allCache['fetchedAt'])) < $cacheTtl) {
+    $allCache['source'] = 'cache';
+    $emit($allCache);
+}
+
+// 2. If requesting specific regions and cache is fresh, filter and serve
+if (!$useAllRegions && $allCache && isset($allCache['fetchedAt']) && (time() - intval($allCache['fetchedAt'])) < $cacheTtl) {
+    $filteredItems = [];
+    foreach ($allCache['items'] as $item) {
+        $lat = $item['lat']; $lng = $item['lng'];
+        foreach ($requestedRegions as $r) {
+            if (isset($regions[$r])) {
+                $b = $regions[$r];
+                if ($lat >= $b[0] && $lat <= $b[1] && $lng >= $b[2] && $lng <= $b[3]) {
+                    $filteredItems[] = $item;
+                    break;
                 }
             }
         }
-        $filtered = $allCache;
-        $filtered['items'] = $filteredItems;
-        $filtered['count'] = count($filteredItems);
-        $filtered['cacheKey'] = $cacheKey;
-        $filtered['source'] = 'cache-filtered';
-        $emit($filtered);
     }
-    // If requesting 'all' and cache is fresh, serve it
-    if ($useAllRegions) {
-        $emit($allCache);
-    }
+    $filtered = $allCache;
+    $filtered['items'] = $filteredItems;
+    $filtered['count'] = count($filteredItems);
+    $filtered['cacheKey'] = $cacheKey;
+    $filtered['source'] = 'cache-filtered';
+    $emit($filtered);
 }
 
+// 3. Cache is stale or missing — try to fetch from OpenSky
 $url = 'https://opensky-network.org/api/states/all';
-
-// Try cURL first (more reliable on shared hosting), fall back to file_get_contents
 $raw = null;
 $httpCode = 0;
+
 if (function_exists('curl_init')) {
     $ch = curl_init($url);
     curl_setopt_array($ch, [
@@ -120,93 +99,100 @@ if ($raw === null) {
     $raw = @file_get_contents($url, false, $ctx);
 }
 
-if ($raw === false || $raw === '' || $raw === null) {
-    // Rate limited or blocked — serve stale cache if available
-    if ($allCache && isset($allCache['items'])) {
-        if (!$useAllRegions) {
-            $filteredItems = [];
-            foreach ($allCache['items'] as $item) {
-                $lat = $item['lat']; $lng = $item['lng'];
-                foreach ($requestedRegions as $r) {
-                    if (isset($regions[$r])) {
-                        $b = $regions[$r];
-                        if ($lat >= $b[0] && $lat <= $b[1] && $lng >= $b[2] && $lng <= $b[3]) {
-                            $filteredItems[] = $item;
-                            break;
-                        }
+// 4. If fetch succeeded, process and cache
+if ($raw && $raw !== '') {
+    $decoded = json_decode($raw, true);
+    $states = $decoded['states'] ?? [];
+
+    $items = [];
+    foreach ($states as $s) {
+        if (!is_array($s)) continue;
+        if ($s[5] === null || $s[6] === null || $s[7] === null) continue;
+        $alt = $s[7];
+        $callsign = trim($s[1] ?? '');
+        $velocity = $s[9] ?? 0;
+        $lat = $s[6];
+        $lng = $s[5];
+
+        if ($alt < 3000 || $velocity <= 25) continue;
+        if (!preg_match('/^[A-Z]{3}[0-9]{1,4}[A-Z]?$/i', $callsign)) continue;
+
+        $items[] = [
+            'icao24' => $s[0],
+            'callsign' => $callsign,
+            'origin' => $s[2] ?? '',
+            'lng' => $lng,
+            'lat' => $lat,
+            'alt' => $alt,
+            'velocity' => $velocity,
+            'heading' => $s[10] ?? null,
+        ];
+    }
+
+    if (count($items) > 500) {
+        shuffle($items);
+        $items = array_slice($items, 0, 500);
+    }
+
+    // Always cache as 'all'
+    $payload = [
+        'items' => $items,
+        'fetchedAt' => time(),
+        'count' => count($items),
+        'cacheKey' => 'all',
+        'regions' => ['all'],
+    ];
+    @file_put_contents($cachePath, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+
+    // Filter by region if needed
+    if (!$useAllRegions) {
+        $filteredItems = [];
+        foreach ($items as $item) {
+            $lat = $item['lat']; $lng = $item['lng'];
+            foreach ($requestedRegions as $r) {
+                if (isset($regions[$r])) {
+                    $b = $regions[$r];
+                    if ($lat >= $b[0] && $lat <= $b[1] && $lng >= $b[2] && $lng <= $b[3]) {
+                        $filteredItems[] = $item;
+                        break;
                     }
                 }
             }
-            $allCache['items'] = $filteredItems;
-            $allCache['count'] = count($filteredItems);
-            $allCache['cacheKey'] = $cacheKey;
         }
-        $allCache['stale'] = true;
-        $allCache['source'] = 'stale-cache';
-        $emit($allCache);
+        $payload['items'] = $filteredItems;
+        $payload['count'] = count($filteredItems);
+        $payload['cacheKey'] = $cacheKey;
+        $payload['regions'] = $requestedRegions;
     }
-    http_response_code(502);
-    $emit(['error' => 'fetch_failed', 'http_code' => $httpCode, 'items' => []]);
+    $payload['source'] = 'live';
+    $emit($payload);
 }
 
-$decoded = json_decode($raw, true);
-$states = $decoded['states'] ?? [];
-
-$items = [];
-foreach ($states as $s) {
-    if (!is_array($s)) continue;
-    if ($s[5] === null || $s[6] === null || $s[7] === null) continue;
-    $alt = $s[7];
-    $callsign = trim($s[1] ?? '');
-    $velocity = $s[9] ?? 0;
-    $lat = $s[6];
-    $lng = $s[5];
-
-    // Only airborne commercial flights at cruising altitude (> 3000m / ~10,000ft)
-    if ($alt < 3000 || $velocity <= 25) continue;
-
-    // Only commercial callsigns (3-letter IATA prefix + flight number)
-    if (!preg_match('/^[A-Z]{3}[0-9]{1,4}[A-Z]?$/i', $callsign)) continue;
-
-    // Filter by region if not requesting all
+// 5. Fetch failed — serve stale cache if available (better than nothing)
+if ($allCache && isset($allCache['items'])) {
     if (!$useAllRegions) {
-        $inRegion = false;
-        foreach ($requestedRegions as $r) {
-            if (isset($regions[$r])) {
-                $b = $regions[$r];
-                if ($lat >= $b[0] && $lat <= $b[1] && $lng >= $b[2] && $lng <= $b[3]) {
-                    $inRegion = true;
-                    break;
+        $filteredItems = [];
+        foreach ($allCache['items'] as $item) {
+            $lat = $item['lat']; $lng = $item['lng'];
+            foreach ($requestedRegions as $r) {
+                if (isset($regions[$r])) {
+                    $b = $regions[$r];
+                    if ($lat >= $b[0] && $lat <= $b[1] && $lng >= $b[2] && $lng <= $b[3]) {
+                        $filteredItems[] = $item;
+                        break;
+                    }
                 }
             }
         }
-        if (!$inRegion) continue;
+        $allCache['items'] = $filteredItems;
+        $allCache['count'] = count($filteredItems);
+        $allCache['cacheKey'] = $cacheKey;
     }
-
-    $items[] = [
-        'icao24' => $s[0],
-        'callsign' => $callsign,
-        'origin' => $s[2] ?? '',
-        'lng' => $lng,
-        'lat' => $lat,
-        'alt' => $alt,
-        'velocity' => $velocity,
-        'heading' => $s[10] ?? null,
-    ];
+    $allCache['stale'] = true;
+    $allCache['source'] = 'stale-cache';
+    $emit($allCache);
 }
 
-// Cap at 500 for clean display
-if (count($items) > 500) {
-    shuffle($items);
-    $items = array_slice($items, 0, 500);
-}
-
-$payload = [
-    'items' => $items,
-    'fetchedAt' => time(),
-    'count' => count($items),
-    'cacheKey' => $cacheKey,
-    'regions' => $requestedRegions,
-];
-$writeCache($payload);
-$emit($payload);
+// 6. No cache, no live data — error
+http_response_code(502);
+$emit(['error' => 'fetch_failed', 'http_code' => $httpCode, 'items' => []]);
