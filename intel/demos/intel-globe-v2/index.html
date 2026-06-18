@@ -536,6 +536,14 @@
     <div class="lt-info"><div class="lt-name">Satellites</div><div class="lt-desc">Live orbit tracking</div></div>
     <div class="lt-count" id="count-satellites">OFF</div>
   </label>
+  <!-- Satellite Orbit Filters -->
+  <div id="sat-orbits" class="flight-region-filters">
+    <div class="fr-title">Filter by Orbit</div>
+    <label class="fr-toggle"><input type="checkbox" id="orbit-leo" checked> <span>LEO <span style="color:#22dd88">●</span></span> <span class="fr-count" id="orbit-count-leo">0</span></label>
+    <label class="fr-toggle"><input type="checkbox" id="orbit-meo" checked> <span>MEO <span style="color:#ffaa22">●</span></span> <span class="fr-count" id="orbit-count-meo">0</span></label>
+    <label class="fr-toggle"><input type="checkbox" id="orbit-geo" checked> <span>GEO <span style="color:#ff6644">●</span></span> <span class="fr-count" id="orbit-count-geo">0</span></label>
+    <label class="fr-toggle"><input type="checkbox" id="orbit-paths"> <span>Show Orbit Paths</span></label>
+  </div>
 
   <div class="layer-section-title collapsible-header" id="globe-controls-header">
     <span>Globe Controls</span>
@@ -772,6 +780,9 @@ let earth, atmosphere, starField, clouds;
 let flightGroup, cityGroup, hotspotGroup, borderGroup, nightGroup, dayNightMesh, satelliteGroup = null;
 let satelliteData = [];
 let satelliteOrbitInterval = null;
+let orbitPathsGroup = null;
+let activeOrbitFilters = { LEO: true, MEO: true, GEO: true };
+let showOrbitPaths = false;
 let raycaster, mouse;
 let hoveredCity = null;
 let flightPaths = [];
@@ -859,6 +870,9 @@ async function init() {
   satelliteGroup = new THREE.Group();
   satelliteGroup.visible = true;
   scene.add(satelliteGroup);
+  orbitPathsGroup = new THREE.Group();
+  orbitPathsGroup.visible = false;
+  scene.add(orbitPathsGroup);
   await fetchSatellites();
   satelliteOrbitInterval = setInterval(fetchSatellites, 30000);
   setupUI();
@@ -1293,7 +1307,6 @@ async function buildSatellites() {
 async function fetchSatellites() {
   try {
     document.getElementById('count-satellites').textContent = 'LOADING';
-    // Reuse v1 satellite tracker proxy
     const res = await fetch('../../api/satellite-tracker.php');
     if (!res.ok) throw new Error('Sat fetch failed: ' + res.status);
     const data = await res.json();
@@ -1301,27 +1314,31 @@ async function fetchSatellites() {
 
     // Clear old markers
     while (satelliteGroup.children.length) satelliteGroup.remove(satelliteGroup.children[0]);
+    while (orbitPathsGroup.children.length) orbitPathsGroup.remove(orbitPathsGroup.children[0]);
 
     const dotGeo = new THREE.SphereGeometry(0.03, 6, 4);
     const colorMap = { 'LEO': 0x22dd88, 'MEO': 0xffaa22, 'GEO': 0xff6644 };
     const now = new Date();
     let plotted = 0;
+    const counts = { LEO: 0, MEO: 0, GEO: 0 };
 
     for (const sat of satelliteData) {
       if (!sat.tle1 || !sat.tle2) continue;
+
+      const orbitClass = sat.orbitClass || 'LEO';
+      if (!activeOrbitFilters[orbitClass]) continue;
+      counts[orbitClass] = (counts[orbitClass] || 0) + 1;
 
       // Propagate TLE to get current position
       const satrec = satellite.twoline2satrec(sat.tle1, sat.tle2);
       const pv = satellite.propagate(satrec, now);
       if (!pv.position || typeof pv.position === 'boolean') continue;
 
-      // Convert ECI to ECEF (geodetic lat/lng)
+      // Convert ECI to geodetic lat/lng
       const gmst = satellite.gstime(now);
       const geo = satellite.eciToGeodetic(pv.position, gmst);
 
-      const orbitClass = sat.orbitClass || 'LEO';
       const altKm = sat.altitude || geo.height || 0;
-      // Visual altitude: scale real altitude to globe
       const visualAlt = Math.min(altKm / 6371, 6) * EARTH_RADIUS * 0.15 + 0.08;
       const pos = latLngTo3D(geo.latitude * 180/Math.PI, geo.longitude * 180/Math.PI, EARTH_RADIUS + visualAlt);
 
@@ -1332,12 +1349,38 @@ async function fetchSatellites() {
       });
       const dot = new THREE.Mesh(dotGeo, mat);
       dot.position.copy(pos);
-      dot.userData = { name: sat.name, orbitClass, network: sat.network };
+      dot.userData = { name: sat.name, orbitClass, network: sat.network, tle1: sat.tle1, tle2: sat.tle2 };
       satelliteGroup.add(dot);
       plotted++;
+
+      // Draw orbit path if enabled
+      if (showOrbitPaths) {
+        const orbitColor = colorMap[orbitClass] || 0x22dd88;
+        const points = [];
+        const period = (sat.periodMinutes || 90) * 60; // seconds
+        const steps = 60;
+        for (let i = 0; i <= steps; i++) {
+          const t = new Date(now.getTime() + (period * i / steps) * 1000);
+          const pv2 = satellite.propagate(satrec, t);
+          if (!pv2.position || typeof pv2.position === 'boolean') continue;
+          const gmst2 = satellite.gstime(t);
+          const geo2 = satellite.eciToGeodetic(pv2.position, gmst2);
+          const vAlt = Math.min((sat.altitude || geo2.height || 0) / 6371, 6) * EARTH_RADIUS * 0.15 + 0.08;
+          points.push(latLngTo3D(geo2.latitude * 180/Math.PI, geo2.longitude * 180/Math.PI, EARTH_RADIUS + vAlt));
+        }
+        if (points.length > 2) {
+          const orbitGeo = new THREE.BufferGeometry().setFromPoints(points);
+          const orbitMat = new THREE.LineBasicMaterial({ color: orbitColor, transparent: true, opacity: 0.15 });
+          const orbitLine = new THREE.Line(orbitGeo, orbitMat);
+          orbitPathsGroup.add(orbitLine);
+        }
+      }
     }
 
     document.getElementById('count-satellites').textContent = plotted;
+    document.getElementById('orbit-count-leo').textContent = counts.LEO;
+    document.getElementById('orbit-count-meo').textContent = counts.MEO;
+    document.getElementById('orbit-count-geo').textContent = counts.GEO;
   } catch (err) {
     console.error('Satellite fetch error:', err);
     document.getElementById('count-satellites').textContent = 'ERR';
@@ -1364,6 +1407,9 @@ function setupUI() {
       if (group) group.visible = e.target.checked;
       if (key === 'satellites' && e.target.checked && satelliteData.length === 0) {
         buildSatellites();
+      }
+      if (key === 'satellites') {
+        orbitPathsGroup.visible = e.target.checked && showOrbitPaths;
       }
       const countEl = document.getElementById('count-' + key);
       if (countEl) countEl.textContent = e.target.checked ? (key === 'flights' ? flightPaths.length : key === 'cities' ? 52 : key === 'hotspots' ? 10 : key === 'satellites' ? (satelliteData.length || '...') : 'ON') : 'OFF';
@@ -1397,6 +1443,23 @@ function setupUI() {
   // Flight region filter checkboxes — refetch on change
   document.querySelectorAll('.fr-toggle input').forEach(cb => {
     cb.addEventListener('change', () => fetchRealFlights());
+  });
+
+  // Satellite orbit filter checkboxes
+  ['orbit-leo', 'orbit-meo', 'orbit-geo'].forEach(id => {
+    const cb2 = document.getElementById(id);
+    if (cb2) cb2.addEventListener('change', () => {
+      const key = id.replace('orbit-', '').toUpperCase();
+      activeOrbitFilters[key] = cb2.checked;
+      fetchSatellites();
+    });
+  });
+  // Orbit paths toggle
+  const pathsCb = document.getElementById('orbit-paths');
+  if (pathsCb) pathsCb.addEventListener('change', () => {
+    showOrbitPaths = pathsCb.checked;
+    orbitPathsGroup.visible = showOrbitPaths;
+    fetchSatellites();
   });
 
   // Collapsible Globe Controls — toggle open/close
