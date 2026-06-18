@@ -21,8 +21,26 @@ $writeCache = function ($payload) use ($cachePath) {
     @file_put_contents($cachePath, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
 };
 
+// Region bounding boxes [minLat, maxLat, minLng, maxLng]
+$regions = [
+    'north-america' => [25, 75, -170, -50],
+    'mexico'        => [14, 33, -118, -86],
+    'europe'        => [35, 72, -15, 45],
+    'asia'          => [0, 75, 45, 180],
+    'middle-east'   => [12, 42, 25, 65],
+    'south-america' => [-60, 15, -85, -35],
+    'africa'        => [-40, 38, -20, 55],
+    'oceania'       => [-50, 0, 110, 180],
+];
+
+// Get requested regions from query param
+$requestedRegions = isset($_GET['regions']) ? explode(',', $_GET['regions']) : ['all'];
+$useAllRegions = in_array('all', $requestedRegions);
+
+// Check cache (keyed by requested regions)
+$cacheKey = implode(',', $requestedRegions);
 $cached = $readCache();
-if ($cached && isset($cached['fetchedAt']) && (time() - intval($cached['fetchedAt'])) < $cacheTtl) {
+if ($cached && isset($cached['fetchedAt']) && isset($cached['cacheKey']) && $cached['cacheKey'] === $cacheKey && (time() - intval($cached['fetchedAt'])) < $cacheTtl) {
     $emit($cached);
 }
 
@@ -53,21 +71,36 @@ foreach ($states as $s) {
     $alt = $s[7];
     $callsign = trim($s[1] ?? '');
     $velocity = $s[9] ?? 0;
+    $lat = $s[6];
+    $lng = $s[5];
 
-:    // Only airborne commercial flights at cruising altitude (> 3000m / ~10,000ft)
-    // This excludes climbing/descending aircraft and shows only established routes
+    // Only airborne commercial flights at cruising altitude (> 3000m / ~10,000ft)
     if ($alt < 3000 || $velocity <= 25) continue;
 
     // Only commercial callsigns (3-letter IATA prefix + flight number)
-    // This filters out private, military, and ground vehicles
     if (!preg_match('/^[A-Z]{3}[0-9]{1,4}[A-Z]?$/i', $callsign)) continue;
+
+    // Filter by region if not requesting all
+    if (!$useAllRegions) {
+        $inRegion = false;
+        foreach ($requestedRegions as $r) {
+            if (isset($regions[$r])) {
+                $b = $regions[$r];
+                if ($lat >= $b[0] && $lat <= $b[1] && $lng >= $b[2] && $lng <= $b[3]) {
+                    $inRegion = true;
+                    break;
+                }
+            }
+        }
+        if (!$inRegion) continue;
+    }
 
     $items[] = [
         'icao24' => $s[0],
         'callsign' => $callsign,
         'origin' => $s[2] ?? '',
-        'lng' => $s[5],
-        'lat' => $s[6],
+        'lng' => $lng,
+        'lat' => $lat,
         'alt' => $alt,
         'velocity' => $velocity,
         'heading' => $s[10] ?? null,
@@ -84,6 +117,8 @@ $payload = [
     'items' => $items,
     'fetchedAt' => time(),
     'count' => count($items),
+    'cacheKey' => $cacheKey,
+    'regions' => $requestedRegions,
 ];
 $writeCache($payload);
 $emit($payload);
