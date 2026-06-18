@@ -4,7 +4,7 @@ header('Cache-Control: no-store, max-age=0');
 header('Access-Control-Allow-Origin: *');
 
 $cachePath = dirname(__DIR__) . '/data/air-traffic-cache.json';
-$cacheTtl = 30;
+$cacheTtl = 300; // 5 min cache — OpenSky rate limits anonymous requests
 
 $emit = function ($payload) {
     echo json_encode($payload, JSON_UNESCAPED_SLASHES);
@@ -48,6 +48,7 @@ $url = 'https://opensky-network.org/api/states/all';
 
 // Try cURL first (more reliable on shared hosting), fall back to file_get_contents
 $raw = null;
+$httpCode = 0;
 if (function_exists('curl_init')) {
     $ch = curl_init($url);
     curl_setopt_array($ch, [
@@ -60,8 +61,8 @@ if (function_exists('curl_init')) {
     ]);
     $raw = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    if ($httpCode !== 200) $raw = false;
     curl_close($ch);
+    if ($httpCode !== 200) $raw = false;
 }
 if ($raw === null) {
     $ctx = stream_context_create([
@@ -75,10 +76,15 @@ if ($raw === null) {
     $raw = @file_get_contents($url, false, $ctx);
 }
 
-if ($raw === false) {
-    if ($cached) $emit($cached + ['stale' => true]);
+if ($raw === false || $raw === '' || $raw === null) {
+    // Rate limited or blocked — serve stale cache if available
+    if ($cached) {
+        $cached['stale'] = true;
+        $cached['source'] = 'cache';
+        $emit($cached);
+    }
     http_response_code(502);
-    $emit(['error' => 'fetch_failed', 'items' => []]);
+    $emit(['error' => 'fetch_failed', 'http_code' => $httpCode, 'items' => []]);
 }
 
 $decoded = json_decode($raw, true);
