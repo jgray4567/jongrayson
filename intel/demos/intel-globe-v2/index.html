@@ -295,9 +295,12 @@
     padding: 10px 14px; display: none; min-width: 160px;
     font-family: 'JetBrains Mono', monospace;
   }
-  #tooltip .tip-title { font-size: 13.2px; color: #00c2ff; font-weight: 600; margin-bottom: 4px; }
+  #tooltip .tip-title { font-size: 13.2px; color: #00c2ff; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
   #tooltip .tip-row { display: flex; justify-content: space-between; font-size: 11.0px; color: #bbc; padding: 1px 0; }
   #tooltip .tip-row .tip-val { color: #e8eaed; font-weight: 500; }
+  #tooltip .airline-badge { width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 8.8px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  #tooltip .airline-info { display: flex; flex-direction: column; }
+  #tooltip .airline-name { font-size: 8.8px; color: #889; margin-top: 1px; }
 
   /* ─── Scan Line ─── */
   #scan-overlay {
@@ -627,7 +630,13 @@
 
 <!-- Tooltip -->
 <div id="tooltip">
-  <div class="tip-title" id="tip-title">City</div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+    <div class="airline-badge" id="tip-badge" style="display:none"></div>
+    <div class="airline-info">
+      <div class="tip-title" id="tip-title">City</div>
+      <div class="airline-name" id="tip-airline"></div>
+    </div>
+  </div>
   <div id="tip-flight-info" style="display:none">
     <div class="tip-row"><span>Callsign</span><span class="tip-val" id="tip-callsign">—</span></div>
     <div class="tip-row"><span>Origin</span><span class="tip-val" id="tip-origin">—</span></div>
@@ -809,38 +818,43 @@ const layers = {
 };
 
 const AIRLINE_PREFIXES = {
-  'UAL': 'United', 'AAL': 'American', 'DAL': 'Delta', 'SWA': 'Southwest',
-  'ASA': 'Alaska', 'JBU': 'JetBlue', 'FFT': 'Frontier', 'NKS': 'Spirit',
-  'ATI': 'Air Transport', 'SKW': 'SkyWest', 'RPA': 'Republic', 'ENY': 'Envoy',
-  'EDV': 'Endeavor', 'PDT': 'Piedmont', 'OO': 'SkyWest', 'AA': 'American',
-  'AC': 'Air Canada', 'WJA': 'WestJet', 'JZA': 'Jazz', 'ROU': 'Air Canada Rouge',
-  'TSC': 'Air Transat', 'KNT': 'Air Canada', 'FLE': 'Flair', 'ASP': 'Air Sprint',
-  'AWE': 'US Airways', 'JIA': 'JSX', 'PJI': 'PSA', 'GJS': 'GoJet',
-  'LXJ': 'Flexjet', 'EJA': 'NetJets', 'CKS': 'Kalitta', 'NCA': 'Nippon Cargo',
-  'FDX': 'FedEx', 'UPS': 'UPS', 'GTI': 'Atlas Air', 'GT': 'Atlas Air',
-  'ABW': 'Air Transport', 'ATN': 'Air Transport', 'TAY': 'Thomas Cook',
-  'AAR': 'AAR', 'MXY': 'Mexican', 'VTM': 'Viva Aerobus', 'AMX': 'Aeromexico',
-  'VOI': 'Volaris', 'SLI': 'Volaris', 'LET': 'Aeromexico', 'AJT': 'AeroJET',
-  'AIH': 'Air India', 'ANA': 'All Nippon', 'JAL': 'Japan Airlines',
-  'CCA': 'Air China', 'CPA': 'Cathay Pacific', 'QTR': 'Qatar Airways',
-  'UAE': 'Emirates', 'ETD': 'Etihad', 'DLH': 'Lufthansa', 'CFG': 'Condor',
-  'AFR': 'Air France', 'BAW': 'British Airways', 'KLM': 'KLM Royal Dutch',
-  'IBE': 'Iberia', 'AZA': 'ITA Airways', 'SAS': 'SAS', 'SWR': 'Swiss',
-  'AUA': 'Austrian', 'TAP': 'TAP Portugal', 'THY': 'Turkish Airlines',
-  'ETH': 'Ethiopian Airlines', 'SAA': 'South African', 'QFA': 'Qantas',
-  'JST': 'Jetstar', 'NZ': 'Air New Zealand', 'SIA': 'Singapore Airlines',
-  'KOR': 'Korean Air', 'KAL': 'Korean Air', 'JNA': 'Jin Air', 'AAR_K': 'Asiana'
+  'UAL': {name:'United', color:'#1a4d8f'}, 'AAL': {name:'American', color:'#c8102e'}, 'DAL': {name:'Delta', color:'#a01933'},
+  'SWA': {name:'Southwest', color:'#304cb2'}, 'ASA': {name:'Alaska', color:'#01426a'}, 'JBU': {name:'JetBlue', color:'#0033a0'},
+  'FFT': {name:'Frontier', color:'#046a38'}, 'NKS': {name:'Spirit', color:'#frend'}, 'SKW': {name:'SkyWest', color:'#003882'},
+  'RPA': {name:'Republic', color:'#00528c'}, 'ENY': {name:'Envoy', color:'#0a1a3a'}, 'EDV': {name:'Endeavor', color:'#003882'},
+  'PDT': {name:'Piedmont', color:'#0a1a3a'}, 'OO': {name:'SkyWest', color:'#003882'},
+  'AC': {name:'Air Canada', color:'#d52b1e'}, 'WJA': {name:'WestJet', color:'#0033a0'}, 'JZA': {name:'Jazz', color:'#5b2c8d'},
+  'ROU': {name:'Air Canada Rouge', color:'#c8102e'}, 'TSC': {name:'Air Transat', color:'#e2231a'},
+  'KNT': {name:'Air Canada', color:'#d52b1e'}, 'FLE': {name:'Flair', color:'#0d6b3d'}, 'ASP': {name:'Air Sprint', color:'#003882'},
+  'JIA': {name:'JSX', color:'#0066cc'}, 'PJI': {name:'PSA', color:'#003882'}, 'GJS': {name:'GoJet', color:'#003882'},
+  'LXJ': {name:'Flexjet', color:'#1a1a1a'}, 'EJA': {name:'NetJets', color:'#003882'}, 'CKS': {name:'Kalitta', color:'#002f6c'},
+  'FDX': {name:'FedEx', color:'#4d148c'}, 'UPS': {name:'UPS', color:'#351c15'}, 'GTI': {name:'Atlas Air', color:'#0033a0'},
+  'ABW': {name:'Air Transport', color:'#003882'}, 'ATN': {name:'Air Transport', color:'#003882'},
+  'MXY': {name:'Mexican', color:'#0d6b3d'}, 'VTM': {name:'Viva Aerobus', color:'#ff6b00'},
+  'AMX': {name:'Aeroméxico', color:'#1a1a3a'}, 'VOI': {name:'Volaris', color:'#0099cc'}, 'SLI': {name:'Volaris', color:'#0099cc'},
+  'LET': {name:'Aeroméxico', color:'#1a1a3a'}, 'ANA': {name:'All Nippon', color:'#13448f'},
+  'JAL': {name:'Japan Airlines', color:'#e60012'}, 'CCA': {name:'Air China', color:'#c8102e'},
+  'CPA': {name:'Cathay Pacific', color:'#006564'}, 'QTR': {name:'Qatar Airways', color:'#5c0632'},
+  'UAE': {name:'Emirates', color:'#d71921'}, 'ETD': {name:'Etihad', color:'#007a5e'},
+  'DLH': {name:'Lufthansa', color:'#05164d'}, 'CFG': {name:'Condor', color:'#ffcc00'},
+  'AFR': {name:'Air France', color:'#002157'}, 'BAW': {name:'British Airways', color:'#075aaa'},
+  'KLM': {name:'KLM', color:'#00a1de'}, 'IBE': {name:'Iberia', color:'#d50032'},
+  'AZA': {name:'ITA Airways', color:'#0066b3'}, 'SAS': {name:'SAS', color:'#0033a0'}, 'SWR': {name:'Swiss', color:'#cc0000'},
+  'AUA': {name:'Austrian', color:'#ed1c24'}, 'TAP': {name:'TAP Portugal', color:'#0066b3'}, 'THY': {name:'Turkish Airlines', color:'#e81932'},
+  'ETH': {name:'Ethiopian', color:'#f7a800'}, 'QFA': {name:'Qantas', color:'#ee0000'},
+  'JST': {name:'Jetstar', color:'#f7a800'}, 'SIA': {name:'Singapore Airlines', color:'#1a3668'},
+  'KOR': {name:'Korean Air', color:'#002f6c'}, 'KAL': {name:'Korean Air', color:'#002f6c'},
+  'AWE': {name:'US Airways', color:'#1a4d8f'}, 'AAR': {name:'AAR', color:'#003882'},
+  'NCA': {name:'Nippon Cargo', color:'#13448f'}, 'GT': {name:'Atlas Air', color:'#0033a0'}
 };
 
-function getAirlineName(callsign) {
-  if (!callsign) return 'Unknown';
-  // Try 3-letter prefix
+function getAirlineInfo(callsign) {
+  if (!callsign) return { name: 'Unknown', color: '#333', code: '??' };
   const p3 = callsign.substring(0, 3);
-  if (AIRLINE_PREFIXES[p3]) return AIRLINE_PREFIXES[p3];
-  // Try 2-letter prefix
+  if (AIRLINE_PREFIXES[p3]) return { ...AIRLINE_PREFIXES[p3], code: p3 };
   const p2 = callsign.substring(0, 2);
-  if (AIRLINE_PREFIXES[p2]) return AIRLINE_PREFIXES[p2];
-  return callsign;
+  if (AIRLINE_PREFIXES[p2]) return { ...AIRLINE_PREFIXES[p2], code: p2 };
+  return { name: callsign, color: '#333', code: callsign.substring(0, 2) };
 }
 
 function latLngTo3D(lat, lng, r) {
@@ -1090,22 +1104,35 @@ async function fetchRealFlights() {
     // Create shared jet icon geometry (top-down silhouette)
     if (!planeIconGeo) {
       const shape = new THREE.Shape();
-      // Airliner silhouette (top-down): long fuselage, swept wings, tail
-      shape.moveTo(0.08, 0);          // nose
-      // Right side
-      shape.lineTo(0.025, 0.007);      // forward fuselage
-      shape.lineTo(-0.008, 0.038);     // right wing root (swept)
-      shape.lineTo(-0.020, 0.034);     // right wing tip
-      shape.lineTo(-0.030, 0.007);     // aft fuselage
-      shape.lineTo(-0.048, 0.017);      // right stabilizer tip
-      shape.lineTo(-0.054, 0.010);      // tail
-      shape.lineTo(-0.054, -0.010);     // tail left
-      shape.lineTo(-0.048, -0.017);     // left stabilizer tip
-      shape.lineTo(-0.030, -0.007);    // aft fuselage
-      shape.lineTo(-0.020, -0.034);     // left wing tip
-      shape.lineTo(-0.008, -0.038);     // left wing root
-      shape.lineTo(0.025, -0.007);      // forward fuselage
-      shape.lineTo(0.08, 0);          // back to nose
+      // Commercial airliner silhouette (top-down): wide fuselage, swept wings, tail
+      // Nose
+      shape.moveTo(0.09, 0);
+      // Right side — forward fuselage to wing root
+      shape.lineTo(0.03, 0.008);
+      // Right wing (swept back, wide)
+      shape.lineTo(-0.01, 0.055);
+      shape.lineTo(-0.025, 0.05);
+      shape.lineTo(-0.02, 0.008);
+      // Aft fuselage to tail
+      shape.lineTo(-0.055, 0.006);
+      // Right horizontal stabilizer
+      shape.lineTo(-0.065, 0.022);
+      shape.lineTo(-0.075, 0.020);
+      shape.lineTo(-0.075, 0.003);
+      // Tail cone
+      shape.lineTo(-0.078, 0.003);
+      shape.lineTo(-0.078, -0.003);
+      // Left horizontal stabilizer
+      shape.lineTo(-0.075, -0.003);
+      shape.lineTo(-0.075, -0.020);
+      shape.lineTo(-0.065, -0.022);
+      shape.lineTo(-0.055, -0.006);
+      // Left aft fuselage to wing
+      shape.lineTo(-0.02, -0.008);
+      shape.lineTo(-0.025, -0.05);
+      shape.lineTo(-0.01, -0.055);
+      shape.lineTo(0.03, -0.008);
+      shape.lineTo(0.09, 0);
       planeIconGeo = new THREE.ShapeGeometry(shape);
     }
     if (!planeIconMat) {
@@ -1697,18 +1724,26 @@ function animate() {
 
       if (ud.type === 'flight') {
         // Flight tooltip
+        const airline = getAirlineInfo(ud.callsign);
+        const badge = document.getElementById('tip-badge');
+        badge.style.display = 'flex';
+        badge.style.background = airline.color;
+        badge.textContent = airline.code;
         document.getElementById('tip-title').textContent = ud.callsign || 'Unknown';
+        document.getElementById('tip-airline').textContent = airline.name;
         document.getElementById('tip-flight-info').style.display = 'block';
         document.getElementById('tip-city-info').style.display = 'none';
         document.getElementById('tip-sat-info').style.display = 'none';
         document.getElementById('tip-callsign').textContent = ud.callsign || '—';
-        document.getElementById('tip-origin').textContent = (ud.origin || '—') + ' · ' + getAirlineName(ud.callsign);
+        document.getElementById('tip-origin').textContent = (ud.origin || '—') + ' · ' + airline.name;
         document.getElementById('tip-alt').textContent = ud.alt ? (ud.alt / 1000).toFixed(1) + ' km' : '—';
         document.getElementById('tip-velocity').textContent = ud.velocity ? Math.round(ud.velocity * 3.6) + ' km/h' : '—';
         document.getElementById('tip-heading').textContent = ud.heading != null ? Math.round(ud.heading) + '°' : '—';
         tip.style.display = 'block';
       } else if (ud.type === 'sat') {
         // Satellite tooltip
+        document.getElementById('tip-badge').style.display = 'none';
+        document.getElementById('tip-airline').textContent = '';
         document.getElementById('tip-title').textContent = ud.name || 'Satellite';
         document.getElementById('tip-flight-info').style.display = 'none';
         document.getElementById('tip-city-info').style.display = 'none';
@@ -1720,6 +1755,8 @@ function animate() {
         tip.style.display = 'block';
       } else if (ud.city) {
         // City tooltip
+        document.getElementById('tip-badge').style.display = 'none';
+        document.getElementById('tip-airline').textContent = '';
         const city = ud.city;
         document.getElementById('tip-title').textContent = city.name;
         document.getElementById('tip-flight-info').style.display = 'none';
