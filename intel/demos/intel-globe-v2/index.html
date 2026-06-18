@@ -1128,9 +1128,50 @@ async function fetchRealFlights() {
   try {
     document.getElementById('count-flights').textContent = 'LOADING';
     const regions = getSelectedRegions();
-    const res = await fetch('air-traffic.php?regions=' + regions.join(','));
-    if (!res.ok) throw new Error('OpenSky fetch failed: ' + res.status);
-    const data = await res.json();
+
+    // Try PHP proxy first, fall back to direct OpenSky API with client-side region filtering
+    let data = null;
+    try {
+      const res = await fetch('air-traffic.php?regions=' + regions.join(','));
+      if (res.ok) data = await res.json();
+    } catch (e) { /* proxy failed */ }
+
+    if (!data || data.error || !data.items) {
+      // Direct fetch from OpenSky as fallback
+      const regionBoxes = {
+        'north-america': [25, 75, -170, -50],
+        'mexico': [14, 33, -118, -86],
+        'europe': [35, 72, -15, 45],
+        'asia': [0, 75, 45, 180],
+        'middle-east': [12, 42, 25, 65],
+        'south-america': [-60, 15, -85, -35],
+        'africa': [-40, 38, -20, 55],
+        'oceania': [-50, 0, 110, 180],
+      };
+      // For multiple regions, fetch all and filter client-side
+      const osRes = await fetch('https://opensky-network.org/api/states/all');
+      if (!osRes.ok) throw new Error('OpenSky direct fetch failed: ' + osRes.status);
+      const osData = await osRes.json();
+      const allStates = osData.states || [];
+
+      // Filter by selected regions
+      const useAll = regions.includes('all');
+      const items = allStates.filter(s => {
+        if (useAll) return true;
+        const lat = s[6], lng = s[5];
+        if (lat == null || lng == null) return false;
+        for (const r of regions) {
+          const box = regionBoxes[r];
+          if (box && lat >= box[0] && lat <= box[1] && lng >= box[2] && lng <= box[3]) return true;
+        }
+        return false;
+      }).map(s => ({
+        icao: s[0], callsign: (s[1] || '').trim(), origin: s[2],
+        lng: s[5], lat: s[6], alt: s[7], velocity: s[9], heading: s[10]
+      }));
+      data = { items, count: items.length, source: 'direct' };
+    }
+
     const states = data.items || [];
 
     // Clear old flight objects
