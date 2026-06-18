@@ -45,16 +45,36 @@ if ($cached && isset($cached['fetchedAt']) && isset($cached['cacheKey']) && $cac
 }
 
 $url = 'https://opensky-network.org/api/states/all';
-$ctx = stream_context_create([
-    'http' => [
-        'method' => 'GET',
-        'timeout' => 15,
-        'header' => "User-Agent: intel-globe-v2/1.0\r\n"
-    ],
-    'ssl' => ['verify_peer' => true, 'verify_peer_name' => true]
-]);
 
-$raw = @file_get_contents($url, false, $ctx);
+// Try cURL first (more reliable on shared hosting), fall back to file_get_contents
+$raw = null;
+if (function_exists('curl_init')) {
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 15,
+        CURLOPT_USERAGENT => 'intel-globe-v2/1.0',
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_FOLLOWLOCATION => true,
+    ]);
+    $raw = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if ($httpCode !== 200) $raw = false;
+    curl_close($ch);
+}
+if ($raw === null) {
+    $ctx = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'timeout' => 15,
+            'header' => "User-Agent: intel-globe-v2/1.0\r\n"
+        ],
+        'ssl' => ['verify_peer' => true, 'verify_peer_name' => true]
+    ]);
+    $raw = @file_get_contents($url, false, $ctx);
+}
+
 if ($raw === false) {
     if ($cached) $emit($cached + ['stale' => true]);
     http_response_code(502);
