@@ -464,6 +464,7 @@
     .lt-name { font-size: 12.1px; }
     .panel-close { display: flex; }
     #layers-panel h2 { padding-right: 36px; }
+    #alerts-close { display: flex !important; padding: 4px 8px; }
 
     #ai-summary {
       position: fixed; bottom: 0; left: 0; right: 0;
@@ -641,11 +642,12 @@
 </div>
 
 <!-- Bottom Panel — Alerts -->
-<div id="alerts-panel" class="glass">
+:<div id="alerts-panel" class="glass">
   <div class="ap-header">
     <div class="ap-title">Live Alerts Feed</div>
     <div class="ap-actions">
       <button class="ap-btn" id="btn-ai-summary">INTEL SUMMARY</button>
+      <button class="ap-btn panel-close" id="alerts-close" aria-label="Close" style="display:none">✕</button>
     </div>
   </div>
   <div class="ap-list" id="alerts-list"></div>
@@ -1640,6 +1642,7 @@ function setupUI() {
 
   // Mobile panel close buttons
   document.getElementById('layers-close')?.addEventListener('click', closeAllPanels);
+  document.getElementById('alerts-close')?.addEventListener('click', closeAllPanels);
 
   // Alerts
   renderAlerts();
