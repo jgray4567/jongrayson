@@ -470,10 +470,10 @@
     .lt-name { font-size: 12.1px; }
     .panel-close { display: flex; }
     #layers-panel h2 { padding-right: 36px; }
-    #alerts-close { display: flex !important; padding: 4px 8px; min-width: 28px; }
-    #alerts-panel .ap-title { font-size: 10px; letter-spacing: 0.5px; }
-    #alerts-panel .ap-btn { padding: 3px 6px; font-size: 9px; letter-spacing: 0.3px; }
-    #alerts-panel .ap-actions { gap: 4px; }
+    #alerts-close { display: flex !important; padding: 4px 8px; min-width: 28px; max-width: 32px; }
+    #alerts-panel .ap-title { font-size: 10px; letter-spacing: 0.5px; max-width: 40vw; }
+    #alerts-panel .ap-btn { padding: 3px 6px; font-size: 9px; letter-spacing: 0.3px; white-space: nowrap; }
+    #alerts-panel .ap-actions { gap: 4px; flex-shrink: 0; }
 
     #ai-summary {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -667,7 +667,7 @@
   <div class="ap-header">
     <div class="ap-title">Live Alerts Feed</div>
     <div class="ap-actions">
-      <button class="ap-btn" id="btn-ai-summary">INTEL SUMMARY</button>
+      <button class="ap-btn" id="btn-ai-summary">SUMMARY</button>
       <button class="ap-btn panel-close" id="alerts-close" aria-label="Close" style="display:none; padding: 4px 8px; min-width: 28px;">✕</button>
     </div>
   </div>
