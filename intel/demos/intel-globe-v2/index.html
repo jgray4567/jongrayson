@@ -221,7 +221,7 @@
     color: #C4D600; text-transform: uppercase;
     font-family: 'JetBrains Mono', monospace;
   }
-  #alerts-panel .ap-actions { display: flex; gap: 6px; }
+  #alerts-panel .ap-actions { display: flex; gap: 8px; align-items: center; }
   #alerts-panel .ap-btn {
     padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(196,214,0,0.15);
     background: rgba(196,214,0,0.05); color: #C4D600; cursor: pointer;
@@ -662,7 +662,7 @@
     <div class="ap-title">Live Alerts Feed</div>
     <div class="ap-actions">
       <button class="ap-btn" id="btn-ai-summary">INTEL SUMMARY</button>
-      <button class="ap-btn panel-close" id="alerts-close" aria-label="Close" style="display:none">✕</button>
+      <button class="ap-btn panel-close" id="alerts-close" aria-label="Close" style="display:none; padding: 4px 8px; min-width: 28px;">✕</button>
     </div>
   </div>
   <div class="ap-list" id="alerts-list"></div>
