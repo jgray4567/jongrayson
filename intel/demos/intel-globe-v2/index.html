@@ -804,106 +804,105 @@ function buildStars() {
 function buildFlights() {
   flightGroup = new THREE.Group();
   flightPaths = [];
-
-  // Generate 40 random flight paths
-  for (let i = 0; i < 40; i++) {
-    const dep = AIRPORTS[Math.floor(Math.random() * AIRPORTS.length)];
-    let arr = AIRPORTS[Math.floor(Math.random() * AIRPORTS.length)];
-    while (arr === dep) arr = AIRPORTS[Math.floor(Math.random() * AIRPORTS.length)];
-
-    const start = latLngTo3D(dep.lat, dep.lng, EARTH_RADIUS);
-    const end = latLngTo3D(arr.lat, arr.lng, EARTH_RADIUS);
-
-    // Great circle arc (slerp)
-    const steps = 100;
-    const arcHeight = 0.03 + start.distanceTo(end) * 0.01;
-    const points = [];
-    for (let s = 0; s <= steps; s++) {
-      const t = s / steps;
-      const pos = start.clone().lerp(end, t);
-      pos.normalize().multiplyScalar(EARTH_RADIUS + Math.sin(t * Math.PI) * arcHeight);
-      points.push(pos);
-    }
-
-    // Flight path line
-    const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
-    const lineMat = new THREE.LineBasicMaterial({
-      color: 0x00c2ff, transparent: true, opacity: 0.12,
-      blending: THREE.AdditiveBlending,
-    });
-    const line = new THREE.Line(lineGeo, lineMat);
-    flightGroup.add(line);
-
-    // Trail (behind plane, fades out)
-    const trailLen = 8;
-    const trailPositions = [];
-    for (let t = 0; t < trailLen; t++) {
-      const idx = 0; // will update
-      trailPositions.push(points[0].clone());
-    }
-    const trailGeo = new THREE.BufferGeometry().setFromPoints(trailPositions);
-    const trailMat = new THREE.LineBasicMaterial({
-      color: 0x00c2ff, transparent: true, opacity: 0.6,
-      blending: THREE.AdditiveBlending,
-    });
-    const trail = new THREE.Line(trailGeo, trailMat);
-    flightGroup.add(trail);
-
-    // Plane icon (arrow shape pointing forward)
-    const planeShape = new THREE.Shape();
-    planeShape.moveTo(0.06, 0);       // nose
-    planeShape.lineTo(-0.035, 0.025); // left wing tip
-    planeShape.lineTo(-0.02, 0);     // left tail
-    planeShape.lineTo(-0.035, -0.025); // right wing tip
-    planeShape.lineTo(0.06, 0);       // back to nose
-    const planeGeo = new THREE.ShapeGeometry(planeShape);
-    const planeMat = new THREE.MeshBasicMaterial({
-      color: 0x88eeff, transparent: true, opacity: 1.0,
-      blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
-    });
-    const plane = new THREE.Mesh(planeGeo, planeMat);
-    flightGroup.add(plane);
-
-    flightPaths.push({
-      points, line, trail, trailPositions, plane,
-      progress: Math.random(),
-      speed: 0.00002 + Math.random() * 0.00002,
-      trailLen,
-    });
-  }
-
   scene.add(flightGroup);
-  document.getElementById('stat-flights').textContent = flightPaths.length;
-  document.getElementById('count-flights').textContent = flightPaths.length;
+  document.getElementById('stat-flights').textContent = '...';
+  document.getElementById('count-flights').textContent = '...';
+
+  // Fetch real flight data from OpenSky Network
+  fetchRealFlights();
+  // Refresh every 60 seconds
+  setInterval(fetchRealFlights, 60000);
+}
+
+let planeIconGeo = null;
+let planeIconMat = null;
+
+async function fetchRealFlights() {
+  try {
+    document.getElementById('count-flights').textContent = 'LOADING';
+    const res = await fetch('air-traffic.php');
+    if (!res.ok) throw new Error('OpenSky fetch failed: ' + res.status);
+    const data = await res.json();
+    const states = data.items || [];
+
+    // Clear old flight objects
+    for (const fp of flightPaths) {
+      flightGroup.remove(fp.plane);
+    }
+    flightPaths = [];
+
+    // Create shared plane geometry (small triangle)
+    if (!planeIconGeo) {
+      const shape = new THREE.Shape();
+      shape.moveTo(0.05, 0);
+      shape.lineTo(-0.03, 0.02);
+      shape.lineTo(-0.015, 0);
+      shape.lineTo(-0.03, -0.02);
+      shape.lineTo(0.05, 0);
+      planeIconGeo = new THREE.ShapeGeometry(shape);
+    }
+    if (!planeIconMat) {
+      planeIconMat = new THREE.MeshBasicMaterial({
+        color: 0x88eeff, transparent: true, opacity: 0.9,
+        blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+      });
+    }
+
+    for (const s of states) {
+      const icao24 = s.icao24;
+      const callsign = (s.callsign || '').trim() || icao24;
+      const origin = s.origin || '';
+      const lng = s.lng;
+      const lat = s.lat;
+      const alt = s.alt; // meters
+      const velocity = s.velocity; // m/s
+      const heading = s.heading; // rad
+
+      // Skip if no valid lat/lng
+      if (lat == null || lng == null) continue;
+
+      // Altitude scaled to visual height (real cruise alt ~10-12km, Earth radius 6371km)
+      const altKm = Math.min(alt / 1000, 14); // cap at 14km
+      const visualAlt = (altKm / 6371) * EARTH_RADIUS * 8; // exaggerated for visibility
+      const pos = latLngTo3D(lat, lng, EARTH_RADIUS + visualAlt + 0.02);
+
+      const plane = new THREE.Mesh(planeIconGeo, planeIconMat);
+      plane.position.copy(pos);
+
+      // Orient plane to face heading direction
+      if (heading != null) {
+        const dir = new THREE.Vector3(
+          Math.cos(heading), 0, Math.sin(heading)
+        );
+        const up = pos.clone().normalize();
+        const right = new THREE.Vector3().crossVectors(up, dir).normalize();
+        const forward = new THREE.Vector3().crossVectors(right, up).normalize();
+        const m = new THREE.Matrix4().makeBasis(forward, up, right);
+        plane.quaternion.setFromRotationMatrix(m);
+      } else {
+        // Face along velocity vector
+        plane.lookAt(0, 0, 0);
+        plane.rotateY(Math.PI / 2);
+      }
+
+      plane.userData = { callsign, origin, alt, velocity, lat, lng };
+      flightGroup.add(plane);
+      flightPaths.push({ plane, heading: heading || 0, lat, lng, alt });
+    }
+
+    document.getElementById('stat-flights').textContent = flightPaths.length;
+    document.getElementById('count-flights').textContent = flightPaths.length;
+  } catch (err) {
+    console.error('OpenSky fetch error:', err);
+    document.getElementById('count-flights').textContent = 'ERR';
+  }
 }
 
 function updateFlights() {
+  // Planes are static between fetches (real positions don't update every frame)
+  // Just subtle altitude bob for visual life
   for (const fp of flightPaths) {
-    fp.progress += fp.speed;
-    if (fp.progress > 1) fp.progress = 0;
-
-    const idx = Math.floor(fp.progress * (fp.points.length - 1));
-    fp.plane.position.copy(fp.points[idx]);
-
-    // Orient plane to face direction of travel
-    const nextIdx = Math.min(idx + 1, fp.points.length - 1);
-    const direction = fp.points[nextIdx].clone().sub(fp.points[idx]);
-    if (direction.lengthSq() > 0.0001) {
-      const up = fp.points[idx].clone().normalize();
-      const quat = new THREE.Quaternion();
-      quat.setFromUnitVectors(new THREE.Vector3(1, 0, 0), direction.clone().normalize());
-      fp.plane.quaternion.copy(quat);
-    }
-
-    // Update trail
-    const trailPoints = [];
-    for (let t = 0; t < fp.trailLen; t++) {
-      const ti = idx - t;
-      if (ti >= 0) trailPoints.push(fp.points[ti]);
-      else trailPoints.push(fp.points[0]);
-    }
-    fp.trail.geometry.setFromPoints(trailPoints);
-    fp.trail.material.opacity = 0.5;
+    // No per-frame movement — real data refreshes every 60s
   }
 }
 
