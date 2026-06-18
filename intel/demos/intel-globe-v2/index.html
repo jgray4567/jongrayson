@@ -327,7 +327,7 @@
   <div class="spacer"></div>
   <div class="stat-strip">
     <div class="si"><div class="dot" style="background:#00c2ff;box-shadow:0 0 6px #00c2ff;"></div><span class="val" id="stat-flights">0</span><span class="lbl">FLIGHTS</span></div>
-    <div class="si"><div class="dot" style="background:#22dd88;box-shadow:0 0 6px #22dd88;"></div><span class="val" id="stat-cities">50</span><span class="lbl">CITIES</span></div>
+    <div class="si"><div class="dot" style="background:#22dd88;box-shadow:0 0 6px #22dd88;"></div><span class="val" id="stat-cities">52</span><span class="lbl">CITIES</span></div>
     <div class="si"><div class="dot" style="background:#ff2244;box-shadow:0 0 6px #ff2244;"></div><span class="val" id="stat-hotspots">10</span><span class="lbl">HOTSPOTS</span></div>
     <div class="si"><div class="dot" style="background:#ffaa22;box-shadow:0 0 6px #ffaa22;"></div><span class="val" id="stat-alerts">0</span><span class="lbl">ALERTS</span></div>
   </div>
@@ -364,8 +364,8 @@
   <label class="layer-toggle">
     <input type="checkbox" class="lt-checkbox" id="layer-cities" checked>
     <div class="lt-icon">◉</div>
-    <div class="lt-info"><div class="lt-name">City Markers</div><div class="lt-desc">50 major cities</div></div>
-    <div class="lt-count" id="count-cities">50</div>
+    <div class="lt-info"><div class="lt-name">City Markers</div><div class="lt-desc">52 major cities</div></div>
+    <div class="lt-count" id="count-cities">52</div>
   </label>
 
   <label class="layer-toggle">
@@ -482,6 +482,8 @@ const DEG2RAD = Math.PI / 180;
 // ─── Cities (50) ───
 const CITIES = [
   {name:'New York',lat:40.71,lng:-74.00,pop:8336817,country:'USA'},
+  {name:'Pittsburgh',lat:40.44,lng:-79.99,pop:302971,country:'USA'},
+  {name:'Washington DC',lat:38.90,lng:-77.04,pop:705749,country:'USA'},
   {name:'London',lat:51.51,lng:-0.13,pop:8982000,country:'UK'},
   {name:'Tokyo',lat:35.68,lng:139.69,pop:13960000,country:'Japan'},
   {name:'Paris',lat:48.86,lng:2.35,pop:2161000,country:'France'},
@@ -1074,7 +1076,7 @@ function setupUI() {
       layers[key] = e.target.checked;
       if (group) group.visible = e.target.checked;
       const countEl = document.getElementById('count-' + key);
-      if (countEl) countEl.textContent = e.target.checked ? (key === 'flights' ? flightPaths.length : key === 'cities' ? 50 : key === 'hotspots' ? 10 : 'ON') : 'OFF';
+      if (countEl) countEl.textContent = e.target.checked ? (key === 'flights' ? flightPaths.length : key === 'cities' ? 52 : key === 'hotspots' ? 10 : 'ON') : 'OFF';
     });
   }
 
