@@ -69,9 +69,9 @@
     padding-bottom: 10px; border-bottom: 1px solid rgba(196,214,0,0.12);
     font-family: 'JetBrains Mono', monospace;
   }
-  .layer-toggle {
+.layer-toggle {
     display: flex; align-items: center; gap: 10px;
-    padding: 8px 0; cursor: pointer; user-select: none;
+    padding: 6px 0; cursor: pointer; user-select: none;
     border-bottom: 1px solid rgba(255,255,255,0.03);
     transition: all 0.15s;
   }
@@ -128,16 +128,28 @@
   .collapsible-body.collapsed { max-height: 0; opacity: 0; }
 
   /* ─── Flight Region Filters ─── */
-  .flight-region-filters {
-    margin: 6px 0 10px 26px; padding: 8px 10px;
+.flight-region-filters {
+    margin: 4px 0 6px 26px; padding: 6px 10px;
     background: rgba(196,214,0,0.04); border-radius: 8px;
     border: 1px solid rgba(196,214,0,0.08);
+    max-height: 500px; overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+    opacity: 1;
+  }
+  .flight-region-filters.collapsed {
+    max-height: 0; opacity: 0; margin-top: 0; margin-bottom: 0;
+    border-color: transparent; padding-top: 0; padding-bottom: 0;
   }
   .fr-title {
     font-size: 8.8px; font-weight: 700; letter-spacing: 1px;
-    color: #667; text-transform: uppercase; margin-bottom: 6px;
+    color: #667; text-transform: uppercase; margin-bottom: 4px;
     font-family: 'JetBrains Mono', monospace;
+    cursor: pointer; user-select: none; display: flex; align-items: center; gap: 4px;
   }
+  .fr-title::after {
+    content: '▼'; font-size: 7px; margin-left: auto; transition: transform 0.2s;
+  }
+  .fr-title.collapsed::after { transform: rotate(-90deg); }
   .fr-toggle {
     display: flex; align-items: center; gap: 6px;
     padding: 4px 0; cursor: pointer; user-select: none;
@@ -372,11 +384,11 @@
   #regions-btn:hover { background: rgba(196,214,0,0.12); }
   #regions-btn.active { background: rgba(196,214,0,0.18); }
 
-  /* ─── Mobile Alerts Toggle ─── */
+/* ─── Mobile Alerts Toggle ─── */
   #alerts-btn {
     display: none;
-    position: absolute; bottom: 44px; left: 12px; z-index: 15;
-    padding: 8px 14px; border-radius: 20px;
+    position: absolute; bottom: 40px; right: 12px; z-index: 15;
+    padding: 6px 12px; border-radius: 20px;
     background: rgba(6,7,10,0.88); backdrop-filter: blur(20px);
     border: 1px solid rgba(196,214,0,0.15);
     color: #C4D600; font-size: 12.1px; cursor: pointer;
@@ -434,7 +446,12 @@
       width: 100vw; max-height: 45vh; border-radius: 14px 14px 0 0;
       z-index: 12; display: none;
     }
-    #alerts-panel.open { display: flex; }
+#alerts-panel.open { display: flex; }
+
+    /* Compact layer toggles on mobile — hide descriptions */
+    .lt-desc { display: none; }
+    .layer-toggle { padding: 5px 0; }
+    .lt-name { font-size: 12.1px; }
 
     #ai-summary {
       position: fixed; bottom: 0; left: 0; right: 0;
@@ -444,7 +461,7 @@
     #ticker { font-size: 11.0px; }
   }
 
-:  @media (max-width: 640px) {
+@media (max-width: 640px) {
     #top-bar .title .sep { display: none; }
     #top-bar .stat-strip { gap: 6px; }
     #top-bar .utc-clock { display: none; }
@@ -503,8 +520,8 @@
     <div class="lt-count" id="count-flights">0</div>
   </label>
   <!-- Flight Region Filters -->
-  <div id="flight-regions" class="flight-region-filters">
-    <div class="fr-title">Filter by Region</div>
+  <div id="flight-regions" class="flight-region-filters collapsed">
+    <div class="fr-title collapsed">Filter by Region</div>
     <label class="fr-toggle"><input type="checkbox" id="fr-north-america" checked> <span>North America</span> <span class="fr-count" id="fr-count-na"></span></label>
     <label class="fr-toggle"><input type="checkbox" id="fr-mexico" checked> <span>Mexico</span> <span class="fr-count" id="fr-count-mx"></span></label>
     <label class="fr-toggle"><input type="checkbox" id="fr-europe"> <span>Europe</span> <span class="fr-count" id="fr-count-eu"></span></label>
@@ -550,8 +567,8 @@
     <div class="lt-count" id="count-satellites">OFF</div>
   </label>
   <!-- Satellite Orbit Filters -->
-  <div id="sat-orbits" class="flight-region-filters">
-    <div class="fr-title">Filter by Orbit</div>
+  <div id="sat-orbits" class="flight-region-filters collapsed">
+    <div class="fr-title collapsed">Filter by Orbit</div>
     <label class="fr-toggle"><input type="checkbox" id="orbit-leo" checked> <span>LEO <span style="color:#22dd88">●</span></span> <span class="fr-count" id="orbit-count-leo">0</span></label>
     <label class="fr-toggle"><input type="checkbox" id="orbit-meo" checked> <span>MEO <span style="color:#ffaa22">●</span></span> <span class="fr-count" id="orbit-count-meo">0</span></label>
     <label class="fr-toggle"><input type="checkbox" id="orbit-geo" checked> <span>GEO <span style="color:#ff6644">●</span></span> <span class="fr-count" id="orbit-count-geo">0</span></label>
@@ -1564,6 +1581,15 @@ function setupUI() {
       gcBody.classList.toggle('collapsed');
     });
   }
+
+  // Collapsible filter sections (flight regions + orbit filters)
+  document.querySelectorAll('.fr-title').forEach(title => {
+    title.addEventListener('click', () => {
+      const parent = title.parentElement;
+      title.classList.toggle('collapsed');
+      parent.classList.toggle('collapsed');
+    });
+  });
 
   // Alerts
   renderAlerts();
