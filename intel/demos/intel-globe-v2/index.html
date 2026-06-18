@@ -215,13 +215,15 @@
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 10px; padding-bottom: 8px;
     border-bottom: 1px solid rgba(196,214,0,0.10);
+    gap: 8px; flex-shrink: 0;
   }
   #alerts-panel .ap-title {
     font-size: 12.1px; font-weight: 600; letter-spacing: 1.5px;
     color: #C4D600; text-transform: uppercase;
     font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  #alerts-panel .ap-actions { display: flex; gap: 8px; align-items: center; }
+  #alerts-panel .ap-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
   #alerts-panel .ap-btn {
     padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(196,214,0,0.15);
     background: rgba(196,214,0,0.05); color: #C4D600; cursor: pointer;
@@ -468,9 +470,9 @@
     .panel-close { display: flex; }
     #layers-panel h2 { padding-right: 36px; }
     #alerts-close { display: flex !important; padding: 4px 8px; min-width: 28px; }
-    #alerts-panel .ap-title { font-size: 11px; }
-    #alerts-panel .ap-btn { padding: 4px 8px; font-size: 10px; }
-    #alerts-panel .ap-actions { gap: 6px; }
+    #alerts-panel .ap-title { font-size: 10px; letter-spacing: 0.5px; }
+    #alerts-panel .ap-btn { padding: 3px 6px; font-size: 9px; letter-spacing: 0.3px; }
+    #alerts-panel .ap-actions { gap: 4px; }
 
     #ai-summary {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
