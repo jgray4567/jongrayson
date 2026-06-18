@@ -816,7 +816,7 @@ function buildFlights() {
 
     // Great circle arc (slerp)
     const steps = 100;
-    const arcHeight = 0.3 + start.distanceTo(end) * 0.08;
+    const arcHeight = 0.03 + start.distanceTo(end) * 0.01;
     const points = [];
     for (let s = 0; s <= steps; s++) {
       const t = s / steps;
@@ -867,7 +867,7 @@ function buildFlights() {
     flightPaths.push({
       points, line, trail, trailPositions, plane,
       progress: Math.random(),
-      speed: 0.00004 + Math.random() * 0.00004,
+      speed: 0.00002 + Math.random() * 0.00002,
       trailLen,
     });
   }
