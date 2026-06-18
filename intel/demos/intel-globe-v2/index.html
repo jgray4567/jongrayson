@@ -319,7 +319,7 @@
 
 <!-- 3D Scene -->
 <div id="scene-container"></div>
-<div id="scan-overlay"><div class="scan-line"></div></div>
+
 
 <!-- Top Bar -->
 <div id="top-bar">
@@ -654,14 +654,14 @@ function init() {
   mouse = new THREE.Vector2(-999, -999);
 
   // ─── Lighting ───
-  const ambient = new THREE.AmbientLight('#445566', 1.2);
+  const ambient = new THREE.AmbientLight('#667788', 1.5);
   scene.add(ambient);
-  const sun = new THREE.DirectionalLight('#ffffff', 3.0);
+  const sun = new THREE.DirectionalLight('#ffffff', 4.0);
   const sunDir = getSunDirection();
   sun.position.copy(sunDir.clone().multiplyScalar(20));
   sun.name = 'sunLight';
   scene.add(sun);
-  const fill = new THREE.DirectionalLight('#0044cc', 0.8);
+  const fill = new THREE.DirectionalLight('#0044cc', 1.2);
   fill.position.set(-30, 10, -20);
   scene.add(fill);
 
@@ -705,9 +705,9 @@ function buildEarth() {
 
   // Ocean base
   const oceanGrad = ctx.createLinearGradient(0, 0, 0, 1024);
-  oceanGrad.addColorStop(0, '#1a3a5a');
-  oceanGrad.addColorStop(0.5, '#1a4a6a');
-  oceanGrad.addColorStop(1, '#1a3a5a');
+  oceanGrad.addColorStop(0, '#2a5a8a');
+  oceanGrad.addColorStop(0.5, '#2a6a9a');
+  oceanGrad.addColorStop(1, '#2a5a8a');
   ctx.fillStyle = oceanGrad;
   ctx.fillRect(0, 0, 2048, 1024);
 
@@ -732,11 +732,11 @@ function buildEarth() {
   ];
 
   const landGrad = ctx.createLinearGradient(0, 0, 0, 1024);
-  landGrad.addColorStop(0, '#3a5a2a');
-  landGrad.addColorStop(0.3, '#4a6a3a');
-  landGrad.addColorStop(0.5, '#3a5a1a');
-  landGrad.addColorStop(0.7, '#5a5a3a');
-  landGrad.addColorStop(1, '#2a3a1a');
+  landGrad.addColorStop(0, '#5a7a3a');
+  landGrad.addColorStop(0.3, '#6a8a4a');
+  landGrad.addColorStop(0.5, '#5a7a2a');
+  landGrad.addColorStop(0.7, '#7a7a4a');
+  landGrad.addColorStop(1, '#3a5a1a');
 
   for (const c of continents) {
     ctx.fillStyle = landGrad;
