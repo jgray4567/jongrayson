@@ -225,10 +225,16 @@
 
   /* ─── AI Summary Modal ─── */
   #ai-summary {
-    position: absolute; bottom: 40px; left: 432px; z-index: 11;
-    width: 360px; padding: 16px 18px; display: none;
+    position: absolute; bottom: 340px; left: 16px; z-index: 15;
+    width: 400px; max-height: 300px; padding: 16px 18px; display: none;
+    background: rgba(6,7,10,0.95); backdrop-filter: blur(16px);
+    border: 1px solid rgba(196,214,0,0.15); border-radius: 14px;
+    transform: translateY(10px); opacity: 0;
+    transition: transform 0.25s ease, opacity 0.25s ease;
   }
-  #ai-summary.active { display: block; }
+  #ai-summary.active {
+    display: block; transform: translateY(0); opacity: 1;
+  }
   #ai-summary .as-header {
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 10px; padding-bottom: 8px;
