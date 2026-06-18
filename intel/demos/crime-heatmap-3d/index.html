@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intel Layer — 3D Crime Heatmap v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #06070a; color: #e8eaed; font-family: 'Inter', 'Segoe UI', sans-serif; overflow: hidden; }
+
+  #scene-container { position: absolute; inset: 0; }
+
+  /* ─── Control Panel ─── */
+  #controls {
+    position: absolute; top: 16px; left: 16px; z-index: 10;
+    background: rgba(6, 7, 10, 0.94);
+    backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid rgba(0, 194, 255, 0.08);
+    border-radius: 14px;
+    padding: 18px 20px;
+    width: 280px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #1a2233 transparent;
+  }
+  #controls::-webkit-scrollbar { width: 4px; }
+  #controls::-webkit-scrollbar-track { background: transparent; }
+  #controls::-webkit-scrollbar-thumb { background: #1a2233; border-radius: 2px; }
+
+  #controls h2 {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+    color: #00c2ff; text-transform: uppercase; margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 194, 255, 0.12);
+  }
+
+  .section-title {
+    font-size: 9px; font-weight: 700; letter-spacing: 1.2px;
+    color: #556; text-transform: uppercase; margin: 14px 0 8px;
+  }
+
+  .control-group { margin-bottom: 10px; }
+  .control-group label {
+    display: block; font-size: 10px; color: #778;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .category-toggle {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 0; cursor: pointer; user-select: none;
+  }
+  .category-toggle input[type="checkbox"] {
+    appearance: none; width: 14px; height: 14px; border-radius: 3px;
+    border: 2px solid currentColor; cursor: pointer; position: relative;
+    transition: all 0.15s ease;
+  }
+  .category-toggle input[type="checkbox"]:checked::after {
+    content: '✓'; position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 9px; color: #06070a; font-weight: 700;
+  }
+  .cat-violent { color: #ff2244; } .cat-violent input:checked { background: #ff2244; }
+  .cat-property { color: #3388ff; } .cat-property input:checked { background: #3388ff; }
+  .cat-drug { color: #22dd88; } .cat-drug input:checked { background: #22dd88; }
+  .cat-other { color: #667788; } .cat-other input:checked { background: #667788; }
+  .category-toggle span { font-size: 12px; color: #ccd; }
+
+  .slider-row { display: flex; align-items: center; gap: 8px; }
+  .slider-row input[type="range"] { flex: 1; accent-color: #00c2ff; height: 3px; }
+  .slider-row .val {
+    font-size: 11px; color: #00c2ff;
+    font-family: 'JetBrains Mono', monospace;
+    min-width: 32px; text-align: right;
+  }
+
+  /* Month slider special style */
+  #month-slider { width: 100%; }
+  .month-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; color: #00c2ff; text-align: center;
+    margin: 4px 0 2px; letter-spacing: 0.5px;
+  }
+  .month-range {
+    display: flex; justify-content: space-between;
+    font-size: 9px; color: #445; font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Zone toggles */
+  .zone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+  .zone-chip {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10px; padding: 3px 6px; border-radius: 4px;
+    background: rgba(255,255,255,0.03); cursor: pointer;
+    font-family: 'JetBrains Mono', monospace; color: #99a;
+    transition: all 0.15s;
+  }
+  .zone-chip.active { background: rgba(0,194,255,0.08); color: #dde; }
+  .zone-chip .zone-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+
+  /* View mode buttons */
+  .view-modes { display: flex; gap: 4px; }
+  .view-btn {
+    flex: 1; padding: 6px 0; border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02); color: #778;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    cursor: pointer; border-radius: 6px; transition: all 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .view-btn.active { background: rgba(0,194,255,0.1); color: #00c2ff; border-color: rgba(0,194,255,0.25); }
+  .view-btn:hover { background: rgba(0,194,255,0.06); }
+
+  /* ─── Stats Bar ─── */
+  #stats {
+    position: absolute; bottom: 16px; left: 16px; z-index: 10;
+    background: rgba(6, 7, 10, 0.94); backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid rgba(0, 194, 255, 0.08); border-radius: 12px;
+    padding: 14px 18px; display: flex; gap: 20px;
+  }
+  .stat-item { display: flex; flex-direction: column; gap: 1px; }
+  .stat-item .stat-val {
+    font-size: 18px; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .stat-item .stat-label {
+    font-size: 9px; text-transform: uppercase;
+    letter-spacing: 0.8px; color: #445;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ─── Title Badge ─── */
+  #title-badge {
+    position: absolute; top: 16px; right: 16px; z-index: 10;
+    background: rgba(6, 7, 10, 0.94); backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid rgba(0, 194, 255, 0.08); border-radius: 12px;
+    padding: 14px 18px; text-align: right;
+  }
+  #title-badge h1 {
+    font-size: 15px; font-weight: 600; color: #e8eaed;
+    font-family: 'JetBrains Mono', monospace; letter-spacing: -0.3px;
+  }
+  #title-badge .subtitle {
+    font-size: 10px; color: #556; margin-top: 3px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #title-badge .version {
+    font-size: 9px; color: #334; margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ─── Legend ─── */
+  #legend {
+    position: absolute; bottom: 16px; right: 16px; z-index: 10;
+    background: rgba(6, 7, 10, 0.94); backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid rgba(0, 194, 255, 0.08); border-radius: 12px;
+    padding: 12px 16px; font-size: 11px;
+  }
+  #legend h3 {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+    color: #445; margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+  .legend-bar { width: 10px; height: 10px; border-radius: 2px; }
+
+  /* ─── Tooltip ─── */
+  #tooltip {
+    position: absolute; z-index: 20; pointer-events: none;
+    background: rgba(6, 7, 10, 0.96); backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 194, 255, 0.15); border-radius: 8px;
+    padding: 10px 14px; display: none; min-width: 180px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #tooltip .tip-title { font-size: 12px; color: #00c2ff; font-weight: 600; margin-bottom: 4px; }
+  #tooltip .tip-row { display: flex; justify-content: space-between; font-size: 10px; color: #99a; padding: 1px 0; }
+  #tooltip .tip-row .tip-val { color: #e8eaed; font-weight: 500; }
+
+  /* ─── Scan Line ─── */
+  #scan-overlay {
+    position: absolute; inset: 0; z-index: 5; pointer-events: none;
+    overflow: hidden;
+  }
+  .scan-line {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0,194,255,0.3), transparent);
+    animation: scanDown 6s linear infinite;
+  }
+  @keyframes scanDown {
+    0% { top: -2px; opacity: 0; }
+    5% { opacity: 1; }
+    95% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* ─── Loading ─── */
+  #loading {
+    position: absolute; inset: 0; z-index: 100;
+    background: #06070a; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #loading .loader-text { font-size: 13px; color: #00c2ff; letter-spacing: 2px; }
+  #loading .loader-sub { font-size: 10px; color: #445; margin-top: 8px; }
+  .loader-bar { width: 200px; height: 2px; background: #111; margin-top: 16px; border-radius: 1px; overflow: hidden; }
+  .loader-bar-fill { height: 100%; background: #00c2ff; width: 0%; transition: width 0.3s; border-radius: 1px; }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="loader-text">INITIALIZING INTEL LAYER</div>
+  <div class="loader-bar"><div class="loader-bar-fill" id="load-progress"></div></div>
+  <div class="loader-sub" id="load-status">Loading crime dataset...</div>
+</div>
+
+<div id="scene-container"></div>
+<div id="scan-overlay"><div class="scan-line"></div></div>
+
+<div id="controls">
+  <h2>Crime Heatmap v2</h2>
+
+  <div class="section-title">View Mode</div>
+  <div class="control-group">
+    <div class="view-modes">
+      <button class="view-btn active" data-view="heatmap">Heatmap</button>
+      <button class="view-btn" data-view="columns">Columns</button>
+      <button class="view-btn" data-view="scatter">Scatter</button>
+    </div>
+  </div>
+
+  <div class="section-title">Categories</div>
+  <div class="control-group">
+    <label class="category-toggle cat-violent"><input type="checkbox" id="cat-violent" checked><span>Violent Crime</span></label>
+    <label class="category-toggle cat-property"><input type="checkbox" id="cat-property" checked><span>Property Crime</span></label>
+    <label class="category-toggle cat-drug"><input type="checkbox" id="cat-drug" checked><span>Drug Offenses</span></label>
+    <label class="category-toggle cat-other"><input type="checkbox" id="cat-other" checked><span>Other</span></label>
+  </div>
+
+  <div class="section-title">Time</div>
+  <div class="control-group">
+    <div class="month-label" id="month-label">All Months</div>
+    <input type="range" id="month-slider" min="-1" max="12" step="1" value="-1">
+    <div class="month-range"><span>ALL</span><span>JAN</span><span>JUN</span><span>DEC</span></div>
+  </div>
+
+  <div class="section-title">Zones</div>
+  <div class="control-group">
+    <div class="zone-grid" id="zone-grid"></div>
+  </div>
+
+  <div class="section-title">Display</div>
+  <div class="control-group">
+    <label class="category-toggle" style="color:#556;">
+      <input type="checkbox" id="log-scale-toggle" style="border-color:#556;">
+      <span style="font-size:11px;">Logarithmic Scale</span>
+    </label>
+  </div>
+  <div class="control-group">
+    <label>Column Height</label>
+    <div class="slider-row">
+      <input type="range" id="height-slider" min="0.5" max="12" step="0.5" value="5">
+      <span class="val" id="height-val">5.0</span>
+    </div>
+  </div>
+  <div class="control-group">
+    <label>Grid Resolution</label>
+    <div class="slider-row">
+      <input type="range" id="grid-slider" min="0.002" max="0.010" step="0.001" value="0.004">
+      <span class="val" id="grid-val">0.4°</span>
+    </div>
+  </div>
+  <div class="control-group">
+    <label>Opacity</label>
+    <div class="slider-row">
+      <input type="range" id="opacity-slider" min="0.2" max="1" step="0.05" value="0.85">
+      <span class="val" id="opacity-val">85%</span>
+    </div>
+  </div>
+  <div class="control-group">
+    <label>Pulse Intensity</label>
+    <div class="slider-row">
+      <input type="range" id="pulse-slider" min="0" max="3" step="0.1" value="1.0">
+      <span class="val" id="pulse-val">1.0</span>
+    </div>
+  </div>
+  <div class="control-group">
+    <label>River Opacity</label>
+    <div class="slider-row">
+      <input type="range" id="river-slider" min="0" max="1" step="0.05" value="0.6">
+      <span class="val" id="river-val">60%</span>
+    </div>
+  </div>
+  <div class="control-group" style="margin-top:6px;">
+    <label class="category-toggle" style="color:#556;">
+      <input type="checkbox" id="scan-toggle" checked style="border-color:#556;">
+      <span style="font-size:11px;">Scan Line Effect</span>
+    </label>
+    <label class="category-toggle" style="color:#556;">
+      <input type="checkbox" id="neighborhoods-toggle" checked style="border-color:#556;">
+      <span style="font-size:11px;">Neighborhood Labels</span>
+    </label>
+    <label class="category-toggle" style="color:#556;">
+      <input type="checkbox" id="ground-glow-toggle" checked style="border-color:#556;">
+      <span style="font-size:11px;">Ground Glow</span>
+    </label>
+  </div>
+</div>
+
+<div id="title-badge">
+  <h1>Pittsburgh Crime Heatmap</h1>
+  <div class="subtitle">3D Volumetric Visualization</div>
+  <div class="version">v2.0 — 31,708 incidents</div>
+</div>
+
+<div id="stats">
+  <div class="stat-item"><div class="stat-val" id="stat-total" style="color:#00c2ff;">0</div><div class="stat-label">Visible</div></div>
+  <div class="stat-item"><div class="stat-val" id="stat-hotspots" style="color:#ff2244;">0</div><div class="stat-label">Hotspots</div></div>
+  <div class="stat-item"><div class="stat-val" id="stat-cells" style="color:#22dd88;">0</div><div class="stat-label">Grid Cells</div></div>
+  <div class="stat-item"><div class="stat-val" id="stat-zones" style="color:#ffaa22;">0</div><div class="stat-label">Zones</div></div>
+</div>
+
+<div id="legend">
+  <h3>Legend</h3>
+  <div class="legend-item"><div class="legend-bar" style="background:#ff2244;"></div> Violent</div>
+  <div class="legend-item"><div class="legend-bar" style="background:#3388ff;"></div> Property</div>
+  <div class="legend-item"><div class="legend-bar" style="background:#22dd88;"></div> Drug</div>
+  <div class="legend-item"><div class="legend-bar" style="background:#667788;"></div> Other</div>
+  <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="font-size:9px;color:#445;margin-bottom:4px;font-family:'JetBrains Mono',monospace;">HEATMAP: CONE = DENSITY</div>
+    <div class="legend-item"><div style="width:8px;height:14px;background:linear-gradient(#ff2244,#4411aa);border-radius:2px 2px 1px 1px;"></div> Taller = denser</div>
+    <div class="legend-item"><div style="width:8px;height:8px;background:#ff2244;border-radius:50%;box-shadow:0 0 6px #ff2244;"></div> Glow = hotspot</div>
+  </div>
+</div>
+
+<div id="tooltip">
+  <div class="tip-title" id="tip-title">Zone</div>
+  <div class="tip-row"><span>Incidents</span><span class="tip-val" id="tip-count">0</span></div>
+  <div class="tip-row"><span>Dominant</span><span class="tip-val" id="tip-cat">—</span></div>
+  <div class="tip-row"><span>Density</span><span class="tip-val" id="tip-density">—</span></div>
+  <div class="tip-row"><span>Zone</span><span class="tip-val" id="tip-zone">—</span></div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ─── Constants ───
+const PITT = { lat: 40.4406, lng: -79.9959 };
+const SCALE = 110;
+const DEG2RAD = Math.PI / 180;
+const MONTHS = ['All', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+// Pittsburgh neighborhood centers for labels
+const NEIGHBORHOODS = [
+  { name: 'DOWNTOWN', lat: 40.4406, lng: -80.000, size: 'large' },
+  { name: 'OAKLAND', lat: 40.442, lng: -79.955, size: 'medium' },
+  { name: 'SQUIRREL HILL', lat: 40.428, lng: -79.925, size: 'medium' },
+  { name: 'SHADYSIDE', lat: 40.447, lng: -79.935, size: 'medium' },
+  { name: 'LAWRENCEVILLE', lat: 40.469, lng: -79.962, size: 'small' },
+  { name: 'BLOOMFIELD', lat: 40.458, lng: -79.950, size: 'small' },
+  { name: 'STRIP DISTRICT', lat: 40.453, lng: -79.982, size: 'small' },
+  { name: 'NORTH SIDE', lat: 40.452, lng: -80.008, size: 'medium' },
+  { name: 'SOUTH SIDE', lat: 40.425, lng: -79.980, size: 'medium' },
+  { name: 'HOMEWOOD', lat: 40.455, lng: -79.910, size: 'small' },
+  { name: 'EAST LIBERTY', lat: 40.458, lng: -79.925, size: 'small' },
+  { name: 'GREENFIELD', lat: 40.418, lng: -79.960, size: 'small' },
+  { name: 'BROOKLINE', lat: 40.395, lng: -80.020, size: 'small' },
+  { name: 'CARRICK', lat: 40.395, lng: -80.005, size: 'small' },
+  { name: 'MT WASHINGTON', lat: 40.432, lng: -80.015, size: 'small' },
+  { name: 'HAZELWOOD', lat: 40.410, lng: -79.950, size: 'small' },
+  { name: 'BRIGHTON HEIGHTS', lat: 40.475, lng: -80.040, size: 'small' },
+  { name: 'BELZHOOSER', lat: 40.415, lng: -79.975, size: 'small' },
+];
+
+const CAT_COLORS = {
+  Violent:  0xff2244,
+  Property: 0x3388ff,
+  Drug:     0x22dd88,
+  Other:    0x556677
+};
+
+const ZONE_COLORS = [
+  0x00c2ff, 0xff6622, 0x22dd88, 0xff2244,
+  0xffaa22, 0xaa44ff, 0x44ddff, 0xff44aa,
+  0x88ff44, 0xffdd22
+];
+
+let crimeData = [];
+let heatmapMeshes = [];
+let heatmapGlows = [];
+let neighborhoodLabels = [];
+let groundGlowMeshes = [];
+let scene, camera, renderer, controls;
+let raycaster, mouse;
+let hoveredMesh = null;
+
+let visibleCategories = new Set(['Violent', 'Property', 'Drug', 'Other']);
+let visibleZones = new Set();
+let selectedMonth = -1; // -1 = all
+let columnHeight = 5.0;
+let gridResolution = 0.004;
+let columnOpacity = 0.85;
+let pulseIntensity = 1.0;
+let riverOpacity = 0.6;
+let viewMode = 'heatmap'; // heatmap, columns, scatter
+let showScanLine = true;
+let showNeighborhoods = true;
+let showGroundGlow = true;
+let logScale = false;
+let allZones = new Set();
+
+// ─── Convert lat/lng to local X/Z ───
+function latLngToLocal(lat, lng) {
+  return {
+    x: (lng - PITT.lng) * SCALE * Math.cos(PITT.lat * DEG2RAD),
+    z: -(lat - PITT.lat) * SCALE
+  };
+}
+
+// ─── Loading ───
+function setLoadProgress(pct, msg) {
+  document.getElementById('load-progress').style.width = pct + '%';
+  if (msg) document.getElementById('load-status').textContent = msg;
+}
+
+// ─── Init ───
+async function init() {
+  setLoadProgress(10, 'Loading crime dataset...');
+  try {
+    // Try full dataset first, fall back to sample
+    let dataSource = 'crime_sample.json';
+    try {
+      const testResp = await fetch('data/pittsburgh/daily_crimes.json');
+      if (testResp.ok) dataSource = 'data/pittsburgh/daily_crimes.json';
+    } catch(e) {}
+
+    setLoadProgress(20, `Fetching ${dataSource}...`);
+    const resp = await fetch(dataSource);
+    const raw = await resp.json();
+    setLoadProgress(50, 'Processing incidents...');
+
+    if (raw.length > 0 && raw[0].category) {
+      // Full dataset format
+      crimeData = raw.map(d => ({
+        lat: d.lat,
+        lng: d.lng,
+        cat: d.category,
+        zone: d.zone || '?',
+        time: d.time || '',
+        incident_type: d.incident_type || ''
+      }));
+    } else {
+      // Sample format
+      crimeData = raw.map(d => ({
+        lat: d.lat,
+        lng: d.lng,
+        cat: d.cat || 'Other',
+        zone: String(Math.floor(Math.random() * 6) + 1),
+        time: '2026-0' + (Math.floor(Math.random() * 5) + 1) + '-15 12:00',
+        incident_type: ''
+      }));
+    }
+
+    // Collect zones
+    crimeData.forEach(d => allZones.add(d.zone));
+    allZones = new Set([...allZones].sort((a, b) => {
+      const na = parseInt(a), nb = parseInt(b);
+      if (!isNaN(na) && !isNaN(nb)) return na - nb;
+      return a.localeCompare(b);
+    }));
+    visibleZones = new Set(allZones);
+
+    document.querySelector('#title-badge .version').textContent =
+      `v2.0 — ${crimeData.length.toLocaleString()} incidents`;
+
+  } catch (e) {
+    console.error('Data load failed:', e);
+    crimeData = generateFallbackData();
+  }
+
+  setLoadProgress(65, 'Building 3D scene...');
+  setupScene();
+  buildGround();
+  buildZoneGrid();
+  setLoadProgress(80, 'Rendering heatmap...');
+  buildHeatmap();
+  buildNeighborhoodLabels();
+  setupControls();
+
+  setLoadProgress(100, 'Ready');
+  setTimeout(() => {
+    document.getElementById('loading').style.opacity = '0';
+    document.getElementById('loading').style.transition = 'opacity 0.6s ease';
+    setTimeout(() => document.getElementById('loading').style.display = 'none', 600);
+  }, 300);
+
+  animate();
+}
+
+function generateFallbackData() {
+  const data = [];
+  const cats = ['Violent', 'Property', 'Drug', 'Other'];
+  for (let i = 0; i < 2000; i++) {
+    const cat = cats[Math.floor(Math.random() * 4)];
+    data.push({
+      lat: 40.35 + Math.random() * 0.2,
+      lng: -80.05 + Math.random() * 0.15,
+      cat, zone: String(Math.floor(Math.random() * 6) + 1),
+      time: `2026-0${Math.floor(Math.random()*5)+1}-15 12:00`,
+      incident_type: ''
+    });
+  }
+  return data;
+}
+
+function setupScene() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color('#06070a');
+  scene.fog = new THREE.FogExp2('#06070a', 0.0025);
+
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
+  camera.position.set(5, 30, 30);
+  camera.lookAt(0, 8, 0);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.3;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.getElementById('scene-container').appendChild(renderer.domElement);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+  controls.minDistance = 8;
+  controls.maxDistance = 200;
+  controls.maxPolarAngle = Math.PI * 0.48;
+  controls.target.set(0, 5, 0);
+
+  // Raycaster for hover
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2(-999, -999);
+
+  // ─── Lighting ───
+  const ambient = new THREE.AmbientLight('#1a2233', 1.2);
+  scene.add(ambient);
+
+  const mainLight = new THREE.DirectionalLight('#ffffff', 2.0);
+  mainLight.position.set(40, 60, 30);
+  mainLight.castShadow = true;
+  mainLight.shadow.mapSize.set(2048, 2048);
+  mainLight.shadow.camera.near = 0.5;
+  mainLight.shadow.camera.far = 200;
+  mainLight.shadow.camera.left = -100;
+  mainLight.shadow.camera.right = 100;
+  mainLight.shadow.camera.top = 100;
+  mainLight.shadow.camera.bottom = -100;
+  scene.add(mainLight);
+
+  // Blue fill from below
+  const fillBlue = new THREE.DirectionalLight('#0044cc', 0.5);
+  fillBlue.position.set(-30, 5, -40);
+  scene.add(fillBlue);
+
+  // Cyan accent from side
+  const cyanAccent = new THREE.PointLight('#00c2ff', 1.5, 80);
+  cyanAccent.position.set(-20, 25, 15);
+  scene.add(cyanAccent);
+
+  // Warm accent
+  const warmAccent = new THREE.PointLight('#ff4422', 0.8, 60);
+  warmAccent.position.set(20, 15, -10);
+  scene.add(warmAccent);
+
+  // Overhead spot
+  const spot = new THREE.SpotLight('#ffffff', 2.5, 250, Math.PI / 5, 0.4, 1);
+  spot.position.set(0, 80, 0);
+  spot.target.position.set(0, 0, 0);
+  spot.castShadow = true;
+  scene.add(spot);
+  scene.add(spot.target);
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Mouse tracking for hover
+  renderer.domElement.addEventListener('mousemove', onMouseMove);
+  renderer.domElement.addEventListener('mouseleave', () => {
+    mouse.set(-999, -999);
+    hideTooltip();
+  });
+}
+
+function onMouseMove(e) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  // Position tooltip near cursor
+  const tooltip = document.getElementById('tooltip');
+  tooltip.style.left = (e.clientX + 16) + 'px';
+  tooltip.style.top = (e.clientY - 10) + 'px';
+}
+
+function showTooltip(data) {
+  const tip = document.getElementById('tooltip');
+  document.getElementById('tip-title').textContent = data.title;
+  document.getElementById('tip-count').textContent = data.count;
+  document.getElementById('tip-cat').textContent = data.cat;
+  document.getElementById('tip-density').textContent = data.density;
+  document.getElementById('tip-zone').textContent = data.zone;
+  tip.style.display = 'block';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').style.display = 'none';
+}
+
+function buildGround() {
+  // Ground plane with subtle gradient
+  const groundGeo = new THREE.PlaneGeometry(500, 500);
+  const groundMat = new THREE.MeshStandardMaterial({
+    color: '#0a0f18',
+    roughness: 0.95,
+    metalness: 0.05,
+  });
+  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI / 2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // Grid
+  const gridHelper = new THREE.GridHelper(500, 100, '#141e2e', '#0d1520');
+  gridHelper.position.y = 0.01;
+  scene.add(gridHelper);
+
+  // ─── Rivers with glow ───
+  buildRivers();
+
+  // ─── Ground glow under hotspots ───
+  buildGroundGlow();
+
+  // Pittsburgh label
+  buildLabel('PITTSBURGH', PITT.lat, PITT.lng, '#00c2ff', 2.5, '#1a3344');
+}
+
+function buildRivers() {
+  // Ohio River
+  const ohio = [
+    latLngToLocal(40.50, -80.20), latLngToLocal(40.47, -80.08),
+    latLngToLocal(40.44, -80.00), latLngToLocal(40.42, -79.95),
+    latLngToLocal(40.38, -79.90), latLngToLocal(40.35, -79.80),
+  ].map(p => new THREE.Vector3(p.x, 0.05, p.z));
+
+  // Allegheny River
+  const allegheny = [
+    latLngToLocal(40.57, -79.75), latLngToLocal(40.52, -79.85),
+    latLngToLocal(40.49, -79.94), latLngToLocal(40.47, -80.00),
+  ].map(p => new THREE.Vector3(p.x, 0.05, p.z));
+
+  // Monongahela River
+  const monongahela = [
+    latLngToLocal(40.35, -79.85), latLngToLocal(40.38, -79.90),
+    latLngToLocal(40.41, -79.95), latLngToLocal(40.44, -80.00),
+  ].map(p => new THREE.Vector3(p.x, 0.05, p.z));
+
+  for (const pts of [ohio, allegheny, monongahela]) {
+    // Solid river line
+    const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
+    const lineMat = new THREE.LineBasicMaterial({ color: '#1a4466', linewidth: 2, transparent: true, opacity: riverOpacity });
+    const line = new THREE.Line(lineGeo, lineMat);
+    line.userData.isRiver = true;
+    scene.add(line);
+
+    // River glow (wider, semi-transparent)
+    const glowPts = pts.map(p => new THREE.Vector3(p.x, 0.02, p.z));
+    const glowGeo = new THREE.BufferGeometry().setFromPoints(glowPts);
+    const glowMat = new THREE.LineBasicMaterial({ color: '#2255aa', linewidth: 1, transparent: true, opacity: riverOpacity * 0.4 });
+    const glow = new THREE.Line(glowGeo, glowMat);
+    glow.userData.isRiver = true;
+    scene.add(glow);
+  }
+}
+
+function buildGroundGlow() {
+  // Ground-level glow planes under high-density areas
+  // These get built/rebuilt with the heatmap
+  for (const m of groundGlowMeshes) {
+    scene.remove(m);
+    m.geometry.dispose();
+    m.material.dispose();
+  }
+  groundGlowMeshes = [];
+}
+
+function buildZoneGrid() {
+  // Build zone filter UI
+  const grid = document.getElementById('zone-grid');
+  grid.innerHTML = '';
+  let idx = 0;
+  for (const zone of allZones) {
+    const chip = document.createElement('div');
+    chip.className = 'zone-chip active';
+    const color = ZONE_COLORS[idx % ZONE_COLORS.length];
+    chip.innerHTML = `<div class="zone-dot" style="background:#${color.toString(16).padStart(6, '0')}"></div>Zone ${zone}`;
+    chip.dataset.zone = zone;
+    chip.addEventListener('click', () => {
+      if (visibleZones.has(zone)) {
+        visibleZones.delete(zone);
+        chip.classList.remove('active');
+      } else {
+        visibleZones.add(zone);
+        chip.classList.add('active');
+      }
+      buildHeatmap();
+    });
+    grid.appendChild(chip);
+    idx++;
+  }
+}
+
+function buildNeighborhoodLabels() {
+  // Remove old labels
+  for (const label of neighborhoodLabels) {
+    scene.remove(label);
+  }
+  neighborhoodLabels = [];
+
+  if (!showNeighborhoods) return;
+
+  for (const hood of NEIGHBORHOODS) {
+    const fontSize = hood.size === 'large' ? 44 : hood.size === 'medium' ? 30 : 20;
+    const isLarge = hood.size === 'large';
+    const isMedium = hood.size === 'medium';
+    const canvas = document.createElement('canvas');
+    canvas.width = 640;
+    canvas.height = fontSize * 4;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = `${isLarge ? 'bold ' : (isMedium ? '600 ' : '')}${fontSize}px JetBrains Mono, monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Dark background pill for readability
+    const metrics = ctx.measureText(hood.name);
+    const pad = isLarge ? 16 : (isMedium ? 10 : 6);
+    ctx.fillStyle = isLarge ? 'rgba(0, 15, 30, 0.92)' : 'rgba(6, 10, 18, 0.88)';
+    const bgX = (canvas.width / 2) - (metrics.width / 2) - pad;
+    const bgW = metrics.width + pad * 2;
+    const bgY = (canvas.height / 2) - (fontSize / 2) - 6;
+    const bgH = fontSize + 12;
+    ctx.beginPath();
+    ctx.roundRect(bgX, bgY, bgW, bgH, isLarge ? 6 : 4);
+    ctx.fill();
+
+    // Border glow for large labels
+    if (isLarge) {
+      ctx.strokeStyle = 'rgba(0, 194, 255, 0.35)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(bgX, bgY, bgW, bgH, 6);
+      ctx.stroke();
+    }
+
+    // Text shadow
+    ctx.fillStyle = isLarge ? '#003344' : '#0a1520';
+    ctx.fillText(hood.name, canvas.width / 2 + 1, canvas.height / 2 + 1);
+
+    // Main text
+    ctx.fillStyle = isLarge ? '#00c2ff' : (isMedium ? '#7799bb' : '#557799');
+    ctx.fillText(hood.name, canvas.width / 2, canvas.height / 2);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.minFilter = THREE.LinearFilter;
+    const geoW = isLarge ? 20 : (isMedium ? 14 : 9);
+    const geoH = isLarge ? 4.5 : (isMedium ? 3 : 2);
+    const geo = new THREE.PlaneGeometry(geoW, geoH);
+    const mat = new THREE.MeshBasicMaterial({
+      map: tex, transparent: true, depthWrite: false, depthTest: false, opacity: 0.95
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    const pos = latLngToLocal(hood.lat, hood.lng);
+    mesh.position.set(pos.x, isLarge ? 0.35 : 0.25, pos.z);
+    mesh.rotation.x = -Math.PI / 2;
+    scene.add(mesh);
+    neighborhoodLabels.push(mesh);
+  }
+}
+
+function buildLabel(text, lat, lng, color, scale, subtext) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 160;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 512, 160);
+  ctx.font = `bold 48px JetBrains Mono, monospace`;
+  ctx.textAlign = 'center';
+
+  // Background strip for readability
+  const titleMetrics = ctx.measureText(text);
+  ctx.fillStyle = 'rgba(6, 7, 10, 0.85)';
+  ctx.beginPath();
+  ctx.roundRect(256 - titleMetrics.width/2 - 16, 38, titleMetrics.width + 32, 64, 6);
+  ctx.fill();
+
+  ctx.fillStyle = color;
+  ctx.fillText(text, 256, 72);
+  if (subtext) {
+    ctx.font = '20px JetBrains Mono, monospace';
+    ctx.fillStyle = subtext;
+    ctx.fillText(`${PITT.lat.toFixed(2)}°N  ${Math.abs(PITT.lng).toFixed(2)}°W`, 256, 110);
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  const geo = new THREE.PlaneGeometry(scale * 8, scale * 2.5);
+  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false, opacity: 0.95 });
+  const mesh = new THREE.Mesh(geo, mat);
+  const pos = latLngToLocal(lat, lng);
+  mesh.position.set(pos.x, 0.3, pos.z);
+  mesh.rotation.x = -Math.PI / 2;
+  scene.add(mesh);
+  neighborhoodLabels.push(mesh);
+}
+
+function getFilteredData() {
+  return crimeData.filter(d => {
+    if (!visibleCategories.has(d.cat)) return false;
+    if (!visibleZones.has(d.zone)) return false;
+    if (selectedMonth >= 0) {
+      const month = parseInt(d.time.split('-')[1]);
+      if (month !== selectedMonth) return false;
+    }
+    return true;
+  });
+}
+
+function buildHeatmap() {
+  // Clean up
+  for (const mesh of heatmapMeshes) {
+    scene.remove(mesh);
+    mesh.geometry.dispose();
+    if (mesh.material.dispose) mesh.material.dispose();
+  }
+  for (const mesh of heatmapGlows) {
+    scene.remove(mesh);
+    mesh.geometry.dispose();
+    if (mesh.material.dispose) mesh.material.dispose();
+  }
+  for (const mesh of groundGlowMeshes) {
+    scene.remove(mesh);
+    mesh.geometry.dispose();
+    if (mesh.material.dispose) mesh.material.dispose();
+  }
+  heatmapMeshes = [];
+  heatmapGlows = [];
+  groundGlowMeshes = [];
+
+  const filtered = getFilteredData();
+
+  if (viewMode === 'scatter') {
+    buildScatter(filtered);
+    updateStats(filtered, {}, 0);
+    return;
+  }
+
+  // Build density grid
+  const grid = {};
+  for (const d of filtered) {
+    const key = `${Math.round(d.lat / gridResolution)},${Math.round(d.lng / gridResolution)}`;
+    if (!grid[key]) grid[key] = { lat: 0, lng: 0, count: 0, cats: {}, zones: {} };
+    grid[key].lat += d.lat;
+    grid[key].lng += d.lng;
+    grid[key].count++;
+    grid[key].cats[d.cat] = (grid[key].cats[d.cat] || 0) + 1;
+    grid[key].zones[d.zone] = (grid[key].zones[d.zone] || 0) + 1;
+  }
+
+  const counts = Object.values(grid).map(g => g.count);
+  const maxCount = Math.max(...counts, 1);
+  let hotspotCount = 0;
+  const zoneIdxMap = {};
+  [...allZones].forEach((z, i) => zoneIdxMap[z] = i);
+
+  // Instanced approach: shared geometry
+  const baseGeo = new THREE.BoxGeometry(1, 1, 1);
+  baseGeo.translate(0, 0.5, 0);
+
+  // Ground glow circles for hotspots
+  const glowCircleGeo = new THREE.CircleGeometry(1, 16);
+  glowCircleGeo.rotateX(-Math.PI / 2);
+
+  for (const [key, cell] of Object.entries(grid)) {
+    const avgLat = cell.lat / cell.count;
+    const avgLng = cell.lng / cell.count;
+    const linearNormalized = cell.count / maxCount;
+    const normalized = logScale ? Math.log(1 + cell.count) / Math.log(1 + maxCount) : linearNormalized;
+
+    if (linearNormalized > 0.5) hotspotCount++;
+
+    // Dominant category
+    let dominantCat = 'Other', maxCat = 0;
+    for (const [cat, cnt] of Object.entries(cell.cats)) {
+      if (cnt > maxCat) { maxCat = cnt; dominantCat = cat; }
+    }
+
+    // Dominant zone
+    let dominantZone = '?', maxZone = 0;
+    for (const [zone, cnt] of Object.entries(cell.zones)) {
+      if (cnt > maxZone) { maxZone = cnt; dominantZone = zone; }
+    }
+
+    const pos = latLngToLocal(avgLat, avgLng);
+
+    if (viewMode === 'heatmap') {
+      // ─── Heatmap mode: tapered cones with glow caps ───
+      // Cap height to prevent single spike dominating the view
+      const height = Math.min(Math.max(0.3, normalized * columnHeight * 1.8), columnHeight * 2.2);
+      // Taper width: base wider than top for cone effect
+      const baseWidth = Math.max(0.5, 0.5 + normalized * 1.8);
+      const width = baseWidth;
+
+      const color = new THREE.Color(CAT_COLORS[dominantCat]);
+      if (normalized > 0.7) color.lerp(new THREE.Color('#ffffff'), 0.15);
+
+      // Cone geometry for heatmap mode — base wide, top narrow
+      const coneGeo = new THREE.CylinderGeometry(width * 0.35, width * 0.55, 1, 6);
+      coneGeo.translate(0, 0.5, 0);
+
+      const mat = new THREE.MeshStandardMaterial({
+        color: color,
+        emissive: color,
+        emissiveIntensity: 0.12 + normalized * 0.35,
+        transparent: true,
+        opacity: columnOpacity * (0.45 + normalized * 0.55),
+        roughness: 0.35,
+        metalness: 0.1,
+      });
+
+      const mesh = new THREE.Mesh(coneGeo, mat);
+      mesh.position.set(pos.x, 0.05, pos.z);
+      mesh.scale.set(1, height, 1);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.userData = {
+        density: normalized, cat: dominantCat, count: cell.count,
+        zone: dominantZone, lat: avgLat, lng: avgLng,
+        isHeatmapMesh: true, baseWidth: baseWidth
+      };
+      heatmapMeshes.push(mesh);
+      scene.add(mesh);
+
+      // Glow cap on hotspots — smaller, more focused
+      if (normalized > 0.3) {
+        const glowGeo = new THREE.SphereGeometry(width * 0.3, 8, 6);
+        const glowMat = new THREE.MeshBasicMaterial({
+          color: CAT_COLORS[dominantCat],
+          transparent: true,
+          opacity: Math.min(normalized * 0.25, 0.5),
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+        const glow = new THREE.Mesh(glowGeo, glowMat);
+        glow.position.set(pos.x, height + 0.1, pos.z);
+        glow.userData = { density: normalized, isGlow: true, cat: dominantCat };
+        heatmapGlows.push(glow);
+        scene.add(glow);
+      }
+
+      // Ground glow — subtle radial rings for hotspots only
+      if (showGroundGlow && normalized > 0.35) {
+        const glowRadius = 0.8 + normalized * 2;
+        const glowMat = new THREE.MeshBasicMaterial({
+          color: CAT_COLORS[dominantCat],
+          transparent: true,
+          opacity: Math.min(normalized * 0.08, 0.15),
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+        const glowCircle = new THREE.Mesh(glowCircleGeo, glowMat);
+        glowCircle.position.set(pos.x, 0.02, pos.z);
+        glowCircle.scale.set(glowRadius, 1, glowRadius);
+        groundGlowMeshes.push(glowCircle);
+        scene.add(glowCircle);
+      }
+
+    } else if (viewMode === 'columns') {
+      // ─── Columns mode: uniform width, height varies, zone-colored ───
+      const height = Math.max(0.2, normalized * columnHeight * 2);
+      const width = 0.7;
+      const zoneIdx = zoneIdxMap[dominantZone] || 0;
+
+      // Zone-colored columns with category accent stripe
+      const zoneColor = new THREE.Color(ZONE_COLORS[zoneIdx % ZONE_COLORS.length]);
+      const catColor = new THREE.Color(CAT_COLORS[dominantCat]);
+      const blendedColor = zoneColor.clone().lerp(catColor, 0.4);
+
+      const mat = new THREE.MeshStandardMaterial({
+        color: blendedColor,
+        emissive: blendedColor,
+        emissiveIntensity: 0.1 + normalized * 0.25,
+        transparent: true,
+        opacity: columnOpacity * (0.6 + normalized * 0.4),
+        roughness: 0.5,
+        metalness: 0.1,
+      });
+
+      const mesh = new THREE.Mesh(baseGeo, mat);
+      mesh.position.set(pos.x, 0.05, pos.z);
+      mesh.scale.set(width, height, width);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.userData = {
+        density: normalized, cat: dominantCat, count: cell.count,
+        zone: dominantZone, lat: avgLat, lng: avgLng,
+        isHeatmapMesh: true
+      };
+      heatmapMeshes.push(mesh);
+      scene.add(mesh);
+    }
+  }
+
+  updateStats(filtered, grid, hotspotCount);
+}
+
+function buildScatter(filtered) {
+  // Scatter mode: individual points as small spheres
+  const sphereGeo = new THREE.SphereGeometry(0.15, 6, 4);
+  const maxPoints = Math.min(filtered.length, 8000); // Cap for performance
+  const step = Math.max(1, Math.floor(filtered.length / maxPoints));
+  let idx = 0;
+
+  for (let i = 0; i < filtered.length; i += step) {
+    const d = filtered[i];
+    const pos = latLngToLocal(d.lat, d.lng);
+    const color = new THREE.Color(CAT_COLORS[d.cat] || CAT_COLORS.Other);
+
+    const mat = new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: columnOpacity * 0.8,
+    });
+
+    const mesh = new THREE.Mesh(sphereGeo, mat);
+    mesh.position.set(pos.x, 0.3, pos.z);
+    mesh.userData = {
+      density: 1, cat: d.cat, count: 1,
+      zone: d.zone, lat: d.lat, lng: d.lng,
+      isHeatmapMesh: true
+    };
+    heatmapMeshes.push(mesh);
+    scene.add(mesh);
+    idx++;
+  }
+}
+
+function updateStats(filtered, grid, hotspotCount) {
+  const zoneCount = new Set(filtered.map(d => d.zone)).size;
+  document.getElementById('stat-total').textContent = filtered.length.toLocaleString();
+  document.getElementById('stat-hotspots').textContent = hotspotCount.toLocaleString();
+  document.getElementById('stat-cells').textContent = Object.keys(grid).length.toLocaleString();
+  document.getElementById('stat-zones').textContent = zoneCount;
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  const time = performance.now() * 0.001;
+  controls.update();
+
+  // Pulse animation - only hotspots (density > 0.6)
+  if (pulseIntensity > 0) {
+    for (const mesh of heatmapMeshes) {
+      if (mesh.userData.density !== undefined && mesh.userData.density > 0.6) {
+        const pulse = 1 + Math.sin(time * 1.5 + mesh.userData.density * 8) * 0.03 * pulseIntensity;
+        if (viewMode === 'heatmap') {
+          mesh.scale.x = pulse;
+          mesh.scale.z = pulse;
+        }
+      }
+    }
+    for (const glow of heatmapGlows) {
+      if (glow.userData.isGlow) {
+        const s = 1 + Math.sin(time * 2 + glow.userData.density * 7) * 0.2 * pulseIntensity;
+        glow.scale.set(s, s, s);
+        glow.material.opacity = Math.min(glow.userData.density * 0.25 * (0.7 + Math.sin(time * 2.5 + glow.userData.density * 5) * 0.3 * pulseIntensity), 0.5);
+      }
+    }
+  }
+
+  // Ground glow pulse
+  if (showGroundGlow) {
+    for (const m of groundGlowMeshes) {
+      const baseOpacity = m.material.opacity;
+      if (baseOpacity > 0) {
+        m.material.opacity = baseOpacity * (0.8 + Math.sin(time * 1.5) * 0.2);
+      }
+    }
+  }
+
+  // Hover detection
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(heatmapMeshes);
+  if (intersects.length > 0) {
+    const hit = intersects[0].object;
+    if (hit.userData.isHeatmapMesh && hit !== hoveredMesh) {
+      // Reset previous
+      if (hoveredMesh && hoveredMesh.material.emissiveIntensity !== undefined) {
+        hoveredMesh.material.emissiveIntensity = hoveredMesh.userData._origEmissive || 0.2;
+      }
+      hoveredMesh = hit;
+      if (hoveredMesh.material.emissiveIntensity !== undefined) {
+        hoveredMesh.userData._origEmissive = hoveredMesh.material.emissiveIntensity;
+        hoveredMesh.material.emissiveIntensity = 0.8;
+      }
+      showTooltip({
+        title: `Grid ${hit.userData.lat?.toFixed(4)}, ${hit.userData.lng?.toFixed(4)}`,
+        count: hit.userData.count || '—',
+        cat: hit.userData.cat || '—',
+        density: hit.userData.density ? (hit.userData.density * 100).toFixed(0) + '%' : '—',
+        zone: `Zone ${hit.userData.zone || '?'}`,
+      });
+    }
+  } else {
+    if (hoveredMesh) {
+      if (hoveredMesh.material.emissiveIntensity !== undefined && hoveredMesh.userData._origEmissive !== undefined) {
+        hoveredMesh.material.emissiveIntensity = hoveredMesh.userData._origEmissive;
+      }
+      hoveredMesh = null;
+      hideTooltip();
+    }
+  }
+
+  renderer.render(scene, camera);
+}
+
+function setupControls() {
+  // Category toggles
+  for (const cat of ['Violent', 'Property', 'Drug', 'Other']) {
+    document.getElementById(`cat-${cat.toLowerCase()}`).addEventListener('change', (e) => {
+      if (e.target.checked) visibleCategories.add(cat);
+      else visibleCategories.delete(cat);
+      buildHeatmap();
+    });
+  }
+
+  // Month slider
+  const monthSlider = document.getElementById('month-slider');
+  monthSlider.addEventListener('input', (e) => {
+    selectedMonth = parseInt(e.target.value);
+    document.getElementById('month-label').textContent =
+      selectedMonth < 0 ? 'All Months' : MONTHS[selectedMonth];
+    buildHeatmap();
+  });
+
+  // Log scale toggle
+  document.getElementById('log-scale-toggle').addEventListener('change', (e) => {
+    logScale = e.target.checked;
+    buildHeatmap();
+  });
+
+  // Sliders
+  document.getElementById('height-slider').addEventListener('input', (e) => {
+    columnHeight = parseFloat(e.target.value);
+    document.getElementById('height-val').textContent = columnHeight.toFixed(1);
+    buildHeatmap();
+  });
+
+  document.getElementById('grid-slider').addEventListener('input', (e) => {
+    gridResolution = parseFloat(e.target.value);
+    document.getElementById('grid-val').textContent = gridResolution < 0.01
+      ? `${(gridResolution * 1000).toFixed(0)}m°` : `${(gridResolution * 180).toFixed(1)}°`;
+    buildHeatmap();
+  });
+
+  document.getElementById('opacity-slider').addEventListener('input', (e) => {
+    columnOpacity = parseFloat(e.target.value);
+    document.getElementById('opacity-val').textContent = Math.round(columnOpacity * 100) + '%';
+    buildHeatmap();
+  });
+
+  document.getElementById('pulse-slider').addEventListener('input', (e) => {
+    pulseIntensity = parseFloat(e.target.value);
+    document.getElementById('pulse-val').textContent = pulseIntensity.toFixed(1);
+  });
+
+  document.getElementById('river-slider').addEventListener('input', (e) => {
+    riverOpacity = parseFloat(e.target.value);
+    document.getElementById('river-val').textContent = Math.round(riverOpacity * 100) + '%';
+    scene.traverse(obj => {
+      if (obj.userData.isRiver && obj.material) {
+        obj.material.opacity = obj.material.color.r < 0.2 ? riverOpacity : riverOpacity * 0.4;
+      }
+    });
+  });
+
+  // Toggles
+  document.getElementById('scan-toggle').addEventListener('change', (e) => {
+    showScanLine = e.target.checked;
+    document.getElementById('scan-overlay').style.display = showScanLine ? 'block' : 'none';
+  });
+
+  document.getElementById('neighborhoods-toggle').addEventListener('change', (e) => {
+    showNeighborhoods = e.target.checked;
+    buildNeighborhoodLabels();
+  });
+
+  document.getElementById('ground-glow-toggle').addEventListener('change', (e) => {
+    showGroundGlow = e.target.checked;
+    buildHeatmap();
+  });
+
+  // View mode buttons
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      viewMode = btn.dataset.view;
+      buildHeatmap();
+    });
+  });
+}
+
+init();
+</script>
+</body>
+</html>
