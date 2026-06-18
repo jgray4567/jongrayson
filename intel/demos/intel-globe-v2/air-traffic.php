@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL & ~E_DEPRECATED);
 header('Content-Type: application/json');
 header('Cache-Control: no-store, max-age=0');
 header('Access-Control-Allow-Origin: *');
@@ -44,6 +45,49 @@ if ($cached && isset($cached['fetchedAt']) && isset($cached['cacheKey']) && $cac
     $emit($cached);
 }
 
+// Also check if we have an 'all' cache we can filter from
+$allCache = null;
+if ($cached && isset($cached['cacheKey']) && $cached['cacheKey'] === 'all') {
+    $allCache = $cached;
+} else {
+    // Try reading with 'all' key
+    $allCachePath = dirname(__DIR__) . '/data/air-traffic-cache.json';
+    if (file_exists($allCachePath)) {
+        $decoded = json_decode(file_get_contents($allCachePath), true);
+        if (is_array($decoded) && isset($decoded['cacheKey']) && $decoded['cacheKey'] === 'all') {
+            $allCache = $decoded;
+        }
+    }
+}
+if ($allCache && isset($allCache['fetchedAt']) && (time() - intval($allCache['fetchedAt'])) < $cacheTtl) {
+    // Filter the 'all' cache by requested regions
+    if (!$useAllRegions && isset($allCache['items'])) {
+        $filteredItems = [];
+        foreach ($allCache['items'] as $item) {
+            $lat = $item['lat']; $lng = $item['lng'];
+            foreach ($requestedRegions as $r) {
+                if (isset($regions[$r])) {
+                    $b = $regions[$r];
+                    if ($lat >= $b[0] && $lat <= $b[1] && $lng >= $b[2] && $lng <= $b[3]) {
+                        $filteredItems[] = $item;
+                        break;
+                    }
+                }
+            }
+        }
+        $filtered = $allCache;
+        $filtered['items'] = $filteredItems;
+        $filtered['count'] = count($filteredItems);
+        $filtered['cacheKey'] = $cacheKey;
+        $filtered['source'] = 'cache-filtered';
+        $emit($filtered);
+    }
+    // If requesting 'all' and cache is fresh, serve it
+    if ($useAllRegions) {
+        $emit($allCache);
+    }
+}
+
 $url = 'https://opensky-network.org/api/states/all';
 
 // Try cURL first (more reliable on shared hosting), fall back to file_get_contents
@@ -78,10 +122,28 @@ if ($raw === null) {
 
 if ($raw === false || $raw === '' || $raw === null) {
     // Rate limited or blocked — serve stale cache if available
-    if ($cached) {
-        $cached['stale'] = true;
-        $cached['source'] = 'cache';
-        $emit($cached);
+    if ($allCache && isset($allCache['items'])) {
+        if (!$useAllRegions) {
+            $filteredItems = [];
+            foreach ($allCache['items'] as $item) {
+                $lat = $item['lat']; $lng = $item['lng'];
+                foreach ($requestedRegions as $r) {
+                    if (isset($regions[$r])) {
+                        $b = $regions[$r];
+                        if ($lat >= $b[0] && $lat <= $b[1] && $lng >= $b[2] && $lng <= $b[3]) {
+                            $filteredItems[] = $item;
+                            break;
+                        }
+                    }
+                }
+            }
+            $allCache['items'] = $filteredItems;
+            $allCache['count'] = count($filteredItems);
+            $allCache['cacheKey'] = $cacheKey;
+        }
+        $allCache['stale'] = true;
+        $allCache['source'] = 'stale-cache';
+        $emit($allCache);
     }
     http_response_code(502);
     $emit(['error' => 'fetch_failed', 'http_code' => $httpCode, 'items' => []]);
