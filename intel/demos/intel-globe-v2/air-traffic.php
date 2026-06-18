@@ -54,8 +54,9 @@ foreach ($states as $s) {
     $callsign = trim($s[1] ?? '');
     $velocity = $s[9] ?? 0;
 
-    // Only airborne aircraft: altitude > 152m (500ft), moving > 25 m/s
-    if ($alt <= 152 || $velocity <= 25) continue;
+:    // Only airborne commercial flights at cruising altitude (> 3000m / ~10,000ft)
+    // This excludes climbing/descending aircraft and shows only established routes
+    if ($alt < 3000 || $velocity <= 25) continue;
 
     // Only commercial callsigns (3-letter IATA prefix + flight number)
     // This filters out private, military, and ground vehicles
@@ -73,10 +74,10 @@ foreach ($states as $s) {
     ];
 }
 
-// Cap at 2500 for performance
-if (count($items) > 2500) {
+// Cap at 500 for clean display
+if (count($items) > 500) {
     shuffle($items);
-    $items = array_slice($items, 0, 2500);
+    $items = array_slice($items, 0, 500);
 }
 
 $payload = [
