@@ -1134,31 +1134,58 @@ function updateDayNight() {
 //  COUNTRY BORDERS (simplified wireframe)
 // ═══════════════════════════════════════════════════════════════════
 
-function buildBorders() {
+async function buildBorders() {
   borderGroup = new THREE.Group();
-  // Simple latitude/longitude grid lines as border proxy
-  const lineMat = new THREE.LineBasicMaterial({
-    color: 0x00c2ff, transparent: true, opacity: 0.15,
-    blending: THREE.AdditiveBlending,
-  });
-  // Latitude lines
-  for (let lat = -60; lat <= 60; lat += 30) {
-    const pts = [];
-    for (let lng = -180; lng <= 180; lng += 5) {
-      pts.push(latLngTo3D(lat, lng, EARTH_RADIUS + 0.005));
-    }
-    borderGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
-  }
-  // Longitude lines
-  for (let lng = -180; lng < 180; lng += 30) {
-    const pts = [];
-    for (let lat = -85; lat <= 85; lat += 5) {
-      pts.push(latLngTo3D(lat, lng, EARTH_RADIUS + 0.005));
-    }
-    borderGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
-  }
   borderGroup.visible = false;
   scene.add(borderGroup);
+
+  try {
+    // Load simplified world country borders from GeoJSON
+    const res = await fetch('https://cdn.jsdelivr.net/gh/martynafford/geojson-country-bounds@master/countries-50m.geojson');
+    if (!res.ok) throw new Error('GeoJSON fetch failed: ' + res.status);
+    const geo = await res.json();
+
+    const lineMat = new THREE.LineBasicMaterial({
+      color: 0x00c2ff, transparent: true, opacity: 0.25,
+      blending: THREE.AdditiveBlending,
+    });
+
+    for (const feature of geo.features) {
+      const geom = feature.geometry;
+      if (!geom) continue;
+      const coords = geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates;
+      for (const polygon of coords) {
+        for (const ring of polygon) {
+          const pts = [];
+          for (const [lng, lat] of ring) {
+            pts.push(latLngTo3D(lat, lng, EARTH_RADIUS + 0.005));
+          }
+          if (pts.length >= 2) {
+            borderGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
+          }
+        }
+      }
+    }
+    document.getElementById('count-borders').textContent = 'ON';
+  } catch (err) {
+    console.error('Border GeoJSON load error:', err);
+    // Fallback: simple lat/lng grid
+    const lineMat = new THREE.LineBasicMaterial({
+      color: 0x00c2ff, transparent: true, opacity: 0.15,
+      blending: THREE.AdditiveBlending,
+    });
+    for (let lat = -60; lat <= 60; lat += 30) {
+      const pts = [];
+      for (let lng = -180; lng <= 180; lng += 5) pts.push(latLngTo3D(lat, lng, EARTH_RADIUS + 0.005));
+      borderGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
+    }
+    for (let lng = -180; lng < 180; lng += 30) {
+      const pts = [];
+      for (let lat = -85; lat <= 85; lat += 5) pts.push(latLngTo3D(lat, lng, EARTH_RADIUS + 0.005));
+      borderGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
+    }
+    document.getElementById('count-borders').textContent = 'GRID';
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
