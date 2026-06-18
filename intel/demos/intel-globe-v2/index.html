@@ -116,6 +116,17 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
+  /* ─── Collapsible Section ─── */
+  .collapsible-header {
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; user-select: none; transition: color 0.15s;
+  }
+  .collapsible-header:hover { color: #00c2ff; }
+  .collapse-arrow { font-size: 8px; transition: transform 0.25s ease; }
+  .collapsible-header.collapsed .collapse-arrow { transform: rotate(-90deg); }
+  .collapsible-body { overflow: hidden; transition: max-height 0.3s ease, opacity 0.2s ease; max-height: 500px; opacity: 1; }
+  .collapsible-body.collapsed { max-height: 0; opacity: 0; }
+
   /* ─── Flight Region Filters ─── */
   .flight-region-filters {
     margin: 6px 0 10px 26px; padding: 8px 10px;
@@ -526,25 +537,29 @@
     <div class="lt-count" id="count-satellites">OFF</div>
   </label>
 
-  <div class="layer-section-title">Globe Controls</div>
+  <div class="layer-section-title collapsible-header" id="globe-controls-header">
+    <span>Globe Controls</span>
+    <span class="collapse-arrow">▼</span>
+  </div>
+  <div class="collapsible-body" id="globe-controls-body">
+    <label class="layer-toggle">
+      <input type="checkbox" class="lt-checkbox" id="toggle-autorotate" checked>
+      <div class="lt-icon">⟳</div>
+      <div class="lt-info"><div class="lt-name">Auto-Rotate</div><div class="lt-desc">Idle globe spin</div></div>
+    </label>
 
-  <label class="layer-toggle">
-    <input type="checkbox" class="lt-checkbox" id="toggle-autorotate" checked>
-    <div class="lt-icon">⟳</div>
-    <div class="lt-info"><div class="lt-name">Auto-Rotate</div><div class="lt-desc">Idle globe spin</div></div>
-  </label>
+    <label class="layer-toggle">
+      <input type="checkbox" class="lt-checkbox" id="toggle-atmosphere" checked>
+      <div class="lt-icon">◌</div>
+      <div class="lt-info"><div class="lt-name">Atmosphere Glow</div><div class="lt-desc">Cyan rim lighting</div></div>
+    </label>
 
-  <label class="layer-toggle">
-    <input type="checkbox" class="lt-checkbox" id="toggle-atmosphere" checked>
-    <div class="lt-icon">◌</div>
-    <div class="lt-info"><div class="lt-name">Atmosphere Glow</div><div class="lt-desc">Cyan rim lighting</div></div>
-  </label>
-
-  <label class="layer-toggle">
-    <input type="checkbox" class="lt-checkbox" id="toggle-stars" checked>
-    <div class="lt-icon">✦</div>
-    <div class="lt-info"><div class="lt-name">Star Field</div><div class="lt-desc">Background stars</div></div>
-  </label>
+    <label class="layer-toggle">
+      <input type="checkbox" class="lt-checkbox" id="toggle-stars" checked>
+      <div class="lt-icon">✦</div>
+      <div class="lt-info"><div class="lt-name">Star Field</div><div class="lt-desc">Background stars</div></div>
+    </label>
+  </div>
 </div>
 
 <!-- Right Sidebar — Region Presets -->
@@ -1364,6 +1379,21 @@ function setupUI() {
   document.querySelectorAll('.fr-toggle input').forEach(cb => {
     cb.addEventListener('change', () => fetchRealFlights());
   });
+
+  // Collapsible Globe Controls — toggle open/close
+  const gcHeader = document.getElementById('globe-controls-header');
+  const gcBody = document.getElementById('globe-controls-body');
+  if (gcHeader && gcBody) {
+    // Starts open, auto-closes after load completes (3s after init)
+    setTimeout(() => {
+      gcHeader.classList.add('collapsed');
+      gcBody.classList.add('collapsed');
+    }, 3000);
+    gcHeader.addEventListener('click', () => {
+      gcHeader.classList.toggle('collapsed');
+      gcBody.classList.toggle('collapsed');
+    });
+  }
 
   // Alerts
   renderAlerts();
