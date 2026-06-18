@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intel Layer — Global Situation Awareness</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #06070a; color: #e8eaed; font-family: 'Inter','Segoe UI',sans-serif; overflow: hidden; }
+
+  #scene-container { position: absolute; inset: 0; }
+
+  /* ─── Glassmorphic Panel Base ─── */
+  .glass {
+    background: rgba(6,7,10,0.88);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid rgba(0,194,255,0.10);
+    border-radius: 14px;
+  }
+
+  /* ─── Top Bar ─── */
+  #top-bar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    height: 56px; display: flex; align-items: center;
+    padding: 0 20px; gap: 24px;
+    background: linear-gradient(180deg, rgba(6,7,10,0.95) 0%, rgba(6,7,10,0.6) 80%, transparent 100%);
+    border-bottom: 1px solid rgba(0,194,255,0.06);
+  }
+  #top-bar .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; font-weight: 600; color: #00c2ff;
+    letter-spacing: 1.5px; white-space: nowrap;
+  }
+  #top-bar .title .sep { color: #334; margin: 0 8px; }
+  #top-bar .title .sub { color: #556; font-weight: 400; font-size: 12px; }
+  #top-bar .spacer { flex: 1; }
+  #top-bar .stat-strip {
+    display: flex; gap: 18px; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #top-bar .stat-strip .si { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+  #top-bar .stat-strip .si .dot { width: 6px; height: 6px; border-radius: 50%; }
+  #top-bar .stat-strip .si .val { color: #00c2ff; font-weight: 600; }
+  #top-bar .stat-strip .si .lbl { color: #556; }
+  #top-bar .utc-clock {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; color: #e8eaed; letter-spacing: 1px;
+    padding: 4px 12px; border-radius: 8px;
+    background: rgba(0,194,255,0.06); border: 1px solid rgba(0,194,255,0.12);
+  }
+  #top-bar .utc-clock .label { font-size: 9px; color: #445; margin-right: 6px; }
+
+  /* ─── Left Sidebar — Layers ─── */
+  #layers-panel {
+    position: absolute; top: 72px; left: 16px; z-index: 10;
+    width: 260px; max-height: calc(100vh - 180px);
+    overflow-y: auto; scrollbar-width: thin; scrollbar-color: #1a2233 transparent;
+    padding: 16px 18px;
+  }
+  #layers-panel::-webkit-scrollbar { width: 4px; }
+  #layers-panel::-webkit-scrollbar-track { background: transparent; }
+  #layers-panel::-webkit-scrollbar-thumb { background: #1a2233; border-radius: 2px; }
+  #layers-panel h2 {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+    color: #00c2ff; text-transform: uppercase; margin-bottom: 12px;
+    padding-bottom: 10px; border-bottom: 1px solid rgba(0,194,255,0.12);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .layer-toggle {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; cursor: pointer; user-select: none;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    transition: all 0.15s;
+  }
+  .layer-toggle:last-child { border-bottom: none; }
+  .layer-toggle:hover { padding-left: 4px; }
+  .layer-toggle .lt-checkbox {
+    appearance: none; width: 16px; height: 16px; border-radius: 4px;
+    border: 2px solid rgba(0,194,255,0.3); cursor: pointer; position: relative;
+    transition: all 0.15s ease; flex-shrink: 0;
+  }
+  .layer-toggle .lt-checkbox:checked {
+    background: #00c2ff; border-color: #00c2ff;
+  }
+  .layer-toggle .lt-checkbox:checked::after {
+    content: '✓'; position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 10px; color: #06070a; font-weight: 700;
+  }
+  .layer-toggle .lt-icon {
+    width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; opacity: 0.6;
+  }
+  .layer-toggle .lt-checkbox:checked ~ .lt-icon { opacity: 1; }
+  .layer-toggle .lt-info { flex: 1; min-width: 0; }
+  .layer-toggle .lt-name {
+    font-size: 12px; color: #ccd; font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .layer-toggle .lt-desc {
+    font-size: 9px; color: #556; margin-top: 1px;
+    font-family: 'JetBrains Mono', monospace; letter-spacing: 0.3px;
+  }
+  .layer-toggle .lt-count {
+    font-size: 10px; color: #00c2ff; font-weight: 600;
+    font-family: 'JetBrains Mono', monospace; flex-shrink: 0;
+  }
+  .layer-toggle .lt-checkbox:checked ~ .lt-info .lt-name { color: #e8eaed; }
+
+  .layer-section-title {
+    font-size: 9px; font-weight: 700; letter-spacing: 1.2px;
+    color: #445; text-transform: uppercase; margin: 14px 0 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ─── Right Sidebar — Region Presets ─── */
+  #regions-panel {
+    position: absolute; top: 72px; right: 16px; z-index: 10;
+    width: 220px; padding: 16px 18px;
+  }
+  #regions-panel h2 {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+    color: #00c2ff; text-transform: uppercase; margin-bottom: 12px;
+    padding-bottom: 10px; border-bottom: 1px solid rgba(0,194,255,0.12);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .region-btn {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 10px 12px; margin-bottom: 6px;
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px; cursor: pointer; transition: all 0.2s;
+    color: #99a; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; text-align: left;
+  }
+  .region-btn:hover {
+    background: rgba(0,194,255,0.06); border-color: rgba(0,194,255,0.2);
+    color: #e8eaed; transform: translateX(-2px);
+  }
+  .region-btn .rb-icon { font-size: 14px; opacity: 0.7; }
+  .region-btn .rb-coords { font-size: 8px; color: #334; margin-top: 2px; }
+
+  /* ─── Bottom Panel — Alerts ─── */
+  #alerts-panel {
+    position: absolute; bottom: 40px; left: 16px; z-index: 10;
+    width: 400px; max-height: 280px; padding: 14px 16px;
+    display: flex; flex-direction: column;
+  }
+  #alerts-panel .ap-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px; padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,194,255,0.10);
+  }
+  #alerts-panel .ap-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+    color: #00c2ff; text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #alerts-panel .ap-actions { display: flex; gap: 6px; }
+  #alerts-panel .ap-btn {
+    padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(0,194,255,0.15);
+    background: rgba(0,194,255,0.05); color: #00c2ff; cursor: pointer;
+    font-size: 10px; font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px; transition: all 0.2s;
+  }
+  #alerts-panel .ap-btn:hover { background: rgba(0,194,255,0.12); }
+  #alerts-panel .ap-list {
+    flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #1a2233 transparent;
+  }
+  #alerts-panel .ap-list::-webkit-scrollbar { width: 3px; }
+  #alerts-panel .ap-list::-webkit-scrollbar-thumb { background: #1a2233; border-radius: 2px; }
+  .alert-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.02);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .alert-item .ai-sev {
+    width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0;
+  }
+  .alert-item .ai-time { font-size: 9px; color: #445; white-space: nowrap; }
+  .alert-item .ai-text { font-size: 10px; color: #99a; flex: 1; line-height: 1.4; }
+  .alert-item .ai-loc { font-size: 9px; color: #00c2ff; }
+
+  /* ─── AI Summary Modal ─── */
+  #ai-summary {
+    position: absolute; bottom: 40px; left: 432px; z-index: 11;
+    width: 360px; padding: 16px 18px; display: none;
+  }
+  #ai-summary.active { display: block; }
+  #ai-summary .as-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px; padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,194,255,0.10);
+  }
+  #ai-summary .as-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 1px;
+    color: #00c2ff; text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #ai-summary .as-close {
+    cursor: pointer; color: #556; font-size: 14px; padding: 2px 6px;
+    border-radius: 4px; transition: all 0.15s;
+  }
+  #ai-summary .as-close:hover { color: #e8eaed; background: rgba(255,255,255,0.05); }
+  #ai-summary .as-body {
+    font-size: 11px; color: #99a; line-height: 1.6;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #ai-summary .as-body .highlight { color: #00c2ff; }
+  #ai-summary .as-body .danger { color: #ff2244; }
+  #ai-summary .as-body .warn { color: #ffaa22; }
+  #ai-summary .as-body .meta {
+    font-size: 9px; color: #334; margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  /* ─── Ticker ─── */
+  #ticker {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
+    height: 32px; display: flex; align-items: center;
+    background: rgba(6,7,10,0.92); backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(0,194,255,0.08);
+    overflow: hidden; font-family: 'JetBrains Mono', monospace;
+  }
+  #ticker .ticker-label {
+    flex-shrink: 0; padding: 0 14px; font-size: 10px; color: #00c2ff;
+    letter-spacing: 1px; font-weight: 600; border-right: 1px solid rgba(0,194,255,0.12);
+    height: 100%; display: flex; align-items: center;
+  }
+  #ticker .ticker-track {
+    flex: 1; overflow: hidden; position: relative; height: 100%;
+  }
+  #ticker .ticker-content {
+    position: absolute; white-space: nowrap; display: flex; align-items: center;
+    height: 100%; font-size: 11px; color: #778;
+    animation: tickerScroll 60s linear infinite;
+  }
+  #ticker .ticker-content .tc-item { padding: 0 24px; }
+  #ticker .ticker-content .tc-item .tc-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 8px; }
+  #ticker .ticker-content .tc-item .tc-time { color: #334; margin-right: 8px; }
+  #ticker .ticker-content .tc-item .tc-text { color: #99a; }
+  @keyframes tickerScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ─── Tooltip ─── */
+  #tooltip {
+    position: absolute; z-index: 20; pointer-events: none;
+    background: rgba(6,7,10,0.96); backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,194,255,0.15); border-radius: 8px;
+    padding: 10px 14px; display: none; min-width: 160px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #tooltip .tip-title { font-size: 12px; color: #00c2ff; font-weight: 600; margin-bottom: 4px; }
+  #tooltip .tip-row { display: flex; justify-content: space-between; font-size: 10px; color: #778; padding: 1px 0; }
+  #tooltip .tip-row .tip-val { color: #e8eaed; font-weight: 500; }
+
+  /* ─── Scan Line ─── */
+  #scan-overlay {
+    position: absolute; inset: 0; z-index: 5; pointer-events: none; overflow: hidden;
+  }
+  .scan-line {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0,194,255,0.15), transparent);
+    animation: scanDown 8s linear infinite;
+  }
+  @keyframes scanDown {
+    0% { top: -2px; opacity: 0; }
+    5% { opacity: 0.6; }
+    95% { opacity: 0.6; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* ─── Loading ─── */
+  #loading {
+    position: absolute; inset: 0; z-index: 100;
+    background: #06070a; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #loading .loader-text { font-size: 13px; color: #00c2ff; letter-spacing: 2px; }
+  #loading .loader-sub { font-size: 10px; color: #445; margin-top: 8px; }
+  .loader-bar { width: 220px; height: 2px; background: #111; margin-top: 16px; border-radius: 1px; overflow: hidden; }
+  .loader-bar-fill { height: 100%; background: #00c2ff; width: 0%; transition: width 0.3s; border-radius: 1px; }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 1100px) {
+    #layers-panel { width: 220px; }
+    #regions-panel { width: 190px; }
+    #alerts-panel { width: 340px; }
+    #ai-summary { left: 372px; width: 320px; }
+  }
+  @media (max-width: 850px) {
+    #layers-panel { width: 180px; padding: 12px 14px; }
+    #regions-panel { width: 160px; padding: 12px 14px; }
+    #alerts-panel { width: 280px; max-height: 200px; }
+    #ai-summary { left: 308px; width: 280px; }
+    #top-bar .stat-strip { display: none; }
+  }
+  @media (max-width: 640px) {
+    #regions-panel { display: none; }
+    #alerts-panel { width: calc(100vw - 32px); max-height: 160px; }
+    #ai-summary { left: 16px; width: calc(100vw - 32px); bottom: 200px; }
+    #layers-panel { width: 160px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading">
+  <div class="loader-text">INITIALIZING INTEL LAYER</div>
+  <div class="loader-bar"><div class="loader-bar-fill" id="load-progress"></div></div>
+  <div class="loader-sub" id="load-status">Booting globe subsystems...</div>
+</div>
+
+<!-- 3D Scene -->
+<div id="scene-container"></div>
+<div id="scan-overlay"><div class="scan-line"></div></div>
+
+<!-- Top Bar -->
+<div id="top-bar">
+  <div class="title">INTEL LAYER<span class="sep">—</span><span class="sub">GLOBAL SITUATION AWARENESS</span></div>
+  <div class="spacer"></div>
+  <div class="stat-strip">
+    <div class="si"><div class="dot" style="background:#00c2ff;box-shadow:0 0 6px #00c2ff;"></div><span class="val" id="stat-flights">0</span><span class="lbl">FLIGHTS</span></div>
+    <div class="si"><div class="dot" style="background:#22dd88;box-shadow:0 0 6px #22dd88;"></div><span class="val" id="stat-cities">50</span><span class="lbl">CITIES</span></div>
+    <div class="si"><div class="dot" style="background:#ff2244;box-shadow:0 0 6px #ff2244;"></div><span class="val" id="stat-hotspots">10</span><span class="lbl">HOTSPOTS</span></div>
+    <div class="si"><div class="dot" style="background:#ffaa22;box-shadow:0 0 6px #ffaa22;"></div><span class="val" id="stat-alerts">0</span><span class="lbl">ALERTS</span></div>
+  </div>
+  <div class="utc-clock"><span class="label">UTC</span><span id="utc-time">--:--:--</span></div>
+</div>
+
+<!-- Left Sidebar — Layers -->
+<div id="layers-panel" class="glass">
+  <h2>Intel Layers</h2>
+
+  <div class="layer-section-title">Active Overlays</div>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="layer-flights" checked>
+    <div class="lt-icon">✈</div>
+    <div class="lt-info"><div class="lt-name">Flight Traffic</div><div class="lt-desc">Great-circle air routes</div></div>
+    <div class="lt-count" id="count-flights">0</div>
+  </label>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="layer-daynight" checked>
+    <div class="lt-icon">◐</div>
+    <div class="lt-info"><div class="lt-name">Day/Night Terminator</div><div class="lt-desc">Solar shadow + city lights</div></div>
+    <div class="lt-count" id="count-daynight">LIVE</div>
+  </label>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="layer-borders">
+    <div class="lt-icon">⬡</div>
+    <div class="lt-info"><div class="lt-name">Country Borders</div><div class="lt-desc">Wireframe overlay</div></div>
+    <div class="lt-count" id="count-borders">OFF</div>
+  </label>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="layer-cities" checked>
+    <div class="lt-icon">◉</div>
+    <div class="lt-info"><div class="lt-name">City Markers</div><div class="lt-desc">50 major cities</div></div>
+    <div class="lt-count" id="count-cities">50</div>
+  </label>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="layer-hotspots" checked>
+    <div class="lt-icon">⚠</div>
+    <div class="lt-info"><div class="lt-name">Hotspots</div><div class="lt-desc">Active conflict zones</div></div>
+    <div class="lt-count" id="count-hotspots">10</div>
+  </label>
+
+  <div class="layer-section-title">Globe Controls</div>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="toggle-autorotate" checked>
+    <div class="lt-icon">⟳</div>
+    <div class="lt-info"><div class="lt-name">Auto-Rotate</div><div class="lt-desc">Idle globe spin</div></div>
+  </label>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="toggle-atmosphere" checked>
+    <div class="lt-icon">◌</div>
+    <div class="lt-info"><div class="lt-name">Atmosphere Glow</div><div class="lt-desc">Cyan rim lighting</div></div>
+  </label>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="toggle-stars" checked>
+    <div class="lt-icon">✦</div>
+    <div class="lt-info"><div class="lt-name">Star Field</div><div class="lt-desc">Background stars</div></div>
+  </label>
+</div>
+
+<!-- Right Sidebar — Region Presets -->
+<div id="regions-panel" class="glass">
+  <h2>Region Presets</h2>
+  <button class="region-btn" data-lat="48.38" data-lng="32.0" data-name="Ukraine">
+    <span class="rb-icon">📍</span>
+    <div><div>Ukraine</div><div class="rb-coords">48.4°N 32.0°E</div></div>
+  </button>
+  <button class="region-btn" data-lat="31.35" data-lng="34.31" data-name="Middle East">
+    <span class="rb-icon">📍</span>
+    <div><div>Middle East</div><div class="rb-coords">31.4°N 34.3°E</div></div>
+  </button>
+  <button class="region-btn" data-lat="12.0" data-lng="114.0" data-name="South China Sea">
+    <span class="rb-icon">📍</span>
+    <div><div>South China Sea</div><div class="rb-coords">12.0°N 114.0°E</div></div>
+  </button>
+  <button class="region-btn" data-lat="39.0" data-lng="-74.5" data-name="US East Coast">
+    <span class="rb-icon">📍</span>
+    <div><div>US East Coast</div><div class="rb-coords">39.0°N 74.5°W</div></div>
+  </button>
+  <button class="region-btn" data-lat="50.0" data-lng="10.0" data-name="Europe">
+    <span class="rb-icon">📍</span>
+    <div><div>Europe</div><div class="rb-coords">50.0°N 10.0°E</div></div>
+  </button>
+  <button class="region-btn" data-lat="0.0" data-lng="20.0" data-name="Africa">
+    <span class="rb-icon">📍</span>
+    <div><div>Africa</div><div class="rb-coords">0.0° 20.0°E</div></div>
+  </button>
+</div>
+
+<!-- Bottom Panel — Alerts -->
+<div id="alerts-panel" class="glass">
+  <div class="ap-header">
+    <div class="ap-title">Live Alerts Feed</div>
+    <div class="ap-actions">
+      <button class="ap-btn" id="btn-ai-summary">GLM-5.2 SUMMARY</button>
+    </div>
+  </div>
+  <div class="ap-list" id="alerts-list"></div>
+</div>
+
+<!-- AI Summary -->
+<div id="ai-summary" class="glass">
+  <div class="as-header">
+    <div class="as-title">GLM-5.2 Intelligence Analysis</div>
+    <div class="as-close" id="ai-close">✕</div>
+  </div>
+  <div class="as-body" id="ai-body"></div>
+</div>
+
+<!-- Ticker -->
+<div id="ticker">
+  <div class="ticker-label">◢ LIVE FEED</div>
+  <div class="ticker-track"><div class="ticker-content" id="ticker-content"></div></div>
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip">
+  <div class="tip-title" id="tip-title">City</div>
+  <div class="tip-row"><span>Population</span><span class="tip-val" id="tip-pop">—</span></div>
+  <div class="tip-row"><span>Country</span><span class="tip-val" id="tip-country">—</span></div>
+  <div class="tip-row"><span>Coordinates</span><span class="tip-val" id="tip-coords">—</span></div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ═══════════════════════════════════════════════════════════════════
+//  CONSTANTS & DATA
+// ═══════════════════════════════════════════════════════════════════
+
+const EARTH_RADIUS = 5;
+const DEG2RAD = Math.PI / 180;
+
+// ─── Cities (50) ───
+const CITIES = [
+  {name:'New York',lat:40.71,lng:-74.00,pop:8336817,country:'USA'},
+  {name:'London',lat:51.51,lng:-0.13,pop:8982000,country:'UK'},
+  {name:'Tokyo',lat:35.68,lng:139.69,pop:13960000,country:'Japan'},
+  {name:'Paris',lat:48.86,lng:2.35,pop:2161000,country:'France'},
+  {name:'Moscow',lat:55.76,lng:37.62,pop:12506000,country:'Russia'},
+  {name:'Beijing',lat:39.90,lng:116.40,pop:21540000,country:'China'},
+  {name:'Shanghai',lat:31.23,lng:121.47,pop:24870000,country:'China'},
+  {name:'Mumbai',lat:19.08,lng:72.88,pop:20410000,country:'India'},
+  {name:'Sydney',lat:-33.87,lng:151.21,pop:5312000,country:'Australia'},
+  {name:'Singapore',lat:1.35,lng:103.82,pop:5704000,country:'Singapore'},
+  {name:'Los Angeles',lat:34.05,lng:-118.24,pop:3979000,country:'USA'},
+  {name:'Berlin',lat:52.52,lng:13.40,pop:3669000,country:'Germany'},
+  {name:'Rome',lat:41.90,lng:12.50,pop:2873000,country:'Italy'},
+  {name:'Madrid',lat:40.42,lng:-3.70,pop:3223000,country:'Spain'},
+  {name:'Toronto',lat:43.65,lng:-79.38,pop:2963000,country:'Canada'},
+  {name:'Mexico City',lat:19.43,lng:-99.13,pop:9209000,country:'Mexico'},
+  {name:'Sao Paulo',lat:-23.55,lng:-46.63,pop:12320000,country:'Brazil'},
+  {name:'Buenos Aires',lat:-34.60,lng:-58.38,pop:3075000,country:'Argentina'},
+  {name:'Cairo',lat:30.04,lng:31.24,pop:9540000,country:'Egypt'},
+  {name:'Lagos',lat:6.52,lng:3.38,pop:14862000,country:'Nigeria'},
+  {name:'Johannesburg',lat:-26.20,lng:28.05,pop:5635000,country:'S.Africa'},
+  {name:'Nairobi',lat:-1.29,lng:36.82,pop:4397000,country:'Kenya'},
+  {name:'Istanbul',lat:41.01,lng:28.98,pop:15460000,country:'Turkey'},
+  {name:'Dubai',lat:25.20,lng:55.27,pop:3331000,country:'UAE'},
+  {name:'Riyadh',lat:24.71,lng:46.68,pop:7676000,country:'S.Arabia'},
+  {name:'Tehran',lat:35.69,lng:51.39,pop:9134000,country:'Iran'},
+  {name:'Baghdad',lat:33.31,lng:44.36,pop:7510000,country:'Iraq'},
+  {name:'Jerusalem',lat:31.78,lng:35.22,pop:9360000,country:'Israel'},
+  {name:'Karachi',lat:24.86,lng:67.01,pop:16459000,country:'Pakistan'},
+  {name:'Delhi',lat:28.61,lng:77.21,pop:32941000,country:'India'},
+  {name:'Bangkok',lat:13.76,lng:100.50,pop:10539000,country:'Thailand'},
+  {name:'Hanoi',lat:21.03,lng:105.85,pop:8057000,country:'Vietnam'},
+  {name:'Manila',lat:14.60,lng:120.98,pop:13923000,country:'Philippines'},
+  {name:'Jakarta',lat:-6.21,lng:106.85,pop:10770000,country:'Indonesia'},
+  {name:'Seoul',lat:37.57,lng:126.98,pop:9776000,country:'S.Korea'},
+  {name:'Hong Kong',lat:22.32,lng:114.17,pop:7482000,country:'China'},
+  {name:'Taipei',lat:25.03,lng:121.57,pop:2695000,country:'Taiwan'},
+  {name:'Honolulu',lat:21.31,lng:-157.86,pop:350000,country:'USA'},
+  {name:'San Francisco',lat:37.77,lng:-122.42,pop:881549,country:'USA'},
+  {name:'Chicago',lat:41.88,lng:-87.63,pop:2716000,country:'USA'},
+  {name:'Houston',lat:29.76,lng:-95.37,pop:2320000,country:'USA'},
+  {name:'Miami',lat:25.76,lng:-80.19,pop:471000,country:'USA'},
+  {name:'Vancouver',lat:49.28,lng:-123.12,pop:675000,country:'Canada'},
+  {name:'Stockholm',lat:59.33,lng:18.07,pop:975000,country:'Sweden'},
+  {name:'Amsterdam',lat:52.37,lng:4.90,pop:872000,country:'Netherlands'},
+  {name:'Vienna',lat:48.21,lng:16.37,pop:1910000,country:'Austria'},
+  {name:'Athens',lat:37.98,lng:23.73,pop:3154000,country:'Greece'},
+  {name:'Lisbon',lat:38.72,lng:-9.13,pop:505000,country:'Portugal'},
+  {name:'Dublin',lat:53.35,lng:-6.26,pop:1395000,country:'Ireland'},
+];
+
+// ─── Airports (30 hubs) ───
+const AIRPORTS = [
+  {iata:'JFK',lat:40.64,lng:-73.78}, {iata:'LHR',lat:51.47,lng:-0.45},
+  {iata:'HND',lat:35.55,lng:139.78}, {iata:'DXB',lat:25.25,lng:55.36},
+  {iata:'LAX',lat:33.94,lng:-118.41}, {iata:'CDG',lat:49.00,lng:2.55},
+  {iata:'AMS',lat:52.31,lng:4.76}, {iata:'FRA',lat:50.04,lng:8.56},
+  {iata:'SIN',lat:1.36,lng:103.99}, {iata:'ICN',lat:37.46,lng:126.44},
+  {iata:'SYD',lat:-33.95,lng:151.18}, {iata:'GRU',lat:-23.43,lng:-46.47},
+  {iata:'HKG',lat:22.31,lng:113.91}, {iata:'PEK',lat:40.08,lng:116.58},
+  {iata:'DEL',lat:28.56,lng:77.10}, {iata:'BOM',lat:19.09,lng:72.87},
+  {iata:'IST',lat:41.27,lng:28.75}, {iata:'DOH',lat:25.27,lng:51.61},
+  {iata:'MUC',lat:48.35,lng:11.79}, {iata:'KIX',lat:34.43,lng:135.24},
+  {iata:'CAN',lat:23.39,lng:113.30}, {iata:'MEL',lat:-37.67,lng:144.84},
+  {iata:'JNB',lat:-26.13,lng:28.24}, {iata:'NBO',lat:-1.32,lng:36.92},
+  {iata:'EZE',lat:-34.82,lng:-58.54}, {iata:'YYZ',lat:43.68,lng:-79.61},
+  {iata:'MEX',lat:19.44,lng:-99.07}, {iata:'CPH',lat:55.62,lng:12.65},
+  {iata:'ZRH',lat:47.46,lng:8.54}, {iata:'VIE',lat:48.11,lng:16.57},
+];
+
+// ─── Hotspots ───
+const HOTSPOTS = [
+  {lat:48.38,lng:32.0,name:'Eastern Ukraine Conflict',sev:3},
+  {lat:31.35,lng:34.31,name:'Israel-Gaza Conflict',sev:3},
+  {lat:15.0,lng:41.0,name:'Houthi Maritime Threat',sev:2},
+  {lat:24.5,lng:120.5,name:'Taiwan Strait Tension',sev:2},
+  {lat:12.0,lng:114.0,name:'SCS Territorial Dispute',sev:2},
+  {lat:35.0,lng:38.0,name:'Syrian Civil Conflict',sev:2},
+  {lat:14.0,lng:2.0,name:'Sahel Instability',sev:1},
+  {lat:8.0,lng:-66.0,name:'Venezuela Crisis',sev:1},
+  {lat:18.97,lng:-72.29,name:'Haiti Security Crisis',sev:2},
+  {lat:15.0,lng:30.0,name:'Sudan Civil War',sev:3},
+];
+
+// ─── Alerts ───
+const ALERTS = [
+  {time:'11:42 UTC',sev:3,text:'Artillery exchanges reported along eastern front line',loc:'Ukraine'},
+  {time:'11:38 UTC',sev:3,text:'Airstrikes target infrastructure in Khan Younis',loc:'Gaza'},
+  {time:'11:35 UTC',sev:3,text:'RSF forces advance on El Fasher, humanitarian crisis deepening',loc:'Sudan'},
+  {time:'11:30 UTC',sev:2,text:'Merchant vessel reports drone sighting near Bab-el-Mandeb',loc:'Red Sea'},
+  {time:'11:22 UTC',sev:2,text:'PLA Navy exercises observed near median line',loc:'Taiwan Strait'},
+  {time:'11:15 UTC',sev:2,text:'Gang violence escalates in Port-au-Prince, evacuation advised',loc:'Haiti'},
+  {time:'11:08 UTC',sev:2,text:'Syrian regime artillery fires on Idlib province',loc:'Syria'},
+  {time:'10:55 UTC',sev:1,text:'Coup leaders delay elections to 2027',loc:'Sahel'},
+  {time:'10:42 UTC',sev:1,text:'Hyperinflation reaches 450%, mass migration continues',loc:'Venezuela'},
+  {time:'10:30 UTC',sev:3,text:'5.2 magnitude earthquake strikes southern Japan',loc:'Japan'},
+  {time:'10:18 UTC',sev:2,text:'Critical CVE-2026-4419 patch released, active exploitation detected',loc:'Global'},
+  {time:'10:05 UTC',sev:2,text:'Oil prices surge 3.2% on supply disruption fears',loc:'Global Markets'},
+];
+
+// ─── Ticker items ───
+const TICKER = [
+  {dot:'#ff2244',time:'11:42',text:'Ukraine: Artillery exchanges along eastern front'},
+  {dot:'#ff2244',time:'11:38',text:'Gaza: Airstrikes target Khan Younis infrastructure'},
+  {dot:'#ff2244',time:'11:35',text:'Sudan: RSF advances on El Fasher'},
+  {dot:'#ffaa22',time:'11:30',text:'Red Sea: Drone sighting near Bab-el-Mandeb'},
+  {dot:'#ffaa22',time:'11:22',text:'Taiwan Strait: PLA Navy exercises near median line'},
+  {dot:'#ffaa22',time:'11:15',text:'Haiti: Gang violence escalates in Port-au-Prince'},
+  {dot:'#22dd88',time:'10:55',text:'CVE-2026-4419: Critical patch released'},
+  {dot:'#00c2ff',time:'10:42',text:'Markets: Oil +3.2%, Defense sector +1.1%'},
+];
+
+// ═══════════════════════════════════════════════════════════════════
+//  THREE.JS SCENE SETUP
+// ═══════════════════════════════════════════════════════════════════
+
+let scene, camera, renderer, controls;
+let earth, atmosphere, starField;
+let flightGroup, cityGroup, hotspotGroup, borderGroup, nightGroup, dayNightMesh;
+let raycaster, mouse;
+let hoveredCity = null;
+let flightPaths = [];
+
+const layers = {
+  flights: true, daynight: true, borders: false,
+  cities: true, hotspots: true,
+  autorotate: true, atmosphere: true, stars: true
+};
+
+function latLngTo3D(lat, lng, r) {
+  const phi = (90 - lat) * DEG2RAD;
+  const theta = (lng + 180) * DEG2RAD;
+  return new THREE.Vector3(
+    -r * Math.sin(phi) * Math.cos(theta),
+    r * Math.cos(phi),
+    r * Math.sin(phi) * Math.sin(theta)
+  );
+}
+
+function setLoadProgress(pct, msg) {
+  document.getElementById('load-progress').style.width = pct + '%';
+  if (msg) document.getElementById('load-status').textContent = msg;
+}
+
+function init() {
+  setLoadProgress(10, 'Creating scene...');
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color('#06070a');
+
+  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 3, 14);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+  document.getElementById('scene-container').appendChild(renderer.domElement);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+  controls.minDistance = 6;
+  controls.maxDistance = 30;
+  controls.rotateSpeed = 0.5;
+  controls.enablePan = false;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.3;
+
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2(-999, -999);
+
+  // ─── Lighting ───
+  const ambient = new THREE.AmbientLight('#222233', 0.6);
+  scene.add(ambient);
+  const sun = new THREE.DirectionalLight('#ffffff', 1.8);
+  const sunDir = getSunDirection();
+  sun.position.copy(sunDir.clone().multiplyScalar(20));
+  sun.name = 'sunLight';
+  scene.add(sun);
+  const fill = new THREE.DirectionalLight('#0044cc', 0.3);
+  fill.position.set(-30, 10, -20);
+  scene.add(fill);
+
+  setLoadProgress(25, 'Building Earth...');
+  buildEarth();
+  setLoadProgress(45, 'Adding atmosphere...');
+  buildAtmosphere();
+  setLoadProgress(55, 'Generating star field...');
+  buildStars();
+  setLoadProgress(65, 'Plotting flight routes...');
+  buildFlights();
+  setLoadProgress(75, 'Placing city markers...');
+  buildCities();
+  setLoadProgress(82, 'Marking hotspots...');
+  buildHotspots();
+  setLoadProgress(88, 'Calculating day/night...');
+  buildDayNight();
+  setLoadProgress(94, 'Finalizing...');
+  buildBorders();
+  setupUI();
+
+  setLoadProgress(100, 'Ready');
+  setTimeout(() => {
+    const l = document.getElementById('loading');
+    l.style.opacity = '0'; l.style.transition = 'opacity 0.6s';
+    setTimeout(() => l.style.display = 'none', 600);
+  }, 300);
+
+  animate();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  EARTH (procedural texture)
+// ═══════════════════════════════════════════════════════════════════
+
+function buildEarth() {
+  // Create procedural Earth texture with canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = 2048; canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+
+  // Ocean base
+  const oceanGrad = ctx.createLinearGradient(0, 0, 0, 1024);
+  oceanGrad.addColorStop(0, '#0a1a2a');
+  oceanGrad.addColorStop(0.5, '#0d2540');
+  oceanGrad.addColorStop(1, '#0a1a2a');
+  ctx.fillStyle = oceanGrad;
+  ctx.fillRect(0, 0, 2048, 1024);
+
+  // Simplified continents (noise-based blobs)
+  const continents = [
+    // North America
+    {x:300,y:250,w:350,h:200}, {x:280,y:180,w:200,h:100},
+    // South America
+    {x:450,y:550,w:180,h:250},
+    // Europe
+    {x:950,y:250,w:200,h:120},
+    // Africa
+    {x:980,y:400,w:200,h:280},
+    // Asia
+    {x:1200,y:200,w:400,h:250}, {x:1300,y:350,w:200,h:150},
+    // Australia
+    {x:1550,y:600,w:200,h:120},
+    // Greenland
+    {x:600,y:100,w:150,h:100},
+    // Antarctica strip
+    {x:0,y:920,w:2048,h:104},
+  ];
+
+  const landGrad = ctx.createLinearGradient(0, 0, 0, 1024);
+  landGrad.addColorStop(0, '#1a2a1a');
+  landGrad.addColorStop(0.3, '#2a3a1a');
+  landGrad.addColorStop(0.5, '#1a3a0a');
+  landGrad.addColorStop(0.7, '#3a3a1a');
+  landGrad.addColorStop(1, '#0a1a0a');
+
+  for (const c of continents) {
+    ctx.fillStyle = landGrad;
+    ctx.beginPath();
+    ctx.ellipse(c.x + c.w/2, c.y + c.h/2, c.w/2, c.h/2, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Add irregular edges with noise
+    for (let i = 0; i < 30; i++) {
+      const px = c.x + Math.random()*c.w;
+      const py = c.y + Math.random()*c.h;
+      const pr = 5 + Math.random()*25;
+      ctx.fillStyle = `rgba(${20+Math.random()*40},${30+Math.random()*40},${10+Math.random()*20},0.5)`;
+      ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // Add some noise texture
+  const imgData = ctx.getImageData(0, 0, 2048, 1024);
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const n = (Math.random() - 0.5) * 15;
+    imgData.data[i] = Math.max(0, Math.min(255, imgData.data[i] + n));
+    imgData.data[i+1] = Math.max(0, Math.min(255, imgData.data[i+1] + n));
+    imgData.data[i+2] = Math.max(0, Math.min(255, imgData.data[i+2] + n));
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  const earthTex = new THREE.CanvasTexture(canvas);
+  earthTex.colorSpace = THREE.SRGBColorSpace;
+
+  const earthGeo = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
+  const earthMat = new THREE.MeshStandardMaterial({
+    map: earthTex, roughness: 0.85, metalness: 0.1,
+    emissive: new THREE.Color('#0a1a2a'), emissiveIntensity: 0.08,
+  });
+  earth = new THREE.Mesh(earthGeo, earthMat);
+  earth.castShadow = false;
+  earth.receiveShadow = false;
+  scene.add(earth);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ATMOSPHERE GLOW
+// ═══════════════════════════════════════════════════════════════════
+
+function buildAtmosphere() {
+  const atmGeo = new THREE.SphereGeometry(EARTH_RADIUS * 1.08, 64, 64);
+  const atmMat = new THREE.ShaderMaterial({
+    vertexShader: `
+      varying vec3 vNormal;
+      void main() {
+        vNormal = normalize(normalMatrix * normal);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vNormal;
+      void main() {
+        float intensity = pow(0.7 - dot(vNormal, vec3(0,0,1.0)), 2.5);
+        gl_FragColor = vec4(0.0, 0.76, 1.0, 1.0) * intensity;
+      }
+    `,
+    blending: THREE.AdditiveBlending,
+    side: THREE.BackSide,
+    transparent: true,
+  });
+  atmosphere = new THREE.Mesh(atmGeo, atmMat);
+  scene.add(atmosphere);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  STAR FIELD
+// ═══════════════════════════════════════════════════════════════════
+
+function buildStars() {
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 5000;
+  const positions = new Float32Array(starCount * 3);
+  const colors = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount; i++) {
+    const r = 100 + Math.random() * 400;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    positions[i*3] = r * Math.sin(phi) * Math.cos(theta);
+    positions[i*3+1] = r * Math.cos(phi);
+    positions[i*3+2] = r * Math.sin(phi) * Math.sin(theta);
+    const brightness = 0.5 + Math.random() * 0.5;
+    colors[i*3] = brightness * 0.8;
+    colors[i*3+1] = brightness * 0.9;
+    colors[i*3+2] = brightness;
+  }
+  starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  starGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const starMat = new THREE.PointsMaterial({
+    size: 0.8, vertexColors: true, transparent: true,
+    opacity: 0.8, sizeAttenuation: true,
+  });
+  starField = new THREE.Points(starGeo, starMat);
+  scene.add(starField);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  FLIGHT TRAFFIC
+// ═══════════════════════════════════════════════════════════════════
+
+function buildFlights() {
+  flightGroup = new THREE.Group();
+  flightPaths = [];
+
+  // Generate 40 random flight paths
+  for (let i = 0; i < 40; i++) {
+    const dep = AIRPORTS[Math.floor(Math.random() * AIRPORTS.length)];
+    let arr = AIRPORTS[Math.floor(Math.random() * AIRPORTS.length)];
+    while (arr === dep) arr = AIRPORTS[Math.floor(Math.random() * AIRPORTS.length)];
+
+    const start = latLngTo3D(dep.lat, dep.lng, EARTH_RADIUS);
+    const end = latLngTo3D(arr.lat, arr.lng, EARTH_RADIUS);
+
+    // Great circle arc (slerp)
+    const steps = 100;
+    const arcHeight = 0.3 + start.distanceTo(end) * 0.08;
+    const points = [];
+    for (let s = 0; s <= steps; s++) {
+      const t = s / steps;
+      const pos = start.clone().lerp(end, t);
+      pos.normalize().multiplyScalar(EARTH_RADIUS + Math.sin(t * Math.PI) * arcHeight);
+      points.push(pos);
+    }
+
+    // Flight path line
+    const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+    const lineMat = new THREE.LineBasicMaterial({
+      color: 0x00c2ff, transparent: true, opacity: 0.12,
+      blending: THREE.AdditiveBlending,
+    });
+    const line = new THREE.Line(lineGeo, lineMat);
+    flightGroup.add(line);
+
+    // Trail (behind plane, fades out)
+    const trailLen = 8;
+    const trailPositions = [];
+    for (let t = 0; t < trailLen; t++) {
+      const idx = 0; // will update
+      trailPositions.push(points[0].clone());
+    }
+    const trailGeo = new THREE.BufferGeometry().setFromPoints(trailPositions);
+    const trailMat = new THREE.LineBasicMaterial({
+      color: 0x00c2ff, transparent: true, opacity: 0.6,
+      blending: THREE.AdditiveBlending,
+    });
+    const trail = new THREE.Line(trailGeo, trailMat);
+    flightGroup.add(trail);
+
+    // Plane sprite (small glowing dot)
+    const planeGeo = new THREE.SphereGeometry(0.04, 6, 4);
+    const planeMat = new THREE.MeshBasicMaterial({
+      color: 0x00c2ff, transparent: true, opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+    });
+    const plane = new THREE.Mesh(planeGeo, planeMat);
+    flightGroup.add(plane);
+
+    flightPaths.push({
+      points, line, trail, trailPositions, plane,
+      progress: Math.random(),
+      speed: 0.0008 + Math.random() * 0.0008,
+      trailLen,
+    });
+  }
+
+  scene.add(flightGroup);
+  document.getElementById('stat-flights').textContent = flightPaths.length;
+  document.getElementById('count-flights').textContent = flightPaths.length;
+}
+
+function updateFlights() {
+  for (const fp of flightPaths) {
+    fp.progress += fp.speed;
+    if (fp.progress > 1) fp.progress = 0;
+
+    const idx = Math.floor(fp.progress * (fp.points.length - 1));
+    fp.plane.position.copy(fp.points[idx]);
+
+    // Update trail
+    const trailPoints = [];
+    for (let t = 0; t < fp.trailLen; t++) {
+      const ti = idx - t;
+      if (ti >= 0) trailPoints.push(fp.points[ti]);
+      else trailPoints.push(fp.points[0]);
+    }
+    fp.trail.geometry.setFromPoints(trailPoints);
+    fp.trail.material.opacity = 0.5;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  CITIES
+// ═══════════════════════════════════════════════════════════════════
+
+function buildCities() {
+  cityGroup = new THREE.Group();
+  const dotGeo = new THREE.SphereGeometry(0.03, 6, 4);
+  for (const city of CITIES) {
+    const pos = latLngTo3D(city.lat, city.lng, EARTH_RADIUS + 0.02);
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0x00c2ff, transparent: true, opacity: 0.8,
+      blending: THREE.AdditiveBlending,
+    });
+    const dot = new THREE.Mesh(dotGeo, mat);
+    dot.position.copy(pos);
+    dot.userData = { type: 'city', city };
+    cityGroup.add(dot);
+  }
+  scene.add(cityGroup);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  HOTSPOTS
+// ═══════════════════════════════════════════════════════════════════
+
+function buildHotspots() {
+  hotspotGroup = new THREE.Group();
+  const sevColors = [0xffaa22, 0xff6644, 0xff2244];
+  for (const hs of HOTSPOTS) {
+    const pos = latLngTo3D(hs.lat, hs.lng, EARTH_RADIUS + 0.01);
+    const color = sevColors[hs.sev - 1] || 0xff2244;
+
+    // Pulsing ring
+    const ringGeo = new THREE.RingGeometry(0.08, 0.12, 16);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.4,
+      side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.position.copy(pos);
+    ring.lookAt(0, 0, 0);
+    ring.userData = { pulse: Math.random() * Math.PI * 2, baseScale: 1, color };
+    hotspotGroup.add(ring);
+
+    // Center dot
+    const dotGeo = new THREE.SphereGeometry(0.04, 8, 6);
+    const dotMat = new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+    });
+    const dot = new THREE.Mesh(dotGeo, dotMat);
+    dot.position.copy(pos);
+    hotspotGroup.add(dot);
+  }
+  scene.add(hotspotGroup);
+}
+
+function updateHotspots(time) {
+  for (const child of hotspotGroup.children) {
+    if (child.userData.pulse !== undefined) {
+      child.userData.pulse += 0.03;
+      const s = 1 + Math.sin(child.userData.pulse) * 0.3;
+      child.scale.set(s, s, 1);
+      child.material.opacity = 0.4 + Math.sin(child.userData.pulse) * 0.2;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  DAY / NIGHT TERMINATOR
+// ═══════════════════════════════════════════════════════════════════
+
+function getSunDirection() {
+  const now = new Date();
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+  const decl = 23.45 * Math.sin(2 * Math.PI * (284 + dayOfYear) / 365) * DEG2RAD;
+  const utcHours = now.getUTCHours() + now.getUTCMinutes() / 60;
+  const sunLng = (12 - utcHours) * 15;
+  return latLngTo3D(decl / DEG2RAD, sunLng, 1).normalize();
+}
+
+function buildDayNight() {
+  // Night side overlay (dark hemisphere)
+  nightGroup = new THREE.Group();
+  const cityLightGeo = new THREE.SphereGeometry(0.015, 4, 3);
+  const cityLightMat = new THREE.MeshBasicMaterial({
+    color: 0xffdd44, transparent: true, opacity: 0.7,
+    blending: THREE.AdditiveBlending,
+  });
+  for (const city of CITIES) {
+    const pos = latLngTo3D(city.lat, city.lng, EARTH_RADIUS + 0.01);
+    const light = new THREE.Mesh(cityLightGeo, cityLightMat.clone());
+    light.position.copy(pos);
+    light.userData = { cityLat: city.lat, cityLng: city.lng };
+    nightGroup.add(light);
+  }
+  scene.add(nightGroup);
+}
+
+function updateDayNight() {
+  const sunDir = getSunDirection();
+  for (const child of nightGroup.children) {
+    const cityPos = child.position.clone().normalize();
+    const dot = cityPos.dot(sunDir);
+    child.visible = dot < 0.1;
+    child.material.opacity = Math.max(0, Math.min(0.8, (0.1 - dot) * 3));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  COUNTRY BORDERS (simplified wireframe)
+// ═══════════════════════════════════════════════════════════════════
+
+function buildBorders() {
+  borderGroup = new THREE.Group();
+  // Simple latitude/longitude grid lines as border proxy
+  const lineMat = new THREE.LineBasicMaterial({
+    color: 0x00c2ff, transparent: true, opacity: 0.15,
+    blending: THREE.AdditiveBlending,
+  });
+  // Latitude lines
+  for (let lat = -60; lat <= 60; lat += 30) {
+    const pts = [];
+    for (let lng = -180; lng <= 180; lng += 5) {
+      pts.push(latLngTo3D(lat, lng, EARTH_RADIUS + 0.005));
+    }
+    borderGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
+  }
+  // Longitude lines
+  for (let lng = -180; lng < 180; lng += 30) {
+    const pts = [];
+    for (let lat = -85; lat <= 85; lat += 5) {
+      pts.push(latLngTo3D(lat, lng, EARTH_RADIUS + 0.005));
+    }
+    borderGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
+  }
+  borderGroup.visible = false;
+  scene.add(borderGroup);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  UI SETUP
+// ═══════════════════════════════════════════════════════════════════
+
+function setupUI() {
+  // Layer toggles
+  const toggleMap = {
+    'layer-flights': ['flights', flightGroup],
+    'layer-daynight': ['daynight', nightGroup],
+    'layer-borders': ['borders', borderGroup],
+    'layer-cities': ['cities', cityGroup],
+    'layer-hotspots': ['hotspots', hotspotGroup],
+  };
+  for (const [id, [key, group]] of Object.entries(toggleMap)) {
+    document.getElementById(id).addEventListener('change', e => {
+      layers[key] = e.target.checked;
+      if (group) group.visible = e.target.checked;
+      const countEl = document.getElementById('count-' + key);
+      if (countEl) countEl.textContent = e.target.checked ? (key === 'flights' ? flightPaths.length : key === 'cities' ? 50 : key === 'hotspots' ? 10 : 'ON') : 'OFF';
+    });
+  }
+
+  // Globe control toggles
+  document.getElementById('toggle-autorotate').addEventListener('change', e => {
+    layers.autorotate = e.target.checked;
+    controls.autoRotate = e.target.checked;
+  });
+  document.getElementById('toggle-atmosphere').addEventListener('change', e => {
+    layers.atmosphere = e.target.checked;
+    atmosphere.visible = e.target.checked;
+  });
+  document.getElementById('toggle-stars').addEventListener('change', e => {
+    layers.stars = e.target.checked;
+    starField.visible = e.target.checked;
+  });
+
+  // Region presets — camera fly-to
+  document.querySelectorAll('.region-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lat = parseFloat(btn.dataset.lat);
+      const lng = parseFloat(btn.dataset.lng);
+      const target = latLngTo3D(lat, lng, EARTH_RADIUS).multiplyScalar(2.2);
+      flyCameraTo(target);
+    });
+  });
+
+  // Alerts
+  renderAlerts();
+  document.getElementById('stat-alerts').textContent = ALERTS.length;
+
+  // AI Summary
+  document.getElementById('btn-ai-summary').addEventListener('click', () => {
+    const summary = generateAISummary();
+    document.getElementById('ai-body').innerHTML = summary;
+    document.getElementById('ai-summary').classList.add('active');
+  });
+  document.getElementById('ai-close').addEventListener('click', () => {
+    document.getElementById('ai-summary').classList.remove('active');
+  });
+
+  // Ticker
+  renderTicker();
+
+  // UTC clock
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Mouse for hover
+  renderer.domElement.addEventListener('mousemove', e => {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    const tip = document.getElementById('tooltip');
+    tip.style.left = (e.clientX + 16) + 'px';
+    tip.style.top = (e.clientY - 10) + 'px';
+  });
+  renderer.domElement.addEventListener('mouseleave', () => {
+    mouse.set(-999, -999);
+    document.getElementById('tooltip').style.display = 'none';
+  });
+}
+
+function flyCameraTo(target) {
+  const start = camera.position.clone();
+  const duration = 1500;
+  const startTime = performance.now();
+  controls.autoRotate = false;
+  function step() {
+    const t = Math.min((performance.now() - startTime) / duration, 1);
+    const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    camera.position.lerpVectors(start, target, eased);
+    camera.lookAt(0, 0, 0);
+    if (t < 1) requestAnimationFrame(step);
+    else if (layers.autorotate) controls.autoRotate = true;
+  }
+  step();
+}
+
+function renderAlerts() {
+  const list = document.getElementById('alerts-list');
+  const sevColors = ['#ffaa22', '#ff6644', '#ff2244'];
+  list.innerHTML = ALERTS.map(a => `
+    <div class="alert-item">
+      <div class="ai-sev" style="background:${sevColors[a.sev-1]};box-shadow:0 0 6px ${sevColors[a.sev-1]};"></div>
+      <div class="ai-time">${a.time}</div>
+      <div class="ai-text">${a.text}</div>
+      <div class="ai-loc">${a.loc}</div>
+    </div>
+  `).join('');
+}
+
+function generateAISummary() {
+  const sev3 = ALERTS.filter(a => a.sev === 3);
+  const sev2 = ALERTS.filter(a => a.sev === 2);
+  return `<span class="highlight">GLM-5.2 INTELLIGENCE BRIEF — ${new Date().toISOString().slice(0,10)}</span><br><br>
+  <span class="danger">CRITICAL (${sev3.length}):</span> Active combat operations in <span class="highlight">Ukraine, Gaza, Sudan</span>. Pattern indicates sustained escalation across three concurrent conflict zones — highest threat density in 18 months.<br><br>
+  <span class="warn">ELEVATED (${sev2.length}):</span> Maritime drone activity in <span class="highlight">Red Sea</span> disrupting shipping lanes. <span class="highlight">Taiwan Strait</span> exercises suggest readiness posturing. <span class="highlight">Haiti</span> security collapse accelerating. Critical CVE with active exploitation — patch immediately.<br><br>
+  <span class="highlight">MARKET IMPACT:</span> Oil +3.2% on supply disruption fears. Defense sector +1.1%. Recommend monitoring energy and defense exposure.<br><br>
+  <span class="highlight">ASSESSMENT:</span> Three concurrent severity-3 events with geographic dispersion. No direct correlation detected between conflict zones. Cyber threat (CVE-2026-4419) adds asymmetric dimension. Recommend elevated alert posture for next 72 hours.
+  <div class="meta">Analysis generated by GLM-5.2 | ${ALERTS.length} inputs correlated | Confidence: HIGH</div>`;
+}
+
+function renderTicker() {
+  const content = document.getElementById('ticker-content');
+  const items = TICKER.map(t =>
+    `<span class="tc-item"><span class="tc-dot" style="background:${t.dot}"></span><span class="tc-time">${t.time}</span><span class="tc-text">${t.text}</span></span>`
+  ).join('');
+  content.innerHTML = items + items; // Duplicate for seamless loop
+}
+
+function updateClock() {
+  const now = new Date();
+  const utc = now.toISOString().slice(11, 19);
+  document.getElementById('utc-time').textContent = utc;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ANIMATION LOOP
+// ═══════════════════════════════════════════════════════════════════
+
+function animate() {
+  requestAnimationFrame(animate);
+  const time = performance.now() * 0.001;
+
+  controls.update();
+
+  if (layers.flights) updateFlights();
+  if (layers.hotspots) updateHotspots(time);
+  if (layers.daynight) updateDayNight();
+
+  // City hover detection
+  if (layers.cities) {
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(cityGroup.children);
+    const tip = document.getElementById('tooltip');
+    if (intersects.length > 0) {
+      const city = intersects[0].object.userData.city;
+      if (city) {
+        document.getElementById('tip-title').textContent = city.name;
+        document.getElementById('tip-pop').textContent = city.pop.toLocaleString();
+        document.getElementById('tip-country').textContent = city.country;
+        document.getElementById('tip-coords').textContent = `${city.lat.toFixed(1)}°, ${city.lng.toFixed(1)}°`;
+        tip.style.display = 'block';
+      }
+    } else {
+      tip.style.display = 'none';
+    }
+  }
+
+  renderer.render(scene, camera);
+}
+
+init();
+</script>
+</body>
+</html>
