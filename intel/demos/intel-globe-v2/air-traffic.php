@@ -49,17 +49,34 @@ $states = $decoded['states'] ?? [];
 $items = [];
 foreach ($states as $s) {
     if (!is_array($s)) continue;
-    if ($s[5] === null || $s[6] === null || $s[7] === null || $s[7] <= 0) continue;
+    if ($s[5] === null || $s[6] === null || $s[7] === null) continue;
+    $alt = $s[7];
+    $callsign = trim($s[1] ?? '');
+    $velocity = $s[9] ?? 0;
+
+    // Only airborne aircraft: altitude > 152m (500ft), moving > 25 m/s
+    if ($alt <= 152 || $velocity <= 25) continue;
+
+    // Only commercial callsigns (3-letter IATA prefix + flight number)
+    // This filters out private, military, and ground vehicles
+    if (!preg_match('/^[A-Z]{3}[0-9]{1,4}[A-Z]?$/i', $callsign)) continue;
+
     $items[] = [
         'icao24' => $s[0],
-        'callsign' => trim($s[1] ?? ''),
+        'callsign' => $callsign,
         'origin' => $s[2] ?? '',
         'lng' => $s[5],
         'lat' => $s[6],
-        'alt' => $s[7],
-        'velocity' => $s[9] ?? null,
+        'alt' => $alt,
+        'velocity' => $velocity,
         'heading' => $s[10] ?? null,
     ];
+}
+
+// Cap at 2500 for performance
+if (count($items) > 2500) {
+    shuffle($items);
+    $items = array_slice($items, 0, 2500);
 }
 
 $payload = [
