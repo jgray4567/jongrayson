@@ -293,18 +293,109 @@
     #alerts-panel { width: 340px; }
     #ai-summary { left: 372px; width: 320px; }
   }
-  @media (max-width: 850px) {
-    #layers-panel { width: 180px; padding: 12px 14px; }
-    #regions-panel { width: 160px; padding: 12px 14px; }
-    #alerts-panel { width: 280px; max-height: 200px; }
-    #ai-summary { left: 308px; width: 280px; }
-    #top-bar .stat-strip { display: none; }
+
+  /* ─── Mobile Hamburger Button ─── */
+  #menu-btn {
+    display: none;
+    position: absolute; top: 12px; left: 12px; z-index: 15;
+    width: 40px; height: 40px; border-radius: 10px;
+    background: rgba(6,7,10,0.88); backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,194,255,0.15);
+    color: #00c2ff; font-size: 18px; cursor: pointer;
+    align-items: center; justify-content: center;
+    transition: all 0.2s;
   }
+  #menu-btn:hover { background: rgba(0,194,255,0.12); }
+  #menu-btn.active { background: rgba(0,194,255,0.18); }
+
+  /* ─── Mobile Regions Button ─── */
+  #regions-btn {
+    display: none;
+    position: absolute; top: 12px; right: 12px; z-index: 15;
+    width: 40px; height: 40px; border-radius: 10px;
+    background: rgba(6,7,10,0.88); backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,194,255,0.15);
+    color: #00c2ff; font-size: 16px; cursor: pointer;
+    align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  #regions-btn:hover { background: rgba(0,194,255,0.12); }
+  #regions-btn.active { background: rgba(0,194,255,0.18); }
+
+  /* ─── Mobile Alerts Toggle ─── */
+  #alerts-btn {
+    display: none;
+    position: absolute; bottom: 12px; left: 12px; z-index: 15;
+    padding: 8px 14px; border-radius: 20px;
+    background: rgba(6,7,10,0.88); backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,194,255,0.15);
+    color: #00c2ff; font-size: 11px; cursor: pointer;
+    font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px;
+    transition: all 0.2s; align-items: center; gap: 6px;
+  }
+  #alerts-btn:hover { background: rgba(0,194,255,0.12); }
+  #alerts-btn .ab-badge {
+    background: #ff2244; color: #fff; border-radius: 10px;
+    padding: 1px 6px; font-size: 9px; font-weight: 700;
+  }
+
+  /* ─── Mobile Backdrop ─── */
+  #mobile-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 13;
+    background: rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s;
+  }
+  #mobile-backdrop.active { display: block; opacity: 1; }
+
+  /* ─── Mobile Slide-In Panels ─── */
+  @media (max-width: 850px) {
+    #menu-btn { display: flex; }
+    #regions-btn { display: flex; }
+    #alerts-btn { display: flex; }
+
+    #top-bar { padding-left: 64px; padding-right: 64px; height: 50px; }
+    #top-bar .title { font-size: 12px; }
+    #top-bar .title .sub { display: none; }
+    #top-bar .utc-clock { font-size: 11px; padding: 3px 8px; }
+    #top-bar .stat-strip { gap: 10px; }
+    #top-bar .stat-strip .si { font-size: 9px; }
+    #top-bar .stat-strip .si .lbl { display: none; }
+    #top-bar .stat-strip .si .dot { width: 5px; height: 5px; }
+
+    #layers-panel {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: 280px; max-height: 100vh; border-radius: 0;
+      transform: translateX(-100%); transition: transform 0.3s ease;
+      z-index: 14; padding-top: 60px;
+    }
+    #layers-panel.open { transform: translateX(0); }
+
+    #regions-panel {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 240px; max-height: 100vh; border-radius: 0;
+      transform: translateX(100%); transition: transform 0.3s ease;
+      z-index: 14; padding-top: 60px; display: block;
+    }
+    #regions-panel.open { transform: translateX(0); }
+
+    #alerts-panel {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      width: 100vw; max-height: 45vh; border-radius: 14px 14px 0 0;
+      z-index: 12; display: none;
+    }
+    #alerts-panel.open { display: flex; }
+
+    #ai-summary {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      width: 100vw; border-radius: 14px 14px 0 0; z-index: 13;
+    }
+
+    #ticker { font-size: 10px; }
+  }
+
   @media (max-width: 640px) {
-    #regions-panel { display: none; }
-    #alerts-panel { width: calc(100vw - 32px); max-height: 160px; }
-    #ai-summary { left: 16px; width: calc(100vw - 32px); bottom: 200px; }
-    #layers-panel { width: 160px; }
+    #top-bar .title .sep { display: none; }
+    #top-bar .stat-strip { gap: 8px; }
+    #alerts-panel { max-height: 40vh; }
   }
 </style>
 </head>
@@ -319,6 +410,16 @@
 
 <!-- 3D Scene -->
 <div id="scene-container"></div>
+
+<!-- Mobile Backdrop -->
+<div id="mobile-backdrop"></div>
+
+<!-- Mobile Hamburger -->
+<button id="menu-btn">☰</button>
+<!-- Mobile Regions -->
+<button id="regions-btn">📍</button>
+<!-- Mobile Alerts Toggle -->
+<button id="alerts-btn">⚠ ALERTS <span class="ab-badge" id="alerts-badge">0</span></button>
 
 
 <!-- Top Bar -->
@@ -1107,6 +1208,8 @@ function setupUI() {
   // Alerts
   renderAlerts();
   document.getElementById('stat-alerts').textContent = ALERTS.length;
+  const alertsBadge = document.getElementById('alerts-badge');
+  if (alertsBadge) alertsBadge.textContent = ALERTS.length;
 
   // AI Summary
   document.getElementById('btn-ai-summary').addEventListener('click', () => {
@@ -1131,6 +1234,42 @@ function setupUI() {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
+
+  // ─── Mobile Menu Toggles ───
+  const backdrop = document.getElementById('mobile-backdrop');
+  const menuBtn = document.getElementById('menu-btn');
+  const layersPanel = document.getElementById('layers-panel');
+  const regionsBtn = document.getElementById('regions-btn');
+  const regionsPanel = document.getElementById('regions-panel');
+  const alertsBtn = document.getElementById('alerts-btn');
+  const alertsPanel = document.getElementById('alerts-panel');
+
+  function closeAllPanels() {
+    layersPanel.classList.remove('open');
+    regionsPanel.classList.remove('open');
+    alertsPanel.classList.remove('open');
+    backdrop.classList.remove('active');
+    menuBtn.classList.remove('active');
+    regionsBtn.classList.remove('active');
+    alertsBtn.classList.remove('active');
+  }
+
+  menuBtn.addEventListener('click', () => {
+    const isOpen = layersPanel.classList.contains('open');
+    closeAllPanels();
+    if (!isOpen) { layersPanel.classList.add('open'); backdrop.classList.add('active'); menuBtn.classList.add('active'); }
+  });
+  regionsBtn.addEventListener('click', () => {
+    const isOpen = regionsPanel.classList.contains('open');
+    closeAllPanels();
+    if (!isOpen) { regionsPanel.classList.add('open'); backdrop.classList.add('active'); regionsBtn.classList.add('active'); }
+  });
+  alertsBtn.addEventListener('click', () => {
+    const isOpen = alertsPanel.classList.contains('open');
+    closeAllPanels();
+    if (!isOpen) { alertsPanel.classList.add('open'); alertsBtn.classList.add('active'); }
+  });
+  backdrop.addEventListener('click', closeAllPanels);
 
   // Mouse for hover
   renderer.domElement.addEventListener('mousemove', e => {
