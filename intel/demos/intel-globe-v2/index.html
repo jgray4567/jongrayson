@@ -34,8 +34,8 @@
     font-size: 14px; font-weight: 600; color: #00c2ff;
     letter-spacing: 1.5px; white-space: nowrap;
   }
-  #top-bar .title .sep { color: #334; margin: 0 8px; }
-  #top-bar .title .sub { color: #556; font-weight: 400; font-size: 12px; }
+  #top-bar .title .sep { color: #667; margin: 0 8px; }
+  #top-bar .title .sub { color: #889; font-weight: 400; font-size: 12px; }
   #top-bar .spacer { flex: 1; }
   #top-bar .stat-strip {
     display: flex; gap: 18px; align-items: center;
@@ -44,14 +44,14 @@
   #top-bar .stat-strip .si { display: flex; align-items: center; gap: 6px; font-size: 11px; }
   #top-bar .stat-strip .si .dot { width: 6px; height: 6px; border-radius: 50%; }
   #top-bar .stat-strip .si .val { color: #00c2ff; font-weight: 600; }
-  #top-bar .stat-strip .si .lbl { color: #556; }
+  #top-bar .stat-strip .si .lbl { color: #889; }
   #top-bar .utc-clock {
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px; color: #e8eaed; letter-spacing: 1px;
     padding: 4px 12px; border-radius: 8px;
     background: rgba(0,194,255,0.06); border: 1px solid rgba(0,194,255,0.12);
   }
-  #top-bar .utc-clock .label { font-size: 9px; color: #445; margin-right: 6px; }
+  #top-bar .utc-clock .label { font-size: 9px; color: #77a; margin-right: 6px; }
 
   /* ─── Left Sidebar — Layers ─── */
   #layers-panel {
@@ -97,11 +97,11 @@
   .layer-toggle .lt-checkbox:checked ~ .lt-icon { opacity: 1; }
   .layer-toggle .lt-info { flex: 1; min-width: 0; }
   .layer-toggle .lt-name {
-    font-size: 12px; color: #ccd; font-weight: 500;
+    font-size: 12px; color: #dde; font-weight: 500;
     font-family: 'JetBrains Mono', monospace;
   }
   .layer-toggle .lt-desc {
-    font-size: 9px; color: #556; margin-top: 1px;
+    font-size: 9px; color: #889; margin-top: 1px;
     font-family: 'JetBrains Mono', monospace; letter-spacing: 0.3px;
   }
   .layer-toggle .lt-count {
@@ -112,7 +112,7 @@
 
   .layer-section-title {
     font-size: 9px; font-weight: 700; letter-spacing: 1.2px;
-    color: #445; text-transform: uppercase; margin: 14px 0 6px;
+    color: #77a; text-transform: uppercase; margin: 14px 0 6px;
     font-family: 'JetBrains Mono', monospace;
   }
 
@@ -132,7 +132,7 @@
     padding: 10px 12px; margin-bottom: 6px;
     background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
     border-radius: 8px; cursor: pointer; transition: all 0.2s;
-    color: #99a; font-family: 'JetBrains Mono', monospace;
+    color: #bbc; font-family: 'JetBrains Mono', monospace;
     font-size: 11px; text-align: left;
   }
   .region-btn:hover {
@@ -140,7 +140,7 @@
     color: #e8eaed; transform: translateX(-2px);
   }
   .region-btn .rb-icon { font-size: 14px; opacity: 0.7; }
-  .region-btn .rb-coords { font-size: 8px; color: #334; margin-top: 2px; }
+  .region-btn .rb-coords { font-size: 8px; color: #667; margin-top: 2px; }
 
   /* ─── Bottom Panel — Alerts ─── */
   #alerts-panel {
@@ -179,8 +179,8 @@
   .alert-item .ai-sev {
     width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0;
   }
-  .alert-item .ai-time { font-size: 9px; color: #445; white-space: nowrap; }
-  .alert-item .ai-text { font-size: 10px; color: #99a; flex: 1; line-height: 1.4; }
+  .alert-item .ai-time { font-size: 9px; color: #77a; white-space: nowrap; }
+  .alert-item .ai-text { font-size: 10px; color: #bbc; flex: 1; line-height: 1.4; }
   .alert-item .ai-loc { font-size: 9px; color: #00c2ff; }
 
   /* ─── AI Summary Modal ─── */
@@ -200,19 +200,19 @@
     font-family: 'JetBrains Mono', monospace;
   }
   #ai-summary .as-close {
-    cursor: pointer; color: #556; font-size: 14px; padding: 2px 6px;
+    cursor: pointer; color: #889; font-size: 14px; padding: 2px 6px;
     border-radius: 4px; transition: all 0.15s;
   }
   #ai-summary .as-close:hover { color: #e8eaed; background: rgba(255,255,255,0.05); }
   #ai-summary .as-body {
-    font-size: 11px; color: #99a; line-height: 1.6;
+    font-size: 11px; color: #bbc; line-height: 1.6;
     font-family: 'JetBrains Mono', monospace;
   }
   #ai-summary .as-body .highlight { color: #00c2ff; }
   #ai-summary .as-body .danger { color: #ff2244; }
   #ai-summary .as-body .warn { color: #ffaa22; }
   #ai-summary .as-body .meta {
-    font-size: 9px; color: #334; margin-top: 8px; padding-top: 8px;
+    font-size: 9px; color: #667; margin-top: 8px; padding-top: 8px;
     border-top: 1px solid rgba(255,255,255,0.04);
   }
 
@@ -234,13 +234,13 @@
   }
   #ticker .ticker-content {
     position: absolute; white-space: nowrap; display: flex; align-items: center;
-    height: 100%; font-size: 11px; color: #778;
+    height: 100%; font-size: 11px; color: #bbc;
     animation: tickerScroll 60s linear infinite;
   }
   #ticker .ticker-content .tc-item { padding: 0 24px; }
   #ticker .ticker-content .tc-item .tc-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 8px; }
-  #ticker .ticker-content .tc-item .tc-time { color: #334; margin-right: 8px; }
-  #ticker .ticker-content .tc-item .tc-text { color: #99a; }
+  #ticker .ticker-content .tc-item .tc-time { color: #667; margin-right: 8px; }
+  #ticker .ticker-content .tc-item .tc-text { color: #bbc; }
   @keyframes tickerScroll {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
@@ -255,7 +255,7 @@
     font-family: 'JetBrains Mono', monospace;
   }
   #tooltip .tip-title { font-size: 12px; color: #00c2ff; font-weight: 600; margin-bottom: 4px; }
-  #tooltip .tip-row { display: flex; justify-content: space-between; font-size: 10px; color: #778; padding: 1px 0; }
+  #tooltip .tip-row { display: flex; justify-content: space-between; font-size: 10px; color: #bbc; padding: 1px 0; }
   #tooltip .tip-row .tip-val { color: #e8eaed; font-weight: 500; }
 
   /* ─── Scan Line ─── */
@@ -282,7 +282,7 @@
     font-family: 'JetBrains Mono', monospace;
   }
   #loading .loader-text { font-size: 13px; color: #00c2ff; letter-spacing: 2px; }
-  #loading .loader-sub { font-size: 10px; color: #445; margin-top: 8px; }
+  #loading .loader-sub { font-size: 10px; color: #77a; margin-top: 8px; }
   .loader-bar { width: 220px; height: 2px; background: #111; margin-top: 16px; border-radius: 1px; overflow: hidden; }
   .loader-bar-fill { height: 100%; background: #00c2ff; width: 0%; transition: width 0.3s; border-radius: 1px; }
 
