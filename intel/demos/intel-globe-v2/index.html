@@ -69,6 +69,16 @@
     padding-bottom: 10px; border-bottom: 1px solid rgba(196,214,0,0.12);
     font-family: 'JetBrains Mono', monospace;
   }
+  .panel-close {
+    display: none;
+    position: absolute; top: 14px; right: 14px;
+    width: 28px; height: 28px; border-radius: 8px;
+    background: rgba(196,214,0,0.08); border: 1px solid rgba(196,214,0,0.12);
+    color: #C4D600; font-size: 14px; cursor: pointer;
+    align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .panel-close:hover { background: rgba(196,214,0,0.18); }
 .layer-toggle {
     display: flex; align-items: center; gap: 10px;
     padding: 6px 0; cursor: pointer; user-select: none;
@@ -452,6 +462,8 @@
     .lt-desc { display: none; }
     .layer-toggle { padding: 5px 0; }
     .lt-name { font-size: 12.1px; }
+    .panel-close { display: flex; }
+    #layers-panel h2 { padding-right: 36px; }
 
     #ai-summary {
       position: fixed; bottom: 0; left: 0; right: 0;
@@ -510,8 +522,7 @@
 <!-- Left Sidebar — Layers -->
 <div id="layers-panel" class="glass">
   <h2>Intel Layers</h2>
-
-  <div class="layer-section-title">Active Overlays</div>
+  <button class="panel-close" id="layers-close" aria-label="Close">✕</button>
 
   <label class="layer-toggle">
     <input type="checkbox" class="lt-checkbox" id="layer-flights" checked>
@@ -575,11 +586,11 @@
     <label class="fr-toggle"><input type="checkbox" id="orbit-paths"> <span>Show Orbit Paths</span></label>
   </div>
 
-  <div class="layer-section-title collapsible-header" id="globe-controls-header">
+  <div class="layer-section-title collapsible-header collapsed" id="globe-controls-header">
     <span>Globe Controls</span>
     <span class="collapse-arrow">▼</span>
   </div>
-  <div class="collapsible-body" id="globe-controls-body">
+  <div class="collapsible-body collapsed" id="globe-controls-body">
     <label class="layer-toggle">
       <input type="checkbox" class="lt-checkbox" id="toggle-autorotate">
       <div class="lt-icon">⟳</div>
@@ -1571,11 +1582,6 @@ function setupUI() {
   const gcHeader = document.getElementById('globe-controls-header');
   const gcBody = document.getElementById('globe-controls-body');
   if (gcHeader && gcBody) {
-    // Starts open, auto-closes after load completes (3s after init)
-    setTimeout(() => {
-      gcHeader.classList.add('collapsed');
-      gcBody.classList.add('collapsed');
-    }, 3000);
     gcHeader.addEventListener('click', () => {
       gcHeader.classList.toggle('collapsed');
       gcBody.classList.toggle('collapsed');
@@ -1590,6 +1596,9 @@ function setupUI() {
       parent.classList.toggle('collapsed');
     });
   });
+
+  // Mobile panel close buttons
+  document.getElementById('layers-close')?.addEventListener('click', closeAllPanels);
 
   // Alerts
   renderAlerts();
