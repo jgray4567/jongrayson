@@ -149,13 +149,29 @@
     {
       "id": "sig_10",
       "group": 2,
+      "label": "What's in the US-Iran agreement?",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/cvgmqzr6p9mo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/ac9a/live/635a8da0-6ac0-11f1-8546-8f19e4fe30f4.jpg"
+    },
+    {
+      "id": "sig_11",
+      "group": 2,
       "label": "Iran sends tankers loaded with oil past US military blockade",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/cpq37yxexd9o?at_medium=RSS&amp;at_campaign=rss",
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5622/live/98fcb090-6a49-11f1-8e1d-bbbb1017d210.png"
     },
     {
-      "id": "sig_11",
+      "id": "sig_12",
+      "group": 2,
+      "label": "Japan ramping up defence is 'critical' to prevent war, Defence Minister Koizumi tells BBC",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/cly8qd4595eo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/2069/live/d976b510-6a41-11f1-9742-4f68b41a569d.jpg"
+    },
+    {
+      "id": "sig_13",
       "group": 2,
       "label": "Status quo at Jerusalem's holiest site under threat as Israeli nationalists flout rules",
       "size": 12,
@@ -163,7 +179,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/141f/live/a8e752e0-69b7-11f1-9a2b-c1fb07dd1b47.jpg"
     },
     {
-      "id": "sig_12",
+      "id": "sig_14",
       "group": 2,
       "label": "Search for six-year-old Ebola patient after armed men storm DR Congo hospital",
       "size": 12,
@@ -171,7 +187,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3607/live/3b4a8860-6a34-11f1-8e1d-bbbb1017d210.jpg"
     },
     {
-      "id": "sig_13",
+      "id": "sig_15",
       "group": 2,
       "label": "Ex-Nigeria oil minister cleared in UK bribery trial",
       "size": 12,
@@ -179,7 +195,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/06d8/live/d50a1080-6a5f-11f1-b7aa-49f3a4d630f8.jpg"
     },
     {
-      "id": "sig_14",
+      "id": "sig_16",
       "group": 2,
       "label": "Serial killer who murdered eight women in Long Island town imprisoned for life",
       "size": 12,
@@ -187,49 +203,33 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3647/live/5c383800-6a67-11f1-a1ef-fd29fb1a4751.jpg"
     },
     {
-      "id": "sig_15",
-      "group": 2,
-      "label": "Norway's crown princess undergoes successful lung transplant, palace says",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/c1eyg37qyqjo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/0f13/live/65a31920-6a33-11f1-9b8b-e9d622652531.jpg"
-    },
-    {
-      "id": "sig_16",
-      "group": 2,
-      "label": "Israel launches fresh strikes on Lebanon despite Trump criticism",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/c7vyn17g832o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/92ce/live/957a40c0-6a6e-11f1-8546-8f19e4fe30f4.jpg"
-    },
-    {
       "id": "sig_17",
       "group": 2,
-      "label": "Bystanders smash windows of private jet to rescue passengers after crash",
+      "label": "The Ring and Lilo & Stitch actress Daveigh Chase dies aged 35",
       "size": 12,
-      "url": "https://www.bbc.com/news/articles/cd7wv4144yvo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/cdf8/live/fe7d67d0-6a52-11f1-b1db-af71d47507d6.jpg"
+      "url": "https://www.bbc.com/news/articles/cd0m2mg949yo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3832/live/f52109d0-6a7f-11f1-8e56-530bbb41ec43.jpg"
     },
     {
       "id": "sig_18",
       "group": 2,
-      "label": "AI will create more jobs for humans, not replace them, Amazon founder Bezos says",
+      "label": "Trump says he will visit India as frosty relationship with Modi thaws",
       "size": 12,
-      "url": "https://www.bbc.com/news/articles/ceqdrw2yy3vo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1b53/live/14d94320-6a65-11f1-8e1d-bbbb1017d210.jpg"
+      "url": "https://www.bbc.com/news/articles/c621glv9vnqo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/58b3/live/fd48a570-6a5f-11f1-b7aa-49f3a4d630f8.jpg"
     },
     {
       "id": "sig_19",
       "group": 2,
-      "label": "Group planned to attack White House UFC event using snipers and drones, FBI says",
+      "label": "UN experts demand Iranians free Foremans",
       "size": 12,
-      "url": "https://www.bbc.com/news/articles/cqx10xlje1lo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/76bb/live/f3fbc9c0-6979-11f1-a63b-a7cb529e1ca8.jpg"
+      "url": "https://www.bbc.com/news/articles/c9w28e2vn57o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/df05/live/89b9de10-6a7a-11f1-8e56-530bbb41ec43.jpg"
     },
     {
       "id": "sig_20",
       "group": 2,
-      "label": "Live Updates: U.S. Details Agreement With Iran as Trump Departs G7 Summit",
+      "label": "U.S. Details Agreement With Iran as Trump Departs G7 Summit",
       "size": 12,
       "url": "https://www.nytimes.com/live/2026/06/17/world/g7-summit-trump-france",
       "image": ""
@@ -309,13 +309,21 @@
     {
       "id": "sig_30",
       "group": 2,
+      "label": "Finland&apos;s parliament votes to lift decades-old ban on nuclear weapons in historic NATO defense shift",
+      "size": 12,
+      "url": "https://www.foxnews.com/world/finlands-parliament-votes-lift-decades-old-ban-nuclear-weapons-historic-nato-defense-shift",
+      "image": ""
+    },
+    {
+      "id": "sig_31",
+      "group": 2,
       "label": "Colombian military neutralizes five terrorists accused in bus bombing that killed 20, injured 45 civilians",
       "size": 12,
       "url": "https://www.foxnews.com/world/colombian-military-neutralizes-five-terrorists-accused-bus-bombing-killed-20-injured-45-civilians",
       "image": ""
     },
     {
-      "id": "sig_31",
+      "id": "sig_32",
       "group": 2,
       "label": "Israel launches &apos;Biblical Highway&apos; amid campaign to erase Jewish history",
       "size": 12,
@@ -323,7 +331,7 @@
       "image": ""
     },
     {
-      "id": "sig_32",
+      "id": "sig_33",
       "group": 2,
       "label": "Elon Musk demands prison for politicians who &apos;turned a blind eye&apos; to grooming gangs as new report released",
       "size": 12,
@@ -331,7 +339,7 @@
       "image": ""
     },
     {
-      "id": "sig_33",
+      "id": "sig_34",
       "group": 2,
       "label": "3 Brazilian men charged after woman tossed from bridge without safety rope",
       "size": 12,
@@ -339,7 +347,7 @@
       "image": ""
     },
     {
-      "id": "sig_34",
+      "id": "sig_35",
       "group": 2,
       "label": "Russia linked to arson attacks on properties connected to UK PM Keir Starmer, police say",
       "size": 12,
@@ -347,7 +355,7 @@
       "image": ""
     },
     {
-      "id": "sig_35",
+      "id": "sig_36",
       "group": 2,
       "label": "Netanyahu&apos;s Israel grapples with Trump-Iran deal as details remain unclear",
       "size": 12,
@@ -355,7 +363,7 @@
       "image": ""
     },
     {
-      "id": "sig_36",
+      "id": "sig_37",
       "group": 2,
       "label": "Iran’s regime spins nuclear and Strait of Hormuz deal with Trump as victory over US, Israel",
       "size": 12,
@@ -363,7 +371,7 @@
       "image": ""
     },
     {
-      "id": "sig_37",
+      "id": "sig_38",
       "group": 2,
       "label": "Anti-G7 protest turns violent as demonstrators torch Tesla and smash UN office windows",
       "size": 12,
@@ -371,7 +379,7 @@
       "image": ""
     },
     {
-      "id": "sig_38",
+      "id": "sig_39",
       "group": 2,
       "label": "Khamenei&apos;s &apos;target-rich&apos; funeral is Iran’s biggest security gamble, sends message to US: expert",
       "size": 12,
@@ -379,91 +387,83 @@
       "image": ""
     },
     {
-      "id": "sig_39",
-      "group": 2,
-      "label": "Israel fears Trump weary of ‘highly suspicious’ Netanyahu and could &apos;flip&apos; amid Iran deal: analyst",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/israel-fears-trump-weary-highly-suspicious-netanyahu-could-flip-amid-iran-deal-analyst",
-      "image": ""
-    },
-    {
       "id": "sig_40",
       "group": 2,
-      "label": "Diplomat confirms that US and Iran have signed MoU electronically",
+      "label": "Trump’s MoU with Iran draws backlash from some Republicans",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/17/iran-confirms-that-mou-has-been-signed-electronically-by-both-sides?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/18/trumps-iran-framework-draws-backlash-from-some-republicans?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_41",
       "group": 2,
-      "label": "Kane double fires England past Croatia in World Cup thriller",
+      "label": "Netanyahu under pressure in Israel after US-Iran agreement",
       "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/17/kane-double-fires-england-past-croatia-in-world-cup-thriller?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/18/netanyahu-under-pressure-in-israel-after-us-iran-agreement?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_42",
       "group": 2,
-      "label": "Al Jazeera journalist reunited with family in Khartoum after years of war",
+      "label": "Who benefits from Zimbabwe’s lithium boom?",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/17/al-jazeera-journalist-reunited-with-family-in-khartoum-after-years-of-war?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/18/who-benefits-from-zimbabwes-lithium-boom?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_43",
       "group": 2,
-      "label": "Huawei CFO’s admissions can be used at criminal trial, US judge rules",
+      "label": "Greta Thunberg joins Brussels protest against Israel",
       "size": 12,
-      "url": "https://www.aljazeera.com/economy/2026/6/17/huawei-cfos-admissions-can-be-used-at-criminal-trial-us-judge-rules?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/18/greta-thunberg-joins-brussels-protest-against-israel?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_44",
       "group": 2,
-      "label": "Thieves with bulldozer carry out ATM heist in 4 minutes",
+      "label": "South Africa coach tells critics to ‘shut up’ before second World Cup match",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/17/thieves-with-bulldozer-carry-out-atm-heist-in-4-minutes?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/18/south-africa-coach-tells-critics-to-shut-up-before-second-world-cup-match?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_45",
       "group": 2,
-      "label": "Meet Yoane Wissa, who scored DR Congo’s first-ever goal at a World Cup",
+      "label": "Ghalibaf says talks delivered more results than war",
       "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/17/meet-yoane-wissa-who-scored-dr-congos-first-ever-goal-at-a-world-cup?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/18/ghalibaf-says-talks-delivered-more-results-than-war?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_46",
       "group": 2,
-      "label": "Gilgo Beach killer sentenced to life without parole",
+      "label": "US and Iran sign Memorandum of Understanding to end war",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/17/gilgo-beach-killer-sentenced-to-life-without-parole?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/18/us-and-iran-sign-memorandum-of-understanding-to-end-war?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_47",
       "group": 2,
-      "label": "Croatia fans rock cowboy style in Dallas parade ahead of match with England",
+      "label": "Ghana beat Panama 1–0 in chaotic World Cup Group L match",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/17/aje-onl-nf_croatia-fans-parade-dallas-ahead-of-england-match-170626?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/18/ghana-beat-panama-1-0-in-chaotic-charged-world-cup-group-l?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_48",
       "group": 2,
-      "label": "‘Don’t meddle’: Lula calls on Trump to stay out of Brazil’s elections",
+      "label": "US transfers immigrants out of Florida Alligator Alcatraz detention centre",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/17/dont-meddle-lula-calls-on-trump-to-stay-out-of-brazils-elections?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/18/us-transfers-immigrants-out-of-florida-alligator-alcatraz-detention-centre?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_49",
       "group": 2,
-      "label": "Why was India’s Cockroach Janta Party founder attacked?",
+      "label": "Iran war live: Pakistan says MoU in effect after Trump, Pezeshkian signing",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/17/why-was-indias-cockroach-janta-party-founder-attacked?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/liveblog/2026/6/18/iran-war-live-trump-pezeshkian-sign-mou-to-end-fighting-reopen-hormuz?traffic_source=rss",
       "image": ""
     },
     {
@@ -472,12 +472,12 @@
       "label": "US and Iran sign deal aimed at ending war - here's what's in it",
       "size": 12,
       "url": "https://news.sky.com/story/the-14-point-us-iran-deal-what-is-in-it-13555121",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-iran-tehran_7276290.jpg?20260618001220"
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-masoud-pezeshkian-iran_7276312.jpg?20260618033631"
     },
     {
       "id": "sig_51",
       "group": 2,
-      "label": "A stain on America: Trump's war with Iran has been a tragic and expensive waste of time",
+      "label": "America, not so great again: This war has been a waste of time",
       "size": 12,
       "url": "https://news.sky.com/story/trumps-war-with-iran-has-been-a-tragic-and-expensive-waste-of-time-13555179",
       "image": "https://e3.365dm.com/26/06/1920x1080/skynews-trump-us-france_7276296.jpg?20260618003658"
@@ -704,6 +704,11 @@
       "value": 1
     },
     {
+      "source": "sig_6",
+      "target": "sig_5",
+      "value": 1
+    },
+    {
       "source": "sig_7",
       "target": "theme_geo",
       "value": 1
@@ -739,16 +744,6 @@
       "value": 1
     },
     {
-      "source": "sig_10",
-      "target": "theme_econ",
-      "value": 1
-    },
-    {
-      "source": "sig_10",
-      "target": "sig_9",
-      "value": 1
-    },
-    {
       "source": "sig_11",
       "target": "reg_na",
       "value": 1
@@ -756,6 +751,11 @@
     {
       "source": "sig_11",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_11",
+      "target": "theme_econ",
       "value": 1
     },
     {
@@ -765,17 +765,22 @@
     },
     {
       "source": "sig_12",
-      "target": "theme_geo",
+      "target": "reg_asia",
       "value": 1
     },
     {
       "source": "sig_13",
-      "target": "reg_eu",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_13",
-      "target": "theme_econ",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_13",
+      "target": "sig_12",
       "value": 1
     },
     {
@@ -785,22 +790,17 @@
     },
     {
       "source": "sig_15",
-      "target": "theme_geo",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_15",
-      "target": "sig_14",
+      "target": "theme_econ",
       "value": 1
     },
     {
       "source": "sig_16",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_16",
-      "target": "reg_me",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -809,23 +809,23 @@
       "value": 1
     },
     {
-      "source": "sig_18",
-      "target": "theme_geo",
+      "source": "sig_17",
+      "target": "sig_16",
       "value": 1
     },
     {
       "source": "sig_18",
-      "target": "sig_17",
-      "value": 1
-    },
-    {
-      "source": "sig_19",
       "target": "reg_na",
       "value": 1
     },
     {
+      "source": "sig_18",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
       "source": "sig_19",
-      "target": "sig_18",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -869,6 +869,11 @@
       "value": 1
     },
     {
+      "source": "sig_23",
+      "target": "sig_22",
+      "value": 1
+    },
+    {
       "source": "sig_24",
       "target": "theme_geo",
       "value": 1
@@ -904,13 +909,13 @@
       "value": 1
     },
     {
-      "source": "sig_28",
-      "target": "theme_sport",
+      "source": "sig_27",
+      "target": "sig_26",
       "value": 1
     },
     {
       "source": "sig_28",
-      "target": "sig_27",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -919,18 +924,13 @@
       "value": 1
     },
     {
-      "source": "sig_29",
-      "target": "sig_28",
-      "value": 1
-    },
-    {
       "source": "sig_30",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_31",
-      "target": "reg_me",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -940,27 +940,22 @@
     },
     {
       "source": "sig_32",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_32",
-      "target": "sig_31",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_33",
-      "target": "reg_sa",
-      "value": 1
-    },
-    {
-      "source": "sig_34",
       "target": "reg_na",
       "value": 1
     },
     {
+      "source": "sig_33",
+      "target": "sig_32",
+      "value": 1
+    },
+    {
       "source": "sig_34",
-      "target": "reg_eu",
+      "target": "reg_sa",
       "value": 1
     },
     {
@@ -975,7 +970,7 @@
     },
     {
       "source": "sig_35",
-      "target": "reg_me",
+      "target": "reg_eu",
       "value": 1
     },
     {
@@ -995,25 +990,20 @@
     },
     {
       "source": "sig_37",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_37",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_38",
       "target": "theme_geo",
       "value": 1
     },
     {
-      "source": "sig_38",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_38",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_38",
-      "target": "sig_37",
-      "value": 1
-    },
-    {
       "source": "sig_39",
       "target": "reg_na",
       "value": 1
@@ -1021,11 +1011,6 @@
     {
       "source": "sig_39",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_39",
-      "target": "sig_38",
       "value": 1
     },
     {
@@ -1045,12 +1030,12 @@
     },
     {
       "source": "sig_41",
-      "target": "theme_sport",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_41",
-      "target": "sig_40",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1065,12 +1050,17 @@
     },
     {
       "source": "sig_43",
-      "target": "sig_42",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_44",
-      "target": "theme_geo",
+      "target": "reg_afr",
+      "value": 1
+    },
+    {
+      "source": "sig_44",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -1080,22 +1070,17 @@
     },
     {
       "source": "sig_45",
-      "target": "theme_sport",
-      "value": 1
-    },
-    {
-      "source": "sig_45",
-      "target": "sig_44",
-      "value": 1
-    },
-    {
-      "source": "sig_46",
       "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_46",
-      "target": "sig_45",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_46",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1115,12 +1100,17 @@
     },
     {
       "source": "sig_48",
-      "target": "reg_sa",
+      "target": "sig_47",
       "value": 1
     },
     {
       "source": "sig_49",
-      "target": "reg_asia",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_49",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1140,7 +1130,7 @@
     },
     {
       "source": "sig_51",
-      "target": "reg_me",
+      "target": "sig_50",
       "value": 1
     },
     {
@@ -1174,13 +1164,13 @@
       "value": 1
     },
     {
-      "source": "sig_54",
-      "target": "sig_53",
+      "source": "sig_55",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_55",
-      "target": "theme_geo",
+      "target": "sig_54",
       "value": 1
     },
     {
@@ -1221,6 +1211,11 @@
     {
       "source": "sig_59",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_59",
+      "target": "sig_58",
       "value": 1
     }
   ]
