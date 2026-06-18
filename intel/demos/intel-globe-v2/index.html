@@ -654,14 +654,14 @@ function init() {
   mouse = new THREE.Vector2(-999, -999);
 
   // ─── Lighting ───
-  const ambient = new THREE.AmbientLight('#222233', 0.6);
+  const ambient = new THREE.AmbientLight('#445566', 1.2);
   scene.add(ambient);
-  const sun = new THREE.DirectionalLight('#ffffff', 1.8);
+  const sun = new THREE.DirectionalLight('#ffffff', 3.0);
   const sunDir = getSunDirection();
   sun.position.copy(sunDir.clone().multiplyScalar(20));
   sun.name = 'sunLight';
   scene.add(sun);
-  const fill = new THREE.DirectionalLight('#0044cc', 0.3);
+  const fill = new THREE.DirectionalLight('#0044cc', 0.8);
   fill.position.set(-30, 10, -20);
   scene.add(fill);
 
@@ -705,9 +705,9 @@ function buildEarth() {
 
   // Ocean base
   const oceanGrad = ctx.createLinearGradient(0, 0, 0, 1024);
-  oceanGrad.addColorStop(0, '#0a1a2a');
-  oceanGrad.addColorStop(0.5, '#0d2540');
-  oceanGrad.addColorStop(1, '#0a1a2a');
+  oceanGrad.addColorStop(0, '#1a3a5a');
+  oceanGrad.addColorStop(0.5, '#1a4a6a');
+  oceanGrad.addColorStop(1, '#1a3a5a');
   ctx.fillStyle = oceanGrad;
   ctx.fillRect(0, 0, 2048, 1024);
 
@@ -732,11 +732,11 @@ function buildEarth() {
   ];
 
   const landGrad = ctx.createLinearGradient(0, 0, 0, 1024);
-  landGrad.addColorStop(0, '#1a2a1a');
-  landGrad.addColorStop(0.3, '#2a3a1a');
-  landGrad.addColorStop(0.5, '#1a3a0a');
-  landGrad.addColorStop(0.7, '#3a3a1a');
-  landGrad.addColorStop(1, '#0a1a0a');
+  landGrad.addColorStop(0, '#3a5a2a');
+  landGrad.addColorStop(0.3, '#4a6a3a');
+  landGrad.addColorStop(0.5, '#3a5a1a');
+  landGrad.addColorStop(0.7, '#5a5a3a');
+  landGrad.addColorStop(1, '#2a3a1a');
 
   for (const c of continents) {
     ctx.fillStyle = landGrad;
@@ -768,8 +768,8 @@ function buildEarth() {
 
   const earthGeo = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
   const earthMat = new THREE.MeshStandardMaterial({
-    map: earthTex, roughness: 0.85, metalness: 0.1,
-    emissive: new THREE.Color('#0a1a2a'), emissiveIntensity: 0.08,
+    map: earthTex, roughness: 0.7, metalness: 0.05,
+    emissive: new THREE.Color('#1a3a5a'), emissiveIntensity: 0.3,
   });
   earth = new THREE.Mesh(earthGeo, earthMat);
   earth.castShadow = false;
