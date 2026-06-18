@@ -202,8 +202,9 @@
   .alert-item {
     display: flex; align-items: flex-start; gap: 8px;
     padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.02);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', monospace; cursor: pointer; transition: opacity 0.15s;
   }
+  .alert-item:hover { opacity: 0.7; }
   .alert-item .ai-sev {
     width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0;
   }
@@ -265,7 +266,8 @@
     height: 100%; font-size: 11px; color: #bbc;
     animation: tickerScroll 60s linear infinite;
   }
-  #ticker .ticker-content .tc-item { padding: 0 24px; }
+  #ticker .ticker-content .tc-item { padding: 0 24px; cursor: pointer; transition: opacity 0.15s; }
+  #ticker .ticker-content .tc-item:hover { opacity: 0.7; }
   #ticker .ticker-content .tc-item .tc-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 8px; }
   #ticker .ticker-content .tc-item .tc-time { color: #667; margin-right: 8px; }
   #ticker .ticker-content .tc-item .tc-text { color: #bbc; }
@@ -718,30 +720,30 @@ const HOTSPOTS = [
 
 // ─── Alerts ───
 const ALERTS = [
-  {time:'11:42 UTC',sev:3,text:'Artillery exchanges reported along eastern front line',loc:'Ukraine'},
-  {time:'11:38 UTC',sev:3,text:'Airstrikes target infrastructure in Khan Younis',loc:'Gaza'},
-  {time:'11:35 UTC',sev:3,text:'RSF forces advance on El Fasher, humanitarian crisis deepening',loc:'Sudan'},
-  {time:'11:30 UTC',sev:2,text:'Merchant vessel reports drone sighting near Bab-el-Mandeb',loc:'Red Sea'},
-  {time:'11:22 UTC',sev:2,text:'PLA Navy exercises observed near median line',loc:'Taiwan Strait'},
-  {time:'11:15 UTC',sev:2,text:'Gang violence escalates in Port-au-Prince, evacuation advised',loc:'Haiti'},
-  {time:'11:08 UTC',sev:2,text:'Syrian regime artillery fires on Idlib province',loc:'Syria'},
-  {time:'10:55 UTC',sev:1,text:'Coup leaders delay elections to 2027',loc:'Sahel'},
-  {time:'10:42 UTC',sev:1,text:'Hyperinflation reaches 450%, mass migration continues',loc:'Venezuela'},
-  {time:'10:30 UTC',sev:3,text:'5.2 magnitude earthquake strikes southern Japan',loc:'Japan'},
-  {time:'10:18 UTC',sev:2,text:'Critical CVE-2026-4419 patch released, active exploitation detected',loc:'Global'},
-  {time:'10:05 UTC',sev:2,text:'Oil prices surge 3.2% on supply disruption fears',loc:'Global Markets'},
+  {time:'11:42 UTC',sev:3,text:'Artillery exchanges reported along eastern front line',loc:'Ukraine',url:'https://www.reuters.com/world/europe/'},
+  {time:'11:38 UTC',sev:3,text:'Airstrikes target infrastructure in Khan Younis',loc:'Gaza',url:'https://www.bbc.com/news/world/middle_east'},
+  {time:'11:35 UTC',sev:3,text:'RSF forces advance on El Fasher, humanitarian crisis deepening',loc:'Sudan',url:'https://www.aljazeera.com/news/2026/6/18/sudan-el-fasher'},
+  {time:'11:30 UTC',sev:2,text:'Merchant vessel reports drone sighting near Bab-el-Mandeb',loc:'Red Sea',url:'https://www.reuters.com/world/middle-east/'},
+  {time:'11:22 UTC',sev:2,text:'PLA Navy exercises observed near median line',loc:'Taiwan Strait',url:'https://www.reuters.com/world/asia-pacific/'},
+  {time:'11:15 UTC',sev:2,text:'Gang violence escalates in Port-au-Prince, evacuation advised',loc:'Haiti',url:'https://www.bbc.com/news/world/latin_america'},
+  {time:'11:08 UTC',sev:2,text:'Syrian regime artillery fires on Idlib province',loc:'Syria',url:'https://www.aljazeera.com/news/2026/6/18/syria-idlib'},
+  {time:'10:55 UTC',sev:1,text:'Coup leaders delay elections to 2027',loc:'Sahel',url:'https://www.reuters.com/world/africa/'},
+  {time:'10:42 UTC',sev:1,text:'Hyperinflation reaches 450%, mass migration continues',loc:'Venezuela',url:'https://www.bbc.com/news/world/latin_america'},
+  {time:'10:30 UTC',sev:3,text:'5.2 magnitude earthquake strikes southern Japan',loc:'Japan',url:'https://www.jma.go.jp/jma/en/earthquake/'},
+  {time:'10:18 UTC',sev:2,text:'Critical CVE-2026-4419 patch released, active exploitation detected',loc:'Global',url:'https://nvd.nist.gov/vuln/detail/CVE-2026-4419'},
+  {time:'10:05 UTC',sev:2,text:'Oil prices surge 3.2% on supply disruption fears',loc:'Global Markets',url:'https://www.marketwatch.com/investing/index/cl'},
 ];
 
 // ─── Ticker items ───
 const TICKER = [
-  {dot:'#ff2244',time:'11:42',text:'Ukraine: Artillery exchanges along eastern front'},
-  {dot:'#ff2244',time:'11:38',text:'Gaza: Airstrikes target Khan Younis infrastructure'},
-  {dot:'#ff2244',time:'11:35',text:'Sudan: RSF advances on El Fasher'},
-  {dot:'#ffaa22',time:'11:30',text:'Red Sea: Drone sighting near Bab-el-Mandeb'},
-  {dot:'#ffaa22',time:'11:22',text:'Taiwan Strait: PLA Navy exercises near median line'},
-  {dot:'#ffaa22',time:'11:15',text:'Haiti: Gang violence escalates in Port-au-Prince'},
-  {dot:'#22dd88',time:'10:55',text:'CVE-2026-4419: Critical patch released'},
-  {dot:'#00c2ff',time:'10:42',text:'Markets: Oil +3.2%, Defense sector +1.1%'},
+  {dot:'#ff2244',time:'11:42',text:'Ukraine: Artillery exchanges along eastern front',url:'https://www.reuters.com/world/europe/'},
+  {dot:'#ff2244',time:'11:38',text:'Gaza: Airstrikes target Khan Younis infrastructure',url:'https://www.bbc.com/news/world/middle_east'},
+  {dot:'#ff2244',time:'11:35',text:'Sudan: RSF advances on El Fasher',url:'https://www.aljazeera.com/news/2026/6/18/sudan-el-fasher'},
+  {dot:'#ffaa22',time:'11:30',text:'Red Sea: Drone sighting near Bab-el-Mandeb',url:'https://www.reuters.com/world/middle-east/'},
+  {dot:'#ffaa22',time:'11:22',text:'Taiwan Strait: PLA Navy exercises near median line',url:'https://www.reuters.com/world/asia-pacific/'},
+  {dot:'#ffaa22',time:'11:15',text:'Haiti: Gang violence escalates in Port-au-Prince',url:'https://www.bbc.com/news/world/latin_america'},
+  {dot:'#22dd88',time:'10:55',text:'CVE-2026-4419: Critical patch released',url:'https://nvd.nist.gov/vuln/detail/CVE-2026-4419'},
+  {dot:'#00c2ff',time:'10:42',text:'Markets: Oil +3.2%, Defense sector +1.1%',url:'https://www.marketwatch.com/investing/index/cl'},
 ];
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1464,12 +1466,12 @@ function renderAlerts() {
   const list = document.getElementById('alerts-list');
   const sevColors = ['#ffaa22', '#ff6644', '#ff2244'];
   list.innerHTML = ALERTS.map(a => `
-    <div class="alert-item">
+    <a class="alert-item" href="${a.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">
       <div class="ai-sev" style="background:${sevColors[a.sev-1]};box-shadow:0 0 6px ${sevColors[a.sev-1]};"></div>
       <div class="ai-time">${a.time}</div>
       <div class="ai-text">${a.text}</div>
       <div class="ai-loc">${a.loc}</div>
-    </div>
+    </a>
   `).join('');
 }
 
@@ -1484,10 +1486,10 @@ function generateAISummary() {
   <div class="meta">Analysis generated by GLM-5.2 | ${ALERTS.length} inputs correlated | Confidence: HIGH</div>`;
 }
 
-function renderTicker() {
+:function renderTicker() {
   const content = document.getElementById('ticker-content');
   const items = TICKER.map(t =>
-    `<span class="tc-item"><span class="tc-dot" style="background:${t.dot}"></span><span class="tc-time">${t.time}</span><span class="tc-text">${t.text}</span></span>`
+    `<a class="tc-item" href="${t.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit"><span class="tc-dot" style="background:${t.dot}"></span><span class="tc-time">${t.time}</span><span class="tc-text">${t.text}</span></a>`
   ).join('');
   content.innerHTML = items + items; // Duplicate for seamless loop
 }
