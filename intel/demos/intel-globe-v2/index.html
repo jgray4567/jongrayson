@@ -849,11 +849,17 @@ function buildFlights() {
     const trail = new THREE.Line(trailGeo, trailMat);
     flightGroup.add(trail);
 
-    // Plane sprite (small glowing dot)
-    const planeGeo = new THREE.SphereGeometry(0.04, 6, 4);
+    // Plane icon (arrow shape pointing forward)
+    const planeShape = new THREE.Shape();
+    planeShape.moveTo(0.14, 0);       // nose
+    planeShape.lineTo(-0.08, 0.06);   // left wing tip
+    planeShape.lineTo(-0.04, 0);      // left tail
+    planeShape.lineTo(-0.08, -0.06);  // right wing tip
+    planeShape.lineTo(0.14, 0);       // back to nose
+    const planeGeo = new THREE.ShapeGeometry(planeShape);
     const planeMat = new THREE.MeshBasicMaterial({
-      color: 0x00c2ff, transparent: true, opacity: 0.9,
-      blending: THREE.AdditiveBlending,
+      color: 0x88eeff, transparent: true, opacity: 1.0,
+      blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
     });
     const plane = new THREE.Mesh(planeGeo, planeMat);
     flightGroup.add(plane);
@@ -878,6 +884,16 @@ function updateFlights() {
 
     const idx = Math.floor(fp.progress * (fp.points.length - 1));
     fp.plane.position.copy(fp.points[idx]);
+
+    // Orient plane to face direction of travel
+    const nextIdx = Math.min(idx + 1, fp.points.length - 1);
+    const direction = fp.points[nextIdx].clone().sub(fp.points[idx]);
+    if (direction.lengthSq() > 0.0001) {
+      const up = fp.points[idx].clone().normalize();
+      const quat = new THREE.Quaternion();
+      quat.setFromUnitVectors(new THREE.Vector3(1, 0, 0), direction.clone().normalize());
+      fp.plane.quaternion.copy(quat);
+    }
 
     // Update trail
     const trailPoints = [];
