@@ -513,7 +513,7 @@
   </label>
 
   <label class="layer-toggle">
-    <input type="checkbox" class="lt-checkbox" id="layer-borders">
+    <input type="checkbox" class="lt-checkbox" id="layer-borders" checked>
     <div class="lt-icon">⬡</div>
     <div class="lt-info"><div class="lt-name">Country Borders</div><div class="lt-desc">Wireframe overlay</div></div>
     <div class="lt-count" id="count-borders">OFF</div>
@@ -812,7 +812,7 @@ let hoveredCity = null;
 let flightPaths = [];
 
 const layers = {
-  flights: true, daynight: true, borders: false,
+  flights: true, daynight: true, borders: true,
   cities: true, hotspots: true, satellites: true,
   autorotate: false, atmosphere: true, stars: true
 };
@@ -1319,13 +1319,13 @@ async function buildBorders() {
   scene.add(borderGroup);
 
   try {
-    // Load simplified world country borders from GeoJSON
-    const res = await fetch('https://cdn.jsdelivr.net/gh/martynafford/geojson-country-bounds@master/countries-50m.geojson');
+    // Load simplified world country borders from Natural Earth GeoJSON
+    const res = await fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson');
     if (!res.ok) throw new Error('GeoJSON fetch failed: ' + res.status);
     const geo = await res.json();
 
     const lineMat = new THREE.LineBasicMaterial({
-      color: 0x00c2ff, transparent: true, opacity: 0.25,
+      color: 0xC4D600, transparent: true, opacity: 0.3,
       blending: THREE.AdditiveBlending,
     });
 
@@ -1350,7 +1350,7 @@ async function buildBorders() {
     console.error('Border GeoJSON load error:', err);
     // Fallback: simple lat/lng grid
     const lineMat = new THREE.LineBasicMaterial({
-      color: 0x00c2ff, transparent: true, opacity: 0.15,
+      color: 0xC4D600, transparent: true, opacity: 0.15,
       blending: THREE.AdditiveBlending,
     });
     for (let lat = -60; lat <= 60; lat += 30) {
