@@ -831,14 +831,24 @@ async function fetchRealFlights() {
     }
     flightPaths = [];
 
-    // Create shared plane geometry (small triangle)
+    // Create shared jet icon geometry (top-down silhouette)
     if (!planeIconGeo) {
       const shape = new THREE.Shape();
-      shape.moveTo(0.05, 0);
-      shape.lineTo(-0.03, 0.02);
-      shape.lineTo(-0.015, 0);
-      shape.lineTo(-0.03, -0.02);
-      shape.lineTo(0.05, 0);
+      // Nose
+      shape.moveTo(0.12, 0);
+      // Right side: nose to right wing tip
+      shape.lineTo(0.04, 0.016);
+      shape.lineTo(-0.02, 0.07);  // right wing tip (swept back)
+      // Right wing root to tail
+      shape.lineTo(-0.03, 0.016);
+      shape.lineTo(-0.07, 0.036);  // right horizontal stabilizer
+      shape.lineTo(-0.06, 0.01);
+      // Tail to left side (mirror)
+      shape.lineTo(-0.07, -0.036); // left horizontal stabilizer
+      shape.lineTo(-0.03, -0.016);
+      shape.lineTo(-0.02, -0.07);  // left wing tip (swept back)
+      shape.lineTo(0.04, -0.016);
+      shape.lineTo(0.12, 0);       // back to nose
       planeIconGeo = new THREE.ShapeGeometry(shape);
     }
     if (!planeIconMat) {
