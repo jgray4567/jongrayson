@@ -400,7 +400,8 @@
   @media (max-width: 850px) {
     #menu-btn { display: flex; }
     #regions-btn { display: flex; }
-    #alerts-btn { display: flex; }
+    #alerts-btn { display: flex; z-index: 12; }
+    #alerts-btn.hidden { display: none; }
 
     #top-bar { padding-left: 52px; padding-right: 52px; height: 50px; gap: 8px; }
     #top-bar .title { font-size: 12.1px; }
@@ -415,7 +416,8 @@
       position: fixed; top: 0; right: 0; bottom: 0;
       width: 280px; max-height: 100vh; border-radius: 0;
       transform: translateX(100%); transition: transform 0.3s ease;
-      z-index: 14; padding-top: 60px;
+      z-index: 14; padding-top: 56px; padding-bottom: 80px;
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
     }
     #layers-panel.open { transform: translateX(0); }
 
@@ -442,11 +444,13 @@
     #ticker { font-size: 11.0px; }
   }
 
-  @media (max-width: 640px) {
+:  @media (max-width: 640px) {
     #top-bar .title .sep { display: none; }
     #top-bar .stat-strip { gap: 6px; }
     #top-bar .utc-clock { display: none; }
     #alerts-panel { max-height: 40vh; }
+    #layers-panel { width: 100vw; }
+    #regions-panel { width: 100vw; }
   }
 </style>
 </head>
@@ -1608,17 +1612,18 @@ function setupUI() {
     menuBtn.classList.remove('active');
     regionsBtn.classList.remove('active');
     alertsBtn.classList.remove('active');
+    alertsBtn.classList.remove('hidden');
   }
 
   menuBtn.addEventListener('click', () => {
     const isOpen = layersPanel.classList.contains('open');
     closeAllPanels();
-    if (!isOpen) { layersPanel.classList.add('open'); backdrop.classList.add('active'); menuBtn.classList.add('active'); }
+    if (!isOpen) { layersPanel.classList.add('open'); backdrop.classList.add('active'); menuBtn.classList.add('active'); alertsBtn.classList.add('hidden'); }
   });
   regionsBtn.addEventListener('click', () => {
     const isOpen = regionsPanel.classList.contains('open');
     closeAllPanels();
-    if (!isOpen) { regionsPanel.classList.add('open'); backdrop.classList.add('active'); regionsBtn.classList.add('active'); }
+    if (!isOpen) { regionsPanel.classList.add('open'); backdrop.classList.add('active'); regionsBtn.classList.add('active'); alertsBtn.classList.add('hidden'); }
   });
   alertsBtn.addEventListener('click', () => {
     const isOpen = alertsPanel.classList.contains('open');
