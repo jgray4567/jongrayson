@@ -250,15 +250,15 @@
 
   /* ─── AI Summary Modal ─── */
   #ai-summary {
-    position: absolute; bottom: 340px; left: 16px; z-index: 15;
-    width: 400px; max-height: 300px; padding: 16px 18px; display: none;
+    position: absolute; bottom: 340px; left: 50%; transform: translateX(-50%) translateY(10px); z-index: 15;
+    width: 440px; max-height: 320px; padding: 16px 18px; display: none;
     background: rgba(6,7,10,0.95); backdrop-filter: blur(16px);
     border: 1px solid rgba(196,214,0,0.15); border-radius: 14px;
-    transform: translateY(10px); opacity: 0;
+    opacity: 0;
     transition: transform 0.25s ease, opacity 0.25s ease;
   }
   #ai-summary.active {
-    display: block; transform: translateY(0); opacity: 1;
+    display: block; transform: translateX(-50%) translateY(0); opacity: 1;
   }
   #ai-summary .as-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -366,7 +366,8 @@
     #layers-panel { width: 220px; }
     #regions-panel { width: 190px; }
     #alerts-panel { width: 340px; }
-    #ai-summary { left: 372px; width: 320px; }
+    #ai-summary { left: 50%; transform: translateX(-50%) translateY(10px); width: 360px; }
+    #ai-summary.active { transform: translateX(-50%) translateY(0); }
   }
 
   /* ─── Mobile Hamburger Button ─── */
