@@ -149,10 +149,10 @@
     {
       "id": "sig_10",
       "group": 2,
-      "label": "US lifts naval blockade as Iran's supreme leader says Trump made deal 'out of desperation'",
+      "label": "US-Iran talks postponed as Vance pulls out of Switzerland trip",
       "size": 12,
-      "url": "https://www.bbc.com/news/articles/c8r2eejdd35o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/b003/live/59a4cac0-6b4a-11f1-bc34-19faf070d2ff.jpg"
+      "url": "https://www.bbc.com/news/articles/c8r2eme2n5do?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/f807/live/15c36cd0-6ba9-11f1-ad4f-418bfa76e5cc.jpg"
     },
     {
       "id": "sig_11",
@@ -173,13 +173,21 @@
     {
       "id": "sig_13",
       "group": 2,
+      "label": "Do it at home too, women tell Japanese fans who cleaned World Cup stadium",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/crel9xlp8r1o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/ce26/live/6d636b80-6b94-11f1-a202-c5e2a605690a.jpg"
+    },
+    {
+      "id": "sig_14",
+      "group": 2,
       "label": "Moscow residents complain of black rain after largest Ukrainian attack hits oil refinery",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/c98291g5rr1o?at_medium=RSS&amp;at_campaign=rss",
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/fcc6/live/1006d240-6b0f-11f1-8e1d-bbbb1017d210.jpg"
     },
     {
-      "id": "sig_14",
+      "id": "sig_15",
       "group": 2,
       "label": "Thirty-five killed as gunmen attack Niger's biggest airport",
       "size": 12,
@@ -187,7 +195,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/252c/live/b6de6170-fcdb-11f0-9c97-69939b61e7c7.jpg"
     },
     {
-      "id": "sig_15",
+      "id": "sig_16",
       "group": 2,
       "label": "Parents of Serbia's teenage school shooter given jail terms in retrial",
       "size": 12,
@@ -195,7 +203,15 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5099/live/38b56b70-6b2d-11f1-858e-3f275ac14006.jpg"
     },
     {
-      "id": "sig_16",
+      "id": "sig_17",
+      "group": 2,
+      "label": "In Trump's shadow, Vance becomes face of Iran deal ",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/cx23jr133lwo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1efa/live/df12d4a0-6bb2-11f1-8546-8f19e4fe30f4.jpg"
+    },
+    {
+      "id": "sig_18",
       "group": 2,
       "label": "Hegseth renews Nato criticism and says US will review presence in Europe",
       "size": 12,
@@ -203,7 +219,7 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/59ae/live/2100f1e0-6b03-11f1-aa02-f994d64872ca.jpg"
     },
     {
-      "id": "sig_17",
+      "id": "sig_19",
       "group": 2,
       "label": "British man dies in paragliding accident in Spain",
       "size": 12,
@@ -211,31 +227,31 @@
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/2260/live/7e182be0-6b13-11f1-b1db-af71d47507d6.jpg"
     },
     {
-      "id": "sig_18",
-      "group": 2,
-      "label": "Suspected gang leader shot dead in flower bouquet ambush at airport",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/c4gy2l30dd0o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/66b6/live/f1aff820-6af1-11f1-9be9-d920b9420b45.jpg"
-    },
-    {
-      "id": "sig_19",
-      "group": 2,
-      "label": "Jury fails to reach verdict in Norwegian 'hitman' trial",
-      "size": 12,
-      "url": "https://www.bbc.com/news/articles/cz6v1qw7d0no?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/ea9b/live/d8d0af90-5f55-11f1-bb7a-41653d1de4b5.png"
-    },
-    {
       "id": "sig_20",
       "group": 2,
-      "label": "Vance Issues Blunt Warning to Israel as He Defends Trump’s Deal",
+      "label": "Swiss Officials Say Iran Talks Are Off, for Now",
       "size": 12,
-      "url": "https://www.nytimes.com/live/2026/06/18/world/iran-war-trump-us-deal",
+      "url": "https://www.nytimes.com/2026/06/19/world/europe/switzerland-iran-talks.html",
       "image": ""
     },
     {
       "id": "sig_21",
+      "group": 2,
+      "label": "Who Is Andy Burnham, the Man Who Could Be Britain’s Next Prime Minister?",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/18/world/europe/who-is-andy-burnham-britain-next-possible-prime-minister.html",
+      "image": ""
+    },
+    {
+      "id": "sig_22",
+      "group": 2,
+      "label": "What Does It All Mean? Once a Year, French Students Try to Explain.",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/19/world/europe/france-education-high-school-philosophy.html",
+      "image": ""
+    },
+    {
+      "id": "sig_23",
       "group": 2,
       "label": "Critics of Russia Say This Critic Isn’t Critical Enough",
       "size": 12,
@@ -243,7 +259,7 @@
       "image": ""
     },
     {
-      "id": "sig_22",
+      "id": "sig_24",
       "group": 2,
       "label": "Iran and the U.S. Have an Understanding. Will It Lead to a Deal?",
       "size": 12,
@@ -251,7 +267,7 @@
       "image": ""
     },
     {
-      "id": "sig_23",
+      "id": "sig_25",
       "group": 2,
       "label": "Ukraine Strikes Moscow Refinery in Large-Scale Drone Attack",
       "size": 12,
@@ -259,7 +275,7 @@
       "image": ""
     },
     {
-      "id": "sig_24",
+      "id": "sig_26",
       "group": 2,
       "label": "Gunmen Attack a Major Airport in Niger",
       "size": 12,
@@ -267,7 +283,7 @@
       "image": ""
     },
     {
-      "id": "sig_25",
+      "id": "sig_27",
       "group": 2,
       "label": "The Major Oak, Ancient Tree of Robin Hood Legend, Has Died",
       "size": 12,
@@ -275,7 +291,7 @@
       "image": ""
     },
     {
-      "id": "sig_26",
+      "id": "sig_28",
       "group": 2,
       "label": "19-Year-Old Suspect in Consulate Shooting Arrested at Toronto Airport",
       "size": 12,
@@ -283,27 +299,11 @@
       "image": ""
     },
     {
-      "id": "sig_27",
+      "id": "sig_29",
       "group": 2,
       "label": "Afghanistan Issues Ban on Smartphones for Civil Servants and Military",
       "size": 12,
       "url": "https://www.nytimes.com/2026/06/18/world/asia/afghanistan-taliban-smartphone-ban.html",
-      "image": ""
-    },
-    {
-      "id": "sig_28",
-      "group": 2,
-      "label": "In Ancient Pits Near Stonehenge, Scientists See Hints of Solstice Ritual",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/18/world/europe/uk-pits-stonehenge-britain-discovery.html",
-      "image": ""
-    },
-    {
-      "id": "sig_29",
-      "group": 2,
-      "label": "Iran Gets Major Economic Lifeline for Minimal Concessions in Initial Deal",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/18/world/middleeast/iran-deal-oil-strait-of-hormuz-nuclear.html",
       "image": ""
     },
     {
@@ -389,81 +389,81 @@
     {
       "id": "sig_40",
       "group": 2,
-      "label": "Israel strikes southern Lebanon in sudden clash surge with Hezbollah",
+      "label": "Oil prices rise as Lebanon fighting erupts and Hormuz traffic still slow",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/israel-strikes-southern-lebanon-in-sudden-clash-surge-with-hezbollah?traffic_source=rss",
+      "url": "https://www.aljazeera.com/economy/2026/6/19/oil-prices-rise-as-lebanon-fighting-erupts-and-hormuz-traffic-still-slow?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_41",
       "group": 2,
-      "label": "Andy Burnham wins key UK by-election, paving way to challenge Keir Starmer",
+      "label": "US-Iran talks postponed as Israel attacks Lebanon",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/19/andy-burnham-wins-crucial-uk-by-election-in-blow-to-keir-starmer?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/19/us-iran-talks-postponed-as-israel-attacks-lebanon?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_42",
       "group": 2,
-      "label": "Canada vs Qatar World Cup: 3 goals for David, 2 red cards, 1 injured Kone",
+      "label": "Iran to lodge complaint with FIFA over World Cup 2026 travel restrictions",
       "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/19/canada-vs-qatar-world-cup-3-goals-for-david-2-red-cards-1-injured-kone?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/19/iran-to-lodge-complaint-with-fifa-over-world-cup-2026-travel-restrictions?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_43",
       "group": 2,
-      "label": "Obama opens presidential centre with call for unity",
+      "label": "Iran war day 112: Vance defends Tehran ‘deal’ but Switzerland trips are off",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/obama-opens-presidential-centre-with-call-for-unity?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/19/iran-war-day-112-vance-defends-tehran-deal-but-switzerland-trips-are-off?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_44",
       "group": 2,
-      "label": "Paint peeling after $14 million memorial pool renovation",
+      "label": "A world on trial: How lawyers documenting Israeli abuse pay a price",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/paint-peeling-after-14-million-memorial-pool-renovation?traffic_source=rss",
+      "url": "https://www.aljazeera.com/features/2026/6/19/a-world-on-trial-how-lawyers-documenting-israeli-abuse-pay-a-price?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_45",
       "group": 2,
-      "label": "EU won’t lift key Iran sanctions until formal nuclear deal reached",
+      "label": "Cape Verde goalkeeper Vozinha happy his mother will attend World Cup",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/eu-wont-lift-key-iran-sanctions-until-formal-nuclear-deal-reached?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/cape-verde-goalkeeper-vozinha-happy-his-mother-will-attend-world-cup?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_46",
       "group": 2,
-      "label": "Zimbabwe bill to scrap presidential elections sparks backlash",
+      "label": "Burnham by-election victory raises stakes for Starmer",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/19/zimbabwe-bill-to-scrap-presidential-elections-sparks-backlash?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/burnham-by-election-victory-raises-stakes-for-starmer?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_47",
       "group": 2,
-      "label": "Iran war live: JD Vance delays trip to Switzerland for talks with Tehran",
+      "label": "Behind the noise of an ‘Iran deal’, Palestine continues to burn",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/liveblog/2026/6/19/iran-war-live-jd-vance-defends-iran-deal-as-us-says-naval-blockade-lifted?traffic_source=rss",
+      "url": "https://www.aljazeera.com/opinions/2026/6/19/behind-the-noise-of-an-iran-deal-palestine-continues-to-burn?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_48",
       "group": 2,
-      "label": "Vote counting begins in high-stakes UK by-election",
+      "label": "Mexico beat South Korea, become first team to reach World Cup knockouts",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/18/vote-counting-begins-in-high-stakes-uk-by-election?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/19/mexico-beat-south-korea-1-0-become-first-team-to-reach-world-cup-knockouts?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_49",
       "group": 2,
-      "label": "US judge orders release of Palestinian rights advocate detained by ICE",
+      "label": "Norway MP’s join viral World Cup ‘Viking Row’ trend",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/18/us-judge-orders-release-of-palestinian-rights-advocate-detained-by-ice?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/norway-mps-join-viral-world-cup-viking-row-trend?traffic_source=rss",
       "image": ""
     },
     {
@@ -616,6 +616,11 @@
       "value": 2
     },
     {
+      "source": "sig_1",
+      "target": "sig_0",
+      "value": 1
+    },
+    {
       "source": "sig_2",
       "target": "reg_na",
       "value": 1
@@ -629,6 +634,11 @@
       "source": "sig_2",
       "target": "theme_cyber",
       "value": 2
+    },
+    {
+      "source": "sig_2",
+      "target": "sig_1",
+      "value": 1
     },
     {
       "source": "sig_3",
@@ -651,13 +661,13 @@
       "value": 2
     },
     {
-      "source": "sig_5",
-      "target": "sig_4",
+      "source": "sig_6",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_6",
-      "target": "theme_geo",
+      "target": "sig_5",
       "value": 1
     },
     {
@@ -686,6 +696,11 @@
       "value": 1
     },
     {
+      "source": "sig_9",
+      "target": "sig_8",
+      "value": 1
+    },
+    {
       "source": "sig_10",
       "target": "reg_na",
       "value": 1
@@ -693,11 +708,6 @@
     {
       "source": "sig_10",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_10",
-      "target": "sig_9",
       "value": 1
     },
     {
@@ -726,18 +736,33 @@
       "value": 1
     },
     {
-      "source": "sig_13",
-      "target": "reg_eu",
+      "source": "sig_12",
+      "target": "sig_11",
       "value": 1
     },
     {
       "source": "sig_13",
-      "target": "theme_econ",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_13",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_13",
+      "target": "sig_12",
       "value": 1
     },
     {
       "source": "sig_14",
-      "target": "theme_geo",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_14",
+      "target": "theme_econ",
       "value": 1
     },
     {
@@ -752,22 +777,17 @@
     },
     {
       "source": "sig_16",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_16",
-      "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_16",
-      "target": "sig_15",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_17",
-      "target": "theme_geo",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_17",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -776,13 +796,18 @@
       "value": 1
     },
     {
+      "source": "sig_18",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
       "source": "sig_19",
       "target": "theme_geo",
       "value": 1
     },
     {
-      "source": "sig_20",
-      "target": "reg_na",
+      "source": "sig_19",
+      "target": "sig_18",
       "value": 1
     },
     {
@@ -791,28 +816,18 @@
       "value": 1
     },
     {
-      "source": "sig_20",
-      "target": "sig_19",
+      "source": "sig_21",
+      "target": "theme_geo",
       "value": 1
     },
     {
-      "source": "sig_21",
+      "source": "sig_22",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_23",
       "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_21",
-      "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_22",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_22",
-      "target": "sig_21",
       "value": 1
     },
     {
@@ -822,22 +837,17 @@
     },
     {
       "source": "sig_24",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_24",
-      "target": "sig_23",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_25",
-      "target": "theme_geo",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_26",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -847,12 +857,22 @@
     },
     {
       "source": "sig_28",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_28",
+      "target": "sig_27",
+      "value": 1
+    },
+    {
+      "source": "sig_29",
       "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_29",
-      "target": "reg_me",
+      "target": "sig_28",
       "value": 1
     },
     {
@@ -901,11 +921,6 @@
       "value": 1
     },
     {
-      "source": "sig_34",
-      "target": "sig_33",
-      "value": 1
-    },
-    {
       "source": "sig_35",
       "target": "reg_me",
       "value": 1
@@ -913,6 +928,11 @@
     {
       "source": "sig_36",
       "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_36",
+      "target": "sig_35",
       "value": 1
     },
     {
@@ -947,17 +967,22 @@
     },
     {
       "source": "sig_40",
-      "target": "sig_39",
+      "target": "theme_econ",
       "value": 1
     },
     {
       "source": "sig_41",
-      "target": "reg_eu",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_41",
-      "target": "sig_40",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_42",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -967,22 +992,22 @@
     },
     {
       "source": "sig_43",
-      "target": "theme_geo",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_44",
-      "target": "theme_geo",
+      "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_45",
+      "source": "sig_44",
       "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_45",
-      "target": "sig_44",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -1002,12 +1027,22 @@
     },
     {
       "source": "sig_48",
-      "target": "reg_eu",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_48",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_48",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_49",
-      "target": "reg_na",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -1026,13 +1061,13 @@
       "value": 1
     },
     {
-      "source": "sig_51",
-      "target": "sig_50",
+      "source": "sig_52",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_52",
-      "target": "reg_na",
+      "target": "sig_51",
       "value": 1
     },
     {
