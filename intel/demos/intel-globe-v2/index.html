@@ -1310,7 +1310,7 @@ function buildCities() {
   for (const city of CITIES) {
     const pos = latLngTo3D(city.lat, city.lng, EARTH_RADIUS + 0.02);
     const mat = new THREE.MeshBasicMaterial({
-      color: 0x00c2ff, transparent: true, opacity: 0.8,
+      color: 0xC4D600, transparent: true, opacity: 0.8,
       blending: THREE.AdditiveBlending,
     });
     const dot = new THREE.Mesh(dotGeo, mat);
