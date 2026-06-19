@@ -892,6 +892,8 @@ let hoveredCity = null;
 let flightPaths = [];
 let touchHoverActive = false;
 let touchTooltipTimer = null;
+let highlightRing = null;
+let highlightedObj = null;
 
 const layers = {
   flights: true, daynight: true, borders: true,
@@ -1024,6 +1026,18 @@ async function init() {
   orbitPathsGroup = new THREE.Group();
   orbitPathsGroup.visible = false;
   scene.add(orbitPathsGroup);
+
+  // Highlight ring for selected satellite — electric blue torus
+  const HIGHLIGHT_COLOR = 0x88eeff;
+  const ringGeo = new THREE.TorusGeometry(0.08, 0.006, 8, 32);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: HIGHLIGHT_COLOR, transparent: true, opacity: 0.9,
+    blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  });
+  highlightRing = new THREE.Mesh(ringGeo, ringMat);
+  highlightRing.visible = false;
+  scene.add(highlightRing);
+
   await fetchSatellites();
   satelliteOrbitInterval = setInterval(fetchSatellites, 30000);
   setupUI();
@@ -1187,6 +1201,11 @@ async function fetchRealFlights() {
       flightGroup.remove(fp.plane);
     }
     flightPaths = [];
+    // Clear stale flight highlight
+    if (highlightedObj && highlightedObj.userData.type === 'flight') {
+      highlightRing.visible = false;
+      highlightedObj = null;
+    }
 
     // Create shared jet icon geometry (top-down silhouette)
     if (!planeIconGeo) {
@@ -1511,6 +1530,11 @@ async function fetchSatellites() {
     // Clear old markers
     while (satelliteGroup.children.length) satelliteGroup.remove(satelliteGroup.children[0]);
     while (orbitPathsGroup.children.length) orbitPathsGroup.remove(orbitPathsGroup.children[0]);
+    // Clear stale highlight from old satellites
+    if (highlightedObj && highlightedObj.userData.type === 'sat') {
+      highlightRing.visible = false;
+      highlightedObj = null;
+    }
 
     const dotGeo = new THREE.SphereGeometry(0.03, 6, 4);
     const colorMap = { 'LEO': 0x22dd88, 'MEO': 0xffaa22, 'GEO': 0xff6644 };
@@ -2018,11 +2042,60 @@ function animate() {
       } else {
         if (!touchHoverActive) tip.style.display = 'none';
       }
+      // ── Apply highlight to the intersected object ──
+      if (tip.style.display === 'block' && obj) {
+        // Clear old highlight if object changed
+        if (highlightedObj && highlightedObj !== obj) {
+          if (highlightedObj.userData.type === 'flight') {
+            highlightedObj.material = planeIconMat;
+          }
+          highlightRing.visible = false;
+        }
+        highlightedObj = obj;
+        if (ud.type === 'sat') {
+          // Show electric blue ring around satellite
+          highlightRing.position.copy(obj.position);
+          highlightRing.lookAt(camera.position);
+          highlightRing.visible = true;
+        } else if (ud.type === 'flight') {
+          // Turn plane electric blue
+          obj.material = new THREE.MeshBasicMaterial({
+            color: 0x88eeff, transparent: true, opacity: 0.95,
+            blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+          });
+        }
+      }
     } else {
       if (!touchHoverActive) tip.style.display = 'none';
     }
   } else {
     if (!touchHoverActive) tip.style.display = 'none';
+  }
+
+  // ── Highlight management ──
+  // Use the same intersect result from above — no need to raycast twice
+  // The `intersects` variable is scoped inside the if-block above,
+  // so we track the selected object via highlightedObj.
+  // Restore previous highlight if we lost the hover
+  if (highlightedObj) {
+    let stillSelected = false;
+    // Check if the tooltip is still showing (object still hovered/tapped)
+    if (tip.style.display === 'block') {
+      stillSelected = true;
+    }
+    if (!stillSelected) {
+      if (highlightedObj.userData.type === 'flight') {
+        highlightedObj.material = planeIconMat;
+      }
+      highlightRing.visible = false;
+      highlightedObj = null;
+    }
+  }
+
+  // Keep ring facing camera and at satellite position if active
+  if (highlightRing.visible && highlightedObj) {
+    highlightRing.position.copy(highlightedObj.position);
+    highlightRing.lookAt(camera.position);
   }
 
   renderer.render(scene, camera);
