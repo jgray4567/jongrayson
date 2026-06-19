@@ -36,6 +36,8 @@
   }
   #top-bar .title .sep { color: #667; margin: 0 8px; }
   #top-bar .title .sub { color: #889; font-weight: 400; font-size: 13.2px; }
+  .back-link { color: #C4D600; text-decoration: none; font-size: 11px; font-weight: 500; letter-spacing: 1px; padding: 4px 10px; border: 1px solid rgba(196,214,0,0.2); border-radius: 6px; transition: all 0.2s; white-space: nowrap; font-family: 'JetBrains Mono', monospace; }
+  .back-link:hover { background: rgba(196,214,0,0.12); border-color: rgba(196,214,0,0.35); }
   #top-bar .spacer { flex: 1; }
   #top-bar .stat-strip {
     display: flex; gap: 18px; align-items: center;
@@ -431,6 +433,7 @@
     #alerts-btn.hidden { display: none; }
 
     #top-bar { padding-left: 52px; padding-right: 52px; height: 50px; gap: 8px; }
+    .back-link { display: none; }
     #top-bar .title { font-size: 12.1px; }
     #top-bar .title .sub { display: none; }
     #top-bar .utc-clock { font-size: 11.0px; padding: 2px 6px; }
@@ -531,6 +534,7 @@
 <!-- Top Bar -->
 <div id="top-bar">
   <div class="title">INTEL LAYER<span class="sep">—</span><span class="sub">GLOBAL SITUATION AWARENESS</span></div>
+  <a class="back-link" href="https://www.jongrayson.com">← BACK TO BASE</a>
   <div class="spacer"></div>
   <div class="stat-strip">
     <div class="si"><div class="dot" style="background:#C4D600;box-shadow:0 0 6px #C4D600;"></div><span class="val" id="stat-flights">0</span><span class="lbl">FLIGHTS</span></div>
