@@ -566,8 +566,8 @@ html.dark .ctrl-btn { color: #0a0a0a; }
 </div>
 
 <div class="controls">
-  <button class="ctrl-btn" id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
-  <button class="ctrl-btn" onclick="window.print()">Print / Save PDF</button>
+  <button class="ctrl-btn" id="themeToggle" onclick="toggleTheme()">Dark</button>
+  <button class="ctrl-btn" onclick="window.print()">Print / PDF</button>
 </div>
 
 <script>
@@ -575,7 +575,7 @@ function toggleTheme() {
   const html = document.documentElement;
   const btn = document.getElementById('themeToggle');
   html.classList.toggle('dark');
-  btn.textContent = html.classList.contains('dark') ? 'Light Mode' : 'Dark Mode';
+  btn.textContent = html.classList.contains('dark') ? 'Light' : 'Dark';
 }
 </script>
 
