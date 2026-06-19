@@ -1207,6 +1207,16 @@ async function fetchRealFlights() {
       shape.lineTo(0.04, -0.007);
       shape.quadraticCurveTo(0.055, -0.006, 0.06, 0);
       planeIconGeo = new THREE.ShapeGeometry(shape);
+      // Normalize to unit size and center
+      planeIconGeo.computeBoundingBox();
+      const bb = planeIconGeo.boundingBox;
+      const cx = (bb.min.x + bb.max.x) / 2;
+      const cy = (bb.min.y + bb.max.y) / 2;
+      const w = bb.max.x - bb.min.x;
+      const h = bb.max.y - bb.min.y;
+      const s = 0.025 / Math.max(w, h); // scale to ~0.025 units
+      planeIconGeo.translate(-cx, -cy, 0);
+      planeIconGeo.scale(s, s, 1);
     }
     if (!planeIconMat) {
       planeIconMat = new THREE.MeshBasicMaterial({
