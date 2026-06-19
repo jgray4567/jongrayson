@@ -1773,8 +1773,19 @@ function setupUI() {
     mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
     const tip = document.getElementById('tooltip');
-    tip.style.left = (e.clientX + 16) + 'px';
-    tip.style.top = (e.clientY - 10) + 'px';
+    // Clamp tooltip to viewport — measure after making visible
+    if (tip.style.display === 'block' || tip.style.display === '') {
+      const tw = tip.offsetWidth || 200;
+      const th = tip.offsetHeight || 120;
+      let x = e.clientX + 16;
+      let y = e.clientY - 10;
+      if (x + tw > window.innerWidth - 8) x = e.clientX - tw - 16;
+      if (y < 8) y = 8;
+      if (y + th > window.innerHeight - 8) y = window.innerHeight - th - 8;
+      if (x < 8) x = 8;
+      tip.style.left = x + 'px';
+      tip.style.top = y + 'px';
+    }
   });
   renderer.domElement.addEventListener('mouseleave', () => {
     mouse.set(-999, -999);
@@ -1823,11 +1834,19 @@ function setupUI() {
       const obj = intersects[0].object;
       const ud = obj.userData;
       if (ud.type === 'sat' || ud.type === 'flight' || ud.city || ud.type === 'hotspot') {
-        // Position tooltip centered above finger, clamped to viewport
+        // Position tooltip — measure actual size and clamp fully within viewport
         const vw = window.innerWidth;
-        const tipW = 220;
-        tip.style.left = Math.max(8, Math.min(vw - tipW - 8, touch.clientX - tipW / 2)) + 'px';
-        tip.style.top = Math.max(8, touch.clientY - 200) + 'px';
+        const vh = window.innerHeight;
+        const tw = tip.offsetWidth || 220;
+        const th = tip.offsetHeight || 140;
+        let tx = touch.clientX - tw / 2;
+        let ty = touch.clientY - th - 20; // above finger
+        if (tx < 8) tx = 8;
+        if (tx + tw > vw - 8) tx = vw - tw - 8;
+        if (ty < 8) ty = touch.clientY + 20; // flip below if no room above
+        if (ty + th > vh - 8) ty = vh - th - 8;
+        tip.style.left = tx + 'px';
+        tip.style.top = ty + 'px';
         touchHoverActive = true;
         // Auto-dismiss after 8 seconds if no new tap
         clearTimeout(touchTooltipTimer);
