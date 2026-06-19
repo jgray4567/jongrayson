@@ -234,6 +234,7 @@
   }
   #alerts-panel .ap-btn:hover { background: rgba(196,214,0,0.12); }
   #alerts-close { display: none; padding: 4px 10px; min-width: 32px; }
+  .ap-separator { display: none; width: 1px; height: 20px; background: rgba(196,214,0,0.15); }
   #alerts-panel .ap-list {
     flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #1a2233 transparent;
   }
@@ -475,9 +476,10 @@
     .panel-close { display: flex; }
     #layers-panel h2 { padding-right: 36px; }
     #alerts-close { display: flex !important; padding: 4px 10px; min-width: 32px; }
-    #alerts-panel .ap-title { font-size: 10px; letter-spacing: 0.5px; max-width: 40vw; }
+    .ap-separator { display: block; }
+    #alerts-panel .ap-title { font-size: 10px; letter-spacing: 0.5px; max-width: 35vw; }
     #alerts-panel .ap-btn { padding: 4px 8px; font-size: 10px; letter-spacing: 0.3px; white-space: nowrap; }
-    #alerts-panel .ap-actions { gap: 12px; flex-shrink: 0; }
+    #alerts-panel .ap-actions { gap: 8px; flex-shrink: 0; }
 
     #ai-summary {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -673,6 +675,7 @@
     <div class="ap-title">Live Alerts Feed</div>
     <div class="ap-actions">
       <button class="ap-btn" id="btn-ai-summary">SUMMARY</button>
+      <span class="ap-separator"></span>
       <button class="ap-btn panel-close" id="alerts-close" aria-label="Close">✕</button>
     </div>
   </div>
