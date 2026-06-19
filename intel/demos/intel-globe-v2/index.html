@@ -433,7 +433,7 @@
     #alerts-btn.hidden { display: none; }
 
     #top-bar { padding-left: 52px; padding-right: 52px; height: 50px; gap: 8px; }
-    .back-link { display: none; }
+    .back-link { display: flex !important; position: fixed; bottom: 12px; left: 12px; z-index: 15; font-size: 9px; padding: 3px 8px; }
     #top-bar .title { font-size: 12.1px; }
     #top-bar .title .sub { display: none; }
     #top-bar .utc-clock { font-size: 11.0px; padding: 2px 6px; }
@@ -473,10 +473,10 @@
     .lt-name { font-size: 12.1px; }
     .panel-close { display: flex; }
     #layers-panel h2 { padding-right: 36px; }
-    #alerts-close { display: flex !important; padding: 4px 8px; min-width: 28px; max-width: 32px; }
+    #alerts-close { display: flex !important; padding: 4px 8px; min-width: 28px; max-width: 32px; margin-left: 10px; }
     #alerts-panel .ap-title { font-size: 10px; letter-spacing: 0.5px; max-width: 40vw; }
     #alerts-panel .ap-btn { padding: 3px 6px; font-size: 9px; letter-spacing: 0.3px; white-space: nowrap; }
-    #alerts-panel .ap-actions { gap: 4px; flex-shrink: 0; }
+    #alerts-panel .ap-actions { gap: 6px; flex-shrink: 0; }
 
     #ai-summary {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
