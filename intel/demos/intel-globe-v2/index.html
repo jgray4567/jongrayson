@@ -1614,13 +1614,22 @@ function setupUI() {
     starField.visible = e.target.checked;
   });
 
-  // Region presets — camera fly-to
+  // Region presets — camera fly-to + close panel on mobile
   document.querySelectorAll('.region-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const lat = parseFloat(btn.dataset.lat);
       const lng = parseFloat(btn.dataset.lng);
       const target = latLngTo3D(lat, lng, EARTH_RADIUS).multiplyScalar(2.2);
       flyCameraTo(target);
+      // Close the regions panel on mobile after selection
+      const rp = document.getElementById('regions-panel');
+      const rb = document.getElementById('regions-btn');
+      const backdrop = document.getElementById('mobile-backdrop');
+      if (rp && rp.classList.contains('open')) {
+        rp.classList.remove('open');
+        if (rb) rb.classList.remove('active');
+        if (backdrop) backdrop.classList.remove('active');
+      }
     });
   });
 
