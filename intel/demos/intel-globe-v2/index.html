@@ -983,9 +983,9 @@ async function init() {
   controls.autoRotateSpeed = 0.3;
 
   raycaster = new THREE.Raycaster();
-  // Larger hit threshold for small objects (satellites are tiny spheres)
-  raycaster.params.Mesh.threshold = 0.12;
-  raycaster.params.Points.threshold = 0.12;
+  // Larger hit threshold for small objects (satellites are tiny relative to globe)
+  raycaster.params.Mesh.threshold = 0.35;
+  raycaster.params.Points.threshold = 0.35;
   mouse = new THREE.Vector2(-999, -999);
   let touchActive = false;
 
@@ -1549,7 +1549,7 @@ async function fetchSatellites() {
       satelliteGroup.add(dot);
 
       // Invisible larger hit sphere for easier touch/mouse targeting
-      const hitGeo = new THREE.SphereGeometry(0.12, 8, 6);
+      const hitGeo = new THREE.SphereGeometry(0.35, 8, 6);
       const hitMat = new THREE.MeshBasicMaterial({ visible: false });
       const hitSphere = new THREE.Mesh(hitGeo, hitMat);
       hitSphere.position.copy(pos);
@@ -1783,15 +1783,31 @@ function setupUI() {
 
   // Touch handler for mobile — tap to inspect satellites/flights/cities
   // (touchHoverActive declared at module scope above)
-  // Touch handler for mobile — tap to inspect satellites/flights/cities
+  // Use tap-vs-drag: record start position, run raycast on touchend if finger didn't move much
+  let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
   renderer.domElement.addEventListener('touchstart', e => {
-    if (e.touches.length !== 1) return;
-    const touch = e.touches[0];
+    if (e.touches.length !== 1) { touchHoverActive = false; return; }
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = performance.now();
+  }, { passive: true });
+
+  renderer.domElement.addEventListener('touchend', e => {
+    // Must be a tap (short, minimal movement) — not a drag/pinch
+    const dt = performance.now() - touchStartTime;
+    if (dt > 500) return; // took too long, was a drag
+    if (e.changedTouches.length !== 1) return;
+
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    if (Math.sqrt(dx * dx + dy * dy) > 10) return; // moved too far, was a drag
+
     const rect = renderer.domElement.getBoundingClientRect();
     mouse.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
 
-    // Run raycast immediately
+    // Run raycast
     raycaster.setFromCamera(mouse, camera);
     const candidates = [];
     if (layers.flights) candidates.push(...flightGroup.children);
@@ -1799,6 +1815,7 @@ function setupUI() {
     if (layers.hotspots) candidates.push(...hotspotGroup.children);
     if (layers.satellites && satelliteGroup.visible) candidates.push(...satelliteGroup.children);
 
+    // Sort intersects by distance — prefer satellites and hotspots over empty space
     const intersects = raycaster.intersectObjects(candidates);
     const tip = document.getElementById('tooltip');
 
@@ -1812,29 +1829,14 @@ function setupUI() {
         tip.style.left = Math.max(8, Math.min(vw - tipW - 8, touch.clientX - tipW / 2)) + 'px';
         tip.style.top = Math.max(8, touch.clientY - 200) + 'px';
         touchHoverActive = true;
-        // Auto-dismiss after 6 seconds if no new tap
+        // Auto-dismiss after 8 seconds if no new tap
         clearTimeout(touchTooltipTimer);
-        touchTooltipTimer = setTimeout(() => { touchHoverActive = false; }, 6000);
-        e.preventDefault();
+        touchTooltipTimer = setTimeout(() => { touchHoverActive = false; }, 8000);
       }
     } else {
       tip.style.display = 'none';
       touchHoverActive = false;
     }
-  }, { passive: false });
-
-  // Touch end — keep tooltip visible for a few seconds
-  renderer.domElement.addEventListener('touchend', () => {
-    // tooltip stays visible; animate loop will hide it after timeout
-  });
-
-  // Touch move — update mouse position for continuous tracking during drag-free hover
-  renderer.domElement.addEventListener('touchmove', e => {
-    if (e.touches.length !== 1) return;
-    const touch = e.touches[0];
-    const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
   }, { passive: true });
 }
 
@@ -1911,11 +1913,12 @@ function animate() {
   const tip = document.getElementById('tooltip');
   let hoveredObj = null;
 
-  // On mobile, skip mouse-based hover detection while touch tooltip is active
+  // On mobile, only run hover detection via animate loop when touch tooltip is active
+  // (to populate content) or when not on mobile at all (mouse hover)
   const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-  const skipHover = isTouch && touchHoverActive;
+  const shouldRaycast = !isTouch || touchHoverActive;
 
-  if (!skipHover && (layers.cities || layers.flights || layers.satellites)) {
+  if (shouldRaycast && (layers.cities || layers.flights || layers.satellites)) {
     raycaster.setFromCamera(mouse, camera);
     const candidates = [];
     if (layers.flights) candidates.push(...flightGroup.children);
@@ -1994,13 +1997,13 @@ function animate() {
         document.getElementById('tip-hs-coords').textContent = `${hs.lat.toFixed(1)}°, ${hs.lng.toFixed(1)}°`;
         tip.style.display = 'block';
       } else {
-        tip.style.display = 'none';
+        if (!touchHoverActive) tip.style.display = 'none';
       }
     } else {
-      tip.style.display = 'none';
+      if (!touchHoverActive) tip.style.display = 'none';
     }
   } else {
-    tip.style.display = 'none';
+    if (!touchHoverActive) tip.style.display = 'none';
   }
 
   renderer.render(scene, camera);
