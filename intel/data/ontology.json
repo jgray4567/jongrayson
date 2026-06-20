@@ -165,7 +165,7 @@
     {
       "id": "sig_12",
       "group": 2,
-      "label": "US to end funding of South Africa's HIV programmes over claims of Afrikaner persecution",
+      "label": "US to stop funding HIV programmes in South Africa",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/cdr457lxr71o?at_medium=RSS&amp;at_campaign=rss",
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/6893/live/8c956090-6bf7-11f1-8bf6-931d18012412.jpg"
@@ -173,26 +173,26 @@
     {
       "id": "sig_13",
       "group": 2,
+      "label": "Zelensky stripped of highest Polish honour over WW2 name of army unit",
+      "size": 12,
+      "url": "https://www.bbc.com/news/articles/cr7xzg3dmj8o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/4074/live/aa7d3d80-6c1a-11f1-82ca-39eb136d082f.jpg"
+    },
+    {
+      "id": "sig_14",
+      "group": 2,
       "label": "Do it at home too, women tell Japanese fans who cleaned World Cup stadium",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/crel9xlp8r1o?at_medium=RSS&amp;at_campaign=rss",
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/ce26/live/6d636b80-6b94-11f1-a202-c5e2a605690a.jpg"
     },
     {
-      "id": "sig_14",
+      "id": "sig_15",
       "group": 2,
       "label": "Six-year-old Ebola patient taken from DR Congo hospital found and 'doing well'",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/c0qyg29wpk2o?at_medium=RSS&amp;at_campaign=rss",
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/defa/live/2098db00-6be4-11f1-b1db-af71d47507d6.jpg"
-    },
-    {
-      "id": "sig_15",
-      "group": 2,
-      "label": "Morocco captain Achraf Hakimi to stand trial for rape",
-      "size": 12,
-      "url": "https://www.bbc.com/sport/football/articles/c20y18z7le1o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/aba2/live/baf34430-6bba-11f1-8e5f-879143928516.jpg"
     },
     {
       "id": "sig_16",
@@ -213,18 +213,18 @@
     {
       "id": "sig_18",
       "group": 2,
-      "label": "Zimbabwe MPs pass bill to extend president's time in power",
+      "label": "Morocco captain Achraf Hakimi to stand trial for rape",
       "size": 12,
-      "url": "https://www.bbc.com/news/articles/c20y15m0337o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1153/live/7749ed00-6ba7-11f1-ad4f-418bfa76e5cc.jpg"
+      "url": "https://www.bbc.com/sport/football/articles/c20y18z7le1o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/aba2/live/baf34430-6bba-11f1-8e5f-879143928516.jpg"
     },
     {
       "id": "sig_19",
       "group": 2,
-      "label": "UK actress charged with importing meth worth almost A$300m into Australia",
+      "label": "Zimbabwe MPs pass bill to extend president's time in power",
       "size": 12,
-      "url": "https://www.bbc.com/news/articles/ckg5nq0172no?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/d405/live/a5d92360-6b76-11f1-8e1d-bbbb1017d210.jpg"
+      "url": "https://www.bbc.com/news/articles/c20y15m0337o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1153/live/7749ed00-6ba7-11f1-ad4f-418bfa76e5cc.jpg"
     },
     {
       "id": "sig_20",
@@ -309,13 +309,21 @@
     {
       "id": "sig_30",
       "group": 2,
+      "label": "Two-train crash leaves at least 1 dead, 89 injured as emergency crews rush to chaotic scene",
+      "size": 12,
+      "url": "https://www.foxnews.com/world/two-train-crash-leaves-victims-bloodied-emergency-crews-rush-chaotic-scene",
+      "image": ""
+    },
+    {
+      "id": "sig_31",
+      "group": 2,
       "label": "British Prime Minister Keir Starmer faces potential leadership challenge from newly-elected Andy Burnham",
       "size": 12,
       "url": "https://www.foxnews.com/world/british-prime-minister-keir-starmer-faces-potential-leadership-challenge-newly-elected-andy-burnham",
       "image": ""
     },
     {
-      "id": "sig_31",
+      "id": "sig_32",
       "group": 2,
       "label": "Trump&apos;s $300B Iran investment fund may be &apos;close to impossible&apos; due to IRGC sanctions law, expert warns",
       "size": 12,
@@ -323,7 +331,7 @@
       "image": ""
     },
     {
-      "id": "sig_32",
+      "id": "sig_33",
       "group": 2,
       "label": "From bear hugs to handshakes: How India lost its edge with Trump while Pakistan quietly gained ground",
       "size": 12,
@@ -331,7 +339,7 @@
       "image": ""
     },
     {
-      "id": "sig_33",
+      "id": "sig_34",
       "group": 2,
       "label": "Iran hardliner behind US deal warns Tehran won’t honor agreement if Trump fails to deliver",
       "size": 12,
@@ -339,7 +347,7 @@
       "image": ""
     },
     {
-      "id": "sig_34",
+      "id": "sig_35",
       "group": 2,
       "label": "&apos;Pure hell&apos; in Moscow as Ukrainian drones strike major refinery supplying capital&apos;s fuel market",
       "size": 12,
@@ -347,7 +355,7 @@
       "image": ""
     },
     {
-      "id": "sig_35",
+      "id": "sig_36",
       "group": 2,
       "label": "Finland&apos;s parliament votes to lift decades-old ban on nuclear weapons in historic NATO defense shift",
       "size": 12,
@@ -355,7 +363,7 @@
       "image": ""
     },
     {
-      "id": "sig_36",
+      "id": "sig_37",
       "group": 2,
       "label": "Colombian military neutralizes five terrorists accused in bus bombing that killed 20, injured 45 civilians",
       "size": 12,
@@ -363,7 +371,7 @@
       "image": ""
     },
     {
-      "id": "sig_37",
+      "id": "sig_38",
       "group": 2,
       "label": "Israel launches &apos;Biblical Highway&apos; amid campaign to erase Jewish history",
       "size": 12,
@@ -371,7 +379,7 @@
       "image": ""
     },
     {
-      "id": "sig_38",
+      "id": "sig_39",
       "group": 2,
       "label": "Elon Musk demands prison for politicians who &apos;turned a blind eye&apos; to grooming gangs as new report released",
       "size": 12,
@@ -379,91 +387,83 @@
       "image": ""
     },
     {
-      "id": "sig_39",
-      "group": 2,
-      "label": "3 Brazilian men charged after woman tossed from bridge without safety rope",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/3-brazilian-men-charged-woman-tossed-bridge-without-safety-rope",
-      "image": ""
-    },
-    {
       "id": "sig_40",
       "group": 2,
-      "label": "Norway seeks to ban trade with illegal Israeli settlements in Palestine",
+      "label": "US judge rejects Joe Biden’s lawsuit asking to withhold memoir recordings",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/19/norway-seeks-to-ban-trade-with-illegal-israeli-settlements-in-palestine?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/19/us-judge-rejects-joe-bidens-lawsuit-asking-to-withhold-memoir-recordings?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_41",
       "group": 2,
-      "label": "Iran war: Success or disaster? Mehdi Hasan and David Des Roches",
+      "label": "Thirty dead at DRC displacement camp as Ebola threat grows",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/head-to-head/2026/6/19/iran-war-success-or-disaster-mehdi-hasan-and-david-des-roches?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/aje-onl-nf_thirty-dead-at-drc-displacement-camp-ebola-threat-190626?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_42",
       "group": 2,
-      "label": "How is the Iran-US agreement being viewed in Israel?",
+      "label": "USA beat Australia 2–0 to book knockout spot at World Cup",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/inside-story/2026/6/19/how-is-the-iran-us-agreement-being-viewed-in-israel?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/19/usa-beat-australia-2-0-to-book-knockout-spot-at-world?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_43",
       "group": 2,
-      "label": "Two trains collide near Bedford, north of London",
+      "label": "Spain’s Yamal says ‘very early, unnecessary’ to play full World Cup match",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/19/two-trains-collide-near-bedford-north-of-london?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/19/spains-yamal-says-very-early-unnecessary-to-play-full-world-cup-match?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_44",
       "group": 2,
-      "label": "Backlash for UK MP who linked England World Cup result to women’s safety",
+      "label": "Canada’s Kone undergoes major leg surgery; to miss rest of World Cup",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/backlash-for-uk-mp-who-linked-england-world-cup-result-to-womens-safety?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/19/canadas-kone-undergoes-major-leg-surgery-to-miss-rest-of-world-cup?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_45",
       "group": 2,
-      "label": "More than 70 medics infected with Ebola as DRC outbreak spreads ‘fast’",
+      "label": "Does Trump have to submit the Iran memorandum of understanding to Congress?",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/19/more-than-70-medics-infected-with-ebola-as-drc-outbreak-spreads-fast?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/19/does-trump-have-to-submit-the-iran-memorandum-of-understanding-to-congress?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_46",
       "group": 2,
-      "label": "Dramatic rescue as fire rips through school in Japan",
+      "label": "US announces new round of Israel-Lebanon talks in Washington next week",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/aje-onl-nf_dramatic-rescue-fire-rips-through-school-in-japan-190626?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/19/us-announces-new-round-of-israel-lebanon-talks-in-washington-next-week?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_47",
       "group": 2,
-      "label": "Italy’s top diplomat nixes US trip after Meloni says Trump fabricated story",
+      "label": "Italian Prime Minister says she didn’t ‘beg’ Trump for G7 photograph",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/19/italys-top-diplomat-nixes-us-trip-after-meloni-says-trump-fabricated-story?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/italian-prime-minister-says-she-didnt-beg-trump-for-g7-photograph?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_48",
       "group": 2,
-      "label": "How is China using AI in the classroom?",
+      "label": "Israel kills ‘a child a day’ on average in Gaza despite ceasefire, UN says",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/the-take-2/2026/6/19/how-is-china-using-ai-in-the-classroom?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/19/israel-kills-a-child-a-day-on-average-in-gaza-despite-ceasefire-un-says?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_49",
       "group": 2,
-      "label": "Israeli air strikes hit Lebanon minutes after new ceasefire",
+      "label": "Brazil vs Haiti LIVE: World Cup 2026",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/israeli-air-strikes-hit-lebanon-minutes-after-new-ceasefire?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/liveblog/2026/6/19/brazil-vs-haiti-live-world-cup-2026?traffic_source=rss",
       "image": ""
     },
     {
@@ -644,11 +644,6 @@
       "value": 2
     },
     {
-      "source": "sig_2",
-      "target": "sig_1",
-      "value": 1
-    },
-    {
       "source": "sig_3",
       "target": "theme_geo",
       "value": 1
@@ -699,8 +694,18 @@
       "value": 1
     },
     {
+      "source": "sig_8",
+      "target": "sig_7",
+      "value": 1
+    },
+    {
       "source": "sig_9",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_9",
+      "target": "sig_8",
       "value": 1
     },
     {
@@ -711,6 +716,11 @@
     {
       "source": "sig_10",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_10",
+      "target": "sig_9",
       "value": 1
     },
     {
@@ -729,28 +739,23 @@
       "value": 1
     },
     {
-      "source": "sig_12",
-      "target": "sig_11",
+      "source": "sig_13",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_13",
+      "target": "sig_12",
+      "value": 1
+    },
+    {
+      "source": "sig_14",
       "target": "reg_asia",
       "value": 1
     },
     {
-      "source": "sig_13",
+      "source": "sig_14",
       "target": "theme_sport",
-      "value": 1
-    },
-    {
-      "source": "sig_14",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_14",
-      "target": "sig_13",
       "value": 1
     },
     {
@@ -764,6 +769,11 @@
       "value": 1
     },
     {
+      "source": "sig_16",
+      "target": "sig_15",
+      "value": 1
+    },
+    {
       "source": "sig_17",
       "target": "theme_geo",
       "value": 1
@@ -774,23 +784,8 @@
       "value": 1
     },
     {
-      "source": "sig_18",
-      "target": "sig_17",
-      "value": 1
-    },
-    {
       "source": "sig_19",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_19",
-      "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_19",
-      "target": "sig_18",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -814,18 +809,23 @@
       "value": 1
     },
     {
-      "source": "sig_22",
-      "target": "sig_21",
-      "value": 1
-    },
-    {
       "source": "sig_23",
       "target": "reg_afr",
       "value": 1
     },
     {
+      "source": "sig_23",
+      "target": "sig_22",
+      "value": 1
+    },
+    {
       "source": "sig_24",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_24",
+      "target": "sig_23",
       "value": 1
     },
     {
@@ -841,11 +841,6 @@
     {
       "source": "sig_26",
       "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_26",
-      "target": "sig_25",
       "value": 1
     },
     {
@@ -869,28 +864,13 @@
       "value": 1
     },
     {
-      "source": "sig_29",
-      "target": "sig_28",
-      "value": 1
-    },
-    {
       "source": "sig_30",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_30",
-      "target": "sig_29",
-      "value": 1
-    },
-    {
-      "source": "sig_31",
       "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_31",
-      "target": "reg_me",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -905,37 +885,62 @@
     },
     {
       "source": "sig_32",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_32",
+      "target": "sig_31",
+      "value": 1
+    },
+    {
+      "source": "sig_33",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_33",
       "target": "reg_asia",
       "value": 1
     },
     {
       "source": "sig_33",
+      "target": "sig_32",
+      "value": 1
+    },
+    {
+      "source": "sig_34",
       "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_33",
+      "source": "sig_34",
       "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_34",
+      "target": "sig_33",
+      "value": 1
+    },
+    {
+      "source": "sig_35",
       "target": "reg_eu",
       "value": 1
     },
     {
-      "source": "sig_34",
+      "source": "sig_35",
       "target": "theme_econ",
       "value": 1
     },
     {
       "source": "sig_35",
-      "target": "theme_geo",
+      "target": "sig_34",
       "value": 1
     },
     {
       "source": "sig_36",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -945,12 +950,12 @@
     },
     {
       "source": "sig_37",
-      "target": "reg_me",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_38",
-      "target": "reg_na",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -960,17 +965,12 @@
     },
     {
       "source": "sig_39",
-      "target": "reg_sa",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_40",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_40",
-      "target": "theme_econ",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -980,12 +980,7 @@
     },
     {
       "source": "sig_41",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_41",
-      "target": "sig_40",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -995,17 +990,12 @@
     },
     {
       "source": "sig_42",
-      "target": "reg_me",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_43",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_44",
-      "target": "reg_eu",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -1014,23 +1004,28 @@
       "value": 1
     },
     {
-      "source": "sig_44",
-      "target": "sig_43",
+      "source": "sig_45",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_45",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_45",
-      "target": "sig_44",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_46",
-      "target": "reg_asia",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_46",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_46",
+      "target": "sig_45",
       "value": 1
     },
     {
@@ -1045,32 +1040,22 @@
     },
     {
       "source": "sig_48",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_48",
-      "target": "reg_asia",
-      "value": 1
-    },
-    {
-      "source": "sig_49",
       "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_49",
-      "target": "sig_48",
+      "target": "reg_sa",
+      "value": 1
+    },
+    {
+      "source": "sig_49",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_50",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_50",
-      "target": "sig_49",
       "value": 1
     },
     {
@@ -1101,11 +1086,6 @@
     {
       "source": "sig_54",
       "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_54",
-      "target": "sig_53",
       "value": 1
     }
   ]
