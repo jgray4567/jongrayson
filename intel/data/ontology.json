@@ -229,7 +229,7 @@
     {
       "id": "sig_20",
       "group": 2,
-      "label": "Mideast Live Updates: Israel Commits to New Lebanon Cease-Fire, Ambassador Says, but Troops Will Remain",
+      "label": "Israel Commits to New Lebanon Cease-Fire, Ambassador Says, but Troops Will Remain",
       "size": 12,
       "url": "https://www.nytimes.com/live/2026/06/19/world/iran-trump-deal",
       "image": ""
@@ -389,13 +389,53 @@
     {
       "id": "sig_40",
       "group": 2,
+      "label": "One dead and 89 injured following train collision in Bedford, UK",
+      "size": 12,
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/20/one-dead-and-89-injured-following-train-collision-in-bedford-uk?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_41",
+      "group": 2,
+      "label": "Cunha hits Brazil double against Haiti to seal first World Cup 2026 win",
+      "size": 12,
+      "url": "https://www.aljazeera.com/sports/2026/6/20/cunha-hits-brazil-double-against-haiti-to-seal-first-world-cup-2026-win?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_42",
+      "group": 2,
+      "label": "Lebanese influencer organises World Cup event amid Israel’s attack on Leban",
+      "size": 12,
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/20/lebanese-influencer-organises-world-cup-event-amid-israels-attack-on-leban?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_43",
+      "group": 2,
+      "label": "Morocco beat Scotland 1–0 as Saibari scores fastest World Cup 2026 goal",
+      "size": 12,
+      "url": "https://www.aljazeera.com/sports/2026/6/20/morocco-beat-scotland-1-0-as-saibari-scores-fastest-world-cup-2026?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_44",
+      "group": 2,
+      "label": "Iran war live: Tehran says US must ensure Israel ends attacks on Lebanon",
+      "size": 12,
+      "url": "https://www.aljazeera.com/news/liveblog/2026/6/20/iran-war-live-tehran-says-us-must-ensure-israel-ends-attacks-on-lebanon?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_45",
+      "group": 2,
       "label": "US judge rejects Joe Biden’s lawsuit asking to withhold memoir recordings",
       "size": 12,
       "url": "https://www.aljazeera.com/news/2026/6/19/us-judge-rejects-joe-bidens-lawsuit-asking-to-withhold-memoir-recordings?traffic_source=rss",
       "image": ""
     },
     {
-      "id": "sig_41",
+      "id": "sig_46",
       "group": 2,
       "label": "Thirty dead at DRC displacement camp as Ebola threat grows",
       "size": 12,
@@ -403,7 +443,7 @@
       "image": ""
     },
     {
-      "id": "sig_42",
+      "id": "sig_47",
       "group": 2,
       "label": "USA beat Australia 2–0 to book knockout spot at World Cup",
       "size": 12,
@@ -411,7 +451,7 @@
       "image": ""
     },
     {
-      "id": "sig_43",
+      "id": "sig_48",
       "group": 2,
       "label": "Spain’s Yamal says ‘very early, unnecessary’ to play full World Cup match",
       "size": 12,
@@ -419,51 +459,11 @@
       "image": ""
     },
     {
-      "id": "sig_44",
+      "id": "sig_49",
       "group": 2,
       "label": "Canada’s Kone undergoes major leg surgery; to miss rest of World Cup",
       "size": 12,
       "url": "https://www.aljazeera.com/sports/2026/6/19/canadas-kone-undergoes-major-leg-surgery-to-miss-rest-of-world-cup?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_45",
-      "group": 2,
-      "label": "Does Trump have to submit the Iran memorandum of understanding to Congress?",
-      "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/19/does-trump-have-to-submit-the-iran-memorandum-of-understanding-to-congress?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_46",
-      "group": 2,
-      "label": "US announces new round of Israel-Lebanon talks in Washington next week",
-      "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/19/us-announces-new-round-of-israel-lebanon-talks-in-washington-next-week?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_47",
-      "group": 2,
-      "label": "Italian Prime Minister says she didn’t ‘beg’ Trump for G7 photograph",
-      "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/19/italian-prime-minister-says-she-didnt-beg-trump-for-g7-photograph?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_48",
-      "group": 2,
-      "label": "Israel kills ‘a child a day’ on average in Gaza despite ceasefire, UN says",
-      "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/19/israel-kills-a-child-a-day-on-average-in-gaza-despite-ceasefire-un-says?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_49",
-      "group": 2,
-      "label": "Brazil vs Haiti LIVE: World Cup 2026",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/liveblog/2026/6/19/brazil-vs-haiti-live-world-cup-2026?traffic_source=rss",
       "image": ""
     },
     {
@@ -505,6 +505,14 @@
       "size": 12,
       "url": "https://news.sky.com/story/icc-prosecutor-karim-khan-suspended-by-uks-bar-standards-board-13555696",
       "image": "https://e3.365dm.com/26/06/1920x1080/skynews-karim-khan-icc_7277536.jpg?20260619101326"
+    },
+    {
+      "id": "sig_55",
+      "group": 2,
+      "label": "What's in the US-Iran deal? The 14 points explained",
+      "size": 12,
+      "url": "https://news.sky.com/story/the-14-point-us-iran-deal-what-is-in-it-13555121",
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-donald-trump-memorandum_7276832.png?20260618164107"
     }
   ],
   "links": [
@@ -674,13 +682,13 @@
       "value": 1
     },
     {
-      "source": "sig_6",
-      "target": "sig_5",
+      "source": "sig_7",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_7",
-      "target": "theme_geo",
+      "target": "sig_6",
       "value": 1
     },
     {
@@ -691,11 +699,6 @@
     {
       "source": "sig_8",
       "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_8",
-      "target": "sig_7",
       "value": 1
     },
     {
@@ -719,11 +722,6 @@
       "value": 1
     },
     {
-      "source": "sig_10",
-      "target": "sig_9",
-      "value": 1
-    },
-    {
       "source": "sig_11",
       "target": "reg_na",
       "value": 1
@@ -736,6 +734,11 @@
     {
       "source": "sig_12",
       "target": "reg_afr",
+      "value": 1
+    },
+    {
+      "source": "sig_12",
+      "target": "sig_11",
       "value": 1
     },
     {
@@ -764,6 +767,11 @@
       "value": 1
     },
     {
+      "source": "sig_15",
+      "target": "sig_14",
+      "value": 1
+    },
+    {
       "source": "sig_16",
       "target": "theme_geo",
       "value": 1
@@ -784,13 +792,28 @@
       "value": 1
     },
     {
+      "source": "sig_18",
+      "target": "sig_17",
+      "value": 1
+    },
+    {
       "source": "sig_19",
       "target": "theme_geo",
       "value": 1
     },
     {
+      "source": "sig_19",
+      "target": "sig_18",
+      "value": 1
+    },
+    {
       "source": "sig_20",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_20",
+      "target": "sig_19",
       "value": 1
     },
     {
@@ -844,8 +867,18 @@
       "value": 1
     },
     {
+      "source": "sig_26",
+      "target": "sig_25",
+      "value": 1
+    },
+    {
       "source": "sig_27",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_27",
+      "target": "sig_26",
       "value": 1
     },
     {
@@ -861,6 +894,11 @@
     {
       "source": "sig_29",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_29",
+      "target": "sig_28",
       "value": 1
     },
     {
@@ -904,11 +942,6 @@
       "value": 1
     },
     {
-      "source": "sig_33",
-      "target": "sig_32",
-      "value": 1
-    },
-    {
       "source": "sig_34",
       "target": "reg_na",
       "value": 1
@@ -919,11 +952,6 @@
       "value": 1
     },
     {
-      "source": "sig_34",
-      "target": "sig_33",
-      "value": 1
-    },
-    {
       "source": "sig_35",
       "target": "reg_eu",
       "value": 1
@@ -931,11 +959,6 @@
     {
       "source": "sig_35",
       "target": "theme_econ",
-      "value": 1
-    },
-    {
-      "source": "sig_35",
-      "target": "sig_34",
       "value": 1
     },
     {
@@ -969,23 +992,33 @@
       "value": 1
     },
     {
-      "source": "sig_40",
-      "target": "reg_na",
+      "source": "sig_39",
+      "target": "sig_38",
       "value": 1
     },
     {
       "source": "sig_40",
-      "target": "sig_39",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_41",
-      "target": "theme_geo",
+      "target": "reg_sa",
+      "value": 1
+    },
+    {
+      "source": "sig_41",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_41",
+      "target": "sig_40",
       "value": 1
     },
     {
       "source": "sig_42",
-      "target": "reg_na",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1000,7 +1033,12 @@
     },
     {
       "source": "sig_44",
-      "target": "theme_sport",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_44",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1010,17 +1048,12 @@
     },
     {
       "source": "sig_45",
-      "target": "reg_me",
+      "target": "sig_44",
       "value": 1
     },
     {
       "source": "sig_46",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_46",
-      "target": "reg_me",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -1035,17 +1068,17 @@
     },
     {
       "source": "sig_47",
-      "target": "sig_46",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_48",
-      "target": "reg_me",
+      "target": "theme_sport",
       "value": 1
     },
     {
-      "source": "sig_49",
-      "target": "reg_sa",
+      "source": "sig_48",
+      "target": "sig_47",
       "value": 1
     },
     {
@@ -1079,6 +1112,11 @@
       "value": 1
     },
     {
+      "source": "sig_53",
+      "target": "sig_52",
+      "value": 1
+    },
+    {
       "source": "sig_54",
       "target": "reg_na",
       "value": 1
@@ -1086,6 +1124,21 @@
     {
       "source": "sig_54",
       "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_55",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_55",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_55",
+      "target": "sig_54",
       "value": 1
     }
   ]
