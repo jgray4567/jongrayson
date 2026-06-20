@@ -685,18 +685,8 @@
       "value": 2
     },
     {
-      "source": "sig_5",
-      "target": "sig_4",
-      "value": 1
-    },
-    {
       "source": "sig_6",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_6",
-      "target": "sig_5",
       "value": 1
     },
     {
@@ -720,11 +710,6 @@
       "value": 1
     },
     {
-      "source": "sig_9",
-      "target": "sig_8",
-      "value": 1
-    },
-    {
       "source": "sig_10",
       "target": "reg_na",
       "value": 1
@@ -735,8 +720,18 @@
       "value": 1
     },
     {
+      "source": "sig_10",
+      "target": "sig_9",
+      "value": 1
+    },
+    {
       "source": "sig_11",
       "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_11",
+      "target": "sig_10",
       "value": 1
     },
     {
@@ -757,11 +752,6 @@
     {
       "source": "sig_13",
       "target": "theme_sport",
-      "value": 1
-    },
-    {
-      "source": "sig_13",
-      "target": "sig_12",
       "value": 1
     },
     {
@@ -800,13 +790,13 @@
       "value": 1
     },
     {
-      "source": "sig_18",
-      "target": "sig_17",
+      "source": "sig_19",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_19",
-      "target": "theme_geo",
+      "target": "sig_18",
       "value": 1
     },
     {
@@ -815,13 +805,13 @@
       "value": 1
     },
     {
-      "source": "sig_21",
-      "target": "reg_eu",
+      "source": "sig_20",
+      "target": "sig_19",
       "value": 1
     },
     {
       "source": "sig_21",
-      "target": "sig_20",
+      "target": "reg_eu",
       "value": 1
     },
     {
@@ -840,18 +830,23 @@
       "value": 1
     },
     {
-      "source": "sig_23",
-      "target": "sig_22",
-      "value": 1
-    },
-    {
       "source": "sig_24",
       "target": "theme_geo",
       "value": 1
     },
     {
+      "source": "sig_24",
+      "target": "sig_23",
+      "value": 1
+    },
+    {
       "source": "sig_25",
       "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_25",
+      "target": "sig_24",
       "value": 1
     },
     {
@@ -890,8 +885,18 @@
       "value": 1
     },
     {
+      "source": "sig_30",
+      "target": "sig_29",
+      "value": 1
+    },
+    {
       "source": "sig_31",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_31",
+      "target": "sig_30",
       "value": 1
     },
     {
@@ -925,6 +930,11 @@
       "value": 1
     },
     {
+      "source": "sig_34",
+      "target": "sig_33",
+      "value": 1
+    },
+    {
       "source": "sig_35",
       "target": "reg_eu",
       "value": 1
@@ -940,8 +950,18 @@
       "value": 1
     },
     {
+      "source": "sig_36",
+      "target": "sig_35",
+      "value": 1
+    },
+    {
       "source": "sig_37",
       "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_37",
+      "target": "sig_36",
       "value": 1
     },
     {
@@ -952,6 +972,11 @@
     {
       "source": "sig_39",
       "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_39",
+      "target": "sig_38",
       "value": 1
     },
     {
@@ -995,23 +1020,18 @@
       "value": 1
     },
     {
-      "source": "sig_44",
-      "target": "sig_43",
-      "value": 1
-    },
-    {
       "source": "sig_45",
       "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_45",
-      "target": "sig_44",
+      "source": "sig_46",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_46",
-      "target": "theme_sport",
+      "target": "sig_45",
       "value": 1
     },
     {
@@ -1025,8 +1045,18 @@
       "value": 1
     },
     {
+      "source": "sig_48",
+      "target": "sig_47",
+      "value": 1
+    },
+    {
       "source": "sig_49",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_49",
+      "target": "sig_48",
       "value": 1
     },
     {
@@ -1055,11 +1085,6 @@
       "value": 1
     },
     {
-      "source": "sig_52",
-      "target": "sig_51",
-      "value": 1
-    },
-    {
       "source": "sig_53",
       "target": "reg_na",
       "value": 1
@@ -1075,6 +1100,11 @@
       "value": 1
     },
     {
+      "source": "sig_55",
+      "target": "sig_54",
+      "value": 1
+    },
+    {
       "source": "sig_56",
       "target": "reg_na",
       "value": 1
@@ -1082,11 +1112,6 @@
     {
       "source": "sig_56",
       "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_56",
-      "target": "sig_55",
       "value": 1
     }
   ]
