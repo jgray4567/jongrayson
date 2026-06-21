@@ -152,7 +152,7 @@
       "label": "US-Iran talks to begin in Switzerland as Tehran says it closed Strait of Hormuz",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/cwyekkwm1mmo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/17c2/live/72006a90-6d05-11f1-8e1d-bbbb1017d210.jpg"
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3859/live/8c089720-6d3a-11f1-b4b2-ad969f26eb34.jpg"
     },
     {
       "id": "sig_11",
@@ -205,7 +205,7 @@
     {
       "id": "sig_17",
       "group": 2,
-      "label": "France bans alcohol consumption at music festival events under red heatwave alert",
+      "label": "France bans alcohol at music festival events under red heatwave alert",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/cgmdw4vn7y2o?at_medium=RSS&amp;at_campaign=rss",
       "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1768/live/91e33450-6d00-11f1-9f29-21c4f4a06079.jpg"
@@ -229,13 +229,29 @@
     {
       "id": "sig_20",
       "group": 2,
-      "label": "Mideast Live Updates: Vance Heads to Talks as Strait of Hormuz Re-emerges as Point of Tension",
+      "label": "Mideast Live Updates: New Round of U.S.-Iran Talks Set to Start in Switzerland",
       "size": 12,
-      "url": "https://www.nytimes.com/live/2026/06/20/world/iran-trump-israel-lebanon",
+      "url": "https://www.nytimes.com/live/2026/06/21/world/iran-us-trump-lebanon",
       "image": ""
     },
     {
       "id": "sig_21",
+      "group": 2,
+      "label": "Luxury Kushner Project Collides With Albanian Discontent",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/21/world/europe/albania-kushner-project-protests.html",
+      "image": ""
+    },
+    {
+      "id": "sig_22",
+      "group": 2,
+      "label": "The Women Running Businesses Under Taliban Rules",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/21/world/asia/women-taliban-restrictions-jobs-education.html",
+      "image": ""
+    },
+    {
+      "id": "sig_23",
       "group": 2,
       "label": "After Andy Burnham’s Win, the UK Is Set to Test How Far Charisma Can Shift Electoral Dynamics",
       "size": 12,
@@ -243,7 +259,7 @@
       "image": ""
     },
     {
-      "id": "sig_22",
+      "id": "sig_24",
       "group": 2,
       "label": "A 175-Year-Old Shipwreck, Lots of Booze and a Korean Island’s Quest to Survive",
       "size": 12,
@@ -251,7 +267,15 @@
       "image": ""
     },
     {
-      "id": "sig_23",
+      "id": "sig_25",
+      "group": 2,
+      "label": "Huge Blaze Ravages Dominican Republic Beach Resort",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/20/world/americas/dominican-republic-fire.html",
+      "image": ""
+    },
+    {
+      "id": "sig_26",
       "group": 2,
       "label": "Charles Kushner, U.S. Ambassador to France, Riles Paris With Trump Diplomacy",
       "size": 12,
@@ -259,7 +283,7 @@
       "image": ""
     },
     {
-      "id": "sig_24",
+      "id": "sig_27",
       "group": 2,
       "label": "World Leaders Awaited Iran Deal for Months. Here’s Why They’re Still Wary.",
       "size": 12,
@@ -267,7 +291,7 @@
       "image": ""
     },
     {
-      "id": "sig_25",
+      "id": "sig_28",
       "group": 2,
       "label": "Cape Verde Will Count on Vozinha Against Uruguay at the World Cup",
       "size": 12,
@@ -275,35 +299,11 @@
       "image": ""
     },
     {
-      "id": "sig_26",
+      "id": "sig_29",
       "group": 2,
       "label": "Trump Called Iván Cepeda a ‘Radical Left Marxist.’ Can He Be Colombia’s President?",
       "size": 12,
       "url": "https://www.nytimes.com/2026/06/20/world/americas/ivan-cepeda-colombia-president-election.html",
-      "image": ""
-    },
-    {
-      "id": "sig_27",
-      "group": 2,
-      "label": "Abelardo De La Espriella, Right-Wing Outsider, Could Be Colombia’s Next President",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/20/world/americas/colombia-election-abelardo-de-la-espriella.html",
-      "image": ""
-    },
-    {
-      "id": "sig_28",
-      "group": 2,
-      "label": "‘Game Changer’? Too Soon to Tell. But Ukraine Flexed in Striking Moscow.",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/19/world/europe/ukraine-drone-attack-moscow.html",
-      "image": ""
-    },
-    {
-      "id": "sig_29",
-      "group": 2,
-      "label": "Trains Collide in UK, Killing at Least One and Injuring Dozens of Others",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/19/world/europe/uk-trains-collide-bedford-england.html",
       "image": ""
     },
     {
@@ -389,13 +389,61 @@
     {
       "id": "sig_40",
       "group": 2,
+      "label": "Vance arrives in Switzerland for US-Iran talks",
+      "size": 12,
+      "url": "https://www.aljazeera.com/news/2026/6/21/vance-arrives-in-switzerland-for-us-iran-talks?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_41",
+      "group": 2,
+      "label": "Iran war day 114: US, Iranian delegations in Switzerland for key talks",
+      "size": 12,
+      "url": "https://www.aljazeera.com/news/2026/6/21/iran-war-day-114-us-iranian-delegations-in-switzerland-for-key-talks?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_42",
+      "group": 2,
+      "label": "Japan grab 4-0 win as Ueda’s brace knocks Tunisia out of 2026 World Cup",
+      "size": 12,
+      "url": "https://www.aljazeera.com/sports/2026/6/21/japan-tunisia-4-0-fifa-world-cup-2026-ayase-ueda-daichi-kamada-junya-ito?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_43",
+      "group": 2,
+      "label": "Trump official says Iran World Cup visa approval ‘amazing’",
+      "size": 12,
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/21/aje-onl-nf_trump-official-says-iran-visa-approval-amazing-210626?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_44",
+      "group": 2,
       "label": "Which teams have qualified for the World Cup 2026 knockouts, round of 32?",
       "size": 12,
       "url": "https://www.aljazeera.com/sports/2026/6/21/which-teams-have-qualified-for-the-world-cup-2026-knockouts-round-of-32?traffic_source=rss",
       "image": ""
     },
     {
-      "id": "sig_41",
+      "id": "sig_45",
+      "group": 2,
+      "label": "South Africa’s immigration crackdown divides Johannesburg’s inner city",
+      "size": 12,
+      "url": "https://www.aljazeera.com/economy/2026/6/21/south-africas-immigration-crackdown-divides-johannesburgs-inner-city?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_46",
+      "group": 2,
+      "label": "Al Jazeera cameraman Ahmed Wishah killed in targeted Israeli strike",
+      "size": 12,
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/21/al-jazeera-cameraman-ahmed-wishah-killed-in-targeted-israeli-strike?traffic_source=rss",
+      "image": ""
+    },
+    {
+      "id": "sig_47",
       "group": 2,
       "label": "Egypt coach denies Salah rift before World Cup match against New Zealand",
       "size": 12,
@@ -403,7 +451,7 @@
       "image": ""
     },
     {
-      "id": "sig_42",
+      "id": "sig_48",
       "group": 2,
       "label": "Room the hero as tiny Curacao earn first World Cup point against Ecuador",
       "size": 12,
@@ -411,59 +459,11 @@
       "image": ""
     },
     {
-      "id": "sig_43",
+      "id": "sig_49",
       "group": 2,
       "label": "Suspect arrested after anti-Muslim stabbing rampage in Scotland",
       "size": 12,
       "url": "https://www.aljazeera.com/video/newsfeed/2026/6/21/aje-onl-nf_suspect-arrested-anti-muslim-stabbing-in-scotland-200626?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_44",
-      "group": 2,
-      "label": "Iran war live: Vance heads to Switzerland; Israel kills 16 in Lebanon",
-      "size": 12,
-      "url": "https://www.aljazeera.com/news/liveblog/2026/6/21/iran-war-live-vance-heads-to-switzerland-israel-kills-16-in-lebanon?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_45",
-      "group": 2,
-      "label": "US refuses to ease Iran World Cup travel restrictions for Belgium match",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/20/us-refuses-to-ease-iran-world-cup-travel-restrictions-for-belgium-match?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_46",
-      "group": 2,
-      "label": "Iranian delegation arrives in Switzerland for US peace talks",
-      "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/20/iranian-delegation-arrives-in-switzerland-for-us-peace-talks?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_47",
-      "group": 2,
-      "label": "Undav injury-time goal sees Germany beat Ivory Coast to top World Cup group",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/20/amiri-injury-time-goal-sees-germany-beat-ivory-coast-to-top-world-cup-group?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_48",
-      "group": 2,
-      "label": "Trump vows Iran will not charge Strait of Hormuz tolls, but says US might",
-      "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/20/trump-vows-iran-will-not-charge-strait-of-hormuz-tolls-but-says-us-might?traffic_source=rss",
-      "image": ""
-    },
-    {
-      "id": "sig_49",
-      "group": 2,
-      "label": "Uncertain World Cup for Paraguay’s Almiron, sent off for covering his mouth",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/20/uncertain-world-cup-for-paraguays-almiron-sent-off-for-covering-his-mouth?traffic_source=rss",
       "image": ""
     },
     {
@@ -537,6 +537,14 @@
       "size": 12,
       "url": "https://news.sky.com/story/italys-meloni-astonished-over-trumps-claim-she-begged-him-for-photo-13555760",
       "image": "https://e3.365dm.com/26/06/1920x1080/skynews-donald-trump-giorgia-meloni_7277716.jpg?20260619130837"
+    },
+    {
+      "id": "sig_59",
+      "group": 2,
+      "label": "At least 24 killed in Kashmir as protests spark shutdown",
+      "size": 12,
+      "url": "https://news.sky.com/story/at-least-24-killed-in-pakistani-kashmir-protests-as-roads-closed-shops-shut-and-internet-turned-off-13555660",
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-muzaffarabad-pakistan_7277513.jpg?20260619093329"
     }
   ],
   "links": [
@@ -681,6 +689,11 @@
       "value": 1
     },
     {
+      "source": "sig_4",
+      "target": "sig_3",
+      "value": 1
+    },
+    {
       "source": "sig_5",
       "target": "reg_na",
       "value": 1
@@ -691,11 +704,6 @@
       "value": 2
     },
     {
-      "source": "sig_5",
-      "target": "sig_4",
-      "value": 1
-    },
-    {
       "source": "sig_6",
       "target": "theme_geo",
       "value": 1
@@ -703,11 +711,6 @@
     {
       "source": "sig_7",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_7",
-      "target": "sig_6",
       "value": 1
     },
     {
@@ -721,18 +724,8 @@
       "value": 1
     },
     {
-      "source": "sig_8",
-      "target": "sig_7",
-      "value": 1
-    },
-    {
       "source": "sig_9",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_9",
-      "target": "sig_8",
       "value": 1
     },
     {
@@ -743,6 +736,11 @@
     {
       "source": "sig_10",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_10",
+      "target": "sig_9",
       "value": 1
     },
     {
@@ -763,11 +761,6 @@
     {
       "source": "sig_13",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_13",
-      "target": "sig_12",
       "value": 1
     },
     {
@@ -826,13 +819,18 @@
       "value": 1
     },
     {
+      "source": "sig_19",
+      "target": "sig_18",
+      "value": 1
+    },
+    {
       "source": "sig_20",
-      "target": "theme_geo",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_21",
-      "target": "reg_eu",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -842,12 +840,12 @@
     },
     {
       "source": "sig_22",
-      "target": "reg_asia",
+      "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_23",
-      "target": "reg_na",
+      "source": "sig_22",
+      "target": "sig_21",
       "value": 1
     },
     {
@@ -856,13 +854,8 @@
       "value": 1
     },
     {
-      "source": "sig_23",
-      "target": "sig_22",
-      "value": 1
-    },
-    {
       "source": "sig_24",
-      "target": "reg_me",
+      "target": "reg_asia",
       "value": 1
     },
     {
@@ -872,7 +865,7 @@
     },
     {
       "source": "sig_25",
-      "target": "theme_sport",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -882,37 +875,32 @@
     },
     {
       "source": "sig_26",
-      "target": "reg_asia",
-      "value": 1
-    },
-    {
-      "source": "sig_26",
-      "target": "sig_25",
-      "value": 1
-    },
-    {
-      "source": "sig_27",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_27",
-      "target": "sig_26",
-      "value": 1
-    },
-    {
-      "source": "sig_28",
       "target": "reg_eu",
       "value": 1
     },
     {
+      "source": "sig_27",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
       "source": "sig_28",
-      "target": "sig_27",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_29",
-      "target": "reg_eu",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_29",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_29",
+      "target": "sig_28",
       "value": 1
     },
     {
@@ -923,6 +911,11 @@
     {
       "source": "sig_31",
       "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_31",
+      "target": "sig_30",
       "value": 1
     },
     {
@@ -946,6 +939,11 @@
       "value": 1
     },
     {
+      "source": "sig_34",
+      "target": "sig_33",
+      "value": 1
+    },
+    {
       "source": "sig_35",
       "target": "reg_eu",
       "value": 1
@@ -961,8 +959,18 @@
       "value": 1
     },
     {
+      "source": "sig_37",
+      "target": "sig_36",
+      "value": 1
+    },
+    {
       "source": "sig_38",
       "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_38",
+      "target": "sig_37",
       "value": 1
     },
     {
@@ -971,8 +979,18 @@
       "value": 1
     },
     {
+      "source": "sig_39",
+      "target": "sig_38",
+      "value": 1
+    },
+    {
       "source": "sig_40",
-      "target": "theme_sport",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_40",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -982,7 +1000,22 @@
     },
     {
       "source": "sig_41",
-      "target": "theme_sport",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_41",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_41",
+      "target": "sig_40",
+      "value": 1
+    },
+    {
+      "source": "sig_42",
+      "target": "reg_asia",
       "value": 1
     },
     {
@@ -991,38 +1024,38 @@
       "value": 1
     },
     {
+      "source": "sig_42",
+      "target": "sig_41",
+      "value": 1
+    },
+    {
       "source": "sig_43",
       "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_43",
-      "target": "sig_42",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_43",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_44",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_45",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_45",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_45",
       "target": "theme_sport",
       "value": 1
     },
     {
-      "source": "sig_46",
-      "target": "reg_na",
+      "source": "sig_44",
+      "target": "sig_43",
+      "value": 1
+    },
+    {
+      "source": "sig_45",
+      "target": "reg_afr",
       "value": 1
     },
     {
@@ -1032,32 +1065,27 @@
     },
     {
       "source": "sig_47",
-      "target": "reg_eu",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_47",
+      "target": "sig_46",
+      "value": 1
+    },
+    {
+      "source": "sig_48",
       "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_48",
+      "target": "sig_47",
+      "value": 1
+    },
+    {
+      "source": "sig_49",
       "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_48",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_49",
-      "target": "theme_sport",
-      "value": 1
-    },
-    {
-      "source": "sig_49",
-      "target": "sig_48",
       "value": 1
     },
     {
@@ -1068,21 +1096,11 @@
     {
       "source": "sig_50",
       "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_50",
-      "target": "sig_49",
       "value": 1
     },
     {
       "source": "sig_51",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_51",
-      "target": "sig_50",
       "value": 1
     },
     {
@@ -1128,6 +1146,11 @@
     {
       "source": "sig_58",
       "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_59",
+      "target": "theme_geo",
       "value": 1
     }
   ]
