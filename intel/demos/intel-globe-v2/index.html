@@ -255,15 +255,18 @@
   .alert-item .ai-loc { font-size: 9.9px; color: #C4D600; }
 
   /* ─── AI Summary Modal ─── */
- #ai-summary {
-   position: absolute; bottom: 340px; left: 50%; transform: translateX(-50%) translateY(10px); z-index: 15;
-   width: 440px; max-height: 420px; padding: 16px 18px; display: none;
+#ai-summary {
+  position: absolute; bottom: 340px; left: 50%; transform: translateX(-50%) translateY(10px); z-index: 15;
+   width: 480px; max-height: min(85vh, 600px); padding: 16px 18px; display: none;
    background: rgba(6,7,10,0.95); backdrop-filter: blur(16px);
    border: 1px solid rgba(196,214,0,0.15); border-radius: 14px;
    opacity: 0;
    transition: transform 0.25s ease, opacity 0.25s ease;
    overflow-y: auto; -webkit-overflow-scrolling: touch;
+   scrollbar-width: thin; scrollbar-color: #1a2233 transparent;
  }
+ #ai-summary::-webkit-scrollbar { width: 3px; }
+ #ai-summary::-webkit-scrollbar-thumb { background: #1a2233; border-radius: 2px; }
   #ai-summary.active {
     display: block; transform: translateX(-50%) translateY(0); opacity: 1;
   }
@@ -1756,14 +1759,30 @@ function setupUI() {
   const alertsBadge = document.getElementById('alerts-badge');
   if (alertsBadge) alertsBadge.textContent = ALERTS.length;
 
-  // AI Summary
-  document.getElementById('btn-ai-summary').addEventListener('click', () => {
-    const summary = generateAISummary();
-    document.getElementById('ai-body').innerHTML = summary;
-    document.getElementById('ai-summary').classList.add('active');
-  });
-  document.getElementById('ai-close').addEventListener('click', () => {
-    document.getElementById('ai-summary').classList.remove('active');
+ // AI Summary
+ document.getElementById('btn-ai-summary').addEventListener('click', () => {
+   const summary = generateAISummary();
+   document.getElementById('ai-body').innerHTML = summary;
+    const panel = document.getElementById('ai-summary');
+    panel.classList.add('active');
+    // After render, measure content and expand panel if screen permits
+    requestAnimationFrame(() => {
+      const body = document.getElementById('ai-body');
+      const header = panel.querySelector('.as-header');
+      const contentHeight = (body?.scrollHeight || 0) + (header?.offsetHeight || 0) + 48; // padding + borders
+      const viewportHeight = window.innerHeight;
+      const maxByViewport = Math.floor(viewportHeight * 0.85) - 340; // 340px = bottom offset for panel
+      const targetHeight = Math.min(contentHeight, maxByViewport, 600);
+      if (targetHeight > 420) {
+        panel.style.maxHeight = targetHeight + 'px';
+      } else {
+        panel.style.maxHeight = '';
+      }
+    });
+ });
+ document.getElementById('ai-close').addEventListener('click', () => {
+    document.getElementById('ai-summary').style.maxHeight = '';
+   document.getElementById('ai-summary').classList.remove('active');
   });
 
   // Ticker
