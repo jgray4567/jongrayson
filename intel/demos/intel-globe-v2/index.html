@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Intel Layer — Global Situation Awareness</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -507,6 +507,10 @@
     }
 
     #ticker { font-size: 11.0px; }
+    /* Fix ticker disappearing behind mobile browser chrome */
+    #ticker { position: fixed; bottom: 0; }
+    #ticker .tc-item { padding: 0 16px; }
+    #ticker .ticker-label { padding: 0 10px; }
 
     /* Mobile tooltip — wider, centered, stays on screen */
     #tooltip {
