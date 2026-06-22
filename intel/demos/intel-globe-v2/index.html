@@ -4,8 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Intel Layer — Global Situation Awareness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #06070a; color: #e8eaed; font-family: 'Inter','Segoe UI',sans-serif; overflow: hidden; }
@@ -983,7 +988,9 @@ async function init() {
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // Cap pixel ratio — 2 is overkill on high-DPI phones, 1.5 saves GPU
+  const maxDPR = window.innerWidth < 768 ? 1.5 : 2;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxDPR));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.2;
   document.getElementById('scene-container').appendChild(renderer.domElement);
@@ -1032,7 +1039,8 @@ async function init() {
   setLoadProgress(88, 'Calculating day/night...');
   buildDayNight();
   setLoadProgress(94, 'Finalizing...');
-  await buildBorders();
+  // Defer borders (3.1MB geojson) — load after globe renders
+  buildBorders().then(() => { borderGroup.visible = false; });
   // Satellites — load and enable by default
   satelliteGroup = new THREE.Group();
   satelliteGroup.visible = true;
@@ -1052,10 +1060,7 @@ async function init() {
   highlightRing.visible = false;
   scene.add(highlightRing);
 
-  await fetchSatellites();
-  satelliteOrbitInterval = setInterval(fetchSatellites, 30000);
   setupUI();
-
   setLoadProgress(100, 'Ready');
   setTimeout(() => {
     const l = document.getElementById('loading');
@@ -1064,6 +1069,11 @@ async function init() {
   }, 300);
 
   animate();
+
+  // Load satellites after globe is visible — don't block initial render
+  fetchSatellites().then(() => {
+    satelliteOrbitInterval = setInterval(fetchSatellites, 30000);
+  }).catch(e => console.error('Satellite load failed:', e));
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1074,20 +1084,26 @@ function buildEarth() {
   // Use real Earth textures from three.js examples CDN
   const loader = new THREE.TextureLoader();
   loader.setCrossOrigin('anonymous');
+  // Lower texture resolution on mobile — saves ~1MB bandwidth
+  const isMobile = window.innerWidth < 768;
+  const texRes = isMobile ? '1024' : '2048';
 
   // NASA Blue Marble textures from three.js repo
-  const earthDay = loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_atmos_2048.jpg');
+  const earthDay = loader.load(`https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_atmos_${texRes}.jpg`);
   earthDay.colorSpace = THREE.SRGBColorSpace;
 
-  const earthNormal = loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_normal_2048.jpg');
-  const earthSpec = loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_specular_2048.jpg');
+  // Skip normal/specular maps on mobile — saves 560KB, barely visible on small screens
+  const earthNormal = isMobile ? null : loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_normal_2048.jpg');
+  const earthSpec = isMobile ? null : loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_specular_2048.jpg');
 
-  const earthGeo = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
-  const earthMat = new THREE.MeshStandardMaterial({
-    map: earthDay,
-    normalMap: earthNormal,
-    normalScale: new THREE.Vector2(0.85, 0.85),
-    roughnessMap: earthSpec,
+  // Fewer geometry segments on mobile — 32 vs 64 is visually identical at phone scale
+  const segments = isMobile ? 32 : 64;
+  const earthGeo = new THREE.SphereGeometry(EARTH_RADIUS, segments, segments);
+ const earthMat = new THREE.MeshStandardMaterial({
+   map: earthDay,
+    normalMap: earthNormal || undefined,
+    normalScale: earthNormal ? new THREE.Vector2(0.85, 0.85) : undefined,
+    roughnessMap: earthSpec || undefined,
     roughness: 0.85,
     metalness: 0.1,
     emissive: new THREE.Color('#112244'),
@@ -1144,8 +1160,8 @@ function buildAtmosphere() {
 // ═══════════════════════════════════════════════════════════════════
 
 function buildStars() {
-  const starGeo = new THREE.BufferGeometry();
-  const starCount = 5000;
+ const starGeo = new THREE.BufferGeometry();
+  const starCount = window.innerWidth < 768 ? 2000 : 5000;
   const positions = new Float32Array(starCount * 3);
   const colors = new Float32Array(starCount * 3);
   for (let i = 0; i < starCount; i++) {
