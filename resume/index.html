@@ -127,6 +127,9 @@ body {
   color: var(--accent);
   font-weight: 700;
 }
+.competency[style*="grid-column:1/-1"]::before {
+  content: none;
+}
 
 /* Jobs */
 .job { margin-bottom: 1.2rem; }
@@ -335,7 +338,8 @@ html.dark .ctrl-btn { color: #0a0a0a; }
     color: #333;
   }
 
-  .competency::before { color: #2b5c8a; }
+ .competency::before { color: #2b5c8a; }
+  .competency[style*="grid-column:1/-1"]::before { content: none; }
 
   /* ── Jobs ── */
   .job { margin-bottom: .5rem; }
