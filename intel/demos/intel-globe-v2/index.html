@@ -1084,12 +1084,12 @@ function buildEarth() {
   // Use real Earth textures from three.js examples CDN
   const loader = new THREE.TextureLoader();
   loader.setCrossOrigin('anonymous');
-  // Lower texture resolution on mobile — saves ~1MB bandwidth
+  // Mobile detection for reduced geometry + skipping normal/specular maps
   const isMobile = window.innerWidth < 768;
-  const texRes = isMobile ? '1024' : '2048';
 
   // NASA Blue Marble textures from three.js repo
-  const earthDay = loader.load(`https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_atmos_${texRes}.jpg`);
+  // Only 2048px exists on CDN — always use it
+  const earthDay = loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/planets/earth_atmos_2048.jpg');
   earthDay.colorSpace = THREE.SRGBColorSpace;
 
   // Skip normal/specular maps on mobile — saves 560KB, barely visible on small screens
