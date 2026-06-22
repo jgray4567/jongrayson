@@ -559,7 +559,7 @@ nav {
 /* Secondary: outlined */
 .btn-secondary {
   display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;
-  font-size:0.95rem;font-weight:500;padding:0.85rem 2rem;
+  font-size:0.95rem;font-weight:600;padding:0.85rem 2rem;
   background:var(--gray-200);color:var(--near-black);
   border:1.5px solid var(--gray-300);border-radius:980px;cursor:pointer;font-family:inherit;
   flex:1;min-width:190px;max-width:250px;
