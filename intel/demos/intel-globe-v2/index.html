@@ -1332,14 +1332,32 @@ function updateFlights() {
 
 function buildCities() {
   cityGroup = new THREE.Group();
-  const dotGeo = new THREE.SphereGeometry(0.03, 6, 4);
+  // Use ring geometry for cities — distinct from satellite dots
+  const ringGeo = new THREE.RingGeometry(0.025, 0.045, 16);
+  const innerDotGeo = new THREE.SphereGeometry(0.012, 6, 4);
   for (const city of CITIES) {
     const pos = latLngTo3D(city.lat, city.lng, EARTH_RADIUS + 0.02);
-    const mat = new THREE.MeshBasicMaterial({
-      color: 0xC4D600, transparent: true, opacity: 0.8,
+    
+    // Outer ring — flat marker on globe surface
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0xC4D600, transparent: true, opacity: 0.6,
+      side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.position.copy(pos);
+    // Orient ring to face outward from globe center
+    ring.lookAt(0, 0, 0);
+    ring.rotateY(Math.PI);
+    ring.userData = { type: 'city', city, isRing: true, pulse: Math.random() * Math.PI * 2 };
+    cityGroup.add(ring);
+    
+    // Inner solid dot — small bright center
+    const dotMat = new THREE.MeshBasicMaterial({
+      color: 0xC4D600, transparent: true, opacity: 0.9,
       blending: THREE.AdditiveBlending,
     });
-    const dot = new THREE.Mesh(dotGeo, mat);
+    const dot = new THREE.Mesh(innerDotGeo, dotMat);
     dot.position.copy(pos);
     dot.userData = { type: 'city', city };
     cityGroup.add(dot);
@@ -1956,8 +1974,19 @@ function animate() {
 
   if (layers.flights) updateFlights();
   if (layers.hotspots) updateHotspots(time);
-  if (layers.daynight) updateDayNight();
-  if (clouds) clouds.rotation.y += 0.0003;
+ if (layers.daynight) updateDayNight();
+ if (clouds) clouds.rotation.y += 0.0003;
+  // Pulse city ring markers
+  if (layers.cities) {
+    for (const child of cityGroup.children) {
+      if (child.userData.isRing) {
+        child.userData.pulse += 0.03;
+        child.material.opacity = 0.35 + Math.sin(child.userData.pulse) * 0.25;
+        const s = 1.0 + Math.sin(child.userData.pulse) * 0.15;
+        child.scale.set(s, s, s);
+      }
+    }
+  }
 
   // City / Flight / Satellite hover detection
   const tip = document.getElementById('tooltip');
