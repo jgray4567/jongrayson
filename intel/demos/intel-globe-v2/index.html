@@ -991,10 +991,10 @@ async function init() {
   controls.autoRotate = false;
   controls.autoRotateSpeed = 0.3;
 
-  raycaster = new THREE.Raycaster();
-  // Larger hit threshold for small objects (satellites are tiny relative to globe)
-  raycaster.params.Mesh.threshold = 0.35;
-  raycaster.params.Points.threshold = 0.35;
+ raycaster = new THREE.Raycaster();
+  // Tighter threshold — 0.35 was too generous, caused satellite hits to block cities
+  raycaster.params.Mesh.threshold = 0.08;
+  raycaster.params.Points.threshold = 0.08;
   mouse = new THREE.Vector2(-999, -999);
   let touchActive = false;
 
@@ -1597,12 +1597,13 @@ async function fetchSatellites() {
       dot.userData = { type: 'sat', name: sat.name, orbitClass, network: sat.network, altitude: sat.altitudeKm, period: sat.periodMinutes, tle1: sat.tle1, tle2: sat.tle2 };
       satelliteGroup.add(dot);
 
-      // Invisible larger hit sphere for easier touch/mouse targeting
-      const hitGeo = new THREE.SphereGeometry(0.35, 8, 6);
+     // Invisible larger hit sphere for easier touch/mouse targeting
+      // Smaller hit sphere — 0.35 was too large, swallowed city clicks
+      const hitGeo = new THREE.SphereGeometry(0.08, 8, 6);
       const hitMat = new THREE.MeshBasicMaterial({ visible: false });
       const hitSphere = new THREE.Mesh(hitGeo, hitMat);
       hitSphere.position.copy(pos);
-      hitSphere.userData = dot.userData;
+      hitSphere.userData = { ...dot.userData, isHit: true };
       satelliteGroup.add(hitSphere);
       plotted++;
 
@@ -1875,12 +1876,15 @@ function setupUI() {
     if (layers.hotspots) candidates.push(...hotspotGroup.children);
     if (layers.satellites && satelliteGroup.visible) candidates.push(...satelliteGroup.children);
 
-    // Sort intersects by distance — prefer satellites and hotspots over empty space
-    const intersects = raycaster.intersectObjects(candidates);
-    const tip = document.getElementById('tooltip');
+   // Sort intersects by distance — prefer satellites and hotspots over empty space
+   const intersects = raycaster.intersectObjects(candidates);
+    // Filter out invisible hit spheres — prefer the real visible object
+    const visibleHits = intersects.filter(i => !i.object.userData.isHit);
+    const realIntersects = visibleHits.length > 0 ? visibleHits : intersects;
+   const tip = document.getElementById('tooltip');
 
-    if (intersects.length > 0) {
-      const obj = intersects[0].object;
+    if (realIntersects.length > 0) {
+      const obj = realIntersects[0].object;
       const ud = obj.userData;
       if (ud.type === 'sat' || ud.type === 'flight' || ud.city || ud.type === 'hotspot') {
         // Position tooltip — measure actual size and clamp fully within viewport
@@ -2005,10 +2009,13 @@ function animate() {
     if (layers.hotspots) candidates.push(...hotspotGroup.children);
     if (layers.satellites && satelliteGroup.visible) candidates.push(...satelliteGroup.children);
 
-    const intersects = raycaster.intersectObjects(candidates);
+   const intersects = raycaster.intersectObjects(candidates);
+    // Filter out invisible hit spheres — prefer the real visible object
+    const visibleHits2 = intersects.filter(i => !i.object.userData.isHit);
+    const realIntersects2 = visibleHits2.length > 0 ? visibleHits2 : intersects;
 
-    if (intersects.length > 0) {
-      const obj = intersects[0].object;
+    if (realIntersects2.length > 0) {
+      const obj = realIntersects2[0].object;
       const ud = obj.userData;
 
       if (ud.type === 'flight') {
