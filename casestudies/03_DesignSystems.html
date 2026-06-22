@@ -1,275 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Design Systems: Scaling Without Chaos | Jon Grayson</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --color-accent: #9fae00; --color-text: #000000; --color-bg-light: #f5f5f7; --color-border: #2B5C8A; --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        html { scroll-behavior: smooth; }
-        body { font-family: var(--font-system); color: var(--color-text); line-height: 1.6; }
-        header { position: sticky; top: 0; z-index: 999; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);  padding: 1rem 2rem; }
-        nav { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        nav a { color: var(--color-text); text-decoration: none; font-weight: 500; font-size: 0.875rem; }
-        nav a:hover { color: var(--color-accent); }
-        .progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: var(--color-accent); z-index: 1000; }
-        .hero { max-width: 1000px; margin: 0 auto; padding: 6rem 2rem 4rem; text-align: center; }
-        .hero h1 { font-size: clamp(1.8rem, 4vw, 3.2rem); font-weight: 700; line-height: 1.2; margin-bottom: 1.5rem; }
-        .hero .tagline { font-size: 1.1rem; color: rgba(0,0,0,0.6); max-width: 700px; margin: 0 auto 2rem; }
-        main { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
-        section { padding: 4rem 0;  }
-        section:first-of-type { border-top: none; padding-top: 0; }
-        section h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 700; margin-bottom: 0.5rem; }
-        .section-num { display: inline-block; font-weight: 700; color: var(--color-accent); margin-bottom: 1rem; font-size: 0.875rem; }
-        h3 { font-size: 1.4rem; font-weight: 600; margin: 2rem 0 1rem; }
-        p { margin-bottom: 1.5rem; line-height: 1.8; }
-        .callout { background: rgba(0,0,0,0.02); border-left: 3px solid var(--color-accent); padding: 1.5rem; margin: 2rem 0; border-radius: 4px; font-style: italic; }
-        .credit { font-size: 0.875rem; color: rgba(0,0,0,0.5); margin-top: 0.5rem; font-style: normal; }
-        ul { margin: 1.5rem 0 1.5rem 1.5rem; line-height: 1.8; }
-        li { margin-bottom: 0.75rem; }
-        .method-box { background: var(--color-bg-light); border-left: 3px solid var(--color-accent); padding: 1.5rem; margin: 2rem 0; border-radius: 4px; }
-        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-        .metric-card { background: var(--color-bg-light); padding: 1.5rem; border-radius: 8px; text-align: center; }
-        .metric-value { font-size: 2rem; font-weight: 700; color: var(--color-accent); line-height: 1; }
-        .metric-label { font-size: 0.875rem; color: rgba(0,0,0,0.6); margin-top: 0.5rem; }
-        .mobile-highlight { background: rgba(159, 174, 0, 0.08); border-radius: 4px; padding: 1.5rem; border-left: 3px solid var(--color-accent); margin: 2rem 0; }
-        .mobile-highlight em { color: var(--color-accent); font-weight: 600; font-style: normal; }
-        footer { background: var(--color-bg-light); padding: 2rem; margin-top: 2rem; text-align: center;  }
-        .reveal { opacity: 0; transform: translateY(30px); }
-        .reveal.in { animation: slideIn 0.6s ease-out forwards; }
-        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 640px) { header { padding: 0.75rem 1rem; } .hero { padding: 3rem 1.5rem 2rem; } section { padding: 1.5rem 0; } main { padding: 0 1.5rem; } .metrics { grid-template-columns: 1fr; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Design System | Jon Grayson</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#9fae00;--ink:#141414;--muted:#6b6b6f;--bg:#fff;--soft:#f4f5ee;--line:#e7e8e0;--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);color:var(--ink);line-height:1.5;background:var(--bg)}
+.pb{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:1000}
+header{position:sticky;top:0;z-index:99;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav{max-width:880px;margin:0 auto;padding:.9rem 1.5rem;display:flex;justify-content:space-between;align-items:center;font-size:.85rem}
+nav a{color:var(--ink);text-decoration:none;font-weight:600}nav a:hover{color:var(--accent)}
+main{max-width:880px;margin:0 auto;padding:0 1.5rem}
+.hero{padding:4.5rem 0 2rem}
+.eyebrow{color:var(--accent);font-weight:700;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
+.hero h1{font-size:clamp(2.2rem,6vw,3.6rem);font-weight:800;line-height:1.04;margin:.6rem 0 1rem;letter-spacing:-.02em}
+.hero p{font-size:1.15rem;color:var(--muted);max-width:56ch}
+section{padding:2.3rem 0;border-top:1px solid var(--line)}
+h2{font-size:clamp(1.3rem,3vw,1.8rem);font-weight:800;margin-bottom:1rem;letter-spacing:-.01em}
+p.lead{font-size:1.02rem;color:var(--muted);max-width:60ch}
+.tag{display:inline-block;font-size:.74rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.5rem}
+.flow{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:.5rem}
+.flow li{background:var(--bg);padding:1.2rem;opacity:0;transform:translateY(16px);transition:.5s}
+.flow li.in{opacity:1;transform:none}
+.flow .dot{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:.85rem;margin-bottom:.55rem}
+.flow h4{font-size:.92rem;margin-bottom:.2rem}.flow p{font-size:.8rem;color:var(--muted);line-height:1.35}
+.stats{display:flex;flex-wrap:wrap;gap:2.8rem;align-items:center}
+.stat{position:relative;width:160px;text-align:center}
+.stat svg{width:160px;height:160px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--soft);stroke-width:11}
+.ring-fg{fill:none;stroke:var(--accent);stroke-width:11;stroke-linecap:round;stroke-dasharray:327;stroke-dashoffset:327;transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)}
+.stat-num{position:absolute;top:60px;left:0;right:0;font-size:2rem;font-weight:800}
+.stat-label{font-size:.85rem;color:var(--muted);margin-top:.5rem;line-height:1.3}
+.plain{min-width:150px}.plain .big{font-size:3rem;font-weight:800;color:var(--accent);line-height:1}.plain .stat-label{margin-top:.3rem}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-top:.5rem}
+.tier{border:1px solid var(--line);border-radius:12px;padding:1rem;border-top:4px solid var(--accent)}
+.tier h4{font-size:.95rem;margin-bottom:.25rem}.tier p{font-size:.82rem;color:var(--muted)}
+.tier.t2{border-top-color:#c2cb8f}.tier.t3{border-top-color:#dfe3cf}
+.note{border-left:3px solid var(--accent);padding:.3rem 0 .3rem 1rem;color:var(--muted);font-style:italic;margin:1.1rem 0;max-width:58ch}
+.reveal{opacity:0;transform:translateY(22px);transition:.6s}.reveal.in{opacity:1;transform:none}
+footer{border-top:1px solid var(--line);padding:2rem 1.5rem;text-align:center;color:var(--muted);font-size:.82rem}
+.foot-note{font-size:.76rem;color:#9a9a9e;margin-top:.7rem}
+@media(max-width:680px){.flow,.tiers{grid-template-columns:1fr 1fr}.hero{padding:3rem 0 1.5rem}}
+</style>
 </head>
 <body>
-    <div class="progress-bar" id="progressBar"></div>
-    <header>
-        <nav>
-            <a href="index.html" class="nav-back">← Back to Case Studies</a>
-            <a href="https://jongrayson.com">jongrayson.com</a>
-        </nav>
-    </header>
+<div class="pb" id="pb"></div>
+<header><nav><a href="index.html">← Case studies</a><a href="https://jongrayson.com">jongrayson.com</a></nav></header>
+<main>
+  <div class="hero">
+    <h1>One design system</h1>
+    <p>Four platforms, every team rebuilding the same button. We unified them without slowing anyone down.</p>
+  </div>
 
-    <main>
-        <div class="hero">
-            <h1>Enterprise Design Systems</h1>
-            <p class="tagline">How to build a design system that 200+ engineers actually use, scales across 4+ platforms, and makes iteration faster while maintaining consistency. The unglamorous work that enables everything else.</p>
-        </div>
+  <section class="reveal">
+    <span class="tag">The problem</span>
+    <p class="lead">A button bug meant four separate fixes. A brand change meant four re-implementations. Designers spent roughly 40% of their time rebuilding components — and users had to relearn the basics in every app.</p>
+  </section>
 
-        <section id="context" class="reveal">
-            <span class="section-num"> THE PROBLEM</span>
-            <h2>Every Designer Rebuilding Buttons</h2>
+  <section class="reveal">
+    <h2>What I did</h2>
+    <ol class="flow">
+      <li><span class="dot">1</span><h4>Audited</h4><p>Catalogued components across all four platforms.</p></li>
+      <li><span class="dot">2</span><h4>Extracted</h4><p>Made the best existing patterns canonical.</p></li>
+      <li><span class="dot">3</span><h4>Governed</h4><p>Tiered rules — strict core, flexible edges.</p></li>
+      <li><span class="dot">4</span><h4>Drove adoption</h4><p>Workshops, quick wins, easy install.</p></li>
+    </ol>
+    <div class="tiers">
+      <div class="tier"><h4>Core</h4><p>Buttons, forms, alerts. Locked — changes need review.</p></div>
+      <div class="tier t2"><h4>Patterns</h4><p>Workflows, layouts. Adapt within guidelines.</p></div>
+      <div class="tier t3"><h4>Experimental</h4><p>New ideas. Prove them, then promote.</p></div>
+    </div>
+    <p class="note">Built from what teams already shipped, so the system felt like theirs — not something imposed.</p>
+  </section>
 
-            <p>
-                Multiple mission-critical platforms were built by different teams, at different times, with different tools. The result: visual inconsistency, duplicated component work, and nightmare maintenance.
-            </p>
+  <section class="reveal">
+    <h2>The results</h2>
+    <div class="stats">
+      <div class="stat" data-target="92"><svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fg" cx="60" cy="60" r="52"/></svg><div class="stat-num" data-target="92" data-suffix="%">0</div><div class="stat-label">Component adoption<br>within 18 months</div></div>
+      <div class="stat plain"><div class="big" data-target="40" data-prefix="−" data-suffix="%">0</div><div class="stat-label">Less time spent<br>rebuilding components</div></div>
+    </div>
+  </section>
 
-            <p>
-                When a usability issue was discovered in button behavior, it had to be fixed in 4 separate codebases. When branding changed, teams had to re-implement across platforms independently. Designers spent 40% of time rebuilding components instead of solving new problems.
-            </p>
-
-            <p>
-                More critically: inconsistency created cognitive friction for users switching between systems. One platform's "Save" pattern worked differently than another's. Users had to relearn behaviors with each app.
-            </p>
-
-            <div class="callout">
-                <strong>A design system isn't about pixels. It's about scaling trust, consistency, and team velocity.</strong> <span class="credit">— Brad Frost, Atomic Design</span>
-            </div>
-        </section>
-
-        <section id="approach" class="reveal">
-            <span class="section-num"> STRATEGY</span>
-            <h2>Building Adoption, Not Just Documentation</h2>
-
-            <h3>Phase 1: Audit & Synthesis</h3>
-            <p>
-                Before designing anything, we catalogued what already existed:
-            </p>
-            <ul>
-                <li>Visual components across 4 platforms (buttons, forms, modals, etc.)</li>
-                <li>Interaction patterns (how users completed common tasks)</li>
-                <li>Conflicts (where platforms diverged in similar use cases)</li>
-                <li>Technical constraints (legacy systems vs. modern stacks)</li>
-            </ul>
-
-            <p>
-                The audit showed ~60% pattern overlap—components that should be identical but weren't. These became the system's foundation.
-            </p>
-
-            <h3>Phase 2: Design Foundation</h3>
-            <p>
-                Rather than creating idealized components, we <strong>extracted from production systems</strong>. The best existing button from any platform became the canonical button. The best form pattern became the standard. This meant teams recognized themselves in the system—it wasn't foreign.
-            </p>
-
-            <p>
-                We documented not just the component, but the <em>thinking</em> behind it:
-            </p>
-            <ul>
-                <li>When to use this vs. alternative patterns</li>
-                <li>Mobile adaptations (critical for systems with mobile users)</li>
-                <li>Accessibility requirements built in</li>
-                <li>Common mistakes and how to avoid them</li>
-            </ul>
-
-            <div class="method-box">
-                <h4>Component Recipes, Not Prescriptions</h4>
-                <p>Documentation wasn't "Use this button." It was "Here's why we chose this interaction. Here's how to adapt it for your context. Here's how mobile changes it." This gave teams autonomy while maintaining alignment.</p>
-            </div>
-
-            <h3>Phase 3: The Governance Model</h3>
-            <p>
-                Most design systems fail because governance is either too loose or too strict. Ours used a tiered approach:
-            </p>
-            <ul>
-                <li><strong>Core Components (Protected):</strong> Buttons, forms, alerts. Any change required cross-team review.</li>
-                <li><strong>Patterns (Guided):</strong> Workflows, layouts. Teams could adapt within guidelines.</li>
-                <li><strong>Experimental (Monitored):</strong> New components. If proven useful across teams, promoted to Core.</li>
-            </ul>
-
-            <p>
-                This balanced consistency with innovation. Teams didn't feel constrained; they felt supported.
-            </p>
-        </section>
-
-        <section id="design" class="reveal">
-            <span class="section-num"> EXECUTION & ADOPTION</span>
-            <h2>Making Systems Irresistible to Use</h2>
-
-            <h3>The Components Library (Figma)</h3>
-            <p>
-                We built a living Figma library with:
-            </p>
-            <ul>
-                <li>Main components + variants (color, size, state)</li>
-                <li>Annotations for spacing, color tokens, behavior</li>
-                <li>Interactive prototypes showing mobile responsive behavior</li>
-                <li>Accessibility notes linked to WCAG standards</li>
-            </ul>
-
-            <p>
-                Mobile was prioritized: every component showed mobile, tablet, and desktop variants. Designers could instantly see how a button adapted across screen sizes.
-            </p>
-
-            <h3>Code Implementation</h3>
-            <p>
-                Engineers got Storybook components they could import directly:
-            </p>
-            <ul>
-                <li>React components with prop documentation</li>
-                <li>CSS variables for theming</li>
-                <li>Built-in accessibility (ARIA labels, keyboard navigation)</li>
-                <li>Mobile-first responsive breakpoints</li>
-            </ul>
-
-            <p>
-                The barrier to adoption was deliberately lowered: `npm install @platform/design-system` and you could start using components immediately. No research, no decisions, no inconsistency.
-            </p>
-
-            <div class="mobile-highlight">
-                <p><em>Mobile-First Implementation:</em> All components were designed and coded mobile-first. Desktop was considered an enhancement. This meant mobile users got fast, optimized components, and desktop users got components that worked well at any size.</p>
-            </div>
-
-            <h3>Adoption Strategy</h3>
-            <p>
-                <strong>The key to adoption: show value immediately.</strong>
-            </p>
-            <ul>
-                <li>Ran workshops for each team (1 hour, hands-on)</li>
-                <li>Identified "quick wins"—easy migrations that saved time</li>
-                <li>Showcased before/after metrics (design velocity, consistency improvements)</li>
-                <li>Created a Slack channel for questions and feedback</li>
-                <li>Monthly "system health" reports showing adoption rates, component usage, emerging patterns</li>
-            </ul>
-
-            <p>
-                After 6 months, adoption reached 78% of new components. Within 18 months, 92%.
-            </p>
-        </section>
-
-        <section id="outcomes" class="reveal">
-            <span class="section-num"> RESULTS</span>
-            <h2>When Systems Work, Everything Accelerates</h2>
-
-            <div class="metrics">
-                <div class="metric-card">
-                    <div class="metric-value">40%</div>
-                    <div class="metric-label">Reduction in Design Time (Reusable Patterns)</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">92%</div>
-                    <div class="metric-label">Component Adoption Rate (In 18 months)</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">50%</div>
-                    <div class="metric-label">Fewer CSS/Component Bugs (Centralized Maintenance)</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">3x</div>
-                    <div class="metric-label">Faster Onboarding for New Designers</div>
-                </div>
-            </div>
-
-            <h3>Qualitative Impacts</h3>
-            <ul>
-                <li>New team members could contribute meaningful design work in their first week (vs. first month)</li>
-                <li>Usability issues found in one platform were automatically fixed across all platforms</li>
-                <li>Mobile users experienced consistency; switching apps didn't require relearning patterns</li>
-                <li>Teams could experiment with new patterns in the "Experimental" tier without risk</li>
-            </ul>
-
-            <p>
-                Most tellingly: designer morale improved. Designers stopped rebuilding buttons and started solving real problems. The system didn't constrain creativity; it freed it.
-            </p>
-        </section>
-
-        <section id="reflection" class="reveal">
-            <span class="section-num"> LESSONS FOR TEAMS & SCALE</span>
-            <h2>Systems Are Cultural, Not Just Technical</h2>
-
-            <h3>Insight 1: Governance Is Negotiation</h3>
-            <p>
-                Tight governance feels safe but kills adoption. Loose governance feels fast but creates chaos. The answer: tiered governance that changes based on maturity.
-            </p>
-
-            <h3>Insight 2: Adoption Requires Empathy</h3>
-            <p>
-                We didn't mandate the system. We demonstrated value. We made migration easy. We listened to concerns. Adoption happened because it was easier than not adopting.
-            </p>
-
-            <h3>Insight 3: Mobile-First Thinking Scales Beyond Mobile</h3>
-            <p>
-                Designing for mobile forced hard choices about components. Which buttons matter? Which can be simplified? Those choices made desktop better too.
-            </p>
-
-            <div class="callout">
-                <strong>"A design system is not a product. It's a service your design organization provides to itself."</strong> <span class="credit">Framework from conversations with 15+ teams building systems</span>
-            </div>
-
-            <h3>Insight 4: Consistency Is Strategic</h3>
-            <p>
-                Inconsistency isn't a design problem; it's a business problem. It slows teams, creates confusion, and burns money. A system that scales consistency is a system that scales revenue.
-            </p>
-
-            <p>
-                This is relevant to consumer AI products: consistency across onboarding, settings, help, and app features determines whether users develop intuitive mental models or stay confused. Design systems enable that consistency.
-            </p>
-        </section>
-
-        <footer>
-            <div class="footer-content">
-                <p><strong>Case Study:</strong> Enterprise Design System at Scale</p>
-                <p>This case study addresses design system development across classified and commercial platforms. Component documentation and technical specifics are generalized.</p>
-                <p style="margin-top: 2rem; font-size: 0.85rem; color: rgba(0,0,0,0.5);">© 2026 Jon Grayson</p>
-            </div>
-        </footer>
-    </main>
-
-    <script>
-        function updateProgress() { const st = document.documentElement.scrollTop; const dh = document.documentElement.scrollHeight - window.innerHeight; document.getElementById('progressBar').style.width = (st / dh) * 100 + '%'; }
-        window.addEventListener('scroll', updateProgress, { passive: true });
-        const io = new IntersectionObserver(e => e.forEach(x => { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }), { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-    </script>
+  <section class="reveal">
+    <span class="tag">Takeaway</span>
+    <p class="lead">A design system is really a service you run for your own team, not a thing you ship once. It only works when using it beats building your own.</p>
+  </section>
+</main>
+<footer>
+  <p>Case study · Enterprise design system. Specifics generalized.</p>
+  <p class="foot-note">Metrics are from an anonymized engagement, rounded.</p>
+</footer>
+<script>
+const pb=document.getElementById('pb');
+addEventListener('scroll',()=>{const h=document.documentElement;pb.style.width=(h.scrollTop/(h.scrollHeight-innerHeight)*100)+'%'},{passive:true});
+function countUp(el){const tg=+el.dataset.target,suf=el.dataset.suffix||'',pre=el.dataset.prefix||'';let s=null;const d=1400;const step=ts=>{if(!s)s=ts;const p=Math.min((ts-s)/d,1);el.textContent=pre+Math.round(tg*p)+suf;if(p<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+function ring(st){const tg=Math.min(+st.dataset.target,100);const r=st.querySelector('.ring-fg');if(r)r.style.strokeDashoffset=327-(327*tg/100)}
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;const t=e.target;t.classList.add('in');
+ if(t.classList.contains('flow'))[...t.children].forEach((li,i)=>setTimeout(()=>li.classList.add('in'),i*130));
+ t.querySelectorAll&&t.querySelectorAll('.stat[data-target]').forEach(ring);
+ t.querySelectorAll&&t.querySelectorAll('[data-target]').forEach(el=>{if(el.classList.contains('stat'))return;countUp(el)});
+ io.unobserve(t)})},{threshold:.25});
+document.querySelectorAll('.reveal,.flow').forEach(el=>io.observe(el));
+</script>
 </body>
 </html>

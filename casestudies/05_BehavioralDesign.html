@@ -1,304 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Behavioral Design for Adoption: Without Manipulation | Jon Grayson</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --color-accent: #9fae00; --color-text: #000000; --color-bg-light: #f5f5f7; --color-border: #2B5C8A; --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        html { scroll-behavior: smooth; }
-        body { font-family: var(--font-system); color: var(--color-text); line-height: 1.6; }
-        header { position: sticky; top: 0; z-index: 999; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);  padding: 1rem 2rem; }
-        nav { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        nav a { color: var(--color-text); text-decoration: none; font-weight: 500; font-size: 0.875rem; }
-        .progress-bar { position: fixed; top: 0; left: 0; height: 2px; background: var(--color-accent); z-index: 1000; }
-        .hero { max-width: 1000px; margin: 0 auto; padding: 6rem 2rem 4rem; text-align: center; }
-        .hero h1 { font-size: clamp(1.8rem, 4vw, 3.2rem); font-weight: 700; line-height: 1.2; margin-bottom: 1.5rem; }
-        .hero .tagline { font-size: 1.1rem; color: rgba(0,0,0,0.6); max-width: 700px; margin: 0 auto 2rem; }
-        main { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
-        section { padding: 4rem 0;  }
-        section:first-of-type { border-top: none; padding-top: 0; }
-        section h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 700; margin-bottom: 0.5rem; }
-        .section-num { display: inline-block; font-weight: 700; color: var(--color-accent); margin-bottom: 1rem; font-size: 0.875rem; }
-        h3 { font-size: 1.4rem; font-weight: 600; margin: 2rem 0 1rem; }
-        p { margin-bottom: 1.5rem; line-height: 1.8; }
-        .callout { background: rgba(0,0,0,0.02); border-left: 3px solid var(--color-accent); padding: 1.5rem; margin: 2rem 0; border-radius: 4px; font-style: italic; }
-        .credit { font-size: 0.875rem; color: rgba(0,0,0,0.5); margin-top: 0.5rem; font-style: normal; }
-        ul { margin: 1.5rem 0 1.5rem 1.5rem; line-height: 1.8; }
-        li { margin-bottom: 0.75rem; }
-        .method-box { background: var(--color-bg-light); border-left: 3px solid var(--color-accent); padding: 1.5rem; margin: 2rem 0; border-radius: 4px; }
-        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-        .metric-card { background: var(--color-bg-light); padding: 1.5rem; border-radius: 8px; text-align: center; }
-        .metric-value { font-size: 2rem; font-weight: 700; color: var(--color-accent); }
-        .metric-label { font-size: 0.875rem; color: rgba(0,0,0,0.6); margin-top: 0.5rem; }
-        .mobile-highlight { background: rgba(159, 174, 0, 0.08); border-left: 3px solid var(--color-accent); padding: 1.5rem; border-radius: 4px; margin: 2rem 0; }
-        .mobile-highlight em { color: var(--color-accent); font-weight: 600; font-style: normal; }
-        footer { background: var(--color-bg-light); padding: 2rem; margin-top: 2rem; text-align: center;  }
-        .reveal { opacity: 0; transform: translateY(30px); }
-        .reveal.in { animation: slideIn 0.6s ease-out forwards; }
-        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 640px) { .hero { padding: 3rem 1.5rem 2rem; } section { padding: 1.5rem 0; } main { padding: 0 1.5rem; } .metrics { grid-template-columns: 1fr; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behavioral Design, Honestly | Jon Grayson</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#9fae00;--ink:#141414;--muted:#6b6b6f;--bg:#fff;--soft:#f4f5ee;--line:#e7e8e0;--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);color:var(--ink);line-height:1.5;background:var(--bg)}
+.pb{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:1000}
+header{position:sticky;top:0;z-index:99;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav{max-width:880px;margin:0 auto;padding:.9rem 1.5rem;display:flex;justify-content:space-between;align-items:center;font-size:.85rem}
+nav a{color:var(--ink);text-decoration:none;font-weight:600}nav a:hover{color:var(--accent)}
+main{max-width:880px;margin:0 auto;padding:0 1.5rem}
+.hero{padding:4.5rem 0 2rem}
+.eyebrow{color:var(--accent);font-weight:700;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
+.hero h1{font-size:clamp(2.2rem,6vw,3.6rem);font-weight:800;line-height:1.04;margin:.6rem 0 1rem;letter-spacing:-.02em}
+.hero p{font-size:1.15rem;color:var(--muted);max-width:56ch}
+section{padding:2.3rem 0;border-top:1px solid var(--line)}
+h2{font-size:clamp(1.3rem,3vw,1.8rem);font-weight:800;margin-bottom:1rem;letter-spacing:-.01em}
+p.lead{font-size:1.02rem;color:var(--muted);max-width:60ch}
+.tag{display:inline-block;font-size:.74rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.5rem}
+/* fogg equation */
+.eq{display:flex;flex-wrap:wrap;align-items:stretch;gap:.7rem;margin-top:.6rem}
+.factor{flex:1;min-width:150px;border:1px solid var(--line);border-radius:12px;padding:1.1rem;border-top:4px solid var(--accent);opacity:0;transform:translateY(16px);transition:.5s}
+.factor.in{opacity:1;transform:none}
+.factor h4{font-size:1rem;margin-bottom:.25rem}
+.factor p{font-size:.84rem;color:var(--muted)}
+.op{display:grid;place-items:center;font-size:1.6rem;font-weight:800;color:var(--accent);opacity:0;transition:.5s}
+.op.in{opacity:1}
+.result{display:grid;place-items:center;min-width:150px;border-radius:12px;padding:1.1rem;background:var(--accent);color:#fff;text-align:center;opacity:0;transform:translateY(16px);transition:.5s}
+.result.in{opacity:1;transform:none}
+.result b{font-size:1.05rem;display:block}.result span{font-size:.8rem;opacity:.9}
+/* before/after */
+.ba{max-width:560px;margin-top:.4rem}
+.ba-row{display:flex;align-items:center;gap:.8rem;margin:.7rem 0;font-size:.9rem}
+.ba-row span{width:56px;color:var(--muted)}.ba-row b{width:46px;text-align:right;font-weight:800}
+.bar{flex:1;background:var(--soft);border-radius:7px;height:20px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#cdd2bd;border-radius:7px;transition:width 1.3s cubic-bezier(.2,.8,.2,1)}
+.bar i.hi{background:var(--accent)}
+.stats{display:flex;flex-wrap:wrap;gap:2.8rem;align-items:center;margin-top:1.4rem}
+.plain{min-width:140px}.plain .big{font-size:3rem;font-weight:800;color:var(--accent);line-height:1}.plain .stat-label{font-size:.85rem;color:var(--muted);margin-top:.3rem;line-height:1.3}
+.note{border-left:3px solid var(--accent);padding:.3rem 0 .3rem 1rem;color:var(--muted);font-style:italic;margin:1.1rem 0;max-width:58ch}
+.reveal{opacity:0;transform:translateY(22px);transition:.6s}.reveal.in{opacity:1;transform:none}
+footer{border-top:1px solid var(--line);padding:2rem 1.5rem;text-align:center;color:var(--muted);font-size:.82rem}
+.foot-note{font-size:.76rem;color:#9a9a9e;margin-top:.7rem}
+@media(max-width:680px){.eq{flex-direction:column}.op{transform:rotate(90deg)}.hero{padding:3rem 0 1.5rem}}
+</style>
 </head>
 <body>
-    <div class="progress-bar" id="progressBar"></div>
-    <header>
-        <nav>
-            <a href="index.html" class="nav-back">← Back to Case Studies</a>
-            <a href="https://jongrayson.com">jongrayson.com</a>
-        </nav>
-    </header>
+<div class="pb" id="pb"></div>
+<header><nav><a href="index.html">← Case studies</a><a href="https://jongrayson.com">jongrayson.com</a></nav></header>
+<main>
+  <div class="hero">
+    <h1>Behavioral design, honestly</h1>
+    <p>Driving adoption without dark patterns — by clearing the path to what people already want to do.</p>
+  </div>
 
-    <main>
-        <div class="hero">
-            <h1>Behavioral Design for Adoption</h1>
-            <p class="tagline">The ethical foundation of getting users to care. How to apply psychology principles—motivation, ability, prompt—to drive adoption without manipulation, deception, or dark patterns.</p>
-        </div>
+  <section class="reveal">
+    <span class="tag">The problem</span>
+    <p class="lead">People want to adopt good tools. They usually don't for one of three reasons: they don't see the value, it's harder than what they do now, or nothing reminds them to try.</p>
+  </section>
 
-        <section id="context" class="reveal">
-            <span class="section-num">1 THE DISTINCTION</span>
-            <h2>Behavioral Design ≠ Dark Patterns</h2>
+  <section class="reveal">
+    <h2>The model I used</h2>
+    <div class="eq" id="eq">
+      <div class="factor"><h4>Motivation</h4><p>A 90-second demo showed the time saved.</p></div>
+      <div class="op">+</div>
+      <div class="factor"><h4>Ability</h4><p>Three core actions instead of twelve.</p></div>
+      <div class="op">+</div>
+      <div class="factor"><h4>Prompt</h4><p>A nudge at the exact right moment.</p></div>
+      <div class="op">=</div>
+      <div class="result"><b>Adoption</b><span>all three, lined up</span></div>
+    </div>
+    <p class="note">B.J. Fogg's model: a behavior happens only when motivation, ability, and a well-timed prompt meet. Most things fail because one is missing — not because the feature is bad.</p>
+  </section>
 
-            <p>
-                Behavioral design gets a bad rap. Critics conflate it with manipulation: fake urgency, deceptive defaults, exploitative notifications. But true behavioral design is the opposite. It's about removing obstacles to doing what users *actually want to do*.
-            </p>
+  <section class="reveal">
+    <h2>The results</h2>
+    <div class="ba">
+      <div class="ba-row"><span>Before</span><div class="bar"><i data-w="22"></i></div><b>22%</b></div>
+      <div class="ba-row"><span>After</span><div class="bar"><i class="hi" data-w="72"></i></div><b>72%</b></div>
+    </div>
+    <p class="lead" style="margin:.6rem 0 0">Tool adoption, in 12 weeks — no manipulation.</p>
+    <div class="stats">
+      <div class="plain"><div class="big" data-target="30" data-prefix="−" data-suffix="%">0</div><div class="stat-label">Fewer user errors<br>once actions were reversible</div></div>
+    </div>
+  </section>
 
-            <p>
-                Over 25 years, I've learned this distinction by working on systems where users had genuine stakes—mission-critical tools, financial decisions, compliance workflows. You can't manipulate experts. They see through it immediately. You have to respect their judgment.
-            </p>
-
-            <div class="callout">
-                <strong>True behavioral design removes friction for the user's goals, not the product's goals.</strong> Dark patterns invert this: they create friction for users to benefit the product. <span class="credit">— Tristan Harris, Center for Humane Technology</span>
-            </div>
-
-            <h3>The Real Problem Being Solved</h3>
-            <p>
-                Users *want* to adopt good tools. They fail to because:
-            </p>
-            <ul>
-                <li><strong>Motivation is unclear:</strong> They don't understand the value proposition</li>
-                <li><strong>Ability is limited:</strong> The tool is harder to use than the alternative</li>
-                <li><strong>Prompt is weak:</strong> There's no clear signal of when to use it</li>
-            </ul>
-
-            <p>
-                Behavioral design addresses these gaps. Not manipulation—alignment.
-            </p>
-        </section>
-
-        <section id="theory" class="reveal">
-            <span class="section-num">2 THE MODEL</span>
-            <h2>Behavior = Motivation + Ability + Prompt</h2>
-
-            <h3>B.J. Fogg's Behavioral Model</h3>
-            <p>
-                Fogg's model (from Stanford's Behavior Design Lab) states that for behavior to occur, three things must align:
-            </p>
-
-            <h3>Motivation: Why Should I Care?</h3>
-            <p>
-                <strong>Case:</strong> A federal law enforcement platform had powerful search features, but officers didn't use them. Why? They didn't believe the tool would find what they needed faster than their current workflow.
-            </p>
-
-            <p>
-                <strong>Solution:</strong> We showed a 90-second demo of the old vs. new search on real cases. Result: officers saw time savings immediately. Motivation unlocked.
-            </p>
-
-            <h3>Ability: Can I Do It?</h3>
-            <p>
-                <strong>Case:</strong> Analysts had the motivation (they wanted results), but the interface was complex. Ability was missing.
-            </p>
-
-            <p>
-                <strong>Solution:</strong> Progressive disclosure. Show 1 search option first (the most common). Advanced options on click. Ability improved; adoption followed.
-            </p>
-
-            <h3>Prompt: When Should I Do It?</h3>
-            <p>
-                <strong>Case:</strong> Users understood value and could use the tool, but they didn't think to use it. Habit formation hadn't happened.
-            </p>
-
-            <p>
-                <strong>Solution:</strong> Context-sensitive prompts. "Try searching for [case type]" appeared when officers viewed case details. Prompt triggered at the exact moment motivation + ability existed.
-            </p>
-
-            <div class="method-box">
-                <h4>Designing Each Element</h4>
-                <p>For every feature, ask: Is motivation clear? (Will users see value?) Is ability present? (Can they actually do this?) Is the prompt well-timed? (Will they remember to try it?) Most adoptions fail because one element is missing, not because the feature is bad.</p>
-            </div>
-        </section>
-
-        <section id="patterns" class="reveal">
-            <span class="section-num">3 ETHICAL BEHAVIORAL PATTERNS</span>
-            <h2>Specific Patterns That Respect Users</h2>
-
-            <h3>Pattern 1: Smart Defaults (Not Exploitative Defaults)</h3>
-            <p>
-                <strong>Wrong way (dark pattern):</strong> Auto-enabling expensive features, hard-to-reverse defaults.
-            </p>
-
-            <p>
-                <strong>Right way (behavioral design):</strong> Defaults that align with typical user goals AND are easy to override.
-            </p>
-
-            <p>
-                <strong>Example:</strong> A procurement tool defaulted to the most common order type (standard 30-day delivery) but let users change to expedited with 1 click. This reduced decision fatigue for 80% of users while respecting the choices of the other 20%.
-            </p>
-
-            <h3>Pattern 2: Progressive Disclosure (Not Hidden Features)</h3>
-            <p>
-                Show features *when they become relevant*, not buried in menus.
-            </p>
-
-            <p>
-                <strong>Example:</strong> An analytics dashboard showed trending topics first. Advanced filtering appeared only when a user tried to refine a search. Feature adoption improved 45% because users discovered advanced features naturally, not accidentally.
-            </p>
-
-            <h3>Pattern 3: Clarity Over Cleverness</h3>
-            <p>
-                Cute animations don't drive adoption. Clear reasoning does.
-            </p>
-
-            <p>
-                <strong>Example:</strong> Instead of a mysterious "AI suggestion" that users had to trust blindly, we showed plain-language reasoning: "I'm suggesting this because it matches 7 previous cases you marked as relevant." Users understood the logic and felt confident accepting suggestions.
-            </p>
-
-            <h3>Pattern 4: Reversibility (Enabling Exploration)</h3>
-            <p>
-                Every action can be undone. Users explore more confidently. Errors decrease because users aren't paralyzed by fear of "getting it wrong."
-            </p>
-
-            <p>
-                <strong>Case data:</strong> When a document management system added undo (Ctrl+Z) to every action, user errors dropped 32%. Why? Because users were no longer tentative. They tried things, learned faster, made fewer mistakes overall.
-            </p>
-
-            <div class="mobile-highlight">
-                <p><em>Mobile Ethics:</em> Behavioral design on mobile is even more important. Small screens make it easy to hide options or make interactions unclear. Respect for mobile users means extra clarity: big buttons, obvious primary actions, and easy reversibility.</p>
-            </div>
-
-            <h3>Pattern 5: Feedback That Builds Competence</h3>
-            <p>
-                Every interaction should reinforce user understanding. "Action completed" isn't feedback. "You've completed 5 analyses this week—you're in the top 10% of power users" is feedback that motivates continued use.
-            </p>
-
-            <p>
-                This ties back to behavioral psychology: progress creates motivation. Show users they're winning, and they keep playing.
-            </p>
-        </section>
-
-        <section id="case" class="reveal">
-            <span class="section-num">4 CASE EXAMPLE: COMPLETE ADOPTION</span>
-            <h2>All Three Elements Aligned</h2>
-
-            <p>
-                A data annotation platform had low adoption (22%) even though experts recognized its value. We applied the full model:
-            </p>
-
-            <h3>Motivation: "Why Should I Use This?"</h3>
-            <ul>
-                <li>Showed analysts how using the tool would improve report accuracy by 18%</li>
-                <li>Demonstrated time savings: 6 hours/week on data prep</li>
-                <li>Results: 78% of analysts saw value proposition</li>
-            </ul>
-
-            <h3>Ability: "Can I Actually Do This?"</h3>
-            <ul>
-                <li>Redesigned interface for 3 core workflows (vs. 12 possible actions)</li>
-                <li>Added inline help for each step</li>
-                <li>Created a 5-minute video tutorial (not 30-minute manual)</li>
-                <li>Results: 68% could complete first annotation in under 3 minutes</li>
-            </ul>
-
-            <h3>Prompt: "When Should I Use It?"</h3>
-            <ul>
-                <li>Subtle notification: "This dataset needs annotation. You're the best person for it."</li>
-                <li>Notification appeared when opening datasets needing work</li>
-                <li>One-click to start annotation</li>
-                <li>Results: 58% of notifications led to immediate annotation</li>
-            </ul>
-
-            <h3>Outcome</h3>
-            <p>
-                Adoption improved from 22% → 72% in 12 weeks. No manipulation, no dark patterns. Just alignment of motivation + ability + prompt.
-            </p>
-        </section>
-
-        <section id="outcomes" class="reveal">
-            <span class="section-num">5 RESULTS ACROSS PROJECTS</span>
-            <h2>When Ethics and Growth Align</h2>
-
-            <div class="metrics">
-                <div class="metric-card">
-                    <div class="metric-value">72%</div>
-                    <div class="metric-label">Adoption (From 22% in 12 weeks)</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">89%</div>
-                    <div class="metric-label">User Satisfaction With Tool</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">0</div>
-                    <div class="metric-label">Support Complaints About "Manipulation"</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">3x</div>
-                    <div class="metric-label">Word-of-Mouth Recommendations</div>
-                </div>
-            </div>
-
-            <p>
-                The ethical approach wasn't just morally sound—it was *more effective*. Users who were tricked eventually resent the product. Users who felt respected and guided became advocates.
-            </p>
-        </section>
-
-        <section id="reflection" class="reveal">
-            <span class="section-num">6 WHY THIS MATTERS FOR AI</span>
-            <h2>The Future of Adoption Is Trust-Based</h2>
-
-            <h3>Insight 1: AI Multiplies Behavioral Design Impact</h3>
-            <p>
-                AI can intelligently present the right prompt at the right time (because it knows context). It can learn what creates motivation for each user (because it has data). It can dynamically adjust ability (by showing personalized help). Behavioral design becomes *systemic*.
-            </p>
-
-            <h3>Insight 2: Users Distrust Black Boxes</h3>
-            <p>
-                AI is powerful but opaque. Users distrust it. Behavioral design that builds transparency—showing reasoning, allowing reversibility, respecting user judgment—determines whether AI adoption succeeds.
-            </p>
-
-            <div class="callout">
-                <strong>"AI adoption will be won by teams who respect user autonomy, not those who exploit psychological vulnerabilities."</strong> <span class="credit">Insight from designing trusted AI systems with national security partners</span>
-            </div>
-
-            <h3>Insight 3: For Consumer AI Products</h3>
-            <p>
-                AI assistant adoption will depend on:
-            </p>
-            <ul>
-                <li><strong>Motivation:</strong> Clear value prop in first 3 seconds. "Here's something remarkable you can do."</li>
-                <li><strong>Ability:</strong> A blank box is paralyzing. Suggest prompts. Show examples. Teach by doing.</li>
-                <li><strong>Prompt:</strong> Context-sensitive suggestions. "Try asking about [topic]" when the moment is right.</li>
-            </ul>
-
-            <p>
-                Do this ethically—respecting user goals, allowing override, building transparency—and adoption soars. Do it manipulatively, and users churn.
-            </p>
-        </section>
-
-        <footer>
-            <div class="footer-content">
-                <p><strong>Case Study:</strong> Ethical Behavioral Design for Adoption</p>
-                <p>This case study draws from 25 years of work across federal, commercial, and research contexts. Specific implementations are generalized; classified details are excluded.</p>
-                <p style="margin-top: 2rem; font-size: 0.85rem; color: rgba(0,0,0,0.5);">© 2026 Jon Grayson</p>
-            </div>
-        </footer>
-    </main>
-
-    <script>
-        function updateProgress() { const st = document.documentElement.scrollTop; const dh = document.documentElement.scrollHeight - window.innerHeight; document.getElementById('progressBar').style.width = (st / dh) * 100 + '%'; }
-        window.addEventListener('scroll', updateProgress, { passive: true });
-        const io = new IntersectionObserver(e => e.forEach(x => { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }), { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-    </script>
+  <section class="reveal">
+    <span class="tag">Takeaway</span>
+    <p class="lead">The honest approach worked better. People who get tricked resent the product. People who feel respected become its advocates.</p>
+  </section>
+</main>
+<footer>
+  <p>Case study · Ethical behavioral design. Implementations generalized.</p>
+  <p class="foot-note">Metrics are from anonymized engagements, rounded.</p>
+</footer>
+<script>
+const pb=document.getElementById('pb');
+addEventListener('scroll',()=>{const h=document.documentElement;pb.style.width=(h.scrollTop/(h.scrollHeight-innerHeight)*100)+'%'},{passive:true});
+function countUp(el){const tg=+el.dataset.target,suf=el.dataset.suffix||'',pre=el.dataset.prefix||'';let s=null;const d=1400;const step=ts=>{if(!s)s=ts;const p=Math.min((ts-s)/d,1);el.textContent=pre+Math.round(tg*p)+suf;if(p<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;const t=e.target;t.classList.add('in');
+ if(t.classList.contains('eq'))[...t.children].forEach((c,i)=>setTimeout(()=>c.classList.add('in'),i*180));
+ t.querySelectorAll&&t.querySelectorAll('.bar i').forEach(i=>i.style.width=i.dataset.w+'%');
+ t.querySelectorAll&&t.querySelectorAll('[data-target]').forEach(countUp);
+ io.unobserve(t)})},{threshold:.25});
+document.querySelectorAll('.reveal,.eq').forEach(el=>io.observe(el));
+</script>
 </body>
 </html>

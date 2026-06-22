@@ -1,422 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UX & Design Leadership Case Studies | Jon Grayson Portfolio</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --color-accent: #9fae00; --color-text: #000000; --color-bg-light: #f5f5f7; --color-border: #2B5C8A; --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        html { scroll-behavior: smooth; }
-        body { font-family: var(--font-system); color: var(--color-text); line-height: 1.6; }
-
-        header {
-            position: sticky; top: 0; z-index: 999;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-        }
-        nav { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        nav a { color: var(--color-text); text-decoration: none; font-weight: 500; font-size: 0.875rem; transition: color 0.2s; }
-        nav a:hover { color: var(--color-accent); }
-
-        .progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: var(--color-accent); transform-origin: left; z-index: 1000; }
-
-        .hero {
-            max-width: 1200px; margin: 0 auto; padding: 3rem 2rem 2rem;
-            text-align: center;
-        }
-        .hero h1 { font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 700; line-height: 1.1; margin-bottom: 1.5rem; }
-        .hero .tagline { font-size: 1.1rem; color: rgba(0,0,0,0.6); max-width: 800px; margin: 0 auto 2rem; line-height: 1.7; }
-
-        main { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
-
-        section { padding: 2.5rem 0; }
-
-        section h2 {
-            font-size: clamp(1.8rem, 3.5vw, 2.6rem);
-            font-weight: 700; margin-bottom: 1rem; color: var(--color-text);
-        }
-
-        .section-intro { font-size: 1.05rem; color: rgba(0,0,0,0.7); max-width: 800px; margin-bottom: 3rem; line-height: 1.8; }
-
-        .case-studies-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem; margin: 1.5rem 0;
-        }
-
-        .case-card {
-            background: var(--color-bg-light); padding: 2rem; border-radius: 8px;
-            border: 1px solid rgba(0,0,0,0.06);
-            transition: all 0.3s ease-out;
-            text-decoration: none; color: inherit;
-            display: flex; flex-direction: column;
-        }
-
-        .case-card:hover {
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            transform: translateY(-4px);
-        }
-
-        .case-card h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; color: var(--color-text); }
-
-        .case-desc { font-size: 0.95rem; color: rgba(0,0,0,0.7); margin-bottom: 1.5rem; line-height: 1.7; flex-grow: 1; }
-
-        .case-focus {
-            background: rgba(159, 174, 0, 0.08); padding: 1rem; border-radius: 4px;
-            font-size: 0.85rem; color: rgba(0,0,0,0.7); margin-bottom: 1.5rem;
-            border-left: 2px solid var(--color-accent);
-        }
-
-        .case-link {
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            color: var(--color-accent); font-weight: 600;
-            text-decoration: none; font-size: 0.95rem;
-            transition: transform 0.2s;
-        }
-
-        .case-card:hover .case-link { transform: translateX(4px); }
-
-        .intro-section {
-            background: rgba(159, 174, 0, 0.04); padding: 2rem; border-radius: 8px;
-            margin: 2rem 0; border-left: 3px solid var(--color-accent);
-        }
-
-        .intro-section h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; }
-
-        .methodology-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem; margin: 2rem 0;
-        }
-
-        .method-card {
-            background: white; border: 1px solid var(--color-border);
-            padding: 1.5rem; border-radius: 6px; text-align: left;
-        }
-
-        .method-title { font-weight: 600; margin-bottom: 0.5rem; }
-        .method-desc { font-size: 0.875rem; color: rgba(0,0,0,0.6); }
-
-        .mentors-section {
-            background: var(--color-bg-light); padding: 2rem; border-radius: 8px; margin: 2rem 0;
-        }
-
-        .mentors-section h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1.5rem; }
-
-        .mentor-list {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .mentor-item {
-            padding: 1rem; background: white; border-radius: 6px;
-            border-left: 2px solid var(--color-accent);
-        }
-
-        .mentor-name { font-weight: 700; color: #000000; margin-bottom: 0.25rem; font-size: 1.1rem; }
-        .mentor-subtitle { font-size: 0.85rem; color: var(--color-accent); margin-bottom: 0.75rem; }
-        .mentor-influence { font-size: 0.9rem; color: rgba(0,0,0,0.7); line-height: 1.6; }
-
-        footer {
-            background: var(--color-bg-light); padding: 2rem; margin-top: 3rem;
-            text-align: center;
-        }
-
-        .footer-content { max-width: 1200px; margin: 0 auto; }
-        footer p { margin: 0.75rem 0; }
-
-
-        .reveal { opacity: 0; transform: translateY(30px); }
-        .reveal.in { animation: slideIn 0.6s ease-out forwards; }
-        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
-
-        @media (max-width: 768px) {
-            .hero { padding: 3rem 1.5rem 2rem; }
-            main { padding: 0 1.5rem; }
-            .case-studies-grid { grid-template-columns: 1fr; }
-            .methodology-grid { grid-template-columns: repeat(2, 1fr); }
-            .mentor-list { grid-template-columns: 1fr; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX & Design Case Studies | Jon Grayson</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#9fae00;--ink:#141414;--muted:#6b6b6f;--bg:#fff;--soft:#f4f5ee;--line:#e7e8e0;--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);color:var(--ink);line-height:1.5;background:var(--bg)}
+.pb{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:1000}
+header{position:sticky;top:0;z-index:99;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav{max-width:1040px;margin:0 auto;padding:.9rem 1.5rem;display:flex;justify-content:space-between;align-items:center;font-size:.85rem}
+nav a{color:var(--ink);text-decoration:none;font-weight:600}nav a:hover{color:var(--accent)}
+main{max-width:1040px;margin:0 auto;padding:0 1.5rem}
+.hero{padding:5rem 0 2.5rem}
+.eyebrow{color:var(--accent);font-weight:700;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
+.hero h1{font-size:clamp(2.4rem,7vw,4.4rem);font-weight:800;line-height:1.02;margin:.6rem 0 1rem;letter-spacing:-.02em}
+.hero p{font-size:1.15rem;color:var(--muted);max-width:54ch}
+section{padding:2.5rem 0;border-top:1px solid var(--line)}
+h2{font-size:clamp(1.3rem,3vw,1.9rem);font-weight:800;margin-bottom:1.4rem;letter-spacing:-.01em}
+/* process strip */
+.flow{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.flow li{background:var(--bg);padding:1.3rem;opacity:0;transform:translateY(16px);transition:.5s}
+.flow li.in{opacity:1;transform:none}
+.flow .dot{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:.85rem;margin-bottom:.6rem}
+.flow h4{font-size:.95rem;margin-bottom:.2rem}
+.flow p{font-size:.82rem;color:var(--muted);line-height:1.35}
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.2rem}
+.card{display:flex;flex-direction:column;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:1.6rem;text-decoration:none;color:inherit;transition:.25s;opacity:0;transform:translateY(20px)}
+.card.in{opacity:1;transform:none}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.09);border-color:var(--accent)}
+.card .n{font-size:.75rem;font-weight:700;color:var(--accent);letter-spacing:.08em}
+.card h3{font-size:1.3rem;font-weight:800;margin:.5rem 0 .5rem;letter-spacing:-.01em}
+.card p{font-size:.92rem;color:var(--muted);flex-grow:1;margin-bottom:1.1rem}
+.chip{align-self:flex-start;background:#fff;border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.82rem;font-weight:700}
+.chip b{color:var(--accent)}
+.arrow{color:var(--accent);font-weight:700;font-size:.9rem;margin-top:.9rem}
+.influence{color:var(--muted);max-width:60ch}
+.influence b{color:var(--ink)}
+footer{border-top:1px solid var(--line);padding:2.5rem 1.5rem;text-align:center;color:var(--muted);font-size:.85rem}
+footer a{color:var(--accent);text-decoration:none;font-weight:600}
+.note{font-size:.78rem;color:#9a9a9e;max-width:60ch;margin:1rem auto 0}
+@media(max-width:680px){.flow{grid-template-columns:1fr 1fr}.hero{padding:3.2rem 0 2rem}}
+</style>
 </head>
 <body>
-    <div class="progress-bar" id="progressBar"></div>
+<div class="pb" id="pb"></div>
+<header><nav><a href="https://jongrayson.com">← jongrayson.com</a></nav></header>
+<main>
+  <div class="hero">
+    <div class="eyebrow">UX & Design</div>
+    <h1>Designing for adoption</h1>
+    <p>Five projects on one hard problem: getting people to actually use what you build. The first few minutes decide everything.</p>
+  </div>
 
-    <header>
-        <nav>
-            <a href="https://jongrayson.com" class="nav-brand">← jongrayson.com</a>
-        </nav>
-    </header>
+  <section>
+    <h2>How I work</h2>
+    <ol class="flow" id="flow">
+      <li><span class="dot">1</span><h4>Observe</h4><p>Watch real users, not surveys.</p></li>
+      <li><span class="dot">2</span><h4>Prototype</h4><p>Build a few options fast.</p></li>
+      <li><span class="dot">3</span><h4>Test</h4><p>Let the data pick the winner.</p></li>
+      <li><span class="dot">4</span><h4>Ship</h4><p>Launch, measure, refine.</p></li>
+    </ol>
+  </section>
 
-    <main>
-        <!-- HERO -->
-        <div class="hero">
-            <h1>Designing for Adoption</h1>
-            <p class="tagline">
-                How complexity, behavioral psychology, and mobile-first thinking solve the universal challenge: getting users to care. Five detailed case studies across mission-critical platforms, enterprise systems, and consumer products—with insights applicable to any product facing first-mile friction.
-            </p>
-        </div>
+  <section>
+    <h2>Case studies</h2>
+    <div class="grid">
+      <a class="card" href="01_BlankPage_Onboarding.html"><h3>Solving the blank page</h3><p>A powerful tool froze first-time users. We gave them a guided path instead of 12 choices at once.</p><span class="chip">First-try success <b>+73%</b></span><span class="arrow">Read →</span></a>
+      <a class="card" href="02_AI_Workflows.html"><h3>AI people trust</h3><p>Analysts ignored the AI because it was a black box. We made it show its reasoning.</p><span class="chip">Prep time <b>~90% saved</b></span><span class="arrow">Read →</span></a>
+      <a class="card" href="03_DesignSystems.html"><h3>One design system</h3><p>Four platforms, everyone rebuilding the same button. We unified it without slowing teams down.</p><span class="chip">Component adoption <b>92%</b></span><span class="arrow">Read →</span></a>
+      <a class="card" href="04_MobileFistGrowth.html"><h3>Mobile-first growth</h3><p>Most installs never reached first use. We rebuilt onboarding for the small screen.</p><span class="chip">Reached first use <b>+70%</b></span><span class="arrow">Read →</span></a>
+      <a class="card" href="05_BehavioralDesign.html"><h3>Behavioral design, honestly</h3><p>Adoption without dark patterns, using one simple model: motivation, ability, prompt.</p><span class="chip">Adoption <b>+227%</b></span><span class="arrow">Read →</span></a>
+    </div>
+  </section>
 
-        <!-- SECTION 1: OVERVIEW -->
-        <section id="overview" class="reveal">
-            <h2>A Coherent Philosophy</h2>
-            <p class="section-intro">
-                Each case study explores one challenge. Together, they reveal principles that recur across contexts: complexity is solved through clarity, growth follows respect, and adoption is earned—never forced. These frameworks apply whether you're designing for mission-critical platforms or consumer AI.
-            </p>
-
-            <div class="intro-section">
-                <h3>Principles That Recur</h3>
-                <ul style="margin-left: 1.5rem; line-height: 1.8;">
-                    <li><strong>Mobile-First Thinking:</strong> Constraints force clarity. Designing for small screens improved every surface.</li>
-                    <li><strong>Behavioral Psychology:</strong> Not manipulation—alignment of motivation, ability, and prompt.</li>
-                    <li><strong>AI Integration:</strong> 3+ years designing for trust, transparency, and human-AI collaboration.</li>
-                    <li><strong>Scaling With Consistency:</strong> Design systems, governance, and team leadership across 200+ engineers.</li>
-                    <li><strong>Ethics as Competitive Advantage:</strong> Respect for users drives adoption more than tricks ever could.</li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- SECTION 2: CASE STUDIES -->
-        <section id="cases" class="reveal">
-            <h2>Five Problems, Five Solutions</h2>
-            <p class="section-intro">
-                Real challenges from mission-critical platforms, enterprise systems, and consumer products. The methodology, outcomes, and reasoning behind each solution.
-            </p>
-
-            <div class="case-studies-grid">
-                <!-- Case 1 -->
-                <a href="01_BlankPage_Onboarding.html" class="case-card">
-                    <h3>Solving the Blank Page</h3>
-                    <p class="case-desc">
-                        Eliminating friction in complex onboarding. Reduced first-time user failure from 55% to 22%, and achieved 78% first-attempt success through behavioral design.
-                    </p>
-                    <div class="case-focus">
-                        <strong>Focus:</strong> Progressive disclosure, contextual inquiry, friction reduction, behavioral scaffolding
-                    </div>
-                    <span class="case-link">Read Study →</span>
-                </a>
-
-                <!-- Case 2 -->
-                <a href="02_AI_Workflows.html" class="case-card">
-                    <h3>AI-Augmented Workflows</h3>
-                    <p class="case-desc">
-                        Designing for trust in human-AI collaboration. Achieved 91% time savings on routine tasks while maintaining user control and transparency.
-                    </p>
-                    <div class="case-focus">
-                        <strong>Focus:</strong> Explainable AI, confidence scoring, trust calibration, inline reasoning
-                    </div>
-                    <span class="case-link">Read Study →</span>
-                </a>
-
-                <!-- Case 3 -->
-                <a href="03_DesignSystems.html" class="case-card">
-                    <h3>Enterprise Design Systems</h3>
-                    <p class="case-desc">
-                        Scaling consistency across 4 platforms and 200+ engineers. Achieved 92% component adoption, 40% reduction in design time, and 3x faster onboarding for new designers.
-                    </p>
-                    <div class="case-focus">
-                        <strong>Focus:</strong> Governance, adoption strategy, mobile-first components, team leadership
-                    </div>
-                    <span class="case-link">Read Study →</span>
-                </a>
-
-                <!-- Case 4 -->
-                <a href="04_MobileFistGrowth.html" class="case-card">
-                    <h3>Mobile-First Growth</h3>
-                    <p class="case-desc">
-                        Mobile-first onboarding improved activation 68%. Converted 43% of users at acquisition to 73% at activation through ruthless prioritization.
-                    </p>
-                    <div class="case-focus">
-                        <strong>Focus:</strong> Mobile constraints, gestural UX, progressive login, A/B testing, conversion optimization
-                    </div>
-                    <span class="case-link">Read Study →</span>
-                </a>
-
-                <!-- Case 5 -->
-                <a href="05_BehavioralDesign.html" class="case-card">
-                    <h3>Behavioral Design for Adoption</h3>
-                    <p class="case-desc">
-                        Ethical behavioral design without manipulation. Improved adoption from 22% to 72% using Fogg's model (motivation + ability + prompt).
-                    </p>
-                    <div class="case-focus">
-                        <strong>Focus:</strong> B.J. Fogg's behavioral model, ethical patterns, smart defaults, reversibility
-                    </div>
-                    <span class="case-link">Read Study →</span>
-                </a>
-            </div>
-        </section>
-
-        <!-- SECTION 3: METHODOLOGY -->
-        <section id="methods" class="reveal">
-            <h2>The Methods Behind the Work</h2>
-            <p class="section-intro">
-                Six research and design approaches that appear across these studies. Each evolved through iteration in different contexts—what works for intelligence analysts often works for consumer users too.
-            </p>
-
-            <div class="methodology-grid">
-                <div class="method-card">
-                    <div class="method-title">Contextual Inquiry</div>
-                    <div class="method-desc">Observing users in real environments, not lab settings. Reveals true behaviors and mental models.</div>
-                </div>
-
-                <div class="method-card">
-                    <div class="method-title">A/B Testing</div>
-                    <div class="method-desc">High-velocity iteration cycles. Every design decision grounded in quantitative validation.</div>
-                </div>
-
-                <div class="method-card">
-                    <div class="method-title">Mobile-First Design</div>
-                    <div class="method-desc">Designing for constraints first. Discipline at 320px improves design at any resolution.</div>
-                </div>
-
-                <div class="method-card">
-                    <div class="method-title">Behavioral Psychology</div>
-                    <div class="method-desc">Applying Fogg, Norman, and Harris to align design with human cognition and values.</div>
-                </div>
-
-                <div class="method-card">
-                    <div class="method-title">Agile UX</div>
-                    <div class="method-desc">Sprint-based design + engineering. Validation before shipping, not after.</div>
-                </div>
-
-                <div class="method-card">
-                    <div class="method-title">Design Systems</div>
-                    <div class="method-desc">Scalable governance. Consistency without constraint. Enabling team velocity.</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 4: AI INTEGRATION -->
-        <section id="ai" class="reveal">
-            <h2>Designing for Trust in AI</h2>
-            <p class="section-intro">
-                Three years of building interfaces where artificial intelligence amplifies human capability without replacing judgment. The same principles apply whether you're designing intelligence analysis tools or consumer assistants.
-            </p>
-
-            <div class="intro-section">
-                <h3>Core Principles for AI UX</h3>
-                <ul style="margin-left: 1.5rem; line-height: 1.8;">
-                    <li><strong>Transparency Over Magic:</strong> Users need to understand why AI suggested something. Plain-language reasoning, not black-box suggestions.</li>
-                    <li><strong>Confidence Scoring:</strong> Show how certain the AI is. Let users calibrate their trust based on data.</li>
-                    <li><strong>User Control:</strong> Override, undo, and correct. Reframe AI as assistant, not decision-maker.</li>
-                    <li><strong>Progressive Disclosure:</strong> Don't show all AI capabilities at once. Teach by doing, reveal as competence grows.</li>
-                    <li><strong>Human-in-the-Loop:</strong> Let users teach the AI through corrections. AI improves, users feel agency.</li>
-                    <li><strong>Mobile-First Reasoning:</strong> Complex AI reasoning must be digestible on small screens. If you can explain it in 2 lines, it's clear.</li>
-                </ul>
-            </div>
-
-            <p>
-                These principles drove adoption in intelligence analysis platforms, mission-critical workflows, and research applications. They apply to any AI product's first-mile challenge.
-            </p>
-        </section>
-
-        <!-- SECTION 5: MENTORS -->
-        <section id="mentors" class="reveal">
-            <h2>Intellectual Foundations</h2>
-            <p class="section-intro">
-                The researchers, designers, and thinkers whose work shaped these approaches. Standing on the shoulders of people who did the foundational thinking.
-            </p>
-
-            <div class="mentors-section">
-                <h3>Key Influences & Frameworks</h3>
-                <div class="mentor-list">
-                    <div class="mentor-item">
-                        <div class="mentor-name">Don Norman</div>
-                        <div class="mentor-subtitle">(Design of Everyday Things)</div>
-                        <div class="mentor-influence">
-                            Affordances, constraints, and feedback. If something feels hard to use, the design is the problem, not the user. Foundational to everything I build.
-                        </div>
-                    </div>
-
-                    <div class="mentor-item">
-                        <div class="mentor-name">B.J. Fogg</div>
-                        <div class="mentor-subtitle">(Stanford Behavior Design Lab)</div>
-                        <div class="mentor-influence">
-                            Behavior = Motivation + Ability + Prompt. This model explains why features fail. It's not enough to build something good; you must align all three elements.
-                        </div>
-                    </div>
-
-                    <div class="mentor-item">
-                        <div class="mentor-name">Nielsen Norman Group</div>
-                        <div class="mentor-subtitle">(Contextual Inquiry)</div>
-                        <div class="mentor-influence">
-                            Observing real users in their environments beats any survey or focus group. Deployed across every research engagement I've led.
-                        </div>
-                    </div>
-
-                    <div class="mentor-item">
-                        <div class="mentor-name">Brad Frost</div>
-                        <div class="mentor-subtitle">(Atomic Design)</div>
-                        <div class="mentor-influence">
-                            Component-based thinking for design systems. Enabled scaling consistency across enterprise platforms serving 2,000+ concurrent users.
-                        </div>
-                    </div>
-
-                    <div class="mentor-item">
-                        <div class="mentor-name">Tristan Harris</div>
-                        <div class="mentor-subtitle">(Center for Humane Technology)</div>
-                        <div class="mentor-influence">
-                            The ethical foundation of design. Behavioral design is powerful; it can manipulate or respect. The choice is intentional. Always chose respect.
-                        </div>
-                    </div>
-
-                    <div class="mentor-item">
-                        <div class="mentor-name">Kristin Kohler</div>
-                        <div class="mentor-subtitle">(Explainable AI Research)</div>
-                        <div class="mentor-influence">
-                            How to make AI reasoning transparent. Users don't need ML education; they need calibrated trust. Transparency is UI.
-                        </div>
-                    </div>
-
-                    <div class="mentor-item">
-                        <div class="mentor-name">Airbnb Design Leadership</div>
-                        <div class="mentor-subtitle">(Mobile-first & Systems)</div>
-                        <div class="mentor-influence">
-                            Mobile-first discipline, design systems at scale, and balancing speed with quality. Learned that constraints unlock creativity.
-                        </div>
-                    </div>
-
-                    <div class="mentor-item">
-                        <div class="mentor-name">National Security Design Partners</div>
-                        <div class="mentor-subtitle">(Intelligence & Law Enforcement)</div>
-                        <div class="mentor-influence">
-                            Working with experts in intelligence analysis, mission planning, and law enforcement. These users can't be fooled. Design must respect their judgment.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer>
-        <div class="footer-content">
-            <p><strong>UX & Design Case Studies</strong></p>
-            <p>Confidentiality agreements prevent detailed client disclosure. What's preserved: methodology, reasoning, outcomes, and the thinking behind the work.</p>
-            <p><a href="https://jongrayson.com" style="color: var(--color-accent); text-decoration: none; font-weight: 600;">Main Portfolio</a> | <a href="DESIGN_SYSTEM.md" style="color: var(--color-accent); text-decoration: none; font-weight: 600;">Design System Documentation</a></p>
-            <p style="margin-top: 2rem; font-size: 0.85rem; color: rgba(0,0,0,0.5);">© 2026 Jon Grayson</p>
-        </div>
-    </footer>
-
-    <script>
-        function updateProgress() {
-            const scrollTop = document.documentElement.scrollTop;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = (scrollTop / docHeight) * 100;
-            document.getElementById('progressBar').style.width = scrollPercent + '%';
-        }
-        window.addEventListener('scroll', updateProgress, { passive: true });
-
-        const io = new IntersectionObserver(entries => {
-            entries.forEach(e => {
-                if (e.isIntersecting) {
-                    e.target.classList.add('in');
-                    io.unobserve(e.target);
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-    </script>
+  <section>
+    <h2>Influences</h2>
+    <p class="influence"><b>Don Norman</b> on affordances · <b>B.J. Fogg</b> on behavior (motivation + ability + prompt) · <b>Brad Frost</b> on design systems · <b>Tristan Harris</b> on humane, non-manipulative design.</p>
+  </section>
+</main>
+<footer>
+  <p>Confidentiality agreements keep me from naming clients. What I can share is the method, the reasoning, and the results.</p>
+  <p class="note">Metrics are from anonymized engagements and rounded to protect client details.</p>
+</footer>
+<script>
+const pb=document.getElementById('pb');
+addEventListener('scroll',()=>{const h=document.documentElement;pb.style.width=(h.scrollTop/(h.scrollHeight-innerHeight)*100)+'%'},{passive:true});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;const t=e.target;
+ if(t.classList.contains('flow')){[...t.children].forEach((li,i)=>setTimeout(()=>li.classList.add('in'),i*130));io.unobserve(t);return}
+ t.classList.add('in');io.unobserve(t)})},{threshold:.25});
+document.querySelectorAll('.flow,.card').forEach(el=>io.observe(el));
+</script>
 </body>
 </html>
