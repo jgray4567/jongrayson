@@ -149,10 +149,10 @@
     {
       "id": "sig_10",
       "group": 2,
-      "label": "Vance says Iran will allow nuclear inspectors back into the country",
+      "label": "US eases oil sanctions as Iran denies Vance claim on nuclear inspectors",
       "size": 12,
       "url": "https://www.bbc.com/news/articles/c3vy3nr63gxo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/15e7/live/28fdf500-6e5a-11f1-8e1d-bbbb1017d210.jpg"
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/f8a5/live/4c851ec0-6e8e-11f1-8e1d-bbbb1017d210.jpg"
     },
     {
       "id": "sig_11",
@@ -269,9 +269,9 @@
     {
       "id": "sig_25",
       "group": 2,
-      "label": "Two Boys Arrested After Deadly School Shooting in the Philippines",
+      "label": "Suspect and a Civilian Are Among Three Killed in Montreal Shooting",
       "size": 12,
-      "url": "https://www.nytimes.com/2026/06/22/world/asia/philippines-school-shooting-tacloban.html",
+      "url": "https://www.nytimes.com/2026/06/22/world/canada/montreal-shooting-manhunt-police.html",
       "image": ""
     },
     {
@@ -309,13 +309,21 @@
     {
       "id": "sig_30",
       "group": 2,
+      "label": "Russia preparing hybrid attacks on NATO&apos;s eastern flank, intelligence warns",
+      "size": 12,
+      "url": "https://www.foxnews.com/world/russia-preparing-hybrid-attacks-natos-eastern-flank-intelligence-warns",
+      "image": ""
+    },
+    {
+      "id": "sig_31",
+      "group": 2,
       "label": "Suspect &apos;neutralized&apos; after Montreal shooting leaves at least 2 dead including officer",
       "size": 12,
       "url": "https://www.foxnews.com/world/suspect-neutralized-montreal-shooting-leaves-dead-including-officer",
       "image": ""
     },
     {
-      "id": "sig_31",
+      "id": "sig_32",
       "group": 2,
       "label": "Keith Kellogg tells Iranian dissidents the &apos;window is open&apos; to force regime change in Tehran",
       "size": 12,
@@ -323,7 +331,7 @@
       "image": ""
     },
     {
-      "id": "sig_32",
+      "id": "sig_33",
       "group": 2,
       "label": "Keir Starmer resigns as British prime minister after devastating Labour revolt and local election losses",
       "size": 12,
@@ -331,7 +339,7 @@
       "image": ""
     },
     {
-      "id": "sig_33",
+      "id": "sig_34",
       "group": 2,
       "label": "US military conducts strike on another vessel carrying alleged narco-traffickers, killing 2",
       "size": 12,
@@ -339,7 +347,7 @@
       "image": ""
     },
     {
-      "id": "sig_34",
+      "id": "sig_35",
       "group": 2,
       "label": "Major dispute to threaten Trump&apos;s Iran deal over billions in frozen Tehran funds: expert",
       "size": 12,
@@ -347,7 +355,7 @@
       "image": ""
     },
     {
-      "id": "sig_35",
+      "id": "sig_36",
       "group": 2,
       "label": "Meloni&apos;s spat with Trump is calculated strategy to boost her approval ratings: expert",
       "size": 12,
@@ -355,7 +363,7 @@
       "image": ""
     },
     {
-      "id": "sig_36",
+      "id": "sig_37",
       "group": 2,
       "label": "Albanian protesters flood streets demanding prime minister&apos;s resignation amid corruption accusations",
       "size": 12,
@@ -363,7 +371,7 @@
       "image": ""
     },
     {
-      "id": "sig_37",
+      "id": "sig_38",
       "group": 2,
       "label": "Iran&apos;s unprecedented &apos;whole-regime&apos; delegation at US deal talks signals one goal: expert",
       "size": 12,
@@ -371,7 +379,7 @@
       "image": ""
     },
     {
-      "id": "sig_38",
+      "id": "sig_39",
       "group": 2,
       "label": "EXCLUSIVE: Meet the man Israel chose to be its first-ever ambassador to the Christian world",
       "size": 12,
@@ -379,91 +387,83 @@
       "image": ""
     },
     {
-      "id": "sig_39",
-      "group": 2,
-      "label": "Trump says UK&apos;s Starmer will resign, wishes him well amid reports of PM&apos;s political future",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/trump-says-uks-starmer-will-resign-wishes-well-reports-pms-political-future",
-      "image": ""
-    },
-    {
       "id": "sig_40",
       "group": 2,
-      "label": "Lionel Messi scores brace as Argentina beat Austria 2-0 at World Cup 2026",
+      "label": "Gaza surfers seek solace from war in the sea",
       "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/22/lionel-messi-scores-brace-as-argentina-beat-austria-2-0-at-world-cup-2026?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/22/gaza-surfers-seek-solace-from-war-in-the-sea?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_41",
       "group": 2,
-      "label": "Canadian police officer, suspect among 3 dead in Montreal shooting",
+      "label": "Video shows deadly shooting in Montreal, Canada",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/22/canadian-police-officer-suspect-among-3-dead-in-montreal-shooting?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/22/video-shows-deadly-shooting-in-montreal-canada?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_42",
       "group": 2,
-      "label": "Thousands of kites soar over Denmark at annual beach festival",
+      "label": "Belgium’s Doku welcomes son during World Cup amid commentator controversy",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/22/thousands-of-kites-soar-over-denmark-at-annual-beach-festival?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/22/belgiums-doku-welcomes-son-during-world-cup-amid-commentator-controversy?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_43",
       "group": 2,
-      "label": "US raises concern as RSF forces encircle Sudanese city of el-Obeid",
+      "label": "Egypt denied flight to Seattle ahead of final World Cup group match",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/22/us-raises-concern-as-rsf-forces-encircle-sudanese-city-of-el-obeid?traffic_source=rss",
+      "url": "https://www.aljazeera.com/sports/2026/6/22/egypt-denied-flight-to-seattle-ahead-of-final-world-cup-group-match?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_44",
       "group": 2,
-      "label": "A leftward lurch? What to know about the Democratic primaries in New York",
+      "label": "US House committee reaches bipartisan deal on social media rules for kids",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/22/a-leftward-lurch-what-to-know-about-the-democratic-primaries-in-new-york?traffic_source=rss",
+      "url": "https://www.aljazeera.com/economy/2026/6/22/us-house-committee-reaches-bipartisan-deal-on-social-media-rules-for-kids?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_45",
       "group": 2,
-      "label": "Messi breaks World Cup’s all-time scoring record with 17th goal vs Austria",
+      "label": "‘Stop genocide’: Activist stopped by police at Tokyo’s Israeli Embassy",
       "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/22/messi-breaks-world-cups-all-time-scoring-record-with-17th-goal-vs-austria?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/22/stop-genocide-activist-stopped-by-police-at-tokyos-israeli-embassy?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_46",
       "group": 2,
-      "label": "Lebanon discusses ‘deconfliction’ mechanism ahead of Israel talks",
+      "label": "Hungary’s PM launches drive to free country from Orban’s ‘mafia’",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/22/lebanon-discusses-de-confliction-mechanism-ahead-of-israel-talks?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/22/hungarys-pm-launches-drive-to-free-country-from-orbans-mafia?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_47",
       "group": 2,
-      "label": "Qatar’s PM tells Al Jazeera progress made in US-Iran talks",
+      "label": "Czech public media staff strike, citing government threat to independence",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/22/qatars-pm-tells-al-jazeera-progress-made-in-us-iran-talks?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/22/czech-public-media-staff-strike-citing-government-threat-to-independence?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_48",
       "group": 2,
-      "label": "Kenyan court finds minister in contempt over US Ebola site",
+      "label": "US judge blocks Trump administration subpoena against Minnesota officials",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/22/kenyan-court-finds-minister-in-contempt-over-us-ebola-site?traffic_source=rss",
+      "url": "https://www.aljazeera.com/news/2026/6/22/us-judge-blocks-trump-administration-subpoena-against-minnesota-officials?traffic_source=rss",
       "image": ""
     },
     {
       "id": "sig_49",
       "group": 2,
-      "label": "Will a US-Iran deal transform the Iranian economy?",
+      "label": "‘Another day, another leader’: Britons react to Keir Starmer’s exit",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/counting-the-cost/2026/6/22/will-a-us-iran-deal-transform-the-iranian-economy?traffic_source=rss",
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/22/another-day-another-leader-britons-react-to-keir-starmers-exit?traffic_source=rss",
       "image": ""
     },
     {
@@ -521,14 +521,6 @@
       "size": 12,
       "url": "https://news.sky.com/story/vandals-arrested-as-trumps-14m-reflective-pool-project-sees-it-turn-green-again-13556298",
       "image": "https://e3.365dm.com/26/06/1920x1080/skynews-algae-reflecting-pool_7279095.jpg?20260621095320"
-    },
-    {
-      "id": "sig_57",
-      "group": 2,
-      "label": "Police name teenage spectator killed after crash at car rally",
-      "size": 12,
-      "url": "https://news.sky.com/story/police-name-teenage-spectator-killed-after-crash-at-donegal-international-rally-13556418",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-tadhg-callaghan-carter_7279278.jpg?20260621142924"
     }
   ],
   "links": [
@@ -683,11 +675,6 @@
       "value": 2
     },
     {
-      "source": "sig_5",
-      "target": "sig_4",
-      "value": 1
-    },
-    {
       "source": "sig_6",
       "target": "theme_geo",
       "value": 1
@@ -718,8 +705,23 @@
       "value": 1
     },
     {
+      "source": "sig_9",
+      "target": "sig_8",
+      "value": 1
+    },
+    {
+      "source": "sig_10",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
       "source": "sig_10",
       "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_10",
+      "target": "theme_econ",
       "value": 1
     },
     {
@@ -738,11 +740,6 @@
       "value": 1
     },
     {
-      "source": "sig_12",
-      "target": "sig_11",
-      "value": 1
-    },
-    {
       "source": "sig_13",
       "target": "reg_na",
       "value": 1
@@ -750,6 +747,11 @@
     {
       "source": "sig_13",
       "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_13",
+      "target": "sig_12",
       "value": 1
     },
     {
@@ -768,18 +770,8 @@
       "value": 1
     },
     {
-      "source": "sig_16",
-      "target": "sig_15",
-      "value": 1
-    },
-    {
       "source": "sig_17",
       "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_17",
-      "target": "sig_16",
       "value": 1
     },
     {
@@ -808,13 +800,13 @@
       "value": 1
     },
     {
-      "source": "sig_21",
-      "target": "sig_20",
+      "source": "sig_22",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_22",
-      "target": "theme_geo",
+      "target": "sig_21",
       "value": 1
     },
     {
@@ -828,8 +820,13 @@
       "value": 1
     },
     {
+      "source": "sig_24",
+      "target": "sig_23",
+      "value": 1
+    },
+    {
       "source": "sig_25",
-      "target": "theme_geo",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -838,8 +835,18 @@
       "value": 1
     },
     {
+      "source": "sig_26",
+      "target": "sig_25",
+      "value": 1
+    },
+    {
       "source": "sig_27",
       "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_27",
+      "target": "sig_26",
       "value": 1
     },
     {
@@ -850,11 +857,6 @@
     {
       "source": "sig_28",
       "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_28",
-      "target": "sig_27",
       "value": 1
     },
     {
@@ -868,43 +870,33 @@
       "value": 1
     },
     {
-      "source": "sig_31",
-      "target": "reg_me",
+      "source": "sig_30",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_31",
-      "target": "sig_30",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_32",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_33",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_33",
-      "target": "sig_32",
-      "value": 1
-    },
-    {
-      "source": "sig_34",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_34",
       "target": "reg_me",
       "value": 1
     },
     {
+      "source": "sig_32",
+      "target": "sig_31",
+      "value": 1
+    },
+    {
+      "source": "sig_33",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
       "source": "sig_34",
-      "target": "sig_33",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -913,28 +905,18 @@
       "value": 1
     },
     {
-      "source": "sig_36",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_36",
-      "target": "sig_35",
-      "value": 1
-    },
-    {
-      "source": "sig_37",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_37",
+      "source": "sig_35",
       "target": "reg_me",
       "value": 1
     },
     {
+      "source": "sig_36",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
       "source": "sig_37",
-      "target": "sig_36",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -954,87 +936,62 @@
     },
     {
       "source": "sig_39",
-      "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_39",
-      "target": "sig_38",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_40",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_40",
-      "target": "reg_sa",
-      "value": 1
-    },
-    {
-      "source": "sig_40",
-      "target": "theme_sport",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_41",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_42",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_43",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_43",
-      "target": "reg_afr",
-      "value": 1
-    },
-    {
-      "source": "sig_44",
       "target": "theme_geo",
       "value": 1
     },
     {
-      "source": "sig_45",
-      "target": "reg_na",
+      "source": "sig_41",
+      "target": "sig_40",
       "value": 1
     },
     {
-      "source": "sig_45",
+      "source": "sig_42",
       "target": "theme_sport",
       "value": 1
     },
     {
-      "source": "sig_46",
+      "source": "sig_43",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_43",
+      "target": "sig_42",
+      "value": 1
+    },
+    {
+      "source": "sig_44",
       "target": "reg_na",
       "value": 1
     },
     {
+      "source": "sig_45",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_45",
+      "target": "sig_44",
+      "value": 1
+    },
+    {
       "source": "sig_46",
-      "target": "reg_me",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_47",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_47",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_47",
-      "target": "sig_46",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -1044,27 +1001,12 @@
     },
     {
       "source": "sig_49",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_49",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_49",
-      "target": "theme_econ",
+      "target": "reg_asia",
       "value": 1
     },
     {
       "source": "sig_50",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_50",
-      "target": "sig_49",
       "value": 1
     },
     {
@@ -1078,18 +1020,8 @@
       "value": 1
     },
     {
-      "source": "sig_51",
-      "target": "sig_50",
-      "value": 1
-    },
-    {
       "source": "sig_52",
       "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_52",
-      "target": "sig_51",
       "value": 1
     },
     {
@@ -1108,11 +1040,6 @@
       "value": 1
     },
     {
-      "source": "sig_54",
-      "target": "sig_53",
-      "value": 1
-    },
-    {
       "source": "sig_55",
       "target": "reg_na",
       "value": 1
@@ -1125,11 +1052,6 @@
     {
       "source": "sig_56",
       "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_57",
-      "target": "theme_geo",
       "value": 1
     }
   ]
