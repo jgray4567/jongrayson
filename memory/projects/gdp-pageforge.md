@@ -79,19 +79,25 @@ The AI can only compose from approved components. No rogue HTML, no off-brand st
 ## Model Strategy
 
 ### Pass 1 — Analyze (extraction/classification)
-- **Vision:** gemma4:12b (local) or cloud vision API
-- **Document extraction:** GLM-5.1 cloud / JerryKnows API
+- **Primary:** Brainwave (free, 195K context, text-only) — document + text extraction
+- **Fallback:** GLM-5.2 cloud (1M context, $1.40/$4.40/M tokens) — if Brainwave fails or times out
+- **Vision:** gemma4:12b (local) or cloud vision API — image classification
 - **Spreadsheet parsing:** Server-side (no AI needed)
-- **Text extraction:** GLM-5.1 cloud
 - **Requirement:** Mechanical accuracy, not design sense
 - **Can run on:** Any capable model
 
 ### Pass 2 — Compose (editorial judgment)
-- **Launch:** Claude Sonnet (via API) — strongest design reasoning
-- **Transition:** GLM-5.1 cloud (with extensive few-shot examples)
+- **Primary:** GLM-5.2 cloud (1M context, dual thinking High/Max, tool calling)
+- **Fallback:** Claude Sonnet (via API) — if GLM-5.2 unavailable
 - **End state:** Fine-tuned Mythos-3B running locally on Mac Studio
 - **Requirement:** Understands visual hierarchy, editorial decisions, layout relationships
 - **Every composition logged** → becomes training data for Mythos-3B fine-tuning
+
+### Model Routing (updated 2026-06-22)
+- **Brainwave** → first attempt for extraction + light composition (free)
+- **GLM-5.2** → fallback if Brainwave fails, primary for composition + render passes
+- **Mythos-3B** → future local inference (zero marginal cost at scale)
+- This matches the existing sub-agent delegation rule in MEMORY.md
 
 ### Training Path for Mythos-3B
 
@@ -112,7 +118,7 @@ The AI can only compose from approved components. No rogue HTML, no off-brand st
 | Content Type | ai_page_draft | Draft pages with structured JSON |
 | Design System | design-system.json | Per-client, constrains AI output |
 | Vision | gemma4:12b (local) or cloud API | Image classification |
-| Composition | Claude → Mythos-3B | Editorial layout decisions |
+| Composition | Brainwave → GLM-5.2 → Mythos-3B | Editorial layout decisions |
 | Hosting | Per-client (Vercel/Netlify) | Or GDP-managed VPS |
 
 ## Service Tiers (Proposed)
