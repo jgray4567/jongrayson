@@ -862,107 +862,37 @@ const HOTSPOTS = [
   {lat:15.0,lng:30.0,name:'Sudan Civil War',sev:3},
 ];
 
-// ─── Alerts & Ticker (loaded dynamically from ontology.json) ───
-let ALERTS = [];
-let TICKER = [];
-
-// Keyword-based region detection for alert location tagging
-const REGION_KEYWORDS = [
-  {keys:['ukraine','zelensky','kyiv','russia','putin','moscow','nato','eu','europe','france','germany','uk','london','belgium'], loc:'Europe'},
-  {keys:['israel','gaza','beirut','iran','lebanon','syria','iraq','yemen','houthis','red sea','saudi','jordan','qatar','dubai','emirates'], loc:'Middle East'},
-  {keys:['china','xi','beijing','taiwan','japan','tokyo','korea','seoul','india','delhi','australia','philippines','vietnam','thailand'], loc:'Asia-Pacific'},
-  {keys:['us','trump','biden','senate','congress','washington','white house','pentagon','nyc','new york','california','texas','florida'], loc:'North America'},
-  {keys:['mexico','cartel','mexican'], loc:'Mexico'},
-  {keys:['brazil','argentina','peru','colombia','venezuela','chile','bolivia','ecuador','guyana'], loc:'South America'},
-  {keys:['sudan','nigeria','ethiopia','somalia','sahel','niger','mali','burkina','congo','rwanda','africa','kenya','south africa'], loc:'Africa'},
-  {keys:['australia','new zealand','fiji','pacific'], loc:'Oceania'},
-  {keys:['cyber','hack','vulnerability','cve','malware','ransomware','exploit','patch','zero-day'], loc:'Cyber'},
+// ─── Alerts ───
+const ALERTS = [
+  {time:'11:42 UTC',sev:3,text:'Artillery exchanges reported along eastern front line',loc:'Ukraine',url:'https://www.reuters.com/world/europe/'},
+  {time:'11:38 UTC',sev:3,text:'Airstrikes target infrastructure in Khan Younis',loc:'Gaza',url:'https://www.cnn.com/middle-east'},
+  {time:'11:35 UTC',sev:3,text:'RSF forces advance on El Fasher, humanitarian crisis deepening',loc:'Sudan',url:'https://www.aljazeera.com/where/sudan/'},
+  {time:'11:30 UTC',sev:2,text:'Merchant vessel reports drone sighting near Bab-el-Mandeb',loc:'Red Sea',url:'https://www.foxnews.com/category/world/conflicts'},
+  {time:'11:22 UTC',sev:2,text:'PLA Navy exercises observed near median line',loc:'Taiwan Strait',url:'https://www.cnn.com/asia'},
+  {time:'11:15 UTC',sev:2,text:'Gang violence escalates in Port-au-Prince, evacuation advised',loc:'Haiti',url:'https://www.foxnews.com/world'},
+  {time:'11:08 UTC',sev:2,text:'Syrian regime artillery fires on Idlib province',loc:'Syria',url:'https://www.aljazeera.com/where/syria/'},
+  {time:'10:55 UTC',sev:1,text:'Coup leaders delay elections to 2027',loc:'Sahel',url:'https://www.reuters.com/world/africa/'},
+  {time:'10:42 UTC',sev:1,text:'Hyperinflation reaches 450%, mass migration continues',loc:'Venezuela',url:'https://www.bbc.com/news/world/latin_america'},
+  {time:'10:30 UTC',sev:3,text:'5.2 magnitude earthquake strikes southern Japan',loc:'Japan',url:'https://earthquake.usgs.gov/earthquakes/map/'},
+  {time:'10:18 UTC',sev:2,text:'Critical CVE-2026-4419 patch released, active exploitation detected',loc:'Global',url:'https://nvd.nist.gov/vuln/detail/CVE-2026-4419'},
+  {time:'10:05 UTC',sev:2,text:'Oil prices surge 3.2% on supply disruption fears',loc:'Global Markets',url:'https://www.cnn.com/business'},
+  {time:'09:50 UTC',sev:2,text:'Senate blocks defense appropriations amendment',loc:'Washington DC',url:'https://www.foxnews.com/politics'},
+  {time:'09:42 UTC',sev:1,text:'AI chip export controls tightened to Gulf states',loc:'Global Tech',url:'https://www.cnn.com/politics'},
 ];
 
-const SEVERITY_KEYWORDS = [
-  {keys:['war','strike','airstrike','attack','missile','bombing','explosion','killed','casualt','assault','offensive','invasion','crisis','collapse','earthquake','disaster'], sev:3},
-  {keys:['tension','escalat','threat','warning','sanction','military','drone','navy','army','troops','border','clash','protest','unrest','evacuat','surge','crash'], sev:2},
-  {keys:['election','summit','talks','negotiat','policy','report','poll','survey','analysis','market','trade','economy','ai ','tech','chip','export'], sev:1},
+// ─── Ticker items ───
+const TICKER = [
+  {dot:'#ff2244',time:'11:42',text:'Ukraine: Artillery exchanges along eastern front',url:'https://www.reuters.com/world/europe/'},
+  {dot:'#ff2244',time:'11:38',text:'Gaza: Airstrikes target Khan Younis infrastructure',url:'https://www.cnn.com/middle-east'},
+  {dot:'#ff2244',time:'11:35',text:'Sudan: RSF advances on El Fasher',url:'https://www.aljazeera.com/where/sudan/'},
+  {dot:'#ffaa22',time:'11:30',text:'Red Sea: Drone sighting near Bab-el-Mandeb',url:'https://www.foxnews.com/category/world/conflicts'},
+  {dot:'#ffaa22',time:'11:22',text:'Taiwan Strait: PLA Navy exercises near median line',url:'https://www.cnn.com/asia'},
+  {dot:'#ffaa22',time:'11:15',text:'Haiti: Gang violence escalates in Port-au-Prince',url:'https://www.foxnews.com/world'},
+  {dot:'#22dd88',time:'10:55',text:'CVE-2026-4419: Critical patch released',url:'https://nvd.nist.gov/vuln/detail/CVE-2026-4419'},
+  {dot:'#C4D600',time:'10:42',text:'Markets: Oil +3.2%, Defense sector +1.1%',url:'https://www.cnn.com/business'},
+  {dot:'#C4D600',time:'09:50',text:'Senate blocks defense appropriations amendment',url:'https://www.foxnews.com/politics'},
+  {dot:'#22dd88',time:'09:42',text:'AI chip export controls tightened to Gulf states',url:'https://www.cnn.com/politics'},
 ];
-
-function detectRegion(title) {
-  const lower = title.toLowerCase();
-  for (const r of REGION_KEYWORDS) {
-    if (r.keys.some(k => lower.includes(k))) return r.loc;
-  }
-  return 'Global';
-}
-
-function detectSeverity(title) {
-  const lower = title.toLowerCase();
-  for (const s of SEVERITY_KEYWORDS) {
-    if (s.keys.some(k => lower.includes(k))) return s.sev;
-  }
-  return 1;
-}
-
-function formatTime(pubDate) {
-  if (!pubDate) return new Date().toISOString().slice(11,19) + ' UTC';
-  const d = new Date(pubDate);
-  if (isNaN(d)) return '--:-- UTC';
-  return d.toISOString().slice(11,19) + ' UTC';
-}
-
-function formatTickerTime(pubDate) {
-  if (!pubDate) return new Date().toISOString().slice(11,16);
-  const d = new Date(pubDate);
-  if (isNaN(d)) return '--:--';
-  return d.toISOString().slice(11,16);
-}
-
-function severityColor(sev) {
-  return sev === 3 ? '#ff2244' : sev === 2 ? '#ffaa22' : '#22dd88';
-}
-
-async function loadOntologyAlerts() {
-  try {
-    const res = await fetch('/intel/data/ontology.json');
-    if (!res.ok) { console.warn('ontology.json not found, using empty alerts'); return; }
-    const data = await res.json();
-    const signalNodes = (data.nodes || []).filter(n => n.id && n.id.startsWith('sig_'));
-
-    // Map signal nodes to ALERTS
-    ALERTS = signalNodes.map(n => {
-      const title = n.label || 'Untitled';
-      const sev = n.group === 1 ? 3 : detectSeverity(title); // group 1 = cyber in ontology
-      return {
-        time: formatTime(n.pubDate),
-        sev: sev,
-        text: title,
-        loc: detectRegion(title),
-        url: n.url || '#'
-      };
-    });
-
-    // Build TICKER from same signals (top 12)
-    TICKER = signalNodes.slice(0, 12).map(n => {
-      const title = n.label || 'Untitled';
-      const sev = n.group === 1 ? 3 : detectSeverity(title);
-      return {
-        dot: severityColor(sev),
-        time: formatTickerTime(n.pubDate),
-        text: title.length > 70 ? title.substring(0, 67) + '…' : title,
-        url: n.url || '#'
-      };
-    });
-
-    // Re-render alerts, ticker, and stats
-    renderAlerts();
-    renderTicker();
-    document.getElementById('stat-alerts').textContent = ALERTS.length;
-    const alertsBadge = document.getElementById('alerts-badge');
-    if (alertsBadge) alertsBadge.textContent = ALERTS.length;
-
-    console.log(`Loaded ${ALERTS.length} live alerts from ontology.json`);
-  } catch (e) {
-    console.error('Failed to load ontology alerts:', e);
-  }
-}
 
 // ═══════════════════════════════════════════════════════════════════
 //  THREE.JS SCENE SETUP
@@ -1843,8 +1773,8 @@ function setupUI() {
   document.getElementById('layers-close')?.addEventListener('click', closeAllPanels);
   document.getElementById('alerts-close')?.addEventListener('click', closeAllPanels);
 
-  // Alerts — load live data from ontology.json, then render
-  loadOntologyAlerts();
+  // Alerts
+  renderAlerts();
   document.getElementById('stat-alerts').textContent = ALERTS.length;
   const alertsBadge = document.getElementById('alerts-badge');
   if (alertsBadge) alertsBadge.textContent = ALERTS.length;
@@ -2053,27 +1983,12 @@ function renderAlerts() {
 function generateAISummary() {
   const sev3 = ALERTS.filter(a => a.sev === 3);
   const sev2 = ALERTS.filter(a => a.sev === 2);
-  const sev1 = ALERTS.filter(a => a.sev === 1);
-  const locs = [...new Set(ALERTS.map(a => a.loc))];
-  const dateStr = new Date().toISOString().slice(0,10);
-  let html = `<span class="highlight">INTELLIGENCE BRIEF — ${dateStr}</span><br><br>`;
-  if (sev3.length) {
-    html += `<span class="danger">CRITICAL (${sev3.length}):</span> ${sev3.slice(0,5).map(a => `<span class="highlight">${a.loc}</span>`).join(', ')}. `;
-    html += `High-severity events detected across ${new Set(sev3.map(a=>a.loc)).size} zones.<br><br>`;
-  }
-  if (sev2.length) {
-    html += `<span class="warn">ELEVATED (${sev2.length}):</span> ${sev2.slice(0,5).map(a => `<span class="highlight">${a.loc}</span>`).join(', ')}. `;
-    html += `Developing situations require monitoring.<br><br>`;
-  }
-  if (sev1.length) {
-    html += `<span class="highlight">ROUTINE (${sev1.length}):</span> ${sev1.length} lower-severity signals across ${new Set(sev1.map(a=>a.loc)).size} regions. Standard monitoring posture.<br><br>`;
-  }
-  html += `<span class="highlight">ASSESSMENT:</span> ${ALERTS.length} total signals correlated across ${locs.length} regions. `;
-  html += `Data sourced from live RSS feeds (BBC, NYT, Fox, Al Jazeera, Sky, Politico, WaPo, Guardian, NBC) + CISA cyber advisories. `;
-  html += `Recommend ${sev3.length > 2 ? 'elevated' : 'standard'} alert posture.`;
-  html += `<div class="meta">${ALERTS.length} live inputs | Updated: ${new Date().toISOString().slice(11,19)} UTC</div>`;
-  return html;
-}
+  return `<span class="highlight">INTELLIGENCE BRIEF — ${new Date().toISOString().slice(0,10)}</span><br><br>
+  <span class="danger">CRITICAL (${sev3.length}):</span> Active combat operations in <span class="highlight">Ukraine, Gaza, Sudan</span>. Pattern indicates sustained escalation across three concurrent conflict zones — highest threat density in 18 months.<br><br>
+  <span class="warn">ELEVATED (${sev2.length}):</span> Maritime drone activity in <span class="highlight">Red Sea</span> disrupting shipping lanes. <span class="highlight">Taiwan Strait</span> exercises suggest readiness posturing. <span class="highlight">Haiti</span> security collapse accelerating. Critical CVE with active exploitation — patch immediately.<br><br>
+  <span class="highlight">MARKET IMPACT:</span> Oil +3.2% on supply disruption fears. Defense sector +1.1%. Recommend monitoring energy and defense exposure.<br><br>
+  <span class="highlight">ASSESSMENT:</span> Three concurrent severity-3 events with geographic dispersion. No direct correlation detected between conflict zones. Cyber threat (CVE-2026-4419) adds asymmetric dimension. Recommend elevated alert posture for next 72 hours.
+  <div class="meta">${ALERTS.length} inputs correlated | Confidence: HIGH</div>`;
 }
 
 function renderTicker() {
