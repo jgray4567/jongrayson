@@ -331,6 +331,7 @@ body {
 
     <div class="command-bar" id="nav">
       <div class="command-pill active" data-tab="overview"><span class="command-label">Overview</span></div>
+      <div class="command-pill" data-tab="gdp"><span class="command-label">GDP</span></div>
       <div class="command-pill" data-tab="projects"><span class="command-label">Projects</span></div>
       <div class="command-pill" data-tab="memory"><span class="command-label">Memory</span></div>
       <div class="command-pill" data-tab="karpathy"><span class="command-label">Karpathy</span></div>
@@ -372,6 +373,17 @@ body {
       <div class="stage-grid stage-grid-2" id="active-projects"></div>
       <div class="section-kicker">Recent Memory Activity</div>
       <div id="recent-activity"></div>
+    </div>
+
+    <!-- GDP PROJECTS -->
+    <div class="tab-content" id="tab-gdp">
+      <div class="command-bar" style="margin-bottom:18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="text" class="command-input" id="gdp-search" placeholder="Search GDP projects..." style="flex:1;min-width:120px">
+      </div>
+      <div class="section-kicker">Grayson Design Partners — Active Engagements</div>
+      <div class="stage-grid stage-grid-2" id="gdp-projects"></div>
+      <div class="section-kicker" style="margin-top:18px">Infrastructure</div>
+      <div id="gdp-infra"></div>
     </div>
 
     <!-- PROJECTS -->
@@ -707,6 +719,19 @@ function renderAllProjects(filter=''){
   document.getElementById('all-projects').innerHTML=filtered.map(p=>projectCard(p,stars.includes(p.id))).join('');
 }
 
+// ─── GDP PROJECTS RENDER ───────────────────────────────────────────
+const GDP_PROJECT_KEYS=['gdp-pageforge','gdp-site-review','faf-website','skb-customs'];
+function renderGdpProjects(filter=''){
+  const f=filter.toLowerCase();
+  const gdpProjects=PROJECTS.filter(p=>GDP_PROJECT_KEYS.includes(p.id));
+  const filtered=gdpProjects.filter(p=>!f||p.name.toLowerCase().includes(f)||p.desc.toLowerCase().includes(f)||p.tag.includes(f));
+  if(!filtered.length){
+    document.getElementById('gdp-projects').innerHTML='<div style="color:var(--muted);padding:20px;font-family:var(--font-mono);font-size:0.8rem">No GDP projects found</div>';return;
+  }
+  const stars=getStars();
+  document.getElementById('gdp-projects').innerHTML=filtered.map(p=>projectCard(p,stars.includes(p.id))).join('');
+}
+
 let RAW_COUNT=0;
 function renderMemoryTopics(){
   document.getElementById('wiki-files').innerHTML=WIKI_FILES.map(f=>`
@@ -788,6 +813,7 @@ document.querySelectorAll('.command-pill').forEach(btn=>{
     const tab=btn.dataset.tab;
     document.getElementById('tab-'+tab).classList.add('active');
     // Re-render tab content when switching
+    if(tab==='gdp')renderGdpProjects(document.getElementById('gdp-search')?.value||'');
     if(tab==='projects'){
       if(!PROJECTS.length){
         document.getElementById('all-projects').innerHTML='<div style="color:var(--muted);padding:20px;font-family:var(--font-mono);font-size:0.8rem">Reloading data...</div>';
@@ -804,6 +830,7 @@ document.querySelectorAll('.command-pill').forEach(btn=>{
 
 // ─── SEARCH ─────────────────────────────────────────────────────────
 document.getElementById('project-search').addEventListener('input',e=>renderAllProjects(e.target.value));
+document.getElementById('gdp-search').addEventListener('input',e=>renderGdpProjects(e.target.value));
 document.getElementById('memory-search').addEventListener('input',e=>{
   const f=e.target.value.toLowerCase();
   document.querySelectorAll('#tab-memory .mem-file').forEach(el=>{
