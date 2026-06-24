@@ -69,466 +69,772 @@
     {
       "id": "sig_0",
       "group": 2,
-      "label": "Defending Against China-Nexus Covert Networks of Compromised Devices",
+      "label": "Is the Australian Prime Minister’s Pragmatism Enough in Uncertain Times?",
       "size": 12,
-      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa26-113a",
-      "image": ""
+      "url": "https://www.nytimes.com/2026/06/23/world/australia/australia-albanese-prime-minister-popularity.html",
+      "image": "",
+      "pubDate": "2026-06-24T02:05:58.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
     },
     {
       "id": "sig_1",
-      "group": 1,
-      "label": "Iranian-Affiliated Cyber Actors Exploit Programmable Logic Controllers Across US Critical Infrastructure",
+      "group": 2,
+      "label": "Syrians reject Trump’s call for Syria to combat Hezbollah in Lebanon",
       "size": 12,
-      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa26-097a",
-      "image": ""
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/24/syrians-reject-trumps-call-for-syria-to-combat-hezbollah-in-lebanon?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-24T01:57:54.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
       "id": "sig_2",
-      "group": 1,
-      "label": "Pro-Russia Hacktivists Conduct Opportunistic Attacks Against US and Global Critical Infrastructure",
+      "group": 2,
+      "label": "Budimir gives Croatia a 1-0 win to eliminate Panama from the World Cup",
       "size": 12,
-      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-343a",
-      "image": ""
+      "url": "https://www.aljazeera.com/sports/2026/6/24/budimir-gives-croatia-a-1-0-win-to-eliminate-panama-from-the-world-cup?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-24T01:42:11.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
       "id": "sig_3",
       "group": 2,
-      "label": "CISA Shares Lessons Learned from an Incident Response Engagement",
+      "label": "Hoyer alum Adrian Boafo wins Maryland House primary with help of crypto, pro-Israel money",
       "size": 12,
-      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-266a",
-      "image": ""
+      "url": "https://www.politico.com/news/2026/06/23/boafo-wins-maryland-house-primary-00973131",
+      "image": "https://static.politico.com/71/24/0e861e4b45f18e3677ba05a134b1/ap26061633150844.jpg",
+      "pubDate": "2026-06-24T01:30:47.000Z",
+      "source": "https://rss.politico.com/politics-news.xml"
     },
     {
       "id": "sig_4",
       "group": 2,
-      "label": "Countering Chinese State-Sponsored Actors Compromise of Networks Worldwide to Feed Global Espionage System",
+      "label": "US Senate votes to pause Iran war in rare rebuke to Trump",
       "size": 12,
-      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-239a",
-      "image": ""
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/24/us-senate-votes-to-pause-iran-war-in-rare-rebuke-to-trump?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-24T01:29:51.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
       "id": "sig_5",
-      "group": 1,
-      "label": "CISA and USCG Identify Areas for Cyber Hygiene Improvement After Conducting Proactive Threat Hunt at US Critical Infrastructure Organization",
-      "size": 12,
-      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-212a",
-      "image": ""
-    },
-    {
-      "id": "sig_6",
-      "group": 2,
-      "label": "#StopRansomware: Interlock",
-      "size": 12,
-      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-203a",
-      "image": ""
-    },
-    {
-      "id": "sig_7",
-      "group": 2,
-      "label": "Ransomware Actors Exploit Unpatched SimpleHelp Remote Monitoring and Management to Compromise Utility Billing Software Provider",
-      "size": 12,
-      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-163a",
-      "image": ""
-    },
-    {
-      "id": "sig_8",
-      "group": 2,
-      "label": "Russian GRU Targeting Western Logistics Entities and Technology Companies",
-      "size": 12,
-      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-141a",
-      "image": ""
-    },
-    {
-      "id": "sig_9",
-      "group": 2,
-      "label": "Threat Actors Deploy LummaC2 Malware to Exfiltrate Sensitive Data from Organizations",
-      "size": 12,
-      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-141b",
-      "image": ""
-    },
-    {
-      "id": "sig_10",
-      "group": 2,
-      "label": "Drowning deaths soar in France as Europe buckles in peak of heatwave",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/c79yvw3j114o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/2593/live/ebcebc30-6f05-11f1-8546-8f19e4fe30f4.jpg"
-    },
-    {
-      "id": "sig_11",
-      "group": 2,
-      "label": "UN says it will evacuate sailors stranded in Strait of Hormuz, as Rubio warns against tolls",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/c24yr796emzo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/e62d/live/0661c170-6f2c-11f1-8b65-27158411943c.jpg"
-    },
-    {
-      "id": "sig_12",
-      "group": 2,
-      "label": "Israeli troops kill two in south Lebanon after lull in fighting, authorities say",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/c36ykpw0yego?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/f126/live/8b76c460-6f1c-11f1-8546-8f19e4fe30f4.jpg"
-    },
-    {
-      "id": "sig_13",
-      "group": 2,
-      "label": "Germany rail network halted nationwide due to IT malfunction",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/crm0ek4z7ggo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/972f/live/e72ad600-6f5a-11f1-8546-8f19e4fe30f4.jpg"
-    },
-    {
-      "id": "sig_14",
-      "group": 2,
-      "label": "Dozens of ships head through Strait of Hormuz after US-Iran deal",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/cx23rnzdgl8o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/bd09/live/958bc530-6f09-11f1-8546-8f19e4fe30f4.png"
-    },
-    {
-      "id": "sig_15",
-      "group": 2,
-      "label": "UN commission of inquiry says Israel committing genocide in Gaza by deliberately targeting children",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/c0jy96w6pw2o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/a51a/live/f1ee76e0-6f06-11f1-8546-8f19e4fe30f4.jpg"
-    },
-    {
-      "id": "sig_16",
-      "group": 2,
-      "label": "Zambia ex-president's family wins latest legal battle over what should happen to his body ",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/c8r2yryr5mvo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5334/live/cd486880-77a1-11f0-ac7b-4783efd8e136.jpg"
-    },
-    {
-      "id": "sig_17",
-      "group": 2,
-      "label": "Chinese e-commerce giant Alibaba sues US government over defence blacklist",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/ckg0258vpvqo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1bfe/live/8a2019f0-6f5c-11f1-9ab9-83454fe8fa79.jpg"
-    },
-    {
-      "id": "sig_18",
-      "group": 2,
-      "label": "Spider which uses spring trap to capture prey discovered in Australia",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/c70y138y995o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/fd2f/live/66e03ec0-6eee-11f1-b3b4-39330bfcd14d.jpg"
-    },
-    {
-      "id": "sig_19",
-      "group": 2,
-      "label": "US top court says Rastafarian man cannot sue prison guards who cut his dreadlocks ",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/cx247v39r1no?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/4e47/live/8ac99bd0-6f19-11f1-851c-afe522e622a4.jpg"
-    },
-    {
-      "id": "sig_20",
       "group": 2,
       "label": "U.S. and Iran Offer Conflicting Accounts of Nuclear Discussions",
       "size": 12,
       "url": "https://www.nytimes.com/live/2026/06/23/world/iran-us-trump-lebanon",
-      "image": ""
+      "image": "",
+      "pubDate": "2026-06-24T01:28:17.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
     },
     {
-      "id": "sig_21",
+      "id": "sig_6",
       "group": 2,
-      "label": "‘A Terrible Inheritance’: Could Andy Burnham Succeed Where Starmer Failed?",
+      "label": "England’s Spence appears to refuse handshake with booed Ghana player Partey",
       "size": 12,
-      "url": "https://www.nytimes.com/2026/06/23/world/europe/uk-burnham-starmer-politics.html",
-      "image": ""
+      "url": "https://www.aljazeera.com/sports/2026/6/24/englands-spence-appears-to-refuse-handshake-with-booed-ghana-player-partey?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-24T01:18:08.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_22",
+      "id": "sig_7",
       "group": 2,
-      "label": "How Mark Rutte of NATO Manages an Unpredictable Trump",
+      "label": "Eight sentenced to 450 years in prison over anti-ICE riot where officer was shot",
       "size": 12,
-      "url": "https://www.nytimes.com/2026/06/23/world/europe/mark-rutte-nato-trump.html",
-      "image": ""
+      "url": "https://www.bbc.co.uk/news/articles/clyedgnyn4mo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/4888/live/320d54b0-6f4f-11f1-baa9-855c433fc27a.jpg",
+      "pubDate": "2026-06-24T00:00:06.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_23",
+      "id": "sig_8",
       "group": 2,
-      "label": "Iran Makes Moves to Assert Control Over the Strait of Hormuz",
+      "label": "Iran war live: Trump, Tehran at odds over nuclear inspections, Hormuz",
       "size": 12,
-      "url": "https://www.nytimes.com/2026/06/23/world/middleeast/iran-control-strait-of-hormuz.html",
-      "image": ""
+      "url": "https://www.aljazeera.com/news/liveblog/2026/6/24/iran-war-live-trump-tehran-at-odds-over-nuclear-inspections-hormuz?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-24T00:00:00.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_24",
-      "group": 2,
-      "label": "Delcy Rodríguez, Venezuela’s President, Struggles to Uphold Trump’s Narrative of Success",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/23/world/americas/venezuela-oil-delcy-rodriguez-trump.html",
-      "image": ""
-    },
-    {
-      "id": "sig_25",
-      "group": 2,
-      "label": "Britain Is Still Deep in the Shadow of Brexit",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/23/world/europe/britain-brexit-legacy.html",
-      "image": ""
-    },
-    {
-      "id": "sig_26",
-      "group": 2,
-      "label": "After Wars and False Starts, Cautious Optimism for U.S.-Iran Talks",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/23/world/middleeast/united-states-iran-talks-optimism.html",
-      "image": ""
-    },
-    {
-      "id": "sig_27",
-      "group": 2,
-      "label": "Those British Strawberries Are Being Picked by Central Asian Workers",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/23/world/europe/uk-brexit-seasonal-farm-workers-central-asia.html",
-      "image": ""
-    },
-    {
-      "id": "sig_28",
-      "group": 2,
-      "label": "U.S. Warns of ‘Imminent’ Atrocities in El Obeid, Sudan",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/23/world/africa/sudan-war-rsf-atrocities.html",
-      "image": ""
-    },
-    {
-      "id": "sig_29",
-      "group": 2,
-      "label": "Soldier, Scholar and Symbol: Marc Bloch Is Elevated to France’s Panthéon",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/23/world/europe/marc-bloch-pantheon-france.html",
-      "image": ""
-    },
-    {
-      "id": "sig_30",
-      "group": 2,
-      "label": "Turkey detains over 200 suspects, including alleged ISIS militants, in sweeping raid ahead of NATO summit",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/turkey-detains-200-suspects-including-alleged-isis-militants-sweeping-raid-ahead-nato-summit",
-      "image": ""
-    },
-    {
-      "id": "sig_31",
-      "group": 2,
-      "label": "Trump gets major win against China in African rare earth minerals race",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/trump-gets-major-win-against-china-african-rare-earth-minerals-race",
-      "image": ""
-    },
-    {
-      "id": "sig_32",
-      "group": 2,
-      "label": "Trump says Colombia&apos;s &apos;El Tigre&apos; will be a &apos;great president&apos; as socialist opponent launches legal challenge",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/trump-says-colombias-el-tigre-great-president-socialist-opponent-launches-legal-challenge",
-      "image": ""
-    },
-    {
-      "id": "sig_33",
-      "group": 2,
-      "label": "Russia preparing hybrid attacks on NATO&apos;s eastern flank, intelligence warns",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/russia-preparing-hybrid-attacks-natos-eastern-flank-intelligence-warns",
-      "image": ""
-    },
-    {
-      "id": "sig_34",
-      "group": 2,
-      "label": "Suspect &apos;neutralized&apos; after Montreal shooting leaves at least 2 dead including officer",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/suspect-neutralized-montreal-shooting-leaves-dead-including-officer",
-      "image": ""
-    },
-    {
-      "id": "sig_35",
-      "group": 2,
-      "label": "Keith Kellogg tells Iranian dissidents the &apos;window is open&apos; to force regime change in Tehran",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/keith-kellogg-tells-iranian-dissidents-window-open-force-regime-change-tehran",
-      "image": ""
-    },
-    {
-      "id": "sig_36",
-      "group": 2,
-      "label": "Keir Starmer resigns as British prime minister after devastating Labour revolt and local election losses",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/keir-starmer-resigns-british-prime-minister-after-devastating-labour-revolt-local-election-losses",
-      "image": ""
-    },
-    {
-      "id": "sig_37",
-      "group": 2,
-      "label": "US military conducts strike on another vessel carrying alleged narco-traffickers, killing 2",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/us-military-caribbean-drug-boat-strike",
-      "image": ""
-    },
-    {
-      "id": "sig_38",
-      "group": 2,
-      "label": "Major dispute to threaten Trump&apos;s Iran deal over billions in frozen Tehran funds: expert",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/major-dispute-threaten-trumps-iran-deal-over-billions-frozen-tehran-funds-expert",
-      "image": ""
-    },
-    {
-      "id": "sig_39",
-      "group": 2,
-      "label": "Meloni&apos;s spat with Trump is calculated strategy to boost her approval ratings: expert",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/melonis-spat-trump-calculated-strategy-boost-her-approval-ratings-expert",
-      "image": ""
-    },
-    {
-      "id": "sig_40",
+      "id": "sig_9",
       "group": 2,
       "label": "UN begins evacuation of 11,000 sailors stranded in Strait of Hormuz",
       "size": 12,
       "url": "https://www.aljazeera.com/video/newsfeed/2026/6/23/un-begins-evacuation-of-11000-sailors-stranded-in-strait-of-hormuz?traffic_source=rss",
-      "image": ""
+      "image": "",
+      "pubDate": "2026-06-23T23:49:00.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_41",
+      "id": "sig_10",
       "group": 2,
       "label": "Ronaldo late to World Cup party but still able to steal the show",
       "size": 12,
       "url": "https://www.aljazeera.com/sports/2026/6/23/ronaldo-late-to-world-cup-party-but-still-able-to-steal-the-show?traffic_source=rss",
-      "image": ""
+      "image": "",
+      "pubDate": "2026-06-23T23:46:08.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_42",
+      "id": "sig_11",
+      "group": 2,
+      "label": "Germany rail network briefly halted nationwide due to IT malfunction",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/crm0ek4z7ggo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/972f/live/e72ad600-6f5a-11f1-8546-8f19e4fe30f4.jpg",
+      "pubDate": "2026-06-23T23:46:01.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_12",
+      "group": 2,
+      "label": "Alan Wilson, boosted by Trump’s late co-endorsement, wins South Carolina governor runoff",
+      "size": 12,
+      "url": "https://www.politico.com/news/2026/06/23/wilson-wins-south-carolina-governor-primary-00973028",
+      "image": "https://static.politico.com/a4/1e/1905d3d94d3384caca260b45eaaf/https-delivery-gettyimages.com/downloads/2282338695",
+      "pubDate": "2026-06-23T23:29:21.000Z",
+      "source": "https://rss.politico.com/politics-news.xml"
+    },
+    {
+      "id": "sig_13",
+      "group": 2,
+      "label": "Chinese e-commerce giant Alibaba sues US government over defence blacklist",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/ckg0258vpvqo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1bfe/live/8a2019f0-6f5c-11f1-9ab9-83454fe8fa79.jpg",
+      "pubDate": "2026-06-23T23:25:07.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_14",
       "group": 2,
       "label": "Protesters sentenced to decades in US prison over alleged antifa ties",
       "size": 12,
       "url": "https://www.aljazeera.com/news/2026/6/23/protesters-sentenced-to-decades-in-us-prison-over-alleged-antifa-ties?traffic_source=rss",
-      "image": ""
+      "image": "",
+      "pubDate": "2026-06-23T23:22:37.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_43",
+      "id": "sig_15",
       "group": 2,
       "label": "US Supreme Court says Rastafarian man shaved by prison guards can’t sue",
       "size": 12,
       "url": "https://www.aljazeera.com/news/2026/6/23/us-supreme-court-says-rastafarian-man-shaved-by-prison-guards-cant-sue?traffic_source=rss",
-      "image": ""
+      "image": "",
+      "pubDate": "2026-06-23T23:01:10.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_44",
+      "id": "sig_16",
       "group": 2,
       "label": "Israel’s deliberate targeting of Palestinian children",
       "size": 12,
       "url": "https://www.aljazeera.com/video/newsfeed/2026/6/23/aje-onl-nf_israels-targeting-of-palestinian-children-230626?traffic_source=rss",
-      "image": ""
+      "image": "",
+      "pubDate": "2026-06-23T22:50:00.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_45",
+      "id": "sig_17",
+      "group": 2,
+      "label": "Trains across Germany briefly halted after communication system issue",
+      "size": 12,
+      "url": "https://news.sky.com/story/german-railway-network-comes-to-halt-due-to-problem-with-communication-system-13557238",
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-deutsche-bahn-berlin_7281357.jpg?20260623235023",
+      "pubDate": "2026-06-23T22:47:00.000Z",
+      "source": "https://feeds.skynews.com/feeds/rss/world.xml"
+    },
+    {
+      "id": "sig_18",
       "group": 2,
       "label": "England held by Ghana at World Cup as pair close on last-32 passage",
       "size": 12,
       "url": "https://www.aljazeera.com/sports/2026/6/23/england-held-by-ghana-at-world-cup-as-pair-seal-last-32-passage?traffic_source=rss",
-      "image": ""
+      "image": "",
+      "pubDate": "2026-06-23T22:22:57.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_46",
+      "id": "sig_19",
       "group": 2,
       "label": "Donald Trump to attend World Cup final, present trophy: Infantino",
       "size": 12,
       "url": "https://www.aljazeera.com/sports/2026/6/23/donald-trump-to-attend-world-cup-final-present-trophy-infantino?traffic_source=rss",
-      "image": ""
+      "image": "",
+      "pubDate": "2026-06-23T21:44:47.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_47",
+      "id": "sig_20",
+      "group": 2,
+      "label": "Senate approves war powers resolution in symbolic move rebuking Trump on Iran",
+      "size": 12,
+      "url": "https://www.nbcnews.com/video/senate-approves-war-powers-resolution-in-symbolic-move-rebuking-trump-on-iran-265565253507",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/mpx/2704722219/2026_06/1782250881595_now_hallie_senate_iran_vote_260623_S3_1920x1080-ffwdkk.jpg",
+      "pubDate": "2026-06-23T21:41:27.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
+    },
+    {
+      "id": "sig_21",
       "group": 2,
       "label": "UN: Israel committed genocide by targeting Gaza children",
       "size": 12,
       "url": "https://www.aljazeera.com/video/newsfeed/2026/6/23/un-israel-committed-genocide-by-targeting-gaza-children?traffic_source=rss",
-      "image": ""
+      "image": "",
+      "pubDate": "2026-06-23T21:38:23.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_48",
+      "id": "sig_22",
       "group": 2,
       "label": "Paraguay’s Almiron suspended for one game after red card for covering mouth",
       "size": 12,
       "url": "https://www.aljazeera.com/sports/2026/6/23/paraguays-almiron-suspended-for-one-game-after-red-card-for-covering-mouth?traffic_source=rss",
-      "image": ""
+      "image": "",
+      "pubDate": "2026-06-23T21:36:12.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_49",
+      "id": "sig_23",
       "group": 2,
       "label": "Trump allies reassure Israelis amid tensions on US-Iran deal",
       "size": 12,
       "url": "https://www.aljazeera.com/video/newsfeed/2026/6/23/trump-allies-reassure-israelis-amid-tensions-on-us-iran-deal?traffic_source=rss",
-      "image": ""
+      "image": "",
+      "pubDate": "2026-06-23T21:19:35.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
     },
     {
-      "id": "sig_50",
+      "id": "sig_24",
       "group": 2,
-      "label": "Trains across Germany halted due to problem with communication system",
+      "label": "UN says it will evacuate sailors stranded in Strait of Hormuz, as Rubio warns against tolls",
       "size": 12,
-      "url": "https://news.sky.com/story/german-railway-network-comes-to-halt-due-to-problem-with-communication-system-13557238",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-deutsche-bahn-berlin_7281357.jpg?20260623235023"
+      "url": "https://www.bbc.co.uk/news/articles/c24yr796emzo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/e62d/live/0661c170-6f2c-11f1-8b65-27158411943c.jpg",
+      "pubDate": "2026-06-23T21:04:11.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_51",
+      "id": "sig_25",
+      "group": 2,
+      "label": "Ukraine’s drones are spoiling Putin’s vision for Crimea",
+      "size": 12,
+      "url": "https://www.washingtonpost.com/world/2026/06/23/ukraines-drones-are-making-crimea-harder-russia-hold/",
+      "image": "",
+      "pubDate": "2026-06-23T20:44:10.000Z",
+      "source": "https://feeds.washingtonpost.com/rss/world"
+    },
+    {
+      "id": "sig_26",
+      "group": 2,
+      "label": "Trump’s Colombia Prize",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/trump-us-colombia-europe-heat-world-cup.html",
+      "image": "",
+      "pubDate": "2026-06-23T20:42:27.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_27",
+      "group": 2,
+      "label": "Senate rebukes Trump by approving House-passed measure calling for end to Iran war",
+      "size": 12,
+      "url": "https://www.nbcnews.com/politics/congress/senate-rebukes-trump-approving-house-passed-iran-war-powers-resolution-rcna351445",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260623-Iran-war-aa-346-ba5699.jpg",
+      "pubDate": "2026-06-23T20:06:41.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
+    },
+    {
+      "id": "sig_28",
+      "group": 2,
+      "label": "Iranian Singer Sentenced to 74 Lashes for Performing Without Hijab",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/middleeast/iranian-singer-lashing-sentence.html",
+      "image": "",
+      "pubDate": "2026-06-23T19:52:15.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_29",
+      "group": 2,
+      "label": "How Mark Rutte of NATO Manages an Unpredictable Trump",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/europe/mark-rutte-nato-trump.html",
+      "image": "",
+      "pubDate": "2026-06-23T18:40:09.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_30",
+      "group": 2,
+      "label": "‘A Terrible Inheritance’: Could Andy Burnham Succeed Where Starmer Failed?",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/europe/uk-burnham-starmer-politics.html",
+      "image": "",
+      "pubDate": "2026-06-23T18:21:04.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_31",
+      "group": 2,
+      "label": "Trump dismisses Iran’s rejection of nuclear inspections",
+      "size": 12,
+      "url": "https://www.washingtonpost.com/world/2026/06/23/iran-says-no-nuclear-inspections-countering-vance-statement/",
+      "image": "",
+      "pubDate": "2026-06-23T18:19:49.000Z",
+      "source": "https://feeds.washingtonpost.com/rss/world"
+    },
+    {
+      "id": "sig_32",
+      "group": 2,
+      "label": "Ransom note claims Nancy Guthrie died after abduction",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/cvgm0mgzl33o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/0937/live/65772ef0-6e98-11f1-a98d-19c4cda006f8.jpg",
+      "pubDate": "2026-06-23T17:59:22.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_33",
+      "group": 2,
+      "label": "Canadian police warn of possible copycat attacks after deadly shootout in Montreal",
+      "size": 12,
+      "url": "https://www.theguardian.com/world/2026/jun/23/canada-police-warn-copycat-attack-montreal-shooting",
+      "image": "",
+      "pubDate": "2026-06-23T17:34:43.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_34",
+      "group": 2,
+      "label": "Zambia ex-president's family wins latest legal battle over what should happen to his body ",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/c8r2yryr5mvo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5334/live/cd486880-77a1-11f0-ac7b-4783efd8e136.jpg",
+      "pubDate": "2026-06-23T17:30:44.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_35",
       "group": 2,
       "label": "Putin says Russia 'ready for peace talks' after Ukraine refinery strikes",
       "size": 12,
       "url": "https://news.sky.com/story/vladimir-putin-says-russia-ready-for-peace-talks-after-ukraine-refinery-strikes-13557152",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-vladimir-putin-russia_7281142.jpg?20260623180419"
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-vladimir-putin-russia_7281142.jpg?20260623180419",
+      "pubDate": "2026-06-23T16:56:00.000Z",
+      "source": "https://feeds.skynews.com/feeds/rss/world.xml"
     },
     {
-      "id": "sig_52",
+      "id": "sig_36",
       "group": 2,
-      "label": "Police officer, passer-by and gunman killed in hotel shoot-out",
+      "label": "Israeli troops kill two in south Lebanon after lull in fighting, authorities say",
       "size": 12,
-      "url": "https://news.sky.com/story/its-a-nightmare-police-officer-passer-by-and-gunman-killed-in-hotel-shooting-13557033",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-montreal-police-shooting_7280876.jpg?20260623125009"
+      "url": "https://www.bbc.co.uk/news/articles/c36ykpw0yego?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/f126/live/8b76c460-6f1c-11f1-8546-8f19e4fe30f4.jpg",
+      "pubDate": "2026-06-23T16:47:45.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_53",
+      "id": "sig_37",
       "group": 2,
-      "label": "Billionaire to invest in ocean protection as UK and US scale back funding",
+      "label": "Ukraine ramps up pressure on Putin by targeting his ‘sacred place’ of Crimea",
       "size": 12,
-      "url": "https://news.sky.com/story/billionaire-to-invest-in-ocean-protection-as-uk-and-us-scale-back-funding-13556720",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-palau-oceans-pacific_7280239.jpg?20260622165042"
+      "url": "https://www.nbcnews.com/world/ukraine/russia-ukraine-war-drone-strikes-crimea-shortages-putin-pressure-rcna351328",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260623-crimea-oil-depot-mb-0959-da5661.jpg",
+      "pubDate": "2026-06-23T16:46:47.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
     },
     {
-      "id": "sig_54",
+      "id": "sig_38",
+      "group": 2,
+      "label": "Britain Is Still Deep in the Shadow of Brexit",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/europe/britain-brexit-legacy.html",
+      "image": "",
+      "pubDate": "2026-06-23T16:33:42.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_39",
+      "group": 2,
+      "label": "U.S. Warns of ‘Imminent’ Atrocities in El Obeid, Sudan",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/africa/sudan-war-rsf-atrocities.html",
+      "image": "",
+      "pubDate": "2026-06-23T16:28:22.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_40",
+      "group": 2,
+      "label": "Drowning deaths soar in France as Europe buckles in peak of heatwave",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/c79yvw3j114o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/2593/live/ebcebc30-6f05-11f1-8546-8f19e4fe30f4.jpg",
+      "pubDate": "2026-06-23T16:27:17.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_41",
+      "group": 2,
+      "label": "The Extraordinary Embezzlement Case That Rocked Scottish Politics",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/europe/scotland-peter-murrell-nicola-sturgeon-scottish-national-party.html",
+      "image": "",
+      "pubDate": "2026-06-23T16:18:01.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_42",
+      "group": 2,
+      "label": "US top court says Rastafarian man cannot sue prison guards who cut his dreadlocks ",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/cx247v39r1no?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/4e47/live/8ac99bd0-6f19-11f1-851c-afe522e622a4.jpg",
+      "pubDate": "2026-06-23T15:57:29.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_43",
+      "group": 2,
+      "label": "Ukrainian military releases video showing strikes in Russian-held Crimea",
+      "size": 12,
+      "url": "https://www.nbcnews.com/video/ukrainian-military-releases-video-showing-strikes-in-russian-held-crimea-265545797697",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/mpx/2704722219/2026_06/attack-w1s6bm.jpg",
+      "pubDate": "2026-06-23T15:51:09.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
+    },
+    {
+      "id": "sig_44",
+      "group": 2,
+      "label": "Former Pinochet agents convicted over 1976 Washington DC carbomb murder",
+      "size": 12,
+      "url": "https://www.theguardian.com/world/2026/jun/23/conviction-chile-washington-dc-car-bomb-attack-1976",
+      "image": "",
+      "pubDate": "2026-06-23T15:31:01.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_45",
+      "group": 2,
+      "label": "Homeland Security is changing guidelines for Iran soccer team’s next match",
+      "size": 12,
+      "url": "https://www.nbcnews.com/sports/soccer/homeland-security-changing-guidelines-iran-soccer-teams-match-rcna351391",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260623-Iran-World-Cup-aa-1116-4c47ef.jpg",
+      "pubDate": "2026-06-23T15:28:36.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
+    },
+    {
+      "id": "sig_46",
       "group": 2,
       "label": "&lt;a href='https://news.sky.com/story/heatwave-latest-amber-weather-warnings-for-extreme-heat-come-into-force-13555802?postid=11925347#liveblog-body'&gt;Forty people drown in France in a week as country endures hottest night for 79 years&lt;/a&gt;",
       "size": 12,
       "url": "https://news.sky.com/story/forty-people-drown-in-france-in-a-week-as-country-endures-hottest-night-for-79-years-13557111",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-france-heatwave_7281035.jpg?20260623161410"
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-france-heatwave_7281035.jpg?20260623161410",
+      "pubDate": "2026-06-23T15:10:00.000Z",
+      "source": "https://feeds.skynews.com/feeds/rss/world.xml"
+    },
+    {
+      "id": "sig_47",
+      "group": 2,
+      "label": "Dozens of ships head through Strait of Hormuz after US-Iran deal",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/cx23rnzdgl8o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/bd09/live/958bc530-6f09-11f1-8546-8f19e4fe30f4.png",
+      "pubDate": "2026-06-23T14:55:31.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_48",
+      "group": 2,
+      "label": "Turkey detains over 200 suspects, including alleged ISIS militants, in sweeping raid ahead of NATO summit",
+      "size": 12,
+      "url": "https://www.foxnews.com/world/turkey-detains-200-suspects-including-alleged-isis-militants-sweeping-raid-ahead-nato-summit",
+      "image": "",
+      "pubDate": "2026-06-23T14:47:50.000Z",
+      "source": "https://moxie.foxnews.com/google-publisher/world.xml"
+    },
+    {
+      "id": "sig_49",
+      "group": 2,
+      "label": "After Wars and False Starts, Cautious Optimism for U.S.-Iran Talks",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/middleeast/united-states-iran-talks-optimism.html",
+      "image": "",
+      "pubDate": "2026-06-23T14:02:39.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_50",
+      "group": 2,
+      "label": "Erling Haaland powers Norway into the next round and keeps pace in Golden Boot race",
+      "size": 12,
+      "url": "https://www.nbcnews.com/sports/soccer/erling-haaland-powers-norway-keeps-golden-boot-race-rcna351324",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260623-erling-haaland-vl-934a-fc96ba.jpg",
+      "pubDate": "2026-06-23T13:54:06.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
+    },
+    {
+      "id": "sig_51",
+      "group": 2,
+      "label": "Irish government to contribute £197m to cross-border rail services",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/cd95yd1y050o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/13e2/live/f49071f0-6f06-11f1-87e9-1dc598ae70b3.jpg",
+      "pubDate": "2026-06-23T13:39:03.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_52",
+      "group": 2,
+      "label": "Kenyan minister orders halt to construction of US Ebola facility",
+      "size": 12,
+      "url": "https://www.theguardian.com/world/2026/jun/23/kenya-minister-orders-halt-us-ebola-facility",
+      "image": "",
+      "pubDate": "2026-06-23T13:22:39.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_53",
+      "group": 2,
+      "label": "UK prioritised ties with UAE over averting mass atrocities in Sudan, MPs to be told",
+      "size": 12,
+      "url": "https://www.theguardian.com/global-development/2026/jun/23/uk-ties-uae-mass-atrocities-sudan-mps-select-committee-nathaniel-raymond",
+      "image": "",
+      "pubDate": "2026-06-23T13:15:28.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_54",
+      "group": 2,
+      "label": "Keir Starmer is out. Other establishment politicians are in trouble.",
+      "size": 12,
+      "url": "https://www.washingtonpost.com/world/2026/06/23/starmer-quits-collapse-uks-mainstay-parties-mirrors-global-trend/",
+      "image": "",
+      "pubDate": "2026-06-23T12:39:42.000Z",
+      "source": "https://feeds.washingtonpost.com/rss/world"
     },
     {
       "id": "sig_55",
       "group": 2,
-      "label": "Qatar gas facility explosion kills 13 and leaves dozens injured",
+      "label": "George Washington’s letter accepting British surrender in America goes on display in London",
       "size": 12,
-      "url": "https://news.sky.com/story/explosion-leaves-18-missing-and-dozens-injured-at-key-gas-facility-in-qatar-13556606",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-ras-laffan-qatar-gas_7279764.jpg?20260622084518"
+      "url": "https://www.nbcnews.com/world/united-kingdom/george-washingtons-letter-accepting-british-surrender-america-goes-dis-rcna351333",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260623-george-washington-letter-mb-1206-2c0a1c.jpg",
+      "pubDate": "2026-06-23T12:12:22.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
     },
     {
       "id": "sig_56",
       "group": 2,
-      "label": "Scores of drones target Moscow as Russian strikes on Ukraine kill six",
+      "label": "U.S. shifts its Latin America approach. Here’s how it’s playing out in Guatemala.",
       "size": 12,
-      "url": "https://news.sky.com/story/scores-of-drones-target-moscow-as-russian-strikes-on-ukraine-kill-six-13556621",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-sumy-ukraine-russia-war-invasion_7279713.jpg?20260622075730"
+      "url": "https://www.washingtonpost.com/national-security/2026/06/23/trump-allies-push-america-first-guatemala/",
+      "image": "",
+      "pubDate": "2026-06-23T12:05:02.000Z",
+      "source": "https://feeds.washingtonpost.com/rss/world"
     },
     {
       "id": "sig_57",
       "group": 2,
-      "label": "Former Wimbledon champion given four-year suspension",
+      "label": "Police officer, passer-by and gunman killed in hotel shoot-out",
       "size": 12,
-      "url": "https://news.sky.com/story/former-wimbledon-champion-marketa-vondrousova-given-four-year-suspension-for-refusing-drug-test-13556785",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-wimbledon-marketa-vondrousova_7280151.jpg?20260622151340"
+      "url": "https://news.sky.com/story/its-a-nightmare-police-officer-passer-by-and-gunman-killed-in-hotel-shooting-13557033",
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-montreal-police-shooting_7280876.jpg?20260623125009",
+      "pubDate": "2026-06-23T11:41:00.000Z",
+      "source": "https://feeds.skynews.com/feeds/rss/world.xml"
+    },
+    {
+      "id": "sig_58",
+      "group": 2,
+      "label": "10 years after Brexit, Keir Starmer’s resignation highlights Britain’s deeper issues",
+      "size": 12,
+      "url": "https://www.nbcnews.com/world/united-kingdom/starmer-resignation-britain-chaos-brexit-vote-burnham-economy-rcna351117",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260623-andy-burnham-mb-0838-6e6be6.jpg",
+      "pubDate": "2026-06-23T11:27:04.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
+    },
+    {
+      "id": "sig_59",
+      "group": 2,
+      "label": "Deadly heat wave grips Europe with red alerts and scorching records",
+      "size": 12,
+      "url": "https://www.nbcnews.com/world/europe/europe-heat-wave-france-britain-drowned-record-temperatures-rcna351115",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260623-europe-heatwave-mb-1021-2c07ae.jpg",
+      "pubDate": "2026-06-23T11:21:40.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
+    },
+    {
+      "id": "sig_60",
+      "group": 2,
+      "label": "UN commission of inquiry says Israel committing genocide in Gaza by deliberately targeting children",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/c0jy96w6pw2o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/a51a/live/f1ee76e0-6f06-11f1-8546-8f19e4fe30f4.jpg",
+      "pubDate": "2026-06-23T11:10:06.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_61",
+      "group": 2,
+      "label": "Trump anticipates better relationship with Colombia under new leader",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/c9v278ny9meo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/0543/live/81a0c1a0-6edd-11f1-92d8-97879fd3f743.jpg",
+      "pubDate": "2026-06-23T10:27:04.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_62",
+      "group": 2,
+      "label": "Those British Strawberries Are Being Picked by Central Asian Workers",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/europe/uk-brexit-seasonal-farm-workers-central-asia.html",
+      "image": "",
+      "pubDate": "2026-06-23T10:16:21.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_63",
+      "group": 2,
+      "label": "Spider which uses spring trap to capture prey discovered in Australia",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/c70y138y995o?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/fd2f/live/66e03ec0-6eee-11f1-b3b4-39330bfcd14d.jpg",
+      "pubDate": "2026-06-23T10:05:53.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_64",
+      "group": 2,
+      "label": "Trump gets major win against China in African rare earth minerals race",
+      "size": 12,
+      "url": "https://www.foxnews.com/world/trump-gets-major-win-against-china-african-rare-earth-minerals-race",
+      "image": "",
+      "pubDate": "2026-06-23T10:00:20.000Z",
+      "source": "https://moxie.foxnews.com/google-publisher/world.xml"
+    },
+    {
+      "id": "sig_65",
+      "group": 2,
+      "label": "Soldier, Scholar and Symbol: Marc Bloch Is Elevated to France’s Panthéon",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/europe/marc-bloch-pantheon-france.html",
+      "image": "",
+      "pubDate": "2026-06-23T09:27:02.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_66",
+      "group": 2,
+      "label": "Iran Makes Moves to Assert Control Over the Strait of Hormuz",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/middleeast/iran-control-strait-of-hormuz.html",
+      "image": "",
+      "pubDate": "2026-06-23T09:01:32.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_67",
+      "group": 2,
+      "label": "Delcy Rodríguez, Venezuela’s President, Struggles to Uphold Trump’s Narrative of Success",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/americas/venezuela-oil-delcy-rodriguez-trump.html",
+      "image": "",
+      "pubDate": "2026-06-23T09:00:49.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_68",
+      "group": 2,
+      "label": "Montreal shooting leaves officer, civilian and suspect dead",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/c5yz3lv015qo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5f02/live/0d76a1e0-6e7a-11f1-ab41-9551c72e4c6d.jpg",
+      "pubDate": "2026-06-23T08:36:38.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_69",
+      "group": 2,
+      "label": "At World Cup Soccer Game, Palestinian Emblems Abound",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/23/world/europe/world-cup-jordan-palestinians.html",
+      "image": "",
+      "pubDate": "2026-06-23T06:27:37.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_70",
+      "group": 2,
+      "label": "Whistleblower investigating Ecuadorian president’s family business was murdered, activists say",
+      "size": 12,
+      "url": "https://www.theguardian.com/world/2026/jun/23/monika-silva-koniuszek-ecuador-president-family-business",
+      "image": "",
+      "pubDate": "2026-06-23T06:00:33.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_71",
+      "group": 2,
+      "label": "Billionaire to invest in ocean protection as UK and US scale back funding",
+      "size": 12,
+      "url": "https://news.sky.com/story/billionaire-to-invest-in-ocean-protection-as-uk-and-us-scale-back-funding-13556720",
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-palau-oceans-pacific_7280239.jpg?20260622165042",
+      "pubDate": "2026-06-23T04:00:00.000Z",
+      "source": "https://feeds.skynews.com/feeds/rss/world.xml"
+    },
+    {
+      "id": "sig_72",
+      "group": 2,
+      "label": "Defending Against China-Nexus Covert Networks of Compromised Devices",
+      "size": 12,
+      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa26-113a",
+      "image": "",
+      "pubDate": "2026-04-21T15:12:37.000Z",
+      "source": "cisa"
+    },
+    {
+      "id": "sig_73",
+      "group": 1,
+      "label": "Iranian-Affiliated Cyber Actors Exploit Programmable Logic Controllers Across US Critical Infrastructure",
+      "size": 12,
+      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa26-097a",
+      "image": "",
+      "pubDate": "2026-04-06T11:03:58.000Z",
+      "source": "cisa"
+    },
+    {
+      "id": "sig_74",
+      "group": 1,
+      "label": "Pro-Russia Hacktivists Conduct Opportunistic Attacks Against US and Global Critical Infrastructure",
+      "size": 12,
+      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-343a",
+      "image": "",
+      "pubDate": "2025-12-05T19:35:38.000Z",
+      "source": "cisa"
+    },
+    {
+      "id": "sig_75",
+      "group": 2,
+      "label": "CISA Shares Lessons Learned from an Incident Response Engagement",
+      "size": 12,
+      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-266a",
+      "image": "",
+      "pubDate": "2025-09-22T15:12:49.000Z",
+      "source": "cisa"
+    },
+    {
+      "id": "sig_76",
+      "group": 2,
+      "label": "Countering Chinese State-Sponsored Actors Compromise of Networks Worldwide to Feed Global Espionage System",
+      "size": 12,
+      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa25-239a",
+      "image": "",
+      "pubDate": "2025-08-25T13:36:40.000Z",
+      "source": "cisa"
     }
   ],
   "links": [
@@ -628,11 +934,6 @@
       "value": 1
     },
     {
-      "source": "sig_0",
-      "target": "reg_asia",
-      "value": 1
-    },
-    {
       "source": "sig_1",
       "target": "reg_na",
       "value": 1
@@ -643,33 +944,33 @@
       "value": 1
     },
     {
-      "source": "sig_1",
-      "target": "theme_cyber",
-      "value": 2
+      "source": "sig_2",
+      "target": "theme_sport",
+      "value": 1
     },
     {
-      "source": "sig_2",
+      "source": "sig_3",
       "target": "reg_na",
       "value": 1
     },
     {
-      "source": "sig_2",
-      "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_2",
-      "target": "theme_cyber",
-      "value": 2
-    },
-    {
       "source": "sig_3",
-      "target": "theme_geo",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_4",
-      "target": "theme_geo",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_4",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_4",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -679,12 +980,17 @@
     },
     {
       "source": "sig_5",
-      "target": "theme_cyber",
-      "value": 2
+      "target": "reg_me",
+      "value": 1
     },
     {
       "source": "sig_6",
-      "target": "theme_geo",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_6",
+      "target": "sig_5",
       "value": 1
     },
     {
@@ -693,13 +999,18 @@
       "value": 1
     },
     {
+      "source": "sig_7",
+      "target": "sig_6",
+      "value": 1
+    },
+    {
       "source": "sig_8",
       "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_8",
-      "target": "reg_eu",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -714,22 +1025,27 @@
     },
     {
       "source": "sig_10",
-      "target": "reg_eu",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_11",
-      "target": "theme_geo",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_12",
-      "target": "reg_me",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_12",
+      "target": "sig_11",
       "value": 1
     },
     {
       "source": "sig_13",
-      "target": "reg_eu",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -738,18 +1054,8 @@
       "value": 1
     },
     {
-      "source": "sig_14",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_14",
-      "target": "sig_13",
-      "value": 1
-    },
-    {
       "source": "sig_15",
-      "target": "reg_me",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -759,17 +1065,27 @@
     },
     {
       "source": "sig_16",
-      "target": "theme_geo",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_16",
+      "target": "sig_15",
       "value": 1
     },
     {
       "source": "sig_17",
-      "target": "reg_na",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_17",
+      "target": "sig_16",
       "value": 1
     },
     {
       "source": "sig_18",
-      "target": "reg_na",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -783,8 +1099,18 @@
       "value": 1
     },
     {
+      "source": "sig_19",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
       "source": "sig_20",
       "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_20",
+      "target": "reg_eu",
       "value": 1
     },
     {
@@ -799,7 +1125,7 @@
     },
     {
       "source": "sig_21",
-      "target": "theme_geo",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -814,27 +1140,32 @@
     },
     {
       "source": "sig_23",
-      "target": "reg_me",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_23",
-      "target": "sig_22",
+      "target": "reg_me",
       "value": 1
     },
     {
       "source": "sig_24",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_24",
-      "target": "sig_23",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_25",
-      "target": "reg_asia",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_25",
+      "target": "theme_econ",
+      "value": 1
+    },
+    {
+      "source": "sig_25",
+      "target": "sig_24",
       "value": 1
     },
     {
@@ -843,103 +1174,93 @@
       "value": 1
     },
     {
-      "source": "sig_26",
+      "source": "sig_27",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_27",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_27",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_27",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_27",
-      "target": "sig_26",
       "value": 1
     },
     {
       "source": "sig_28",
-      "target": "reg_afr",
-      "value": 1
-    },
-    {
-      "source": "sig_29",
-      "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_30",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_30",
-      "target": "sig_29",
-      "value": 1
-    },
-    {
-      "source": "sig_31",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_31",
-      "target": "reg_asia",
-      "value": 1
-    },
-    {
-      "source": "sig_31",
-      "target": "reg_afr",
-      "value": 1
-    },
-    {
-      "source": "sig_32",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_33",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_33",
-      "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_33",
-      "target": "sig_32",
-      "value": 1
-    },
-    {
-      "source": "sig_34",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_34",
-      "target": "sig_33",
-      "value": 1
-    },
-    {
-      "source": "sig_35",
       "target": "reg_me",
       "value": 1
     },
     {
-      "source": "sig_35",
-      "target": "sig_34",
+      "source": "sig_28",
+      "target": "sig_27",
       "value": 1
     },
     {
-      "source": "sig_36",
+      "source": "sig_29",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_29",
+      "target": "sig_28",
+      "value": 1
+    },
+    {
+      "source": "sig_30",
       "target": "theme_geo",
       "value": 1
     },
     {
-      "source": "sig_37",
+      "source": "sig_31",
       "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_31",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_32",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_32",
+      "target": "sig_31",
+      "value": 1
+    },
+    {
+      "source": "sig_33",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_34",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_35",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_35",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_36",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_37",
+      "target": "reg_eu",
       "value": 1
     },
     {
@@ -949,22 +1270,17 @@
     },
     {
       "source": "sig_38",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_38",
-      "target": "reg_me",
+      "target": "reg_asia",
       "value": 1
     },
     {
       "source": "sig_39",
-      "target": "reg_na",
+      "target": "reg_afr",
       "value": 1
     },
     {
       "source": "sig_40",
-      "target": "theme_geo",
+      "target": "reg_eu",
       "value": 1
     },
     {
@@ -974,7 +1290,7 @@
     },
     {
       "source": "sig_41",
-      "target": "theme_sport",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -993,7 +1309,22 @@
       "value": 1
     },
     {
+      "source": "sig_43",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_43",
+      "target": "sig_42",
+      "value": 1
+    },
+    {
       "source": "sig_44",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_45",
       "target": "reg_me",
       "value": 1
     },
@@ -1003,18 +1334,8 @@
       "value": 1
     },
     {
-      "source": "sig_45",
-      "target": "sig_44",
-      "value": 1
-    },
-    {
       "source": "sig_46",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_46",
-      "target": "theme_sport",
+      "target": "reg_eu",
       "value": 1
     },
     {
@@ -1024,12 +1345,12 @@
     },
     {
       "source": "sig_47",
-      "target": "reg_me",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_47",
-      "target": "sig_46",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1053,33 +1374,23 @@
       "value": 1
     },
     {
-      "source": "sig_50",
-      "target": "reg_eu",
+      "source": "sig_49",
+      "target": "sig_48",
       "value": 1
     },
     {
       "source": "sig_50",
-      "target": "sig_49",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_51",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_51",
-      "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_51",
-      "target": "sig_50",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_52",
-      "target": "theme_geo",
+      "target": "reg_na",
       "value": 1
     },
     {
@@ -1089,12 +1400,12 @@
     },
     {
       "source": "sig_53",
-      "target": "reg_na",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_53",
-      "target": "reg_eu",
+      "target": "reg_afr",
       "value": 1
     },
     {
@@ -1104,37 +1415,207 @@
     },
     {
       "source": "sig_54",
-      "target": "reg_eu",
-      "value": 1
-    },
-    {
-      "source": "sig_55",
       "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_55",
-      "target": "sig_54",
-      "value": 1
-    },
-    {
-      "source": "sig_56",
       "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_56",
-      "target": "reg_eu",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_57",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_57",
       "target": "sig_56",
+      "value": 1
+    },
+    {
+      "source": "sig_58",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_59",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_59",
+      "target": "sig_58",
+      "value": 1
+    },
+    {
+      "source": "sig_60",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_61",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_61",
+      "target": "sig_60",
+      "value": 1
+    },
+    {
+      "source": "sig_62",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_63",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_64",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_64",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_64",
+      "target": "reg_afr",
+      "value": 1
+    },
+    {
+      "source": "sig_64",
+      "target": "sig_63",
+      "value": 1
+    },
+    {
+      "source": "sig_65",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_66",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_67",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_67",
+      "target": "sig_66",
+      "value": 1
+    },
+    {
+      "source": "sig_68",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_68",
+      "target": "sig_67",
+      "value": 1
+    },
+    {
+      "source": "sig_69",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_69",
+      "target": "sig_68",
+      "value": 1
+    },
+    {
+      "source": "sig_70",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_70",
+      "target": "sig_69",
+      "value": 1
+    },
+    {
+      "source": "sig_71",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_71",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_72",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_72",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_73",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_73",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_73",
+      "target": "theme_cyber",
+      "value": 2
+    },
+    {
+      "source": "sig_73",
+      "target": "sig_72",
+      "value": 1
+    },
+    {
+      "source": "sig_74",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_74",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_74",
+      "target": "theme_cyber",
+      "value": 2
+    },
+    {
+      "source": "sig_75",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_75",
+      "target": "sig_74",
+      "value": 1
+    },
+    {
+      "source": "sig_76",
+      "target": "theme_geo",
       "value": 1
     }
   ]

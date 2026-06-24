@@ -4,13 +4,21 @@ const https = require('https');
 
 // Live Intelligence Feeds
 const FEEDS = [
-    "https://www.cisa.gov/uscert/ncas/alerts.xml",
     "https://feeds.bbci.co.uk/news/world/rss.xml",
     "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
     "https://moxie.foxnews.com/google-publisher/world.xml",
     "https://www.aljazeera.com/xml/rss/all.xml",
-    "https://feeds.skynews.com/feeds/rss/world.xml"
+    "https://feeds.skynews.com/feeds/rss/world.xml",
+    "https://rss.politico.com/politics-news.xml",
+    "https://feeds.washingtonpost.com/rss/world",
+    "https://www.theguardian.com/world/rss",
+    "https://feeds.nbcnews.com/nbcnews/public/world"
 ];
+
+// Drop CISA from the main feed — long-lived advisories that make the globe look stale.
+// Keep it as a secondary cyber-only feed with its own freshness rules.
+const CYBER_FEED = "https://www.cisa.gov/uscert/ncas/alerts.xml";
+const MAX_AGE_HOURS = 24; // Only show items published within last 24 hours
 
 async function fetchUrl(url) {
     const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
@@ -18,26 +26,55 @@ async function fetchUrl(url) {
     return await res.text();
 }
 
+function parsePubDate(itemXml) {
+    // Try standard RSS pubDate
+    let match = itemXml.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i);
+    if (match) {
+        const d = new Date(match[1].trim());
+        if (!isNaN(d)) return d;
+    }
+    // Try Atom published
+    match = itemXml.match(/<published[^>]*>([\s\S]*?)<\/published>/i);
+    if (match) {
+        const d = new Date(match[1].trim());
+        if (!isNaN(d)) return d;
+    }
+    // Try Atom updated
+    match = itemXml.match(/<updated[^>]*>([\s\S]*?)<\/updated>/i);
+    if (match) {
+        const d = new Date(match[1].trim());
+        if (!isNaN(d)) return d;
+    }
+    return null;
+}
+
+function isFresh(pubDate, maxAgeHours) {
+    if (!pubDate) return true; // No date = keep (better to show than drop)
+    const ageMs = Date.now() - pubDate.getTime();
+    const maxMs = maxAgeHours * 60 * 60 * 1000;
+    return ageMs <= maxMs;
+}
+
 async function fetchSignals() {
     const signals = [];
+    const now = new Date();
+
+    // News feeds — strict 24h freshness filter
     for (const url of FEEDS) {
         try {
             console.log(`Fetching ${url}...`);
             const xml = await fetchUrl(url);
             
-            // Extract individual items
             const items = xml.match(/<item[^>]*>([\s\S]*?)<\/item>/gi) || xml.match(/<entry[^>]*>([\s\S]*?)<\/entry>/gi) || [];
             
-            for (let i = 0; i < Math.min(items.length, 10); i++) {
+            for (let i = 0; i < Math.min(items.length, 15); i++) {
                 const itemXml = items[i];
                 
-                // Get title
                 let titleMatch = itemXml.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
                 if (!titleMatch) continue;
                 let text = titleMatch[1].trim();
                 text = text.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1');
                 
-                // Get link
                 let linkMatch = itemXml.match(/<link[^>]*>([\s\S]*?)<\/link>/i) || itemXml.match(/<link[^>]*href="([^"]+)"/i);
                 let linkUrl = '';
                 if (linkMatch) {
@@ -45,15 +82,19 @@ async function fetchSignals() {
                     linkUrl = linkUrl.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1');
                 }
                 
-                // Get image/thumbnail
                 let imgMatch = itemXml.match(/<media:thumbnail[^>]*url="([^"]+)"/i) || itemXml.match(/<enclosure[^>]*url="([^"]+)"/i);
                 let imgUrl = imgMatch ? imgMatch[1] : '';
+
+                const pubDate = parsePubDate(itemXml);
+                if (!isFresh(pubDate, MAX_AGE_HOURS)) continue;
                 
                 if (text && !text.includes('BBC News - World') && !text.includes('National Cyber Awareness System')) {
                     signals.push({
                         title: text,
                         url: linkUrl,
-                        image: imgUrl
+                        image: imgUrl,
+                        pubDate: pubDate ? pubDate.toISOString() : null,
+                        source: url
                     });
                 }
             }
@@ -61,7 +102,51 @@ async function fetchSignals() {
             console.error(`Error fetching ${url}:`, e.message);
         }
     }
-    return signals;
+
+    // Cyber feed — keep last 5 CISA advisories regardless of age (they're slow-moving but important)
+    try {
+        console.log(`Fetching ${CYBER_FEED}...`);
+        const xml = await fetchUrl(CYBER_FEED);
+        const items = xml.match(/<item[^>]*>([\s\S]*?)<\/item>/gi) || [];
+        for (let i = 0; i < Math.min(items.length, 5); i++) {
+            const itemXml = items[i];
+            let titleMatch = itemXml.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+            if (!titleMatch) continue;
+            let text = titleMatch[1].trim();
+            text = text.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1');
+            let linkMatch = itemXml.match(/<link[^>]*>([\s\S]*?)<\/link>/i);
+            let linkUrl = linkMatch ? (linkMatch[1] || '').trim() : '';
+            const pubDate = parsePubDate(itemXml);
+            signals.push({
+                title: text,
+                url: linkUrl,
+                image: '',
+                pubDate: pubDate ? pubDate.toISOString() : null,
+                source: 'cisa'
+            });
+        }
+    } catch (e) {
+        console.error(`Error fetching cyber feed:`, e.message);
+    }
+
+    // Deduplicate by title
+    const seen = new Set();
+    const deduped = signals.filter(s => {
+        const key = s.title.toLowerCase().substring(0, 80);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+
+    // Sort by pubDate descending (newest first), undated items last
+    deduped.sort((a, b) => {
+        if (!a.pubDate && !b.pubDate) return 0;
+        if (!a.pubDate) return 1;
+        if (!b.pubDate) return -1;
+        return new Date(b.pubDate) - new Date(a.pubDate);
+    });
+
+    return deduped;
 }
 
 // Procedurally generate a rich interconnected ontology from headlines
@@ -106,7 +191,7 @@ function buildProceduralOntology(signals) {
     links.push({ source: "theme_sport", target: "reg_me", value: 1 });
     links.push({ source: "theme_sport", target: "reg_sa", value: 1 });
 
-    // Process headlines
+    // Process headlines (already sorted newest-first by fetchSignals)
     signals.forEach((sigObj, idx) => {
         const sig = sigObj.title;
         const id = `sig_${idx}`;
@@ -118,7 +203,9 @@ function buildProceduralOntology(signals) {
             label: sig, 
             size: 12,
             url: sigObj.url,
-            image: sigObj.image
+            image: sigObj.image,
+            pubDate: sigObj.pubDate || null,
+            source: sigObj.source || ''
         });
         
         // Naive routing based on keywords
