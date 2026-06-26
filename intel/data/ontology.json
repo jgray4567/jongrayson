@@ -69,15 +69,455 @@
     {
       "id": "sig_0",
       "group": 2,
-      "label": "Iran war day 119: Israel hits Lebanon as IAEA says it will return to Iran",
+      "label": "Venezuela Live Updates: More Rescuers Join Urgent Search for Quake Survivors",
       "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/26/iran-war-day-119-israel-hits-lebanon-as-iaea-says-it-will-return-to-iran?traffic_source=rss",
+      "url": "https://www.nytimes.com/live/2026/06/26/world/venezuela-earthquake",
       "image": "",
-      "pubDate": "2026-06-26T07:07:47.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+      "pubDate": "2026-06-26T11:56:37.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
     },
     {
       "id": "sig_1",
+      "group": 2,
+      "label": "As Europe Sweats, Some Politicians Talk of Air-Conditioning, Not Climate Action",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/26/world/europe/europe-heat-climate-change-politics.html",
+      "image": "",
+      "pubDate": "2026-06-26T11:55:15.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_2",
+      "group": 2,
+      "label": "Venezuela earthquakes: international rescue teams arrive, as 235 confirmed dead so far – latest updates",
+      "size": 12,
+      "url": "https://www.theguardian.com/world/live/2026/jun/26/venezuela-earthquakes-search-survivors-death-toll-rodriguez-rubio-latest-news-updates",
+      "image": "",
+      "pubDate": "2026-06-26T11:53:26.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_3",
+      "group": 2,
+      "label": "Europe’s Scorching Heat Is Gradually Moving East",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/26/weather/europe-heat-wave-temperatures.html",
+      "image": "",
+      "pubDate": "2026-06-26T11:49:00.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_4",
+      "group": 2,
+      "label": "UN pauses Strait of Hormuz evacuation plan after cargo ship attacked",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/cjwg9np904qo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/e8e8/live/eed0f000-70c3-11f1-b607-85b4e4066ca8.jpg",
+      "pubDate": "2026-06-26T11:27:59.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_5",
+      "group": 2,
+      "label": "Egypt vs Iran at World Cup 2026 – Salah, prediction, lineups, how to watch",
+      "size": 12,
+      "url": "https://www.aljazeera.com/sports/2026/6/26/egypt-vs-iran-world-cup-2026-prediction-kickoff-schedule-teams?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T11:25:13.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_6",
+      "group": 2,
+      "label": "After Attacking Cargo Ship, Iran Presses Its Claim to Authority Over Strait",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/26/world/middleeast/strait-of-hormuz-iran-attack.html",
+      "image": "",
+      "pubDate": "2026-06-26T11:17:11.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_7",
+      "group": 2,
+      "label": "Can Europe’s historic cities survive a warming climate?",
+      "size": 12,
+      "url": "https://www.aljazeera.com/opinions/2026/6/26/can-europes-historic-cities-survive-a-warming-climate?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T11:06:57.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_8",
+      "group": 2,
+      "label": "‘Chock full of incredible animals’: marine expedition uncovers 31 new species in two weeks",
+      "size": 12,
+      "url": "https://www.theguardian.com/environment/2026/jun/26/marine-expedition-uncovers-31-new-species-two-weeks-brazil",
+      "image": "",
+      "pubDate": "2026-06-26T11:06:37.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_9",
+      "group": 2,
+      "label": "Trump finds partner in supreme court in his war against immigration",
+      "size": 12,
+      "url": "https://www.theguardian.com/us-news/2026/jun/26/trump-supreme-court-immigration",
+      "image": "",
+      "pubDate": "2026-06-26T11:00:14.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_10",
+      "group": 2,
+      "label": "Hormuz traffic flows despite ship attack as Iran fights to keep its grip on key trade route",
+      "size": 12,
+      "url": "https://www.nbcnews.com/world/iran/hormuz-traffic-flows-ship-attack-iran-trade-route-rcna351885",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-05/260523-iran-hormuz-flag-3x2-ww-1758-37402c.jpg",
+      "pubDate": "2026-06-26T10:58:24.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
+    },
+    {
+      "id": "sig_11",
+      "group": 2,
+      "label": "Whereabouts of nearly 300 people with Ebola unknown in DR Congo",
+      "size": 12,
+      "url": "https://www.theguardian.com/global-development/2026/jun/26/whereabouts-of-nearly-300-people-with-ebola-unknown-in-drc",
+      "image": "",
+      "pubDate": "2026-06-26T10:55:56.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_12",
+      "group": 2,
+      "label": "Christmas market attacker jailed for life for murdering six in Germany",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/cy06y63y6lno?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3dd3/live/369ff970-7142-11f1-8e1d-bbbb1017d210.jpg",
+      "pubDate": "2026-06-26T10:49:11.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_13",
+      "group": 2,
+      "label": "Wes Moore lays out his vision for America",
+      "size": 12,
+      "url": "https://www.politico.com/news/2026/06/26/wes-moore-july-fourth-trump-00977783",
+      "image": "https://static.politico.com/08/1b/7d45dd77433ab0edcd643ebafa84/governors-summit-12540.jpg",
+      "pubDate": "2026-06-26T10:40:00.000Z",
+      "source": "https://rss.politico.com/politics-news.xml"
+    },
+    {
+      "id": "sig_14",
+      "group": 2,
+      "label": "IAEA demands verification of Iran nuclear ambitions amid ‘statement war’",
+      "size": 12,
+      "url": "https://www.aljazeera.com/news/2026/6/26/iaea-demands-strong-verification-of-irans-nuclear-programme?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T10:38:38.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_15",
+      "group": 2,
+      "label": "Senior Ukrainian intelligence official jailed for life for spying for Russia",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/cg4w3wyxzzno?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/aa56/live/c5e73e20-e94b-11ef-80e0-a5172a55ed51.jpg",
+      "pubDate": "2026-06-26T10:38:37.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_16",
+      "group": 2,
+      "label": "Who has profited most from the war on Iran?",
+      "size": 12,
+      "url": "https://www.aljazeera.com/news/2026/6/26/who-has-profited-most-from-the-war-on-iran?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T10:25:20.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_17",
+      "group": 2,
+      "label": "Baby pulled alive from rubble after Venezuela earthquake",
+      "size": 12,
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/26/baby-pulled-alive-from-rubble-after-venezuela-earthquake?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T10:23:01.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_18",
+      "group": 2,
+      "label": "Heat Wave Prompts Paris to Suspend Sports Events and Public Drinking",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/26/world/europe/france-heat-alcohol-paris-ban.html",
+      "image": "",
+      "pubDate": "2026-06-26T10:18:00.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_19",
+      "group": 2,
+      "label": "Ryanair Stops Charging for Parents to Sit With Their Children",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/26/world/europe/ryanair-fee-children-seats.html",
+      "image": "",
+      "pubDate": "2026-06-26T10:15:15.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_20",
+      "group": 2,
+      "label": "Russia reports downing 660 Ukrainian drones, denies seeking Belarus war aid",
+      "size": 12,
+      "url": "https://www.aljazeera.com/news/2026/6/26/russia-reports-downing-660-ukrainian-drones-denies-seeking-belarus-war-aid?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T10:12:32.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_21",
+      "group": 2,
+      "label": "FIFA World Cup: Friday schedule, predictions, standings, knockout race",
+      "size": 12,
+      "url": "https://www.aljazeera.com/sports/2026/6/26/fifa-world-cup-friday-schedule-predictions-standings-knockout-race?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T10:08:05.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_22",
+      "group": 2,
+      "label": "Outrage as woman jailed for three years after criticising Somali government online",
+      "size": 12,
+      "url": "https://www.theguardian.com/global-development/2026/jun/26/woman-sadia-moalim-ali-three-year-jail-sentence-somalia-online-comments-governement",
+      "image": "",
+      "pubDate": "2026-06-26T10:00:14.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_23",
+      "group": 2,
+      "label": "Mother gives birth amid Venezuela earthquake devastation",
+      "size": 12,
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/26/mother-gives-birth-amid-venezuela-earthquake-devastation?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T09:57:50.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_24",
+      "group": 2,
+      "label": "Venezuelans search through rubble as earthquake death toll rises",
+      "size": 12,
+      "url": "https://www.nbcnews.com/world/latin-america/venezuela-eartquake-death-toll-trapped-rcna351884",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260626-venezuela-mb-0941-4b93ce.jpg",
+      "pubDate": "2026-06-26T09:54:22.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
+    },
+    {
+      "id": "sig_25",
+      "group": 2,
+      "label": "When it comes to soccer, there is no such thing as a United Kingdom",
+      "size": 12,
+      "url": "https://www.washingtonpost.com/sports/2026/06/27/scotlands-second-favorite-world-cup-team-anyone-playing-england/",
+      "image": "",
+      "pubDate": "2026-06-26T09:48:13.000Z",
+      "source": "https://feeds.washingtonpost.com/rss/world"
+    },
+    {
+      "id": "sig_26",
+      "group": 2,
+      "label": "Housing board votes to freeze New York rents in victory for Mamdani",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/cn947pxxz4yo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/46de/live/03f01d40-7131-11f1-992d-bb5874cdc3c0.jpg",
+      "pubDate": "2026-06-26T09:42:26.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_27",
+      "group": 2,
+      "label": "Venezuela earthquakes: Why is Caracas so vulnerable?",
+      "size": 12,
+      "url": "https://www.aljazeera.com/news/2026/6/26/venezuela-earthquakes-why-is-caracas-so-vulnerable?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T09:36:27.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_28",
+      "group": 2,
+      "label": "In AI race vs. U.S., China eyes a come-from-behind victory",
+      "size": 12,
+      "url": "https://www.washingtonpost.com/world/2026/06/26/ai-race-china-aims-be-tortoise-with-come-from-behind-win-over-us/",
+      "image": "",
+      "pubDate": "2026-06-26T09:29:29.000Z",
+      "source": "https://feeds.washingtonpost.com/rss/world"
+    },
+    {
+      "id": "sig_29",
+      "group": 2,
+      "label": "‘London cooking’: Why can’t the UK cope with the heat; when will it adapt?",
+      "size": 12,
+      "url": "https://www.aljazeera.com/news/2026/6/26/feeling-the-heat-the-uk-is-cooking?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T09:20:53.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_30",
+      "group": 2,
+      "label": "Iraq’s New Leader Faces Resistance Trying to Bring Militias Under State Control",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/25/world/middleeast/iraq-militias-state-control.html",
+      "image": "",
+      "pubDate": "2026-06-26T09:12:02.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_31",
+      "group": 2,
+      "label": "Iran’s Long World Cup Journey Defined by War and Political Tension",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/26/world/middleeast/world-cup-iran-mexico.html",
+      "image": "",
+      "pubDate": "2026-06-26T09:01:44.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_32",
+      "group": 2,
+      "label": "How Three Months of War Changed the Gulf Forever",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/26/world/middleeast/gulf-changed-forever-iran-war.html",
+      "image": "",
+      "pubDate": "2026-06-26T09:01:04.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_33",
+      "group": 2,
+      "label": "Quakes give U.S. opportunity to transform Venezuela from foe to friend",
+      "size": 12,
+      "url": "https://www.washingtonpost.com/world/2026/06/26/quakes-give-us-opportunity-transform-venezuela-foe-friend/",
+      "image": "",
+      "pubDate": "2026-06-26T09:00:00.000Z",
+      "source": "https://feeds.washingtonpost.com/rss/world"
+    },
+    {
+      "id": "sig_34",
+      "group": 2,
+      "label": "Scientists reveal secrets of ancient scrolls burned by Mount Vesuvius nearly 2,000 years ago",
+      "size": 12,
+      "url": "https://www.nbcnews.com/world/italy/scientists-reveal-secrets-ancient-scrolls-burned-mount-vesuvius-nearly-rcna351178",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260626-pompeii-4-rs-30a4d9.jpg",
+      "pubDate": "2026-06-26T09:00:00.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
+    },
+    {
+      "id": "sig_35",
+      "group": 2,
+      "label": "Zelensky Steps Up Threats Against Belarus for Aiding Drone Attacks",
+      "size": 12,
+      "url": "https://www.nytimes.com/2026/06/26/world/europe/zelensky-belarus-drones-relay.html",
+      "image": "",
+      "pubDate": "2026-06-26T08:38:34.000Z",
+      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+    },
+    {
+      "id": "sig_36",
+      "group": 2,
+      "label": "‘Affordability crisis’: How the Western housing crisis spiralled",
+      "size": 12,
+      "url": "https://www.aljazeera.com/economy/2026/6/26/affordability-crisis-how-the-western-housing-crisis-spiralled?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T08:36:52.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_37",
+      "group": 2,
+      "label": "Watch World Cup Day 15: Netherlands, Australia advance; Curacao eliminated",
+      "size": 12,
+      "url": "https://www.aljazeera.com/video/2026/6/26/video-world-cup-2026-highlights?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T08:30:41.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_38",
+      "group": 2,
+      "label": "Weather tracker: Heatwave expected to bring Germany and Poland to 40C",
+      "size": 12,
+      "url": "https://www.theguardian.com/environment/2026/jun/26/weather-tracker-heatwave-germany-poland-40c-temperatures",
+      "image": "",
+      "pubDate": "2026-06-26T08:22:52.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_39",
+      "group": 2,
+      "label": "North Korea conducts major weapons tests; South training ‘drone warriors’",
+      "size": 12,
+      "url": "https://www.aljazeera.com/news/2026/6/26/north-korea-conducts-major-weapons-tests-south-training-drone-warriors?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T08:16:33.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_40",
+      "group": 2,
+      "label": "Driver plows through Mexico World Cup crowd",
+      "size": 12,
+      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/26/driver-plows-through-mexico-world-cup-crowd?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T08:13:58.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_41",
+      "group": 2,
+      "label": "World aids rescue effort as Venezuela quake death toll hits 235",
+      "size": 12,
+      "url": "https://www.aljazeera.com/news/2026/6/26/neighbours-aid-rescue-effort-as-venezuela-quake-death-toll-hits-235?traffic_source=rss",
+      "image": "",
+      "pubDate": "2026-06-26T08:02:28.000Z",
+      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+    },
+    {
+      "id": "sig_42",
+      "group": 2,
+      "label": "Mexico’s new UK ambassador from ‘party of poor’ has 10 houses and £1m of jewellery",
+      "size": 12,
+      "url": "https://www.theguardian.com/world/2026/jun/26/luxury-assets-mexico-new-ambassador-uk-alejandro-gertz-manero",
+      "image": "",
+      "pubDate": "2026-06-26T08:00:12.000Z",
+      "source": "https://www.theguardian.com/world/rss"
+    },
+    {
+      "id": "sig_43",
+      "group": 2,
+      "label": "Norway fans invade the U.S. with viral ‘Viking row’",
+      "size": 12,
+      "url": "https://www.nbcnews.com/video/norway-fans-invade-the-u-s-with-viral-viking-row-265721413973",
+      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/mpx/2704722219/2026_06/norwegian_fans-amc2km.jpg",
+      "pubDate": "2026-06-26T07:49:46.000Z",
+      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
+    },
+    {
+      "id": "sig_44",
+      "group": 2,
+      "label": "Asia stock markets slide as tech shares slump",
+      "size": 12,
+      "url": "https://www.bbc.co.uk/news/articles/ce8jz40k00ro?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/d7de/live/1bd3b890-7118-11f1-b071-fbfa4a952290.jpg",
+      "pubDate": "2026-06-26T07:33:10.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
+    },
+    {
+      "id": "sig_45",
       "group": 1,
       "label": "A $2.5 Billion Whodunit: The Hack That Dented the U.K. Economy",
       "size": 12,
@@ -87,37 +527,27 @@
       "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
     },
     {
-      "id": "sig_2",
-      "group": 2,
-      "label": "UN pauses Strait of Hormuz evacuation plan after cargo ship attacked",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/cjwg9np904qo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/e8e8/live/eed0f000-70c3-11f1-b607-85b4e4066ca8.jpg",
-      "pubDate": "2026-06-26T06:49:22.000Z",
-      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
-    },
-    {
-      "id": "sig_3",
+      "id": "sig_46",
       "group": 2,
       "label": "Reflecting Pool liner cut with sharp knife or razor, National Park Service says",
       "size": 12,
       "url": "https://www.bbc.co.uk/news/articles/cn8qxz6qypyo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/a10e/live/0cc4bd90-7118-11f1-8546-8f19e4fe30f4.jpg",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/8b01/live/23e949a0-7136-11f1-be59-4b2938e11145.jpg",
       "pubDate": "2026-06-26T06:16:01.000Z",
       "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_4",
+      "id": "sig_47",
       "group": 2,
-      "label": "Man who killed six at Christmas market in Germany sentenced to life in prison",
+      "label": "Christmas market terrorist who drove into crowds jailed for life",
       "size": 12,
       "url": "https://news.sky.com/story/man-who-killed-six-in-car-attack-on-magdeburg-christmas-market-sentenced-to-life-in-prison-13557910",
-      "image": "https://e3.365dm.com/26/04/1920x1080/skynews-breaking-breakingnews_7210863.png?20260516142605",
+      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-germany-christmas-market_7283263.jpg?20260626082151",
       "pubDate": "2026-06-26T06:14:00.000Z",
       "source": "https://feeds.skynews.com/feeds/rss/world.xml"
     },
     {
-      "id": "sig_5",
+      "id": "sig_48",
       "group": 2,
       "label": "South Korea to train half a million military personnel to become ‘drone warriors’",
       "size": 12,
@@ -127,77 +557,17 @@
       "source": "https://www.theguardian.com/world/rss"
     },
     {
-      "id": "sig_6",
+      "id": "sig_49",
       "group": 2,
-      "label": "US ends deportation protections (TPS) for Haitians and Syrians",
+      "label": "Aerial footage reveals destruction in coastal Venezuela",
       "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/26/us-ends-deportation-protections-tps-for-haitians-and-syrians?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T05:25:44.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
+      "url": "https://www.bbc.co.uk/news/videos/c75y1kd16qdo?at_medium=RSS&amp;at_campaign=rss",
+      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/567c/live/234daf40-711d-11f1-8546-8f19e4fe30f4.jpg",
+      "pubDate": "2026-06-26T05:13:22.000Z",
+      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_7",
-      "group": 2,
-      "label": "Turkiye beat US with stoppage-time goal in World Cup dead rubber",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/26/turkiye-usa-fifa-world-cup-2026-ayhan-guler-yilmaz-trusty-berhalter-pulisic?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T04:44:06.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_8",
-      "group": 2,
-      "label": "Which teams have qualified for the World Cup 2026 knockouts, round of 32?",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/26/which-teams-have-qualified-for-the-world-cup-2026-knockouts-round-of-32?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T04:20:22.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_9",
-      "group": 2,
-      "label": "Apple, Microsoft hike prices over surging chip costs",
-      "size": 12,
-      "url": "https://www.aljazeera.com/economy/2026/6/26/apple-microsoft-hike-prices-over-surging-chip-costs?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T04:17:14.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_10",
-      "group": 2,
-      "label": "Australia reach World Cup knockouts after gritty draw with Paraguay",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/26/australia-paraguay-fifa-world-cup-2026-score-report-socceroos?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T04:15:20.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_11",
-      "group": 2,
-      "label": "In London, You Can Celebrate America’s 250th Birthday From the British Side",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/26/travel/america-250-birthday-london-uk.html",
-      "image": "",
-      "pubDate": "2026-06-26T04:05:12.000Z",
-      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
-    },
-    {
-      "id": "sig_12",
-      "group": 2,
-      "label": "Egypt coach offers support for Iranian team before crucial World Cup match",
-      "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/26/egypt-coach-offers-support-for-iranian-team-before-crucial-world-cup-match?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T04:04:29.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_13",
+      "id": "sig_50",
       "group": 2,
       "label": "World Cups Fans in Myanmar Boycott Junta-Linked Broadcasts",
       "size": 12,
@@ -207,7 +577,7 @@
       "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
     },
     {
-      "id": "sig_14",
+      "id": "sig_51",
       "group": 2,
       "label": "Finland's President Stubb on Trump, Putin and the future of NATO",
       "size": 12,
@@ -217,37 +587,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_15",
-      "group": 2,
-      "label": "Satellite images show Venezuela’s La Guaira before and after twin quakes",
-      "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/26/satellite-images-show-venezuelas-la-guaira-before-and-after-twin-quakes?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T03:50:29.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_16",
-      "group": 2,
-      "label": "Rescuers search rubble for survivors as Venezuela earthquakes kill at least 235",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/cjegdqw5d3yo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5ff4/live/aa946140-70f7-11f1-9a82-89f06f847cb2.jpg",
-      "pubDate": "2026-06-26T03:24:12.000Z",
-      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
-    },
-    {
-      "id": "sig_17",
-      "group": 2,
-      "label": "Forever wars: Israel’s cycle of conflict shows no finish line",
-      "size": 12,
-      "url": "https://www.aljazeera.com/news/2026/6/26/forever-wars-israels-conflict-cycle-shows-no-finish-line?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T03:16:13.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_18",
+      "id": "sig_52",
       "group": 2,
       "label": "Who's who from the Trump administration",
       "size": 12,
@@ -257,37 +597,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_19",
-      "group": 2,
-      "label": "Oil prices ease after spiking over halt to Strait of Hormuz evacuation plan",
-      "size": 12,
-      "url": "https://www.aljazeera.com/economy/2026/6/26/oil-prices-climb-after-attack-in-strait-of-hormuz-halts-evacuation-plan?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T02:35:10.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_20",
-      "group": 2,
-      "label": "Marina Mabrey ties WNBA scoring record with 53 points; Tempo rout Sparks",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/26/marina-mabrey-ties-wnba-scoring-record-with-53-points-tempo-rout-sparks?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T02:25:53.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_21",
-      "group": 2,
-      "label": "Netherlands beat Tunisia 3-1, enter World Cup knockouts as group winners",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/26/netherlands-beat-tunisia-3-1-enter-world-cup-knockouts-as-group-winners?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T02:22:01.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_22",
+      "id": "sig_53",
       "group": 2,
       "label": "Supreme Court allows Trump to end protected status for Haitian and Syrian immigrants",
       "size": 12,
@@ -297,7 +607,7 @@
       "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_23",
+      "id": "sig_54",
       "group": 2,
       "label": "Usha Vance, Kamala Harris and Hasan Piker walk into a ... stadium",
       "size": 12,
@@ -307,17 +617,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_24",
-      "group": 2,
-      "label": "Hundreds trapped beneath buildings a day after Venezuela’s twin earthquakes",
-      "size": 12,
-      "url": "https://www.aljazeera.com/video/newsfeed/2026/6/26/hundreds-trapped-beneath-buildings-a-day-after-venezuelas-twin-earthquakes?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T02:13:54.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_25",
+      "id": "sig_55",
       "group": 2,
       "label": "Potential 2028er World Cup attendee leaderboard",
       "size": 12,
@@ -327,7 +627,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_26",
+      "id": "sig_56",
       "group": 2,
       "label": "Earthquake is devastating blow to Venezuela at time of uncertainty  ",
       "size": 12,
@@ -337,27 +637,7 @@
       "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_27",
-      "group": 2,
-      "label": "Ivory Coast coach Fae saddened by Schweinsteiger’s ‘African football’ jab",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/26/ivory-coast-coach-fae-saddened-by-schweinsteigers-african-football-jab?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T01:55:56.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_28",
-      "group": 2,
-      "label": "Japan draw 1-1 with Sweden at World Cup to finish second in Group F",
-      "size": 12,
-      "url": "https://www.aljazeera.com/sports/2026/6/26/japan-draw-1-1-with-sweden-at-world-cup-to-finish-second-in-group-f?traffic_source=rss",
-      "image": "",
-      "pubDate": "2026-06-26T01:46:59.000Z",
-      "source": "https://www.aljazeera.com/xml/rss/all.xml"
-    },
-    {
-      "id": "sig_29",
+      "id": "sig_57",
       "group": 2,
       "label": "Rescue teams race to Venezuela amid fears thousands killed in earthquakes",
       "size": 12,
@@ -367,7 +647,7 @@
       "source": "https://www.theguardian.com/world/rss"
     },
     {
-      "id": "sig_30",
+      "id": "sig_58",
       "group": 2,
       "label": "Xi Jinping has hosted more than a dozen leaders this year, as ‘middle powers’ look beyond the US",
       "size": 12,
@@ -377,7 +657,7 @@
       "source": "https://www.theguardian.com/world/rss"
     },
     {
-      "id": "sig_31",
+      "id": "sig_59",
       "group": 2,
       "label": "Row over alleged theft of donations from India's landmark Ram temple",
       "size": 12,
@@ -387,7 +667,7 @@
       "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_32",
+      "id": "sig_60",
       "group": 2,
       "label": "Usha Vance to attend match",
       "size": 12,
@@ -397,7 +677,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_33",
+      "id": "sig_61",
       "group": 2,
       "label": "Democrats grapple uncomfortably with World Cup success",
       "size": 12,
@@ -407,7 +687,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_34",
+      "id": "sig_62",
       "group": 2,
       "label": "Can Cape Verde keep its World Cup Cinderella story going?",
       "size": 12,
@@ -417,17 +697,7 @@
       "source": "https://feeds.nbcnews.com/nbcnews/public/world"
     },
     {
-      "id": "sig_35",
-      "group": 2,
-      "label": "Officials Shut Down Kenya’s Capital to Block Protest",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/25/world/africa/kenya-protest-nairobi-shutdown.html",
-      "image": "",
-      "pubDate": "2026-06-26T00:17:51.000Z",
-      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
-    },
-    {
-      "id": "sig_36",
+      "id": "sig_63",
       "group": 2,
       "label": "Australia lost. Its ambassador still won.",
       "size": 12,
@@ -437,7 +707,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_37",
+      "id": "sig_64",
       "group": 2,
       "label": "Paris restricts alcohol consumption and sales as Europe's heatwave shifts east",
       "size": 12,
@@ -447,17 +717,7 @@
       "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_38",
-      "group": 2,
-      "label": "Experts say three recent powerful earthquakes are not related",
-      "size": 12,
-      "url": "https://www.theguardian.com/world/2026/jun/25/three-recent-powerful-earthquakes-not-related",
-      "image": "",
-      "pubDate": "2026-06-26T00:01:12.000Z",
-      "source": "https://www.theguardian.com/world/rss"
-    },
-    {
-      "id": "sig_39",
+      "id": "sig_65",
       "group": 2,
       "label": "Canada's biggest fan may be its biggest problem",
       "size": 12,
@@ -467,7 +727,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_40",
+      "id": "sig_66",
       "group": 2,
       "label": "Orange gush: KC mayor parties with the Dutch",
       "size": 12,
@@ -477,7 +737,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_41",
+      "id": "sig_67",
       "group": 2,
       "label": "Iran Strikes Ship in Strait of Hormuz, Undermining Efforts to Restore Traffic",
       "size": 12,
@@ -487,7 +747,7 @@
       "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
     },
     {
-      "id": "sig_42",
+      "id": "sig_68",
       "group": 2,
       "label": "Search for survivors underway as earthquake in Venezuela puts strain on resources",
       "size": 12,
@@ -497,7 +757,7 @@
       "source": "https://feeds.nbcnews.com/nbcnews/public/world"
     },
     {
-      "id": "sig_43",
+      "id": "sig_69",
       "group": 2,
       "label": "How much longer can Donald Trump go missing from the World Cup?",
       "size": 12,
@@ -507,7 +767,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_44",
+      "id": "sig_70",
       "group": 2,
       "label": "Meloni allies fail to take over Italian soccer",
       "size": 12,
@@ -517,7 +777,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_45",
+      "id": "sig_71",
       "group": 2,
       "label": "What to know about ‘doublet’ earthquakes like the destructive pair that hit Venezuela",
       "size": 12,
@@ -527,17 +787,7 @@
       "source": "https://feeds.nbcnews.com/nbcnews/public/world"
     },
     {
-      "id": "sig_46",
-      "group": 2,
-      "label": "King Charles III Has Paid More Than $39.6 Million in Taxes, Palace Discloses in a U.K. First",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/25/world/europe/king-charles-taxes-uk.html",
-      "image": "",
-      "pubDate": "2026-06-25T21:06:09.000Z",
-      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
-    },
-    {
-      "id": "sig_47",
+      "id": "sig_72",
       "group": 2,
       "label": "King Charles reveals his personal tax bill. Spoiler alert: He’s very rich.",
       "size": 12,
@@ -547,7 +797,7 @@
       "source": "https://feeds.washingtonpost.com/rss/world"
     },
     {
-      "id": "sig_48",
+      "id": "sig_73",
       "group": 2,
       "label": "Spot the Pol!",
       "size": 12,
@@ -557,7 +807,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_49",
+      "id": "sig_74",
       "group": 2,
       "label": "The newest GOP campaign surrogates: Confused tourists at Waffle House",
       "size": 12,
@@ -567,17 +817,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_50",
-      "group": 2,
-      "label": "Venezuela earthquakes: ‘intensive’ search for survivors as death toll rises to 188 – as it happened",
-      "size": 12,
-      "url": "https://www.theguardian.com/world/live/2026/jun/25/venezuela-earthquake-live-updates-quake-aftershocks-terremoto-caracas-latest",
-      "image": "",
-      "pubDate": "2026-06-25T19:47:19.000Z",
-      "source": "https://www.theguardian.com/world/rss"
-    },
-    {
-      "id": "sig_51",
+      "id": "sig_75",
       "group": 2,
       "label": "New evidence casts doubt on RFK Jr testimony before Senate",
       "size": 12,
@@ -587,7 +827,7 @@
       "source": "https://www.theguardian.com/world/rss"
     },
     {
-      "id": "sig_52",
+      "id": "sig_76",
       "group": 2,
       "label": "NBC News reporter in Venezuela says people she knows might be missing under rubble",
       "size": 12,
@@ -597,7 +837,7 @@
       "source": "https://feeds.nbcnews.com/nbcnews/public/world"
     },
     {
-      "id": "sig_53",
+      "id": "sig_77",
       "group": 2,
       "label": "For South Korean men, there's only one uniform that matters",
       "size": 12,
@@ -607,7 +847,7 @@
       "source": "https://rss.politico.com/politics-news.xml"
     },
     {
-      "id": "sig_54",
+      "id": "sig_78",
       "group": 2,
       "label": "Women alleging rape and sexual assault in France call to abolish statute of limitations",
       "size": 12,
@@ -617,7 +857,7 @@
       "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_55",
+      "id": "sig_79",
       "group": 2,
       "label": "UN suspends Strait of Hormuz evacuation after ship 'hit by projectile'",
       "size": 12,
@@ -627,17 +867,7 @@
       "source": "https://feeds.skynews.com/feeds/rss/world.xml"
     },
     {
-      "id": "sig_56",
-      "group": 2,
-      "label": "Black, red and complicated",
-      "size": 12,
-      "url": "https://www.politico.com/live-updates/2026/06/25/world-cup-2026/germany-flag-nationalism-complicated-red-black-gold-00975928",
-      "image": "https://static.politico.com/df/51/9ffaab26419b889f169c383cabbd/https-delivery-gettyimages.com/downloads/2282628953",
-      "pubDate": "2026-06-25T18:40:00.000Z",
-      "source": "https://rss.politico.com/politics-news.xml"
-    },
-    {
-      "id": "sig_57",
+      "id": "sig_80",
       "group": 2,
       "label": "Rubio’s new job? Selling Trump’s Iran deal to a worried Gulf.",
       "size": 12,
@@ -647,7 +877,7 @@
       "source": "https://feeds.washingtonpost.com/rss/world"
     },
     {
-      "id": "sig_58",
+      "id": "sig_81",
       "group": 2,
       "label": "Migrants not entitled to apply for asylum while standing on Mexico side of border, Supreme Court rules",
       "size": 12,
@@ -657,7 +887,7 @@
       "source": "https://feeds.washingtonpost.com/rss/world"
     },
     {
-      "id": "sig_59",
+      "id": "sig_82",
       "group": 2,
       "label": "Families lay flowers on barbed wire barricade on anniversary of deadly Kenya protests",
       "size": 12,
@@ -667,7 +897,7 @@
       "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_60",
+      "id": "sig_83",
       "group": 2,
       "label": "Race to find Venezuela quake survivors buried under rubble as death toll rises to 235",
       "size": 12,
@@ -677,7 +907,7 @@
       "source": "https://feeds.nbcnews.com/nbcnews/public/world"
     },
     {
-      "id": "sig_61",
+      "id": "sig_84",
       "group": 2,
       "label": "Deadly Heat Wave in Europe Continues to Smash Temperature Records",
       "size": 12,
@@ -687,17 +917,7 @@
       "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
     },
     {
-      "id": "sig_62",
-      "group": 2,
-      "label": "‘Paralysed by fear’: Venezuelans tell of escape and loss after huge earthquakes",
-      "size": 12,
-      "url": "https://www.theguardian.com/world/2026/jun/25/paralysed-by-fear-venezuelans-tell-of-escape-and-loss-after-huge-earthquakes",
-      "image": "",
-      "pubDate": "2026-06-25T16:23:52.000Z",
-      "source": "https://www.theguardian.com/world/rss"
-    },
-    {
-      "id": "sig_63",
+      "id": "sig_85",
       "group": 2,
       "label": "‘Constitutional coup’ claims as Zimbabwe senate approves extending presidential term",
       "size": 12,
@@ -707,47 +927,7 @@
       "source": "https://www.theguardian.com/world/rss"
     },
     {
-      "id": "sig_64",
-      "group": 2,
-      "label": "US, Cuba and Iran join global rescue effort after Venezuela earthquakes",
-      "size": 12,
-      "url": "https://www.theguardian.com/global-development/2026/jun/25/us-cuba-iran-global-rescue-effort-venezuela-earthquakes",
-      "image": "",
-      "pubDate": "2026-06-25T15:55:02.000Z",
-      "source": "https://www.theguardian.com/world/rss"
-    },
-    {
-      "id": "sig_65",
-      "group": 2,
-      "label": "Oil price falls back to pre-Iran war levels",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/c0jy7d7wzv4o?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/7800/live/6edd4700-7086-11f1-b1db-af71d47507d6.jpg",
-      "pubDate": "2026-06-25T15:32:04.000Z",
-      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
-    },
-    {
-      "id": "sig_66",
-      "group": 2,
-      "label": "A Right-Wing Election Victory in Colombia, With a Little Help from Trump",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/25/world/americas/colombia-election-de-la-espriella-trump.html",
-      "image": "",
-      "pubDate": "2026-06-25T14:45:13.000Z",
-      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
-    },
-    {
-      "id": "sig_67",
-      "group": 2,
-      "label": "Graphic: The U.K. is in a new era of leadership turnover",
-      "size": 12,
-      "url": "https://www.nbcnews.com/data-graphics/united-kingdom-new-era-leadership-turnover-rcna351275",
-      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260622-trump-starmer-bf-1722-0a08c9.jpg",
-      "pubDate": "2026-06-25T14:39:10.000Z",
-      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
-    },
-    {
-      "id": "sig_68",
+      "id": "sig_86",
       "group": 2,
       "label": "British TikToker could face death penalty after Dubai murder charge",
       "size": 12,
@@ -757,17 +937,7 @@
       "source": "https://feeds.skynews.com/feeds/rss/world.xml"
     },
     {
-      "id": "sig_69",
-      "group": 2,
-      "label": "Key figure in South Africa police corruption scandal pleads guilty",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/cx2j4g5k52jo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3e05/live/9e33e940-709b-11f1-a21f-5d8df4493658.jpg",
-      "pubDate": "2026-06-25T14:00:13.000Z",
-      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
-    },
-    {
-      "id": "sig_70",
+      "id": "sig_87",
       "group": 2,
       "label": "Can a Youth Boom Survive South Sudan’s Education Crisis?",
       "size": 12,
@@ -777,17 +947,7 @@
       "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
     },
     {
-      "id": "sig_71",
-      "group": 2,
-      "label": "Temperature records smashed as extreme heat wave grips Europe",
-      "size": 12,
-      "url": "https://www.nbcnews.com/world/europe/europe-heatwave-france-spain-uk-record-temperatures-eiffel-tower-rcna351710",
-      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260625-paris-2-rs-f1f13e.jpg",
-      "pubDate": "2026-06-25T12:45:50.000Z",
-      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
-    },
-    {
-      "id": "sig_72",
+      "id": "sig_88",
       "group": 2,
       "label": "Ryanair says it will reluctantly not charge parents to sit next to children",
       "size": 12,
@@ -797,107 +957,7 @@
       "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
     },
     {
-      "id": "sig_73",
-      "group": 2,
-      "label": "People flee as building collapses on Caracas outskirts",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/videos/c78y1e3606vo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3baf/live/7b34b590-70a6-11f1-8e1d-bbbb1017d210.jpg",
-      "pubDate": "2026-06-25T12:08:30.000Z",
-      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
-    },
-    {
-      "id": "sig_74",
-      "group": 2,
-      "label": "U.N. agency pauses Strait of Hormuz evacuation effort as ship is struck off Oman",
-      "size": 12,
-      "url": "https://www.nbcnews.com/world/iran/oil-tanker-passes-strait-hormuz-iran-threats-traffic-trump-tolls-oman-rcna351704",
-      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260625-hormuz-rs-dcece0.jpg",
-      "pubDate": "2026-06-25T10:59:52.000Z",
-      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
-    },
-    {
-      "id": "sig_75",
-      "group": 2,
-      "label": "TV presenter set to lose job over Tommy Robinson interview",
-      "size": 12,
-      "url": "https://news.sky.com/story/australias-highest-paid-tv-presenter-faces-backlash-over-tommy-robinson-interview-13557660",
-      "image": "https://e3.365dm.com/26/06/1920x1080/skynews-karl-stefanovic-tommy-robinson_7282568.jpg?20260625120532",
-      "pubDate": "2026-06-25T10:32:00.000Z",
-      "source": "https://feeds.skynews.com/feeds/rss/world.xml"
-    },
-    {
-      "id": "sig_76",
-      "group": 2,
-      "label": "Senate Republicans reject Iran war powers resolution after clashing with Trump at Capitol meeting",
-      "size": 12,
-      "url": "https://www.nbcnews.com/politics/congress/senate-republicans-reject-war-powers-resolution-trump-cassidy-clash-rcna351703",
-      "image": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit_1500w/rockcms/2026-06/260625-trump-rs-0abf1f.jpg",
-      "pubDate": "2026-06-25T10:16:21.000Z",
-      "source": "https://feeds.nbcnews.com/nbcnews/public/world"
-    },
-    {
-      "id": "sig_77",
-      "group": 2,
-      "label": "Israel slams UN report as &apos;political blood libel&apos; for alleging deliberate targeting of Palestinian children",
-      "size": 12,
-      "url": "https://www.foxnews.com/world/israel-slams-un-report-political-blood-libel-alleging-deliberate-targeting-palestinian-children",
-      "image": "",
-      "pubDate": "2026-06-25T10:13:37.000Z",
-      "source": "https://moxie.foxnews.com/google-publisher/world.xml"
-    },
-    {
-      "id": "sig_78",
-      "group": 2,
-      "label": "IBM hails new 'block of flats' design breakthrough for ultra tiny chips",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/cvg7vpyn5pxo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/e645/live/ebbfb1a0-7071-11f1-9af3-ff9a7832a0f3.jpg",
-      "pubDate": "2026-06-25T10:04:43.000Z",
-      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
-    },
-    {
-      "id": "sig_79",
-      "group": 2,
-      "label": "North Korean soldier crosses border into South Korea in suspected defection",
-      "size": 12,
-      "url": "https://news.sky.com/story/north-korean-soldier-crosses-border-into-south-korea-in-suspected-defection-13557640",
-      "image": "https://e3.365dm.com/24/06/1920x1080/skynews-south-korea-north-korea_6584336.jpg?20240618042221",
-      "pubDate": "2026-06-25T09:29:00.000Z",
-      "source": "https://feeds.skynews.com/feeds/rss/world.xml"
-    },
-    {
-      "id": "sig_80",
-      "group": 2,
-      "label": "Iraq’s New Leader Faces Resistance Trying to Bring Militias Under State Control",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/25/world/middleeast/iraq-militias-state-control.html",
-      "image": "",
-      "pubDate": "2026-06-25T09:15:28.000Z",
-      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
-    },
-    {
-      "id": "sig_81",
-      "group": 2,
-      "label": "Trump asks Congress for billions for Iran war, after tension with Republicans",
-      "size": 12,
-      "url": "https://www.bbc.co.uk/news/articles/c1eydwldzdjo?at_medium=RSS&amp;at_campaign=rss",
-      "image": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/6509/live/094ddba0-702e-11f1-86a5-c78e0086fe7e.jpg",
-      "pubDate": "2026-06-25T09:06:59.000Z",
-      "source": "https://feeds.bbci.co.uk/news/world/rss.xml"
-    },
-    {
-      "id": "sig_82",
-      "group": 2,
-      "label": "To Escape the Heat, Parisians Jump into an Old Industrial Canal",
-      "size": 12,
-      "url": "https://www.nytimes.com/2026/06/25/world/europe/paris-canal-swimming-heatwave-france.html",
-      "image": "",
-      "pubDate": "2026-06-25T08:17:40.000Z",
-      "source": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
-    },
-    {
-      "id": "sig_83",
+      "id": "sig_89",
       "group": 2,
       "label": "Defending Against China-Nexus Covert Networks of Compromised Devices",
       "size": 12,
@@ -907,7 +967,7 @@
       "source": "cisa"
     },
     {
-      "id": "sig_84",
+      "id": "sig_90",
       "group": 1,
       "label": "Iranian-Affiliated Cyber Actors Exploit Programmable Logic Controllers Across US Critical Infrastructure",
       "size": 12,
@@ -917,7 +977,7 @@
       "source": "cisa"
     },
     {
-      "id": "sig_85",
+      "id": "sig_91",
       "group": 1,
       "label": "Pro-Russia Hacktivists Conduct Opportunistic Attacks Against US and Global Critical Infrastructure",
       "size": 12,
@@ -927,7 +987,7 @@
       "source": "cisa"
     },
     {
-      "id": "sig_86",
+      "id": "sig_92",
       "group": 2,
       "label": "CISA Shares Lessons Learned from an Incident Response Engagement",
       "size": 12,
@@ -937,7 +997,7 @@
       "source": "cisa"
     },
     {
-      "id": "sig_87",
+      "id": "sig_93",
       "group": 2,
       "label": "Countering Chinese State-Sponsored Actors Compromise of Networks Worldwide to Feed Global Espionage System",
       "size": 12,
@@ -1040,47 +1100,37 @@
     },
     {
       "source": "sig_0",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_1",
-      "target": "theme_econ",
-      "value": 1
-    },
-    {
-      "source": "sig_1",
-      "target": "theme_cyber",
-      "value": 2
-    },
-    {
-      "source": "sig_2",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_3",
       "target": "theme_geo",
       "value": 1
     },
     {
-      "source": "sig_4",
+      "source": "sig_1",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_2",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_3",
       "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_4",
-      "target": "theme_econ",
-      "value": 1
-    },
-    {
-      "source": "sig_4",
-      "target": "sig_3",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_5",
-      "target": "reg_asia",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_5",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -1090,92 +1140,102 @@
     },
     {
       "source": "sig_6",
-      "target": "reg_na",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_6",
+      "target": "sig_5",
       "value": 1
     },
     {
       "source": "sig_7",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_7",
-      "target": "theme_sport",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_8",
-      "target": "theme_sport",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_9",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_10",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_10",
       "target": "theme_econ",
       "value": 1
     },
     {
-      "source": "sig_9",
-      "target": "sig_8",
-      "value": 1
-    },
-    {
       "source": "sig_10",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_10",
-      "target": "theme_sport",
+      "target": "sig_9",
       "value": 1
     },
     {
       "source": "sig_11",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_12",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_12",
+      "target": "theme_econ",
+      "value": 1
+    },
+    {
+      "source": "sig_12",
+      "target": "sig_11",
+      "value": 1
+    },
+    {
+      "source": "sig_13",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_14",
       "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_12",
-      "target": "theme_sport",
-      "value": 1
-    },
-    {
-      "source": "sig_13",
-      "target": "theme_sport",
-      "value": 1
-    },
-    {
-      "source": "sig_13",
-      "target": "sig_12",
-      "value": 1
-    },
-    {
-      "source": "sig_14",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_14",
-      "target": "sig_13",
       "value": 1
     },
     {
       "source": "sig_15",
-      "target": "theme_geo",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_15",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_15",
+      "target": "sig_14",
       "value": 1
     },
     {
       "source": "sig_16",
-      "target": "theme_geo",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_16",
+      "target": "sig_15",
       "value": 1
     },
     {
       "source": "sig_17",
-      "target": "reg_me",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -1185,17 +1245,22 @@
     },
     {
       "source": "sig_19",
-      "target": "theme_econ",
-      "value": 1
-    },
-    {
-      "source": "sig_20",
       "target": "theme_geo",
       "value": 1
     },
     {
+      "source": "sig_19",
+      "target": "sig_18",
+      "value": 1
+    },
+    {
       "source": "sig_20",
-      "target": "sig_19",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_20",
+      "target": "reg_eu",
       "value": 1
     },
     {
@@ -1205,17 +1270,17 @@
     },
     {
       "source": "sig_22",
-      "target": "reg_na",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_22",
+      "target": "sig_21",
       "value": 1
     },
     {
       "source": "sig_23",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_23",
-      "target": "sig_22",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -1229,53 +1294,38 @@
       "value": 1
     },
     {
+      "source": "sig_25",
+      "target": "sig_24",
+      "value": 1
+    },
+    {
       "source": "sig_26",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_27",
       "target": "theme_geo",
       "value": 1
     },
     {
-      "source": "sig_26",
-      "target": "sig_25",
-      "value": 1
-    },
-    {
-      "source": "sig_27",
-      "target": "reg_afr",
-      "value": 1
-    },
-    {
-      "source": "sig_27",
-      "target": "theme_sport",
-      "value": 1
-    },
-    {
       "source": "sig_28",
       "target": "reg_asia",
       "value": 1
     },
     {
       "source": "sig_28",
-      "target": "theme_sport",
+      "target": "sig_27",
       "value": 1
     },
     {
       "source": "sig_29",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_29",
-      "target": "sig_28",
+      "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_30",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_30",
-      "target": "reg_asia",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -1285,32 +1335,47 @@
     },
     {
       "source": "sig_31",
-      "target": "reg_asia",
+      "target": "reg_me",
       "value": 1
     },
     {
-      "source": "sig_32",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_32",
+      "source": "sig_31",
       "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_32",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_33",
-      "target": "theme_sport",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_34",
-      "target": "theme_sport",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_34",
+      "target": "sig_33",
       "value": 1
     },
     {
       "source": "sig_35",
-      "target": "theme_geo",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_35",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_35",
+      "target": "sig_34",
       "value": 1
     },
     {
@@ -1320,22 +1385,27 @@
     },
     {
       "source": "sig_37",
-      "target": "reg_eu",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_37",
-      "target": "sig_36",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_38",
-      "target": "theme_geo",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_38",
+      "target": "sig_37",
       "value": 1
     },
     {
       "source": "sig_39",
-      "target": "theme_geo",
+      "target": "reg_asia",
       "value": 1
     },
     {
@@ -1344,13 +1414,33 @@
       "value": 1
     },
     {
+      "source": "sig_40",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_40",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
       "source": "sig_41",
-      "target": "reg_me",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_42",
-      "target": "theme_geo",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_42",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_42",
+      "target": "reg_asia",
       "value": 1
     },
     {
@@ -1360,17 +1450,17 @@
     },
     {
       "source": "sig_43",
-      "target": "reg_na",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_43",
-      "target": "theme_sport",
+      "target": "sig_42",
       "value": 1
     },
     {
       "source": "sig_44",
-      "target": "theme_sport",
+      "target": "theme_econ",
       "value": 1
     },
     {
@@ -1380,17 +1470,22 @@
     },
     {
       "source": "sig_45",
-      "target": "theme_geo",
+      "target": "theme_econ",
+      "value": 1
+    },
+    {
+      "source": "sig_45",
+      "target": "theme_cyber",
+      "value": 2
+    },
+    {
+      "source": "sig_45",
+      "target": "sig_44",
       "value": 1
     },
     {
       "source": "sig_46",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_46",
-      "target": "sig_45",
       "value": 1
     },
     {
@@ -1400,12 +1495,12 @@
     },
     {
       "source": "sig_48",
-      "target": "theme_geo",
+      "target": "reg_asia",
       "value": 1
     },
     {
       "source": "sig_49",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -1415,7 +1510,7 @@
     },
     {
       "source": "sig_50",
-      "target": "theme_geo",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -1425,32 +1520,42 @@
     },
     {
       "source": "sig_51",
-      "target": "theme_geo",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_51",
+      "target": "sig_50",
       "value": 1
     },
     {
       "source": "sig_52",
-      "target": "theme_geo",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_52",
+      "target": "sig_51",
       "value": 1
     },
     {
       "source": "sig_53",
-      "target": "reg_asia",
-      "value": 1
-    },
-    {
-      "source": "sig_53",
-      "target": "sig_52",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_54",
-      "target": "reg_eu",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_54",
+      "target": "sig_53",
       "value": 1
     },
     {
       "source": "sig_55",
-      "target": "reg_na",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -1474,16 +1579,6 @@
       "value": 1
     },
     {
-      "source": "sig_57",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_57",
-      "target": "sig_56",
-      "value": 1
-    },
-    {
       "source": "sig_58",
       "target": "reg_na",
       "value": 1
@@ -1500,47 +1595,47 @@
     },
     {
       "source": "sig_59",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_59",
-      "target": "sig_58",
+      "target": "reg_asia",
       "value": 1
     },
     {
       "source": "sig_60",
-      "target": "theme_geo",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_60",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_60",
+      "target": "sig_59",
       "value": 1
     },
     {
       "source": "sig_61",
-      "target": "reg_eu",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_61",
+      "target": "sig_60",
       "value": 1
     },
     {
       "source": "sig_62",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_62",
-      "target": "sig_61",
+      "target": "theme_sport",
       "value": 1
     },
     {
       "source": "sig_63",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_64",
       "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_64",
-      "target": "reg_me",
+      "target": "reg_eu",
       "value": 1
     },
     {
@@ -1550,12 +1645,7 @@
     },
     {
       "source": "sig_65",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_65",
-      "target": "theme_econ",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -1565,22 +1655,27 @@
     },
     {
       "source": "sig_67",
-      "target": "theme_geo",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_67",
+      "target": "sig_66",
       "value": 1
     },
     {
       "source": "sig_68",
       "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_68",
-      "target": "sig_67",
       "value": 1
     },
     {
       "source": "sig_69",
-      "target": "reg_afr",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_69",
+      "target": "theme_sport",
       "value": 1
     },
     {
@@ -1590,17 +1685,22 @@
     },
     {
       "source": "sig_70",
-      "target": "reg_afr",
+      "target": "theme_sport",
+      "value": 1
+    },
+    {
+      "source": "sig_70",
+      "target": "sig_69",
       "value": 1
     },
     {
       "source": "sig_71",
-      "target": "reg_eu",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_72",
-      "target": "theme_geo",
+      "target": "theme_econ",
       "value": 1
     },
     {
@@ -1625,17 +1725,17 @@
     },
     {
       "source": "sig_76",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_76",
-      "target": "reg_me",
+      "target": "sig_75",
       "value": 1
     },
     {
       "source": "sig_77",
-      "target": "reg_me",
+      "target": "reg_asia",
       "value": 1
     },
     {
@@ -1645,7 +1745,7 @@
     },
     {
       "source": "sig_78",
-      "target": "theme_geo",
+      "target": "reg_eu",
       "value": 1
     },
     {
@@ -1659,18 +1759,13 @@
       "value": 1
     },
     {
-      "source": "sig_79",
-      "target": "reg_asia",
+      "source": "sig_80",
+      "target": "reg_na",
       "value": 1
     },
     {
       "source": "sig_80",
-      "target": "theme_geo",
-      "value": 1
-    },
-    {
-      "source": "sig_80",
-      "target": "sig_79",
+      "target": "reg_me",
       "value": 1
     },
     {
@@ -1680,57 +1775,32 @@
     },
     {
       "source": "sig_81",
-      "target": "reg_me",
+      "target": "reg_asia",
       "value": 1
     },
     {
       "source": "sig_82",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_83",
-      "target": "reg_na",
+      "target": "theme_geo",
       "value": 1
     },
     {
       "source": "sig_83",
-      "target": "reg_asia",
+      "target": "sig_82",
       "value": 1
     },
     {
       "source": "sig_84",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_84",
-      "target": "reg_me",
-      "value": 1
-    },
-    {
-      "source": "sig_84",
-      "target": "theme_cyber",
-      "value": 2
-    },
-    {
-      "source": "sig_85",
-      "target": "reg_na",
-      "value": 1
-    },
-    {
-      "source": "sig_85",
       "target": "reg_eu",
       "value": 1
     },
     {
       "source": "sig_85",
-      "target": "theme_cyber",
-      "value": 2
-    },
-    {
-      "source": "sig_85",
-      "target": "sig_84",
+      "target": "theme_geo",
       "value": 1
     },
     {
@@ -1739,12 +1809,72 @@
       "value": 1
     },
     {
-      "source": "sig_86",
-      "target": "sig_85",
+      "source": "sig_87",
+      "target": "reg_afr",
       "value": 1
     },
     {
-      "source": "sig_87",
+      "source": "sig_88",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_88",
+      "target": "sig_87",
+      "value": 1
+    },
+    {
+      "source": "sig_89",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_89",
+      "target": "reg_asia",
+      "value": 1
+    },
+    {
+      "source": "sig_89",
+      "target": "sig_88",
+      "value": 1
+    },
+    {
+      "source": "sig_90",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_90",
+      "target": "reg_me",
+      "value": 1
+    },
+    {
+      "source": "sig_90",
+      "target": "theme_cyber",
+      "value": 2
+    },
+    {
+      "source": "sig_91",
+      "target": "reg_na",
+      "value": 1
+    },
+    {
+      "source": "sig_91",
+      "target": "reg_eu",
+      "value": 1
+    },
+    {
+      "source": "sig_91",
+      "target": "theme_cyber",
+      "value": 2
+    },
+    {
+      "source": "sig_92",
+      "target": "theme_geo",
+      "value": 1
+    },
+    {
+      "source": "sig_93",
       "target": "theme_geo",
       "value": 1
     }
