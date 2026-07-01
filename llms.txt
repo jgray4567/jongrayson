@@ -1,0 +1,31 @@
+# jongrayson.com — llms.txt
+# AI search context file for ChatGPT, Perplexity, Claude, Google AI
+
+> Jon Grayson is a Director of UX & Design based in Washington, DC, with 25+ years building digital products. He runs Grayson Design Partners (graysondp.com), a design and technology studio.
+
+## What this site is
+Jon Grayson's personal portfolio and professional website. It showcases UX/design case studies, AI/ML workflow lessons, and interactive data visualization projects including a real-time global intelligence dashboard and Pittsburgh crime heatmap.
+
+## Key pages
+- **Homepage:** https://www.jongrayson.com/ — overview of capabilities, AI consulting, and intelligence work
+- **Case Studies:** https://www.jongrayson.com/casestudies/ — 5 detailed UX/design case studies (onboarding, AI workflows, design systems, mobile growth, behavioral design)
+- **AI Playbook Lessons:** https://www.jongrayson.com/lessons/ — 9 practical lessons on AI-augmented workflows (constraint-first prompting, vetting loops, quality checks, knowledge hygiene, workflow augmentation, research synthesis, skill preservation, iteration depth)
+- **Intel Dashboard:** https://www.jongrayson.com/intel/ — interactive global intelligence dashboard with real-time data visualization
+- **Resume:** https://www.jongrayson.com/resume/ — professional experience and credentials
+
+## Services
+- UX/UI design and design systems
+- AI workflow consulting and implementation
+- Data visualization and intelligence dashboards
+- Product strategy and design leadership
+
+## Contact
+- Email: jon@jongrayson.com
+- LinkedIn: https://www.linkedin.com/in/jongrayson
+- Studio: https://graysondp.com
+
+## Notes
+- Site is built with vanilla HTML/CSS/JS, no framework
+- Hosted on DreamHost
+- Intel dashboard uses Three.js for 3D globe visualization
+- Case studies cover work from BlankPage, AI workflows, design systems, mobile-first growth, and behavioral design

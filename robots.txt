@@ -1,0 +1,23 @@
+User-agent: *
+Crawl-delay: 10
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /config/
+
+# AI crawlers welcome
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://www.jongrayson.com/sitemap.xml
