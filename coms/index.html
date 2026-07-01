@@ -348,7 +348,7 @@ body {
             <strong style="color:var(--lime);font-size:0.78rem">Dream Sequence</strong>
             <span class="intel-state-chip chip-active" style="font-size:0.58rem">ACTIVE</span>
           </div>
-          <div style="color:var(--muted);margin-top:4px">Mon 9:00 AM ET</div>
+          <div style="color:var(--muted);margin-top:4px">Mon+Thu 9:00 AM ET</div>
           <div style="color:var(--muted);margin-top:2px">Weekly audit — promotes insights, cleans orphans</div>
         </div>
         <div style="padding:8px;border:1px solid var(--border);background:var(--chip);border-radius:4px">
@@ -587,14 +587,13 @@ async function fetchAllData(){
     
     // Cron jobs - static config with website links
     CRON_JOBS=[
-      {name:"Memory Dream Sequence",schedule:"Mon 9:00 AM ET",model:"glm-5.1:cloud",next:"Mondays",status:"active",url:"",desc:"Audits MEMORY.md + wiki for contradictions, stale claims, duplicates"},
-      {name:"Karpathy New Repo Check",schedule:"Daily 8:00 AM ET",model:"glm-5.1:cloud",next:"Daily 8AM",status:"active",url:"https://github.com/karpathy",desc:"Scans for new repos, clones useful ones"},
-      {name:"K-Bot Morning Planner",schedule:"Daily 8:00 AM ET",model:"glm-5.1:cloud",next:"Daily 8AM",status:"active",url:"",desc:"Drafts trading plan for Kalshi markets"},
-      {name:"K-Bot Daily P&L",schedule:"Daily 6:00 PM ET",model:"glm-5.1:cloud",next:"Daily 6PM",status:"active",url:"",desc:"Reports Kalshi portfolio balance"},
-      {name:"Morning Briefing",schedule:"Mon-Fri 8:00 AM ET",model:"glm-5.1:cloud",next:"Weekdays 8AM",status:"active",url:"",desc:"Checks Gmail for unread client emails"},
-      {name:"Jerry Ontology Builder",schedule:"Every 4 hours",model:"local",next:"Every 4h",status:"active",url:"https://jongrayson.com/intel/",desc:"Updates intel graph on jongrayson.com"},
-      {name:"Weekly Skill Audit",schedule:"Fri 3:00 PM ET",model:"local",next:"Fridays 3PM",status:"active",url:"",desc:"Reviews tools and proposes new automations"},
-      {name:"Qwen3 Coder 24h Review",schedule:"Jun 9 1:25 PM ET",model:"glm-5.1:cloud",next:"One-shot",status:"active",url:"",desc:"Final assessment of qwen3-coder:480b-cloud"},
+      {name:"Memory Dream Sequence",schedule:"Mon+Thu 9:00 AM ET",model:"gemma4:12b",next:"Mon/Thu 9AM",status:"active",url:"",desc:"Audits MEMORY.md + wiki for contradictions, stale claims, duplicates"},
+      {name:"Karpathy New Repo Check",schedule:"Daily 8:00 AM ET",model:"gemma4:12b",next:"Daily 8AM",status:"active",url:"https://github.com/karpathy",desc:"Scans for new repos, clones useful ones"},
+      {name:"Jerry Ontology Builder",schedule:"Every 4 hours",model:"gemma4:12b",next:"Every 4h",status:"active",url:"https://jongrayson.com/intel/",desc:"Updates intel graph on jongrayson.com"},
+      {name:"Morning Briefing",schedule:"Daily 8:00 AM ET",model:"gemma4:12b",next:"Daily 8AM",status:"active",url:"",desc:"Checks Gmail for unread client emails"},
+      {name:"Weekly Skill Audit",schedule:"Fri 3:00 PM ET",model:"gemma4:12b",next:"Fridays 3PM",status:"active",url:"",desc:"Reviews tools and proposes new automations"},
+      {name:"Gov Opps Scanner",schedule:"Weekly",model:"gemma4:12b",next:"Weekly",status:"active",url:"",desc:"Scans SAM.gov for federal/state bid opportunities"},
+      {name:"Starlink TLE Refresh",schedule:"Weekly",model:"gemma4:12b",next:"Weekly",status:"active",url:"",desc:"Updates Starlink TLE satellite data"},
     ];
     
     DATA_LOADED=true;
@@ -720,7 +719,7 @@ function renderAllProjects(filter=''){
 }
 
 // ─── GDP PROJECTS RENDER ───────────────────────────────────────────
-const GDP_PROJECT_KEYS=['gdp-pageforge','gdp-mission-control','gdp-seo-audit','gdp-aeo-services','gdp-ai-visibility-report','faf-website','skb-customs','atlas-audit-service','ai-visibility-api','lyteforge','claude-seo-suite'];
+const GDP_PROJECT_KEYS=['gdp-pageforge','gdp-seo-audit','gdp-site-review','faf-website','skb-customs'];
 function renderGdpProjects(filter=''){
   const f=filter.toLowerCase();
   const gdpProjects=PROJECTS.filter(p=>GDP_PROJECT_KEYS.includes(p.id));
