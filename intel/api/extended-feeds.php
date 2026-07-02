@@ -85,16 +85,21 @@ if ($source === 'fires') {
         $emit($cached);
     }
 
-    // NASA FIRMS VIIRS C2 global active fires — 24h
-    // Public endpoint (no MAP_KEY required for basic CSV access)
-    $fireUrl = 'https://firms.modaps.eosdis.nasa.gov/active_fire/viirs-c2/csv/world/24';
+    // NASA FIRMS API with MAP_KEY
+    $MAP_KEY = 'bba043d5a1402bf3b501806ebb5bbfa5';
 
-    $raw = $httpGet($fireUrl, 25);
+    // Try VIIRS SNPP NRT first (most reliable), then NOAA-20, then MODIS
+    $fireUrls = [
+        "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{$MAP_KEY}/VIIRS_SNPP_NRT/-180,-90,180,90/2",
+        "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{$MAP_KEY}/VIIRS_NOAA20_NRT/-180,-90,180,90/2",
+        "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{$MAP_KEY}/MODIS_NRT/-180,-90,180,90/2",
+    ];
 
-    if ($raw === false || strlen($raw) < 50) {
-        // Try alternate endpoint: MODIS
-        $altUrl = 'https://firms.modaps.eosdis.nasa.gov/active_fire/modis-c6.1/csv/world/24';
-        $raw = $httpGet($altUrl, 25);
+    $raw = false;
+    foreach ($fireUrls as $url) {
+        $raw = $httpGet($url, 25);
+        if ($raw !== false && strlen($raw) > 50 && stripos($raw, 'Invalid') === false) break;
+        $raw = false;
     }
 
     if ($raw === false || strlen($raw) < 50) {
@@ -120,7 +125,6 @@ if ($source === 'fires') {
     $header = str_getcsv(array_shift($lines));
     $headerMap = array_flip(array_map('strtolower', $header));
 
-    // Required columns — adapt to VIIRS or MODIS format
     $colLat   = isset($headerMap['latitude'])  ? $headerMap['latitude']  : 0;
     $colLng   = isset($headerMap['longitude']) ? $headerMap['longitude'] : 1;
     $colBright = isset($headerMap['bright_ti4']) ? $headerMap['bright_ti4']
@@ -134,7 +138,7 @@ if ($source === 'fires') {
     $colTrack = isset($headerMap['track'])      ? $headerMap['track']      : null;
 
     $fires = [];
-    $maxFires = 5000; // cap to prevent overload
+    $maxFires = 5000;
 
     foreach ($lines as $line) {
         if (count($fires) >= $maxFires) break;
@@ -155,10 +159,8 @@ if ($source === 'fires') {
         $scan       = $colScan !== null ? floatval($row[$colScan]) : 1;
         $track      = $colTrack !== null ? floatval($row[$colTrack]) : 1;
 
-        // Build acquisition timestamp
         $acqTimestamp = '';
         if ($acqDate && $acqTime) {
-            // acq_time can be HHMM or HHMMSS
             $timeStr = str_pad($acqTime, 6, '0', STR_PAD_LEFT);
             $h = substr($timeStr, 0, 2);
             $m = substr($timeStr, 2, 2);
@@ -201,15 +203,12 @@ if ($source === 'ships') {
     $cachePath = $dataDir . '/ships-cache.json';
     $cacheTtl  = 120; // 2 minutes
 
-    // Serve from cache if fresh
     $cached = $readCache($cachePath, $cacheTtl);
     if ($cached) {
         $cached['cached'] = true;
         $emit($cached);
     }
 
-    // MarineTraffic public map endpoint — ships in viewport
-    // This is the XHR endpoint the public map uses to populate vessels
     $mtUrl = 'https://www.marinetraffic.com/en/ais/get-fleet-json/get_positions';
     $mtParams = http_build_query([
         'asset_type'   => 'vessel',
@@ -249,18 +248,14 @@ if ($source === 'ships') {
     if ($raw !== false) {
         $decoded = json_decode($raw, true);
         if (is_array($decoded)) {
-            // MarineTraffic returns various formats — try to extract ships
             $rows = $decoded['data']['rows'] ?? $decoded['rows'] ?? $decoded['data'] ?? [];
             if (is_array($rows)) {
                 $maxShips = 3000;
                 foreach ($rows as $row) {
                     if (count($ships) >= $maxShips) break;
-
-                    // MarineTraffic uses various field names — adapt
                     $lat = $row['LAT'] ?? $row['lat'] ?? null;
                     $lng = $row['LON'] ?? $row['lon'] ?? $row['lng'] ?? null;
                     if ($lat === null || $lng === null) continue;
-
                     $mmsi     = $row['MMSI']     ?? $row['mmsi']     ?? '';
                     $speed    = $row['SPEED']    ?? $row['speed']    ?? 0;
                     $heading  = $row['HEADING']  ?? $row['heading']  ?? 0;
@@ -268,10 +263,7 @@ if ($source === 'ships') {
                     $dest     = $row['DESTINATION'] ?? $row['destination'] ?? '';
                     $name     = $row['SHIPNAME'] ?? $row['name']    ?? '';
                     $ts       = $row['TIMESTAMP'] ?? $row['timestamp'] ?? '';
-
-                    // Normalize ship type
                     $typeStr = is_numeric($shipType) ? shipTypeCodeToString(intval($shipType)) : trim($shipType);
-
                     $ships[] = [
                         'mmsi'      => trim((string)$mmsi),
                         'name'      => trim((string)$name),
@@ -288,10 +280,7 @@ if ($source === 'ships') {
         }
     }
 
-    // If MarineTraffic scrape failed, generate synthetic coastal traffic
-    // so the visualization still has data to render
     if (empty($ships)) {
-        // Check stale cache
         if (file_exists($cachePath)) {
             $stale = json_decode(file_get_contents($cachePath), true);
             if (is_array($stale) && !empty($stale['items'])) {
@@ -301,29 +290,27 @@ if ($source === 'ships') {
             }
         }
 
-        // Synthetic fallback: major shipping lanes worldwide
         $shippingLanes = [
-            // [lat, lng, dest, type, heading]
-            [35.9, 14.0, 'Suez Canal', 'Cargo', 305],       // Mediterranean
-            [24.8, 57.8, 'Fujairah', 'Tanker', 340],         // Gulf of Oman
-            [26.6, 56.2, 'Jebel Ali', 'Cargo', 285],         // Strait of Hormuz
-            [1.3, 103.5, 'Singapore', 'Cargo', 75],          // Singapore Strait
-            [34.0, -130.0, 'Los Angeles', 'Cargo', 85],      // Pacific
-            [36.0, -75.0, 'Norfolk', 'Cargo', 180],          // US East Coast
-            [25.0, -80.0, 'Miami', 'Passenger', 45],         // Caribbean
-            [50.0, -5.0, 'English Channel', 'Tanker', 90],   // UK approaches
-            [40.0, -25.0, 'Atlantic', 'Cargo', 270],         // Mid-Atlantic
-            [35.0, 140.0, 'Tokyo', 'Cargo', 270],            // Pacific approach to Japan
-            [-34.0, 18.0, 'Cape Town', 'Tanker', 180],       // South Africa
-            [55.0, 12.0, 'Baltic Sea', 'Tanker', 45],        // Baltic approaches
-            [60.0, 5.0, 'Bergen', 'Passenger', 0],           // Norwegian coast
-            [28.0, -90.0, 'Gulf of Mexico', 'Tanker', 315],  // GoM
-            [13.5, 43.0, 'Bab-el-Mandeb', 'Cargo', 180],     // Red Sea
-            [-6.0, 105.0, 'Sunda Strait', 'Cargo', 90],      // Indonesia
-            [49.0, -125.0, 'Vancouver', 'Cargo', 180],       // Pacific NW
-            [20.0, -160.0, 'Pacific', 'Fishing', 90],        // Central Pacific fishing
-            [38.0, 125.0, 'Yellow Sea', 'Cargo', 180],       // China approaches
-            [72.0, 20.0, 'Norwegian Sea', 'Cargo', 90],      // Arctic route
+            [35.9, 14.0, 'Suez Canal', 'Cargo', 305],
+            [24.8, 57.8, 'Fujairah', 'Tanker', 340],
+            [26.6, 56.2, 'Jebel Ali', 'Cargo', 285],
+            [1.3, 103.5, 'Singapore', 'Cargo', 75],
+            [34.0, -130.0, 'Los Angeles', 'Cargo', 85],
+            [36.0, -75.0, 'Norfolk', 'Cargo', 180],
+            [25.0, -80.0, 'Miami', 'Passenger', 45],
+            [50.0, -5.0, 'English Channel', 'Tanker', 90],
+            [40.0, -25.0, 'Atlantic', 'Cargo', 270],
+            [35.0, 140.0, 'Tokyo', 'Cargo', 270],
+            [-34.0, 18.0, 'Cape Town', 'Tanker', 180],
+            [55.0, 12.0, 'Baltic Sea', 'Tanker', 45],
+            [60.0, 5.0, 'Bergen', 'Passenger', 0],
+            [28.0, -90.0, 'Gulf of Mexico', 'Tanker', 315],
+            [13.5, 43.0, 'Bab-el-Mandeb', 'Cargo', 180],
+            [-6.0, 105.0, 'Sunda Strait', 'Cargo', 90],
+            [49.0, -125.0, 'Vancouver', 'Cargo', 180],
+            [20.0, -160.0, 'Pacific', 'Fishing', 90],
+            [38.0, 125.0, 'Yellow Sea', 'Cargo', 180],
+            [72.0, 20.0, 'Norwegian Sea', 'Cargo', 90],
         ];
 
         $typeNames = ['Cargo', 'Tanker', 'Passenger', 'Fishing', 'Military'];
@@ -367,40 +354,20 @@ if ($source === 'ships') {
     $emit($payload);
 }
 
-// ── AIS ship type code → string (AIS type codes 0-19+ are vessel types) ──
 function shipTypeCodeToString($code) {
     $map = [
-        0  => 'Unknown',
-        20 => 'Wing in ground',
-        30 => 'Fishing',
-        31 => 'Towing',
-        32 => 'Towing (large)',
-        33 => 'Dredging',
-        34 => 'Diving',
-        35 => 'Military',
-        36 => 'Sailing',
-        37 => 'Pleasure Craft',
-        40 => 'High-speed craft',
-        50 => 'Pilot Vessel',
-        51 => 'Search and Rescue',
-        52 => 'Tug',
-        53 => 'Port Tender',
-        54 => 'Anti-pollution',
-        55 => 'Law Enforcement',
-        58 => 'Medical Transport',
-        59 => 'Noncombatant',
-        60 => 'Passenger',
-        70 => 'Cargo',
-        80 => 'Tanker',
-        90 => 'Other',
+        0  => 'Unknown', 20 => 'Wing in ground', 30 => 'Fishing',
+        31 => 'Towing', 32 => 'Towing (large)', 33 => 'Dredging',
+        34 => 'Diving', 35 => 'Military', 36 => 'Sailing',
+        37 => 'Pleasure Craft', 40 => 'High-speed craft',
+        50 => 'Pilot Vessel', 51 => 'Search and Rescue', 52 => 'Tug',
+        53 => 'Port Tender', 54 => 'Anti-pollution', 55 => 'Law Enforcement',
+        58 => 'Medical Transport', 59 => 'Noncombatant',
+        60 => 'Passenger', 70 => 'Cargo', 80 => 'Tanker', 90 => 'Other',
     ];
-    // Find closest bucket
     $best = 'Unknown';
-    foreach ($map as $k => $v) {
-        if ($code >= $k) $best = $v;
-    }
+    foreach ($map as $k => $v) { if ($code >= $k) $best = $v; }
     return $best;
 }
 
-// ── Fallback: unknown source ───────────────────────────────────
 $emit(['error' => 'unknown_source', 'message' => 'Use ?source=fires or ?source=ships'], 400);
