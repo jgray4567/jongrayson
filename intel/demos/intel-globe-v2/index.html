@@ -376,11 +376,56 @@
   .loader-bar { width: 220px; height: 2px; background: #111; margin-top: 16px; border-radius: 1px; overflow: hidden; }
   .loader-bar-fill { height: 100%; background: #C4D600; width: 0%; transition: width 0.3s; border-radius: 1px; }
 
+  /* ─── Camera Popup ─── */
+  #camera-popup {
+    position: absolute; z-index: 25; display: none;
+    background: rgba(6,7,10,0.95); backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid rgba(196,214,0,0.15); border-radius: 12px;
+    padding: 12px 14px; min-width: 340px; max-width: 420px;
+    font-family: 'JetBrains Mono', monospace;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  #camera-popup .cp-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px; padding-bottom: 8px;
+    border-bottom: 1px solid rgba(196,214,0,0.10);
+  }
+  #camera-popup .cp-title {
+    font-size: 12.1px; font-weight: 600; color: #C4D600;
+    letter-spacing: 0.5px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  #camera-popup .cp-close {
+    cursor: pointer; color: #889; font-size: 15.4px; padding: 2px 6px;
+    border-radius: 4px; transition: all 0.15s; flex-shrink: 0; margin-left: 8px;
+  }
+  #camera-popup .cp-close:hover { color: #e8eaed; background: rgba(255,255,255,0.05); }
+  #camera-popup .cp-meta {
+    font-size: 9.9px; color: #889; margin-bottom: 8px; display: flex; gap: 12px;
+  }
+  #camera-popup .cp-meta .cp-area { color: #C4D600; }
+  #camera-popup .cp-img-wrap {
+    width: 100%; min-height: 180px; border-radius: 8px; overflow: hidden;
+    background: #0a0b10; display: flex; align-items: center; justify-content: center;
+  }
+  #camera-popup .cp-img-wrap img {
+    width: 100%; height: auto; display: block; border-radius: 8px;
+  }
+  #camera-popup .cp-img-wrap .cp-loading {
+    color: #C4D600; font-size: 11px; letter-spacing: 1px; padding: 40px 0;
+  }
+  #camera-popup .cp-img-wrap .cp-error {
+    color: #ff2244; font-size: 11px; padding: 40px 0; text-align: center;
+  }
+  #camera-popup .cp-footer {
+    font-size: 9.9px; color: #667; margin-top: 8px; text-align: center;
+  }
+
   /* ─── Responsive ─── */
   @media (max-width: 1100px) {
     #layers-panel { width: 220px; }
     #regions-panel { width: 190px; }
     #alerts-panel { width: 340px; }
+    #camera-popup { min-width: 280px; max-width: 340px; }
     #ai-summary { left: 50%; transform: translateX(-50%) translateY(10px); width: 360px; }
     #ai-summary.active { transform: translateX(-50%) translateY(0); }
   }
@@ -531,8 +576,11 @@
     #alerts-panel { max-height: 40vh; }
     #layers-panel { width: 100vw; }
     #regions-panel { width: 100vw; }
+    #camera-popup { min-width: 260px; max-width: 300px; left: 10px !important; right: 10px; }
+    #top-bar .stat-strip .si { font-size: 8.8px; }
   }
 </style>
+<link rel="stylesheet" href="extended-layers.css">
 </head>
 <body>
 
@@ -566,6 +614,9 @@
     <div class="si"><div class="dot" style="background:#C4D600;box-shadow:0 0 6px #C4D600;"></div><span class="val" id="stat-flights">0</span><span class="lbl">FLIGHTS</span></div>
     <div class="si"><div class="dot" style="background:#22dd88;box-shadow:0 0 6px #22dd88;"></div><span class="val" id="stat-cities">52</span><span class="lbl">CITIES</span></div>
     <div class="si"><div class="dot" style="background:#ff2244;box-shadow:0 0 6px #ff2244;"></div><span class="val" id="stat-hotspots">10</span><span class="lbl">HOTSPOTS</span></div>
+    <div class="si"><div class="dot" style="background:#ff6644;box-shadow:0 0 6px #ff6644;"></div><span class="val" id="stat-quakes">0</span><span class="lbl">QUAKES</span></div>
+    <div class="si"><div class="dot" style="background:#ffaa22;box-shadow:0 0 6px #ffaa22;"></div><span class="val" id="stat-wxalerts">0</span><span class="lbl">WX</span></div>
+    <div class="si"><div class="dot" style="background:#C4D600;box-shadow:0 0 6px #C4D600;"></div><span class="val" id="stat-cams">0</span><span class="lbl">CAMS</span></div>
     <div class="si"><div class="dot" style="background:#ffaa22;box-shadow:0 0 6px #ffaa22;"></div><span class="val" id="stat-alerts">0</span><span class="lbl">ALERTS</span></div>
   </div>
   <div class="utc-clock"><span class="label">UTC</span><span id="utc-time">--:--:--</span></div>
@@ -637,6 +688,37 @@
     <label class="fr-toggle"><input type="checkbox" id="orbit-geo" checked> <span>GEO <span style="color:#ff6644">●</span></span> <span class="fr-count" id="orbit-count-geo">0</span></label>
     <label class="fr-toggle"><input type="checkbox" id="orbit-paths"> <span>Show Orbit Paths</span></label>
   </div>
+
+<!-- Live Data Layers Section -->
+  <div class="layer-section-title">Live Data Feeds</div>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="layer-earthquakes" checked>
+    <div class="lt-icon">⊙</div>
+    <div class="lt-info"><div class="lt-name">Earthquakes</div><div class="lt-desc">USGS live seismic data</div></div>
+    <div class="lt-count" id="count-earthquakes">LOADING...</div>
+  </label>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="layer-weather" checked>
+    <div class="lt-icon">⚠</div>
+    <div class="lt-info"><div class="lt-name">Weather Alerts</div><div class="lt-desc">NWS active alerts</div></div>
+    <div class="lt-count" id="count-weather">LOADING...</div>
+  </label>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="layer-storms" checked>
+    <div class="lt-icon">⛈</div>
+    <div class="lt-info"><div class="lt-name">Storm Alerts</div><div class="lt-desc">Severe storm warnings</div></div>
+    <div class="lt-count" id="count-storms">LOADING...</div>
+  </label>
+
+  <label class="layer-toggle">
+    <input type="checkbox" class="lt-checkbox" id="layer-cameras">
+    <div class="lt-icon">▣</div>
+    <div class="lt-info"><div class="lt-name">Traffic Cameras</div><div class="lt-desc">NYC DOT live cameras</div></div>
+    <div class="lt-count" id="count-cameras">OFF</div>
+  </label>
 
   <div class="layer-section-title collapsible-header collapsed" id="globe-controls-header">
     <span>Globe Controls</span>
@@ -750,6 +832,37 @@
     <div class="tip-row"><span>Severity</span><span class="tip-val" id="tip-severity">—</span></div>
     <div class="tip-row"><span>Coordinates</span><span class="tip-val" id="tip-hs-coords">—</span></div>
   </div>
+  <div id="tip-quake-info" style="display:none">
+    <div class="tip-row"><span>Magnitude</span><span class="tip-val" id="tip-mag">—</span></div>
+    <div class="tip-row"><span>Depth</span><span class="tip-val" id="tip-depth">—</span></div>
+    <div class="tip-row"><span>Time</span><span class="tip-val" id="tip-quake-time">—</span></div>
+  </div>
+  <div id="tip-wx-info" style="display:none">
+    <div class="tip-row"><span>Event</span><span class="tip-val" id="tip-wx-event">—</span></div>
+    <div class="tip-row"><span>Severity</span><span class="tip-val" id="tip-wx-severity">—</span></div>
+    <div class="tip-row"><span>Area</span><span class="tip-val" id="tip-wx-area">—</span></div>
+  </div>
+  <div id="tip-camera-info" style="display:none">
+    <div class="tip-row"><span>Area</span><span class="tip-val" id="tip-cam-area">—</span></div>
+    <div class="tip-row"><span>Status</span><span class="tip-val" id="tip-cam-status">—</span></div>
+    <div class="tip-row" style="color:#C4D600;font-size:9.9px;padding-top:4px;">Click for live image</div>
+  </div>
+</div>
+
+<!-- Camera Popup -->
+<div id="camera-popup">
+  <div class="cp-header">
+    <div class="cp-title" id="cp-title">Camera</div>
+    <div class="cp-close" id="cp-close">✕</div>
+  </div>
+  <div class="cp-meta">
+    <span class="cp-area" id="cp-area">—</span>
+    <span id="cp-id">—</span>
+  </div>
+  <div class="cp-img-wrap" id="cp-img-wrap">
+    <div class="cp-loading">LOADING IMAGE...</div>
+  </div>
+  <div class="cp-footer">NYC DOT Traffic Camera · Live Feed</div>
 </div>
 
 <script type="importmap">
@@ -901,6 +1014,9 @@ const TICKER = [
 let scene, camera, renderer, controls;
 let earth, atmosphere, starField, clouds;
 let flightGroup, cityGroup, hotspotGroup, borderGroup, nightGroup, dayNightMesh, satelliteGroup = null;
+let earthquakeGroup = null, weatherGroup = null, stormGroup = null, cameraGroup = null;
+let earthquakeData = [], weatherAlertData = [], stormAlertData = [], trafficCameraData = [];
+let earthquakeInterval = null, weatherInterval = null, cameraInterval = null;
 let satelliteData = [];
 let satelliteOrbitInterval = null;
 let orbitPathsGroup = null;
@@ -913,10 +1029,12 @@ let touchHoverActive = false;
 let touchTooltipTimer = null;
 let highlightRing = null;
 let highlightedObj = null;
+let activeCameraPopup = null;
 
 const layers = {
   flights: true, daynight: true, borders: true,
   cities: true, hotspots: true, satellites: true,
+  earthquakes: true, weather: true, storms: true, cameras: false,
   autorotate: false, atmosphere: true, stars: true
 };
 
@@ -1049,6 +1167,23 @@ async function init() {
   orbitPathsGroup.visible = false;
   scene.add(orbitPathsGroup);
 
+  // Live data feed groups
+  earthquakeGroup = new THREE.Group();
+  earthquakeGroup.visible = true;
+  scene.add(earthquakeGroup);
+
+  weatherGroup = new THREE.Group();
+  weatherGroup.visible = true;
+  scene.add(weatherGroup);
+
+  stormGroup = new THREE.Group();
+  stormGroup.visible = true;
+  scene.add(stormGroup);
+
+  cameraGroup = new THREE.Group();
+  cameraGroup.visible = false; // off by default
+  scene.add(cameraGroup);
+
   // Highlight ring for selected satellite — electric blue torus
   const HIGHLIGHT_COLOR = 0x88eeff;
   const ringGeo = new THREE.TorusGeometry(0.08, 0.006, 8, 32);
@@ -1074,6 +1209,16 @@ async function init() {
   fetchSatellites().then(() => {
     satelliteOrbitInterval = setInterval(fetchSatellites, 30000);
   }).catch(e => console.error('Satellite load failed:', e));
+
+  // Load live data feeds — earthquakes, weather, storms (non-blocking)
+  fetchEarthquakes().catch(e => console.error('Earthquake load failed:', e));
+  earthquakeInterval = setInterval(fetchEarthquakes, 300000); // 5 min
+
+  fetchWeatherAlerts().catch(e => console.error('Weather load failed:', e));
+  weatherInterval = setInterval(fetchWeatherAlerts, 300000); // 5 min
+
+  fetchStormAlerts().catch(e => console.error('Storm load failed:', e));
+  setInterval(fetchStormAlerts, 300000); // 5 min
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1552,6 +1697,458 @@ async function buildBorders() {
   }
 }
 
+// ─── Live Data Feed Proxy URL ───
+const LIVE_FEED_PROXY = '../../api/live-feeds.php';
+
+// ═══════════════════════════════════════════════════════════════════
+//  USGS EARTHQUAKES
+// ═══════════════════════════════════════════════════════════════════
+
+async function fetchEarthquakes() {
+  try {
+    document.getElementById('count-earthquakes').textContent = 'LOADING...';
+    const res = await fetch(LIVE_FEED_PROXY + '?source=earthquakes');
+    if (!res.ok) throw new Error('USGS fetch failed: ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    earthquakeData = (data.features || []).map(f => ({
+      mag: f.properties.mag,
+      place: f.properties.place,
+      time: f.properties.time,
+      lng: f.geometry.coordinates[0],
+      lat: f.geometry.coordinates[1],
+      depth: f.geometry.coordinates[2]
+    })).filter(q => q.lat != null && q.lng != null);
+
+    // Clear old markers
+    if (earthquakeGroup) {
+      while (earthquakeGroup.children.length) earthquakeGroup.remove(earthquakeGroup.children[0]);
+    }
+
+    for (const q of earthquakeData) {
+      const pos = latLngTo3D(q.lat, q.lng, EARTH_RADIUS + 0.015);
+      // Color by magnitude: <2.5 dim orange, 2.5-4.5 orange, >4.5 red
+      let color, baseSize;
+      if (q.mag < 2.5) { color = 0xff8844; baseSize = 0.015; }
+      else if (q.mag < 4.5) { color = 0xff6622; baseSize = 0.025; }
+      else { color = 0xff2244; baseSize = 0.035 + Math.min((q.mag - 4.5) * 0.01, 0.02); }
+
+      // Core dot
+      const dotGeo = new THREE.SphereGeometry(baseSize, 6, 4);
+      const dotMat = new THREE.MeshBasicMaterial({
+        color, transparent: true, opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+      });
+      const dot = new THREE.Mesh(dotGeo, dotMat);
+      dot.position.copy(pos);
+      dot.userData = { type: 'quake', quake: q, color, baseSize };
+      earthquakeGroup.add(dot);
+
+      // Pulsing ring for mag >= 2.5
+      if (q.mag >= 2.5) {
+        const ringGeo = new THREE.RingGeometry(baseSize * 1.5, baseSize * 2.2, 16);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color, transparent: true, opacity: 0.4,
+          side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false,
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.position.copy(pos);
+        ring.lookAt(0, 0, 0);
+        ring.userData = { type: 'quake-ring', pulse: Math.random() * Math.PI * 2, color, baseSize };
+        earthquakeGroup.add(ring);
+      }
+    }
+
+    document.getElementById('count-earthquakes').textContent = earthquakeData.length;
+    document.getElementById('stat-quakes').textContent = earthquakeData.length;
+    renderTicker();
+  } catch (err) {
+    console.error('Earthquake fetch error:', err);
+    document.getElementById('count-earthquakes').textContent = 'ERR';
+  }
+}
+
+function updateEarthquakes(time) {
+  if (!earthquakeGroup) return;
+  for (const child of earthquakeGroup.children) {
+    if (child.userData.type === 'quake-ring') {
+      child.userData.pulse += 0.04;
+      const s = 1 + Math.sin(child.userData.pulse) * 0.4;
+      child.scale.set(s, s, 1);
+      child.material.opacity = 0.5 + Math.sin(child.userData.pulse) * 0.3;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  NWS WEATHER ALERTS
+// ═══════════════════════════════════════════════════════════════════
+
+const SEVERITY_COLORS = {
+  'Extreme': 0xff2244,
+  'Severe': 0xff6622,
+  'Moderate': 0xffcc22,
+  'Minor': 0x44aaff,
+  'Unknown': 0x888888
+};
+
+// Compute centroid of a GeoJSON polygon/multipolygon
+function computeCentroid(geometry) {
+  if (!geometry) return null;
+  let coords;
+  if (geometry.type === 'Polygon') {
+    coords = geometry.coordinates[0];
+  } else if (geometry.type === 'MultiPolygon') {
+    // Use the largest polygon
+    let largest = geometry.coordinates[0];
+    for (const poly of geometry.coordinates) {
+      if (poly[0].length > largest[0].length) largest = poly;
+    }
+    coords = largest[0];
+  } else {
+    return null;
+  }
+  if (!coords || coords.length === 0) return null;
+  let lat = 0, lng = 0;
+  for (const c of coords) { lng += c[0]; lat += c[1]; }
+  lat /= coords.length;
+  lng /= coords.length;
+  return { lat, lng };
+}
+
+async function fetchWeatherAlerts() {
+  try {
+    document.getElementById('count-weather').textContent = 'LOADING...';
+    const res = await fetch(LIVE_FEED_PROXY + '?source=weather');
+    if (!res.ok) throw new Error('NWS fetch failed: ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    weatherAlertData = (data.features || []).map(f => ({
+      id: f.id,
+      event: f.properties.event,
+      severity: f.properties.severity,
+      areaDesc: f.properties.areaDesc,
+      headline: f.properties.headline,
+      sent: f.properties.sent,
+      geometry: f.geometry
+    })).filter(a => a.geometry);
+
+    // Clear old markers
+    if (weatherGroup) {
+      while (weatherGroup.children.length) weatherGroup.remove(weatherGroup.children[0]);
+    }
+
+    let plotted = 0;
+    for (const a of weatherAlertData) {
+      const centroid = computeCentroid(a.geometry);
+      if (!centroid) continue;
+      const pos = latLngTo3D(centroid.lat, centroid.lng, EARTH_RADIUS + 0.012);
+      const color = SEVERITY_COLORS[a.severity] || 0x888888;
+
+      // Marker dot
+      const dotGeo = new THREE.SphereGeometry(0.02, 6, 4);
+      const dotMat = new THREE.MeshBasicMaterial({
+        color, transparent: true, opacity: 0.85,
+        blending: THREE.AdditiveBlending,
+      });
+      const dot = new THREE.Mesh(dotGeo, dotMat);
+      dot.position.copy(pos);
+      dot.userData = { type: 'weather', alert: a, color, centroid };
+      weatherGroup.add(dot);
+
+      // Ring for Severe/Extreme
+      if (a.severity === 'Severe' || a.severity === 'Extreme') {
+        const ringGeo = new THREE.RingGeometry(0.03, 0.05, 16);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color, transparent: true, opacity: 0.3,
+          side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false,
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.position.copy(pos);
+        ring.lookAt(0, 0, 0);
+        ring.userData = { type: 'weather-ring', pulse: Math.random() * Math.PI * 2, color };
+        weatherGroup.add(ring);
+      }
+      plotted++;
+    }
+
+    document.getElementById('count-weather').textContent = weatherAlertData.length;
+    document.getElementById('stat-wxalerts').textContent = weatherAlertData.length;
+    renderTicker();
+
+    // Update the alerts feed panel with live data
+    updateLiveAlertsFeed();
+  } catch (err) {
+    console.error('Weather alert fetch error:', err);
+    document.getElementById('count-weather').textContent = 'ERR';
+  }
+}
+
+function updateWeather(time) {
+  if (!weatherGroup) return;
+  for (const child of weatherGroup.children) {
+    if (child.userData.type === 'weather-ring') {
+      child.userData.pulse += 0.03;
+      const s = 1 + Math.sin(child.userData.pulse) * 0.25;
+      child.scale.set(s, s, 1);
+      child.material.opacity = 0.4 + Math.sin(child.userData.pulse) * 0.2;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  NOAA STORM ALERTS (subset of NWS)
+// ═══════════════════════════════════════════════════════════════════
+
+async function fetchStormAlerts() {
+  try {
+    document.getElementById('count-storms').textContent = 'LOADING...';
+    const res = await fetch(LIVE_FEED_PROXY + '?source=storms');
+    if (!res.ok) throw new Error('Storm fetch failed: ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    stormAlertData = (data.features || []).map(f => ({
+      id: f.id,
+      event: f.properties.event,
+      severity: f.properties.severity,
+      areaDesc: f.properties.areaDesc,
+      headline: f.properties.headline,
+      sent: f.properties.sent,
+      geometry: f.geometry
+    })).filter(a => a.geometry);
+
+    // Clear old markers
+    if (stormGroup) {
+      while (stormGroup.children.length) stormGroup.remove(stormGroup.children[0]);
+    }
+
+    let plotted = 0;
+    for (const a of stormAlertData) {
+      const centroid = computeCentroid(a.geometry);
+      if (!centroid) continue;
+      const pos = latLngTo3D(centroid.lat, centroid.lng, EARTH_RADIUS + 0.018);
+      const color = SEVERITY_COLORS[a.severity] || 0xff2244;
+
+      // Larger pulsing marker for storms
+      const dotGeo = new THREE.SphereGeometry(0.03, 8, 6);
+      const dotMat = new THREE.MeshBasicMaterial({
+        color, transparent: true, opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+      });
+      const dot = new THREE.Mesh(dotGeo, dotMat);
+      dot.position.copy(pos);
+      dot.userData = { type: 'storm', alert: a, color, centroid };
+      stormGroup.add(dot);
+
+      // Double pulsing ring — more prominent than weather alerts
+      const ringGeo1 = new THREE.RingGeometry(0.04, 0.06, 20);
+      const ringMat1 = new THREE.MeshBasicMaterial({
+        color, transparent: true, opacity: 0.5,
+        side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false,
+      });
+      const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
+      ring1.position.copy(pos);
+      ring1.lookAt(0, 0, 0);
+      ring1.userData = { type: 'storm-ring', pulse: Math.random() * Math.PI * 2, color, speed: 0.05 };
+      stormGroup.add(ring1);
+
+      const ringGeo2 = new THREE.RingGeometry(0.07, 0.09, 20);
+      const ringMat2 = new THREE.MeshBasicMaterial({
+        color, transparent: true, opacity: 0.3,
+        side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false,
+      });
+      const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
+      ring2.position.copy(pos);
+      ring2.lookAt(0, 0, 0);
+      ring2.userData = { type: 'storm-ring', pulse: Math.random() * Math.PI * 2, color, speed: 0.04, phase: 1.5 };
+      stormGroup.add(ring2);
+      plotted++;
+    }
+
+    document.getElementById('count-storms').textContent = stormAlertData.length;
+  } catch (err) {
+    console.error('Storm alert fetch error:', err);
+    document.getElementById('count-storms').textContent = 'ERR';
+  }
+}
+
+function updateStorms(time) {
+  if (!stormGroup) return;
+  for (const child of stormGroup.children) {
+    if (child.userData.type === 'storm-ring') {
+      const speed = child.userData.speed || 0.05;
+      child.userData.pulse += speed;
+      const s = 1 + Math.sin(child.userData.pulse) * 0.5;
+      child.scale.set(s, s, 1);
+      child.material.opacity = 0.5 + Math.sin(child.userData.pulse) * 0.3;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  NYC DOT TRAFFIC CAMERAS
+// ═══════════════════════════════════════════════════════════════════
+
+async function fetchTrafficCameras() {
+  try {
+    document.getElementById('count-cameras').textContent = 'LOADING...';
+    const res = await fetch(LIVE_FEED_PROXY + '?source=cameras');
+    if (!res.ok) throw new Error('Cameras fetch failed: ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    // Filter to online cameras only
+    trafficCameraData = (Array.isArray(data) ? data : (data.items || data.features || [])).filter(c => {
+      const online = c.isOnline;
+      // Handle both string and boolean values
+      return online === true || online === 'true' || online === 1 || online === '1';
+    }).map(c => ({
+      id: c.id,
+      name: c.name || c.cameraName || 'Camera ' + c.id,
+      lat: parseFloat(c.latitude || c.lat),
+      lng: parseFloat(c.longitude || c.lng),
+      area: c.area || c.borough || '',
+      isOnline: true
+    })).filter(c => !isNaN(c.lat) && !isNaN(c.lng) && c.lat !== 0);
+
+    // Clear old markers
+    if (cameraGroup) {
+      while (cameraGroup.children.length) cameraGroup.remove(cameraGroup.children[0]);
+    }
+
+    // Small lime-green dots clustered around NYC
+    const dotGeo = new THREE.SphereGeometry(0.008, 4, 3);
+    const hitGeo = new THREE.SphereGeometry(0.025, 8, 6);
+    const dotMat = new THREE.MeshBasicMaterial({
+      color: 0xC4D600, transparent: true, opacity: 0.7,
+      blending: THREE.AdditiveBlending,
+    });
+
+    for (const cam of trafficCameraData) {
+      const pos = latLngTo3D(cam.lat, cam.lng, EARTH_RADIUS + 0.008);
+      const dot = new THREE.Mesh(dotGeo, dotMat.clone());
+      dot.position.copy(pos);
+      dot.userData = { type: 'camera', camera: cam };
+      cameraGroup.add(dot);
+
+      // Invisible larger hit sphere for easier click targeting
+      const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+      const hitSphere = new THREE.Mesh(hitGeo, hitMat);
+      hitSphere.position.copy(pos);
+      hitSphere.userData = { ...dot.userData, isHit: true };
+      cameraGroup.add(hitSphere);
+    }
+
+    document.getElementById('count-cameras').textContent = trafficCameraData.length;
+    document.getElementById('stat-cams').textContent = trafficCameraData.length;
+  } catch (err) {
+    console.error('Traffic camera fetch error:', err);
+    document.getElementById('count-cameras').textContent = 'ERR';
+  }
+}
+
+function showCameraPopup(camera, clickX, clickY) {
+  const popup = document.getElementById('camera-popup');
+  const titleEl = document.getElementById('cp-title');
+  const areaEl = document.getElementById('cp-area');
+  const idEl = document.getElementById('cp-id');
+  const imgWrap = document.getElementById('cp-img-wrap');
+
+  titleEl.textContent = camera.name;
+  areaEl.textContent = camera.area || 'NYC';
+  idEl.textContent = 'ID: ' + camera.id;
+  imgWrap.innerHTML = '<div class="cp-loading">LOADING IMAGE...</div>';
+
+  // Position popup near click, clamped to viewport
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const pw = 380; // estimated width
+  const ph = 320; // estimated height
+  let px = (clickX || vw / 2) + 16;
+  let py = (clickY || vh / 2) - 16;
+  if (px + pw > vw - 8) px = (clickX || vw / 2) - pw - 16;
+  if (px < 8) px = 8;
+  if (py < 8) py = 8;
+  if (py + ph > vh - 8) py = vh - ph - 8;
+  popup.style.left = px + 'px';
+  popup.style.top = py + 'px';
+  popup.style.display = 'block';
+
+  // Fetch the live image
+  const imgUrl = LIVE_FEED_PROXY + '?source=camera-image&id=' + encodeURIComponent(camera.id);
+  const img = new Image();
+  img.onload = () => {
+    imgWrap.innerHTML = '';
+    imgWrap.appendChild(img);
+  };
+  img.onerror = () => {
+    imgWrap.innerHTML = '<div class="cp-error">FAILED TO LOAD IMAGE</div>';
+  };
+  img.src = imgUrl;
+
+  activeCameraPopup = camera;
+}
+
+function hideCameraPopup() {
+  document.getElementById('camera-popup').style.display = 'none';
+  activeCameraPopup = null;
+}
+
+// Update the alerts feed panel with live NWS data
+function updateLiveAlertsFeed() {
+  const list = document.getElementById('alerts-list');
+  if (!list) return;
+
+  // Combine weather alerts and earthquakes into a unified live feed
+  const liveItems = [];
+
+  // Add weather alerts
+  for (const a of weatherAlertData.slice(0, 8)) {
+    const sev = a.severity === 'Extreme' ? 3 : a.severity === 'Severe' ? 2 : 1;
+    const time = a.sent ? new Date(a.sent).toISOString().slice(11, 16) + ' UTC' : '--:--';
+    liveItems.push({
+      time,
+      sev,
+      text: a.event + (a.areaDesc ? ' — ' + a.areaDesc.substring(0, 60) : ''),
+      loc: a.areaDesc ? a.areaDesc.split(';')[0].substring(0, 20) : 'US',
+      url: 'https://api.weather.gov/alerts/' + a.id
+    });
+  }
+
+  // Add earthquakes (sorted by magnitude, top 5)
+  const topQuakes = [...earthquakeData].sort((a, b) => (b.mag || 0) - (a.mag || 0)).slice(0, 5);
+  for (const q of topQuakes) {
+    const sev = q.mag >= 4.5 ? 3 : q.mag >= 2.5 ? 2 : 1;
+    const time = q.time ? new Date(q.time).toISOString().slice(11, 16) + ' UTC' : '--:--';
+    liveItems.push({
+      time,
+      sev,
+      text: 'M' + (q.mag || '?').toFixed(1) + ' earthquake — ' + (q.place || 'Unknown'),
+      loc: q.place ? q.place.split(',')[0].substring(0, 20) : '—',
+      url: 'https://earthquake.usgs.gov/earthquakes/map/'
+    });
+  }
+
+  if (liveItems.length === 0) {
+    // Fallback to static alerts if no live data yet
+    renderAlerts();
+    return;
+  }
+
+  const sevColors = ['#ffaa22', '#ff6644', '#ff2244'];
+  list.innerHTML = liveItems.map(a => `
+    <a class="alert-item" href="${a.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">
+      <div class="ai-sev" style="background:${sevColors[a.sev-1]};box-shadow:0 0 6px ${sevColors[a.sev-1]};"></div>
+      <div class="ai-time">${a.time}</div>
+      <div class="ai-text">${a.text}</div>
+      <div class="ai-loc">${a.loc}</div>
+    </a>
+  `).join('');
+
+  document.getElementById('stat-alerts').textContent = liveItems.length;
+  const alertsBadge = document.getElementById('alerts-badge');
+  if (alertsBadge) alertsBadge.textContent = liveItems.length;
+}
+
 // ═══════════════════════════════════════════════════════════════════
 //  SATELLITES (reuses v1 PHP proxy)
 // ═══════════════════════════════════════════════════════════════════
@@ -1677,6 +2274,10 @@ function setupUI() {
     'layer-cities': ['cities', cityGroup],
     'layer-hotspots': ['hotspots', hotspotGroup],
     'layer-satellites': ['satellites', satelliteGroup],
+    'layer-earthquakes': ['earthquakes', earthquakeGroup],
+    'layer-weather': ['weather', weatherGroup],
+    'layer-storms': ['storms', stormGroup],
+    'layer-cameras': ['cameras', cameraGroup],
   };
   for (const [id, [key, group]] of Object.entries(toggleMap)) {
     document.getElementById(id).addEventListener('change', e => {
@@ -1688,8 +2289,30 @@ function setupUI() {
       if (key === 'satellites') {
         orbitPathsGroup.visible = e.target.checked && showOrbitPaths;
       }
+      if (key === 'cameras' && e.target.checked && trafficCameraData.length === 0) {
+        fetchTrafficCameras().catch(err => console.error('Camera load failed:', err));
+        cameraInterval = setInterval(fetchTrafficCameras, 600000); // 10 min
+      }
+      if (key === 'cameras' && !e.target.checked && cameraInterval) {
+        clearInterval(cameraInterval);
+        cameraInterval = null;
+      }
       const countEl = document.getElementById('count-' + key);
-      if (countEl) countEl.textContent = e.target.checked ? (key === 'flights' ? flightPaths.length : key === 'cities' ? 52 : key === 'hotspots' ? 10 : key === 'satellites' ? (satelliteData.length || '...') : 'ON') : 'OFF';
+      if (countEl) {
+        if (!e.target.checked) {
+          countEl.textContent = 'OFF';
+        } else {
+          if (key === 'flights') countEl.textContent = flightPaths.length;
+          else if (key === 'cities') countEl.textContent = 52;
+          else if (key === 'hotspots') countEl.textContent = 10;
+          else if (key === 'satellites') countEl.textContent = satelliteData.length || '...';
+          else if (key === 'earthquakes') countEl.textContent = earthquakeData.length || '...';
+          else if (key === 'weather') countEl.textContent = weatherAlertData.length || '...';
+          else if (key === 'storms') countEl.textContent = stormAlertData.length || '...';
+          else if (key === 'cameras') countEl.textContent = trafficCameraData.length || '...';
+          else countEl.textContent = 'ON';
+        }
+      }
     });
   }
 
@@ -1799,11 +2422,14 @@ function setupUI() {
         panel.style.maxHeight = '';
       }
     });
+});
+document.getElementById('ai-close').addEventListener('click', () => {
+   document.getElementById('ai-summary').style.maxHeight = '';
+  document.getElementById('ai-summary').classList.remove('active');
  });
- document.getElementById('ai-close').addEventListener('click', () => {
-    document.getElementById('ai-summary').style.maxHeight = '';
-   document.getElementById('ai-summary').classList.remove('active');
-  });
+
+ // Camera popup close
+ document.getElementById('cp-close').addEventListener('click', hideCameraPopup);
 
   // Ticker
   renderTicker();
@@ -1910,10 +2536,14 @@ function setupUI() {
     // Run raycast
     raycaster.setFromCamera(mouse, camera);
     const candidates = [];
-    if (layers.flights) candidates.push(...flightGroup.children);
-    if (layers.cities) candidates.push(...cityGroup.children);
-    if (layers.hotspots) candidates.push(...hotspotGroup.children);
-    if (layers.satellites && satelliteGroup.visible) candidates.push(...satelliteGroup.children);
+   if (layers.flights) candidates.push(...flightGroup.children);
+   if (layers.cities) candidates.push(...cityGroup.children);
+   if (layers.hotspots) candidates.push(...hotspotGroup.children);
+   if (layers.satellites && satelliteGroup.visible) candidates.push(...satelliteGroup.children);
+    if (layers.earthquakes && earthquakeGroup.visible) candidates.push(...earthquakeGroup.children);
+    if (layers.weather && weatherGroup.visible) candidates.push(...weatherGroup.children);
+    if (layers.storms && stormGroup.visible) candidates.push(...stormGroup.children);
+    if (layers.cameras && cameraGroup.visible) candidates.push(...cameraGroup.children);
 
    // Sort intersects by distance — prefer satellites and hotspots over empty space
    const intersects = raycaster.intersectObjects(candidates);
@@ -1925,7 +2555,13 @@ function setupUI() {
     if (realIntersects.length > 0) {
       const obj = realIntersects[0].object;
       const ud = obj.userData;
-      if (ud.type === 'sat' || ud.type === 'flight' || ud.city || ud.type === 'hotspot') {
+     if (ud.type === 'sat' || ud.type === 'flight' || ud.city || ud.type === 'hotspot') {
+      if (ud.type === 'sat' || ud.type === 'flight' || ud.city || ud.type === 'hotspot' ||
+          ud.type === 'quake' || ud.type === 'weather' || ud.type === 'storm' || ud.type === 'camera') {
+        // Handle tap on camera markers — show live image popup
+        if (ud.type === 'camera') {
+          showCameraPopup(ud.camera, touch.clientX, touch.clientY);
+        }
         // Position tooltip — measure actual size and clamp fully within viewport
         const vw = window.innerWidth;
         const vh = window.innerHeight;
@@ -1948,7 +2584,45 @@ function setupUI() {
       tip.style.display = 'none';
       touchHoverActive = false;
     }
-  }, { passive: true });
+ }, { passive: true });
+
+ // Click handler for camera markers — show live image popup
+ renderer.domElement.addEventListener('click', e => {
+   if (touchHoverActive) return; // Don't fire on touch taps (handled separately)
+   const rect = renderer.domElement.getBoundingClientRect();
+   mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+   mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+   raycaster.setFromCamera(mouse, camera);
+   const candidates = [];
+   if (layers.cameras && cameraGroup.visible) candidates.push(...cameraGroup.children);
+   if (layers.flights) candidates.push(...flightGroup.children);
+   if (layers.cities) candidates.push(...cityGroup.children);
+   if (layers.hotspots) candidates.push(...hotspotGroup.children);
+   if (layers.satellites && satelliteGroup.visible) candidates.push(...satelliteGroup.children);
+   if (layers.earthquakes && earthquakeGroup.visible) candidates.push(...earthquakeGroup.children);
+   if (layers.weather && weatherGroup.visible) candidates.push(...weatherGroup.children);
+   if (layers.storms && stormGroup.visible) candidates.push(...stormGroup.children);
+   const intersects = raycaster.intersectObjects(candidates);
+   const visibleHits = intersects.filter(i => !i.object.userData.isHit);
+   const realIntersects = visibleHits.length > 0 ? visibleHits : intersects;
+   if (realIntersects.length > 0) {
+     const obj = realIntersects[0].object;
+     const ud = obj.userData;
+     if (ud.type === 'camera') {
+       showCameraPopup(ud.camera, e.clientX, e.clientY);
+     } else if (ud.type === 'quake') {
+       // Fly to earthquake location
+       const q = ud.quake;
+       const target = latLngTo3D(q.lat, q.lng, EARTH_RADIUS).multiplyScalar(2.5);
+       flyCameraTo(target);
+     } else if (ud.type === 'weather' || ud.type === 'storm') {
+       // Fly to alert location
+       const c = ud.centroid;
+       const target = latLngTo3D(c.lat, c.lng, EARTH_RADIUS).multiplyScalar(2.5);
+       flyCameraTo(target);
+     }
+   }
+ });
 }
 
 function flyCameraTo(target) {
@@ -1981,22 +2655,60 @@ function renderAlerts() {
 }
 
 function generateAISummary() {
+  // Incorporate live data into summary
+  const liveQuakes = earthquakeData.filter(q => (q.mag || 0) >= 4.5);
+  const extremeWx = weatherAlertData.filter(a => a.severity === 'Extreme');
+  const severeWx = weatherAlertData.filter(a => a.severity === 'Severe');
+  const storms = stormAlertData;
+  const totalInputs = ALERTS.length + earthquakeData.length + weatherAlertData.length + storms.length;
+  let quakeSummary = '';
+  if (liveQuakes.length > 0) {
+    const topQ = liveQuakes[0];
+    quakeSummary = `<span class="warn">SEISMIC:</span> ${liveQuakes.length} significant earthquake(s) detected. Largest: <span class="highlight">M${(topQ.mag || 0).toFixed(1)}</span> near ${topQ.place || 'unknown'}.<br><br>`;
+  }
+  let wxSummary = '';
+  if (weatherAlertData.length > 0) {
+    wxSummary = `<span class="warn">WEATHER (${weatherAlertData.length}):</span> ${extremeWx.length} Extreme, ${severeWx.length} Severe alerts active. `;
+    if (storms.length > 0) {
+      const stormEvents = storms.map(s => s.event).filter((v, i, a) => a.indexOf(v) === i).join(', ');
+      wxSummary += `Storm alerts: <span class="danger">${stormEvents}</span>.<br><br>`;
+    } else {
+      wxSummary += 'No severe storm alerts currently active.<br><br>';
+    }
+  }
   const sev3 = ALERTS.filter(a => a.sev === 3);
   const sev2 = ALERTS.filter(a => a.sev === 2);
   return `<span class="highlight">INTELLIGENCE BRIEF — ${new Date().toISOString().slice(0,10)}</span><br><br>
-  <span class="danger">CRITICAL (${sev3.length}):</span> Active combat operations in <span class="highlight">Ukraine, Gaza, Sudan</span>. Pattern indicates sustained escalation across three concurrent conflict zones — highest threat density in 18 months.<br><br>
-  <span class="warn">ELEVATED (${sev2.length}):</span> Maritime drone activity in <span class="highlight">Red Sea</span> disrupting shipping lanes. <span class="highlight">Taiwan Strait</span> exercises suggest readiness posturing. <span class="highlight">Haiti</span> security collapse accelerating. Critical CVE with active exploitation — patch immediately.<br><br>
-  <span class="highlight">MARKET IMPACT:</span> Oil +3.2% on supply disruption fears. Defense sector +1.1%. Recommend monitoring energy and defense exposure.<br><br>
-  <span class="highlight">ASSESSMENT:</span> Three concurrent severity-3 events with geographic dispersion. No direct correlation detected between conflict zones. Cyber threat (CVE-2026-4419) adds asymmetric dimension. Recommend elevated alert posture for next 72 hours.
-  <div class="meta">${ALERTS.length} inputs correlated | Confidence: HIGH</div>`;
+  <span class="danger">CRITICAL (${sev3.length}):</span> Active combat operations in <span class="highlight">Ukraine, Gaza, Sudan</span>. Pattern indicates sustained escalation across three concurrent conflict zones.<br><br>
+  ${quakeSummary}${wxSummary}
+  <span class="warn">ELEVATED (${sev2.length}):</span> Maritime drone activity in <span class="highlight">Red Sea</span>. <span class="highlight">Taiwan Strait</span> exercises suggest readiness posturing. <span class="highlight">Haiti</span> security collapse accelerating.<br><br>
+  <span class="highlight">ASSESSMENT:</span> Three concurrent severity-3 events with geographic dispersion. ${liveQuakes.length > 0 ? 'Seismic activity adds natural disaster dimension. ' : ''}${weatherAlertData.length > 0 ? weatherAlertData.length + ' active weather alerts monitored. ' : ''}Recommend elevated alert posture for next 72 hours.
+  <div class="meta">${totalInputs} inputs correlated | ${earthquakeData.length} quakes | ${weatherAlertData.length} weather alerts | ${storms.length} storm alerts | Confidence: HIGH</div>`;
 }
 
 function renderTicker() {
   const content = document.getElementById('ticker-content');
-  const items = TICKER.map(t =>
-    `<a class="tc-item" href="${t.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit"><span class="tc-dot" style="background:${t.dot}"></span><span class="tc-time">${t.time}</span><span class="tc-text">${t.text}</span></a>`
-  ).join('');
-  content.innerHTML = items + items; // Duplicate for seamless loop
+  // Build ticker from static + live data
+  const items = [];
+  // Static ticker items
+  for (const t of TICKER) {
+    items.push('<a class="tc-item" href="' + t.url + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit"><span class="tc-dot" style="background:' + t.dot + '"></span><span class="tc-time">' + t.time + '</span><span class="tc-text">' + t.text + '</span></a>');
+  }
+  // Live earthquake items (top 3 by magnitude)
+  const topQ = [...earthquakeData].sort((a, b) => (b.mag || 0) - (a.mag || 0)).slice(0, 3);
+  for (const q of topQ) {
+    const time = q.time ? new Date(q.time).toISOString().slice(11, 16) : '--:--';
+    const dot = q.mag >= 4.5 ? '#ff2244' : q.mag >= 2.5 ? '#ff6622' : '#ff8844';
+    items.push('<a class="tc-item" href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit"><span class="tc-dot" style="background:' + dot + '"></span><span class="tc-time">' + time + '</span><span class="tc-text">M' + (q.mag || 0).toFixed(1) + ' earthquake — ' + (q.place || 'Unknown') + '</span></a>');
+  }
+  // Live weather alert items (top 3)
+  for (const a of weatherAlertData.slice(0, 3)) {
+    const time = a.sent ? new Date(a.sent).toISOString().slice(11, 16) : '--:--';
+    const dot = a.severity === 'Extreme' ? '#ff2244' : a.severity === 'Severe' ? '#ff6622' : '#ffcc22';
+    items.push('<a class="tc-item" href="https://api.weather.gov/alerts/' + a.id + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit"><span class="tc-dot" style="background:' + dot + '"></span><span class="tc-time">' + time + '</span><span class="tc-text">' + a.event + ' — ' + (a.areaDesc || 'US').substring(0, 40) + '</span></a>');
+  }
+  const joined = items.join('');
+  content.innerHTML = joined + joined; // Duplicate for seamless loop
 }
 
 function updateClock() {
@@ -2015,9 +2727,12 @@ function animate() {
 
   controls.update();
 
-  if (layers.flights) updateFlights();
-  if (layers.hotspots) updateHotspots(time);
- if (layers.daynight) updateDayNight();
+ if (layers.flights) updateFlights();
+ if (layers.hotspots) updateHotspots(time);
+ if (layers.earthquakes) updateEarthquakes(time);
+ if (layers.weather) updateWeather(time);
+ if (layers.storms) updateStorms(time);
+if (layers.daynight) updateDayNight();
  if (clouds) clouds.rotation.y += 0.0003;
   // Pulse city ring markers
   if (layers.cities) {
@@ -2043,10 +2758,14 @@ function animate() {
   if (shouldRaycast && (layers.cities || layers.flights || layers.satellites)) {
     raycaster.setFromCamera(mouse, camera);
     const candidates = [];
-    if (layers.flights) candidates.push(...flightGroup.children);
-    if (layers.cities) candidates.push(...cityGroup.children);
-    if (layers.hotspots) candidates.push(...hotspotGroup.children);
-    if (layers.satellites && satelliteGroup.visible) candidates.push(...satelliteGroup.children);
+   if (layers.flights) candidates.push(...flightGroup.children);
+   if (layers.cities) candidates.push(...cityGroup.children);
+   if (layers.hotspots) candidates.push(...hotspotGroup.children);
+   if (layers.satellites && satelliteGroup.visible) candidates.push(...satelliteGroup.children);
+    if (layers.earthquakes && earthquakeGroup.visible) candidates.push(...earthquakeGroup.children);
+    if (layers.weather && weatherGroup.visible) candidates.push(...weatherGroup.children);
+    if (layers.storms && stormGroup.visible) candidates.push(...stormGroup.children);
+    if (layers.cameras && cameraGroup.visible) candidates.push(...cameraGroup.children);
 
    const intersects = raycaster.intersectObjects(candidates);
     // Filter out invisible hit spheres — prefer the real visible object
@@ -2070,6 +2789,9 @@ function animate() {
         document.getElementById('tip-city-info').style.display = 'none';
         document.getElementById('tip-sat-info').style.display = 'none';
         document.getElementById('tip-hotspot-info').style.display = 'none';
+        document.getElementById('tip-quake-info').style.display = 'none';
+        document.getElementById('tip-wx-info').style.display = 'none';
+        document.getElementById('tip-camera-info').style.display = 'none';
         document.getElementById('tip-callsign').textContent = ud.callsign || '—';
         document.getElementById('tip-origin').textContent = (ud.origin || '—') + ' · ' + airline.name;
         document.getElementById('tip-alt').textContent = ud.alt ? (ud.alt / 1000).toFixed(1) + ' km' : '—';
@@ -2085,6 +2807,9 @@ function animate() {
         document.getElementById('tip-city-info').style.display = 'none';
         document.getElementById('tip-sat-info').style.display = 'block';
         document.getElementById('tip-hotspot-info').style.display = 'none';
+        document.getElementById('tip-quake-info').style.display = 'none';
+        document.getElementById('tip-wx-info').style.display = 'none';
+        document.getElementById('tip-camera-info').style.display = 'none';
         document.getElementById('tip-network').textContent = ud.network || '—';
         document.getElementById('tip-orbit').textContent = ud.orbitClass || '—';
         document.getElementById('tip-sat-alt').textContent = ud.altitude ? ud.altitude + ' km' : '—';
@@ -2100,6 +2825,9 @@ function animate() {
         document.getElementById('tip-city-info').style.display = 'block';
         document.getElementById('tip-sat-info').style.display = 'none';
         document.getElementById('tip-hotspot-info').style.display = 'none';
+        document.getElementById('tip-quake-info').style.display = 'none';
+        document.getElementById('tip-wx-info').style.display = 'none';
+        document.getElementById('tip-camera-info').style.display = 'none';
         document.getElementById('tip-pop').textContent = city.pop.toLocaleString();
         document.getElementById('tip-country').textContent = city.country;
         document.getElementById('tip-coords').textContent = `${city.lat.toFixed(1)}°, ${city.lng.toFixed(1)}°`;
@@ -2119,11 +2847,80 @@ function animate() {
         const sevEl = document.getElementById('tip-severity');
         sevEl.textContent = sevLabels[hs.sev - 1] || 'UNKNOWN';
         sevEl.style.color = sevColors[hs.sev - 1] || '#ff2244';
-        document.getElementById('tip-hs-coords').textContent = `${hs.lat.toFixed(1)}°, ${hs.lng.toFixed(1)}°`;
-        tip.style.display = 'block';
-      } else {
-        if (!touchHoverActive) tip.style.display = 'none';
-      }
+       document.getElementById('tip-hs-coords').textContent = `${hs.lat.toFixed(1)}°, ${hs.lng.toFixed(1)}°`;
+       tip.style.display = 'block';
+     } else if (ud.type === 'quake') {
+       // Earthquake tooltip
+       document.getElementById('tip-badge').style.display = 'none';
+       document.getElementById('tip-airline').textContent = '';
+       const q = ud.quake;
+       document.getElementById('tip-title').textContent = 'M' + (q.mag || '?').toFixed(1) + ' Earthquake';
+       document.getElementById('tip-flight-info').style.display = 'none';
+       document.getElementById('tip-city-info').style.display = 'none';
+       document.getElementById('tip-sat-info').style.display = 'none';
+       document.getElementById('tip-hotspot-info').style.display = 'none';
+       document.getElementById('tip-quake-info').style.display = 'block';
+       document.getElementById('tip-wx-info').style.display = 'none';
+       document.getElementById('tip-camera-info').style.display = 'none';
+       document.getElementById('tip-mag').textContent = (q.mag || '?').toFixed(1);
+       document.getElementById('tip-depth').textContent = q.depth ? q.depth.toFixed(1) + ' km' : '—';
+       document.getElementById('tip-quake-time').textContent = q.time ? new Date(q.time).toISOString().slice(11, 19) + ' UTC' : '—';
+       tip.style.display = 'block';
+     } else if (ud.type === 'weather') {
+       // Weather alert tooltip
+       document.getElementById('tip-badge').style.display = 'none';
+       document.getElementById('tip-airline').textContent = '';
+       const a = ud.alert;
+       document.getElementById('tip-title').textContent = a.event || 'Weather Alert';
+       document.getElementById('tip-flight-info').style.display = 'none';
+       document.getElementById('tip-city-info').style.display = 'none';
+       document.getElementById('tip-sat-info').style.display = 'none';
+       document.getElementById('tip-hotspot-info').style.display = 'none';
+       document.getElementById('tip-quake-info').style.display = 'none';
+       document.getElementById('tip-wx-info').style.display = 'block';
+       document.getElementById('tip-camera-info').style.display = 'none';
+       document.getElementById('tip-wx-event').textContent = a.event || '—';
+       document.getElementById('tip-wx-severity').textContent = a.severity || '—';
+       document.getElementById('tip-wx-severity').style.color = a.severity === 'Extreme' ? '#ff2244' : a.severity === 'Severe' ? '#ff6622' : a.severity === 'Moderate' ? '#ffcc22' : '#44aaff';
+       document.getElementById('tip-wx-area').textContent = a.areaDesc ? a.areaDesc.substring(0, 40) : '—';
+       tip.style.display = 'block';
+     } else if (ud.type === 'storm') {
+       // Storm alert tooltip
+       document.getElementById('tip-badge').style.display = 'none';
+       document.getElementById('tip-airline').textContent = '';
+       const a = ud.alert;
+       document.getElementById('tip-title').textContent = '⛈ ' + (a.event || 'Storm Alert');
+       document.getElementById('tip-flight-info').style.display = 'none';
+       document.getElementById('tip-city-info').style.display = 'none';
+       document.getElementById('tip-sat-info').style.display = 'none';
+       document.getElementById('tip-hotspot-info').style.display = 'none';
+       document.getElementById('tip-quake-info').style.display = 'none';
+       document.getElementById('tip-wx-info').style.display = 'block';
+       document.getElementById('tip-camera-info').style.display = 'none';
+       document.getElementById('tip-wx-event').textContent = a.event || '—';
+       document.getElementById('tip-wx-severity').textContent = a.severity || '—';
+       document.getElementById('tip-wx-severity').style.color = a.severity === 'Extreme' ? '#ff2244' : a.severity === 'Severe' ? '#ff6622' : '#ffcc22';
+       document.getElementById('tip-wx-area').textContent = a.areaDesc ? a.areaDesc.substring(0, 40) : '—';
+       tip.style.display = 'block';
+     } else if (ud.type === 'camera') {
+       // Camera tooltip
+       document.getElementById('tip-badge').style.display = 'none';
+       document.getElementById('tip-airline').textContent = '';
+       const cam = ud.camera;
+       document.getElementById('tip-title').textContent = cam.name || 'Camera';
+       document.getElementById('tip-flight-info').style.display = 'none';
+       document.getElementById('tip-city-info').style.display = 'none';
+       document.getElementById('tip-sat-info').style.display = 'none';
+       document.getElementById('tip-hotspot-info').style.display = 'none';
+       document.getElementById('tip-quake-info').style.display = 'none';
+       document.getElementById('tip-wx-info').style.display = 'none';
+       document.getElementById('tip-camera-info').style.display = 'block';
+       document.getElementById('tip-cam-area').textContent = cam.area || 'NYC';
+       document.getElementById('tip-cam-status').textContent = 'Online';
+       tip.style.display = 'block';
+     } else {
+       if (!touchHoverActive) tip.style.display = 'none';
+     }
       // ── Apply highlight to the intersected object ──
       if (tip.style.display === 'block' && obj) {
         // Clear old highlight if object changed
@@ -2184,6 +2981,40 @@ function animate() {
 }
 
 init();
+</script>
+
+<!-- Timeline Scrubber + Fires + Ships Layer Modules -->
+<script src="timeline-engine.js"></script>
+<script src="fires-layer.js"></script>
+<script src="ships-layer.js"></script>
+<script>
+  // Initialize extended layers after main globe loads
+  let timelineEngine, firesLayer, shipsLayer;
+  
+  // Wait for globe to be ready
+  setTimeout(() => {
+    if (typeof TimelineEngine !== 'undefined') {
+      timelineEngine = new TimelineEngine();
+      timelineEngine.startCapture();
+    }
+    if (typeof FiresLayer !== 'undefined') {
+      firesLayer = new FiresLayer({
+        scene: scene,
+        globeRadius: 100,
+        apiBase: '../../api'
+      });
+      firesLayer.init();
+    }
+    if (typeof ShipsLayer !== 'undefined') {
+      shipsLayer = new ShipsLayer({
+        scene: scene,
+        globeRadius: 100,
+        apiBase: '../../api',
+        aisstreamApiKey: '' // Add aisstream.io key here when available
+      });
+      shipsLayer.init();
+    }
+  }, 3000); // Wait 3s for globe to initialize first
 </script>
 </body>
 </html>
