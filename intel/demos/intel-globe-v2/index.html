@@ -1097,6 +1097,7 @@ function setLoadProgress(pct, msg) {
 async function init() {
   setLoadProgress(10, 'Creating scene...');
   scene = new THREE.Scene();
+  window._globeScene = scene; // expose for non-module scripts
   scene.background = new THREE.Color('#06070a');
 
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -2555,7 +2556,6 @@ document.getElementById('ai-close').addEventListener('click', () => {
     if (realIntersects.length > 0) {
       const obj = realIntersects[0].object;
       const ud = obj.userData;
-     if (ud.type === 'sat' || ud.type === 'flight' || ud.city || ud.type === 'hotspot') {
       if (ud.type === 'sat' || ud.type === 'flight' || ud.city || ud.type === 'hotspot' ||
           ud.type === 'quake' || ud.type === 'weather' || ud.type === 'storm' || ud.type === 'camera') {
         // Handle tap on camera markers — show live image popup
@@ -2999,7 +2999,7 @@ init();
     }
     if (typeof FiresLayer !== 'undefined') {
       firesLayer = new FiresLayer({
-        scene: scene,
+        scene: window._globeScene,
         globeRadius: 100,
         apiBase: '../../api'
       });
@@ -3007,7 +3007,7 @@ init();
     }
     if (typeof ShipsLayer !== 'undefined') {
       shipsLayer = new ShipsLayer({
-        scene: scene,
+        scene: window._globeScene,
         globeRadius: 100,
         apiBase: '../../api',
         aisstreamApiKey: '' // Add aisstream.io key here when available
