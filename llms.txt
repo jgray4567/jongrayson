@@ -1,7 +1,8 @@
 # jongrayson.com — llms.txt
 # AI search context file for ChatGPT, Perplexity, Claude, Google AI
+# Last modified: 2026-07-21
 
-> Jon Grayson is a Director of UX & Design based in Washington, DC, with 25+ years building digital products. He runs Grayson Design Partners (graysondp.com), a design and technology studio.
+> Jon Grayson is a Director of UX & Design based in Washington, DC, with 25+ years building digital products. He is the founder and principal of Grayson Design Partners (graysondp.com), a design and technology studio specializing in UX/UI design, AI workflow consulting, data visualization, and intelligence dashboards.
 
 ## What this site is
 Jon Grayson's personal portfolio and professional website. It showcases UX/design case studies, AI/ML workflow lessons, and interactive data visualization projects including a real-time global intelligence dashboard and Pittsburgh crime heatmap.
@@ -19,9 +20,13 @@ Jon Grayson's personal portfolio and professional website. It showcases UX/desig
 - Data visualization and intelligence dashboards
 - Product strategy and design leadership
 
+## Affiliations
+- **Grayson Design Partners** (graysondp.com) — Founder & Principal. Design and technology studio delivering UX strategy, AI integration, and data visualization for enterprise and government clients.
+
 ## Contact
 - Email: jon@jongrayson.com
 - LinkedIn: https://www.linkedin.com/in/jongrayson
+- GitHub: https://github.com/jgray4567
 - Studio: https://graysondp.com
 
 ## Notes

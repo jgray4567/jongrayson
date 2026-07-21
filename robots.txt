@@ -4,20 +4,39 @@ Disallow: /admin/
 Disallow: /includes/
 Disallow: /config/
 
-# AI crawlers welcome
+# AI crawlers — explicitly allowed
 User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
 Allow: /
 
 User-agent: ClaudeBot
 Allow: /
 
-User-agent: CCBot
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
 Allow: /
 
 User-agent: Google-Extended
 Allow: /
 
-User-agent: PerplexityBot
-Allow: /
+# AI crawlers — blocked
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
 
 Sitemap: https://www.jongrayson.com/sitemap.xml
