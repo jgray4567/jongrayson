@@ -579,6 +579,284 @@
     #camera-popup { min-width: 260px; max-width: 300px; left: 10px !important; right: 10px; }
     #top-bar .stat-strip .si { font-size: 8.8px; }
   }
+
+  /* ─── NYC Camera Browser Modal ─── */
+  #camera-browse-btn {
+    background: rgba(196,214,0,0.08);
+    border: 1px solid rgba(196,214,0,0.2);
+    color: #C4D600;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 2px 7px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.15s;
+    white-space: nowrap;
+    margin-left: 4px;
+    flex-shrink: 0;
+  }
+  #camera-browse-btn:hover {
+    background: rgba(196,214,0,0.18);
+    border-color: rgba(196,214,0,0.4);
+  }
+  #camera-browse-btn:disabled {
+    opacity: 0.4; cursor: default;
+  }
+
+  #camera-modal-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: none;
+    animation: cm-fade-in 0.2s ease;
+  }
+  #camera-modal-overlay.active { display: flex; flex-direction: column; }
+  @keyframes cm-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  #camera-modal {
+    flex: 1; display: flex; flex-direction: column;
+    background: rgba(10,11,16,0.98);
+    border: 1px solid rgba(196,214,0,0.12);
+    border-radius: 0;
+    overflow: hidden;
+    margin: 0;
+    max-width: 100%;
+  }
+
+  /* Modal Header */
+  .cm-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 20px;
+    background: rgba(6,7,10,0.95);
+    border-bottom: 1px solid rgba(196,214,0,0.12);
+    flex-shrink: 0;
+  }
+  .cm-header .cm-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15.4px; font-weight: 600; color: #C4D600;
+    letter-spacing: 1px; white-space: nowrap;
+  }
+  .cm-header .cm-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: #889; white-space: nowrap;
+  }
+  .cm-header .cm-count .cm-online { color: #C4D600; font-weight: 600; }
+  .cm-header .cm-close {
+    margin-left: auto; cursor: pointer; color: #889;
+    font-size: 18px; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; transition: all 0.15s;
+  }
+  .cm-header .cm-close:hover {
+    color: #e8eaed; background: rgba(255,255,255,0.06);
+  }
+
+  /* Modal Body */
+  .cm-body {
+    flex: 1; display: flex; overflow: hidden;
+  }
+
+  /* Left Panel — Map */
+  .cm-map-panel {
+    flex: 0 0 42%; max-width: 600px;
+    position: relative;
+    background: #0a0b10;
+    border-right: 1px solid rgba(196,214,0,0.08);
+    overflow: hidden;
+  }
+  .cm-map-panel iframe {
+    width: 100%; height: 100%; border: 0;
+    filter: invert(0.92) hue-rotate(180deg) brightness(0.85) contrast(0.9);
+  }
+  .cm-map-overlay {
+    position: absolute; inset: 0;
+    pointer-events: none;
+  }
+  .cm-pin {
+    position: absolute;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #C4D600;
+    border: 1.5px solid rgba(6,7,10,0.8);
+    box-shadow: 0 0 6px rgba(196,214,0,0.5);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: all 0.15s;
+    transform: translate(-50%, -50%);
+  }
+  .cm-pin:hover {
+    width: 14px; height: 14px;
+    box-shadow: 0 0 10px rgba(196,214,0,0.8);
+  }
+  .cm-pin.selected {
+    width: 14px; height: 14px;
+    background: #fff;
+    box-shadow: 0 0 12px rgba(196,214,0,1);
+  }
+  .cm-map-hint {
+    position: absolute; bottom: 8px; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: rgba(196,214,0,0.5);
+    letter-spacing: 0.5px; pointer-events: none;
+  }
+
+  /* Right Panel — List */
+  .cm-list-panel {
+    flex: 1; display: flex; flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  /* Preview Area */
+  .cm-preview {
+    background: #06070a;
+    border-bottom: 1px solid rgba(196,214,0,0.08);
+    flex-shrink: 0;
+    display: none;
+  }
+  .cm-preview.active { display: block; }
+  .cm-preview-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(196,214,0,0.06);
+  }
+  .cm-preview-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.1px; font-weight: 600; color: #C4D600;
+    flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .cm-preview-area {
+    font-size: 9.9px; color: #889;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .cm-preview-refresh {
+    font-size: 9px; color: #667;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .cm-preview-img-wrap {
+    width: 100%; max-height: 280px;
+    background: #0a0b10; display: flex;
+    align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .cm-preview-img-wrap img {
+    width: 100%; max-height: 280px; object-fit: contain;
+  }
+  .cm-preview-img-wrap .cm-loading-msg {
+    color: #C4D600; font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px; padding: 40px 0;
+  }
+  .cm-preview-img-wrap .cm-error-msg {
+    color: #ff2244; font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 40px 0; text-align: center;
+  }
+
+  /* Search + Borough Filter */
+  .cm-controls {
+    padding: 10px 14px; flex-shrink: 0;
+    border-bottom: 1px solid rgba(196,214,0,0.06);
+  }
+  .cm-search {
+    width: 100%;
+    background: rgba(6,7,10,0.6);
+    border: 1px solid rgba(196,214,0,0.12);
+    border-radius: 8px;
+    color: #e8eaed;
+    font-size: 12.1px; font-family: 'JetBrains Mono', monospace;
+    padding: 8px 12px; outline: none;
+    transition: border-color 0.15s;
+  }
+  .cm-search::placeholder { color: #556; }
+  .cm-search:focus { border-color: rgba(196,214,0,0.3); }
+  .cm-borough-tabs {
+    display: flex; gap: 4px; margin-top: 8px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .cm-borough-tabs::-webkit-scrollbar { display: none; }
+  .cm-borough-tab {
+    background: rgba(196,214,0,0.04);
+    border: 1px solid rgba(196,214,0,0.1);
+    color: #889;
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.3px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .cm-borough-tab:hover { color: #C4D600; border-color: rgba(196,214,0,0.2); }
+  .cm-borough-tab.active {
+    background: rgba(196,214,0,0.15);
+    border-color: rgba(196,214,0,0.35);
+    color: #C4D600;
+  }
+
+  /* Camera List */
+  .cm-list {
+    flex: 1; overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: #1a2233 transparent;
+  }
+  .cm-list::-webkit-scrollbar { width: 4px; }
+  .cm-list::-webkit-scrollbar-track { background: transparent; }
+  .cm-list::-webkit-scrollbar-thumb { background: #1a2233; border-radius: 2px; }
+  .cm-list-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 14px; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.02);
+    transition: background 0.12s;
+  }
+  .cm-list-item:hover { background: rgba(196,214,0,0.04); }
+  .cm-list-item.selected { background: rgba(196,214,0,0.08); }
+  .cm-list-thumb {
+    width: 48px; height: 36px; border-radius: 6px;
+    background: #0a0b10;
+    flex-shrink: 0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cm-list-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .cm-list-thumb .cm-thumb-loading { font-size: 8px; color: #556; font-family: 'JetBrains Mono', monospace; }
+  .cm-list-info { flex: 1; min-width: 0; }
+  .cm-list-name {
+    font-size: 11px; color: #dde;
+    font-family: 'JetBrains Mono', monospace;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .cm-list-area {
+    display: inline-block;
+    font-size: 8.8px; color: #C4D600;
+    background: rgba(196,214,0,0.08);
+    padding: 1px 5px; border-radius: 3px;
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.3px;
+  }
+  .cm-list-status {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #22dd88; flex-shrink: 0;
+    box-shadow: 0 0 4px #22dd88;
+  }
+  .cm-empty {
+    padding: 40px 20px; text-align: center;
+    color: #556; font-size: 12px; font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Responsive — stack panels on mobile */
+  @media (max-width: 768px) {
+    .cm-body { flex-direction: column; }
+    .cm-map-panel {
+      flex: 0 0 220px; max-width: 100%;
+      border-right: none;
+      border-bottom: 1px solid rgba(196,214,0,0.08);
+    }
+    .cm-preview-img-wrap { max-height: 200px; }
+    .cm-preview-img-wrap img { max-height: 200px; }
+  }
 </style>
 <link rel="stylesheet" href="extended-layers.css">
 </head>
@@ -717,6 +995,7 @@
     <input type="checkbox" class="lt-checkbox" id="layer-cameras">
     <div class="lt-icon">▣</div>
     <div class="lt-info"><div class="lt-name">Traffic Cameras</div><div class="lt-desc">NYC DOT live cameras</div></div>
+    <button id="camera-browse-btn" disabled>BROWSE</button>
     <div class="lt-count" id="count-cameras">OFF</div>
   </label>
 
@@ -863,6 +1142,50 @@
     <div class="cp-loading">LOADING IMAGE...</div>
   </div>
   <div class="cp-footer">NYC DOT Traffic Camera · Live Feed</div>
+</div>
+
+<!-- NYC Camera Browser Modal -->
+<div id="camera-modal-overlay">
+  <div id="camera-modal">
+    <div class="cm-header">
+      <div class="cm-title">NYC TRAFFIC CAMERAS</div>
+      <div class="cm-count"><span class="cm-online" id="cm-online-count">0</span> online</div>
+      <div class="cm-close" id="cm-close">✕</div>
+    </div>
+    <div class="cm-body">
+      <!-- Left: Map -->
+      <div class="cm-map-panel">
+        <iframe src="https://maps.google.com/maps?q=40.7128,-74.0060&z=11&output=embed" loading="lazy"></iframe>
+        <div class="cm-map-overlay" id="cm-map-overlay"></div>
+        <div class="cm-map-hint">NYC DOT Camera Locations</div>
+      </div>
+      <!-- Right: List + Preview -->
+      <div class="cm-list-panel">
+        <div class="cm-preview" id="cm-preview">
+          <div class="cm-preview-bar">
+            <div class="cm-preview-name" id="cm-preview-name">—</div>
+            <div class="cm-preview-area" id="cm-preview-area"></div>
+            <div class="cm-preview-refresh" id="cm-preview-refresh"></div>
+          </div>
+          <div class="cm-preview-img-wrap" id="cm-preview-img">
+            <div class="cm-loading-msg">LOADING IMAGE...</div>
+          </div>
+        </div>
+        <div class="cm-controls">
+          <input type="text" class="cm-search" id="cm-search" placeholder="Search by name or area...">
+          <div class="cm-borough-tabs" id="cm-borough-tabs">
+            <div class="cm-borough-tab active" data-borough="All">All</div>
+            <div class="cm-borough-tab" data-borough="Manhattan">Manhattan</div>
+            <div class="cm-borough-tab" data-borough="Brooklyn">Brooklyn</div>
+            <div class="cm-borough-tab" data-borough="Queens">Queens</div>
+            <div class="cm-borough-tab" data-borough="Bronx">Bronx</div>
+            <div class="cm-borough-tab" data-borough="Staten Island">Staten Island</div>
+          </div>
+        </div>
+        <div class="cm-list" id="cm-list"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script type="importmap">
@@ -2042,6 +2365,7 @@ async function fetchTrafficCameras() {
 
     document.getElementById('count-cameras').textContent = trafficCameraData.length;
     document.getElementById('stat-cams').textContent = trafficCameraData.length;
+    updateCameraBrowseBtn();
   } catch (err) {
     console.error('Traffic camera fetch error:', err);
     document.getElementById('count-cameras').textContent = 'ERR';
@@ -2093,6 +2417,259 @@ function showCameraPopup(camera, clickX, clickY) {
 function hideCameraPopup() {
   document.getElementById('camera-popup').style.display = 'none';
   activeCameraPopup = null;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  NYC CAMERA BROWSER MODAL
+// ═══════════════════════════════════════════════════════════════════
+
+let cmSelectedCamera = null;
+let cmRefreshInterval = null;
+let cmCurrentBorough = 'All';
+let cmSearchQuery = '';
+
+// NYC bounds for simple mercator projection
+const NYC_BOUNDS = { north: 40.92, south: 40.50, east: -73.70, west: -74.25 };
+
+function openCameraModal() {
+  if (!trafficCameraData || trafficCameraData.length === 0) return;
+  const overlay = document.getElementById('camera-modal-overlay');
+  overlay.classList.add('active');
+  document.getElementById('cm-online-count').textContent = trafficCameraData.length;
+  renderCameraList();
+  renderMapPins();
+  // Close popup if open
+  hideCameraPopup();
+}
+
+function closeCameraModal() {
+  const overlay = document.getElementById('camera-modal-overlay');
+  overlay.classList.remove('active');
+  if (cmRefreshInterval) { clearInterval(cmRefreshInterval); cmRefreshInterval = null; }
+  cmSelectedCamera = null;
+  document.getElementById('cm-preview').classList.remove('active');
+}
+
+function getFilteredCameras() {
+  return trafficCameraData.filter(c => {
+    // Borough filter
+    if (cmCurrentBorough !== 'All') {
+      const area = (c.area || '').toLowerCase();
+      const borough = cmCurrentBorough.toLowerCase();
+      // Match common area patterns
+      if (!area.includes(borough) && !area.includes(borough.replace(' ', ''))) return false;
+    }
+    // Search filter
+    if (cmSearchQuery) {
+      const q = cmSearchQuery.toLowerCase();
+      const name = (c.name || '').toLowerCase();
+      const area = (c.area || '').toLowerCase();
+      if (!name.includes(q) && !area.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function boroughFromArea(area) {
+  if (!area) return 'Unknown';
+  const a = area.toLowerCase();
+  if (a.includes('manhattan')) return 'Manhattan';
+  if (a.includes('brooklyn')) return 'Brooklyn';
+  if (a.includes('queens')) return 'Queens';
+  if (a.includes('bronx')) return 'Bronx';
+  if (a.includes('staten')) return 'Staten Island';
+  // Try common abbreviations
+  if (a.includes('mn')) return 'Manhattan';
+  if (a.includes('bk') || a.includes('bkn')) return 'Brooklyn';
+  if (a.includes('qn') || a.includes('qns')) return 'Queens';
+  if (a.includes('bx')) return 'Bronx';
+  if (a.includes('si')) return 'Staten Island';
+  return area;
+}
+
+function renderCameraList() {
+  const listEl = document.getElementById('cm-list');
+  const filtered = getFilteredCameras();
+  if (filtered.length === 0) {
+    listEl.innerHTML = '<div class="cm-empty">No cameras match your filter.</div>';
+    return;
+  }
+  listEl.innerHTML = filtered.map(c => {
+    const sel = cmSelectedCamera && cmSelectedCamera.id === c.id ? ' selected' : '';
+    const borough = boroughFromArea(c.area);
+    return `<div class="cm-list-item${sel}" data-cam-id="${c.id}">
+      <div class="cm-list-thumb" data-cam-id="${c.id}"><span class="cm-thumb-loading">···</span></div>
+      <div class="cm-list-info">
+        <div class="cm-list-name">${c.name || 'Camera ' + c.id}</div>
+        <span class="cm-list-area">${borough}</span>
+      </div>
+      <div class="cm-list-status"></div>
+    </div>`;
+  }).join('');
+  // Load thumbnails lazily for visible items
+  requestAnimationFrame(() => loadVisibleThumbnails());
+  // Attach click handlers
+  listEl.querySelectorAll('.cm-list-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.camId;
+      const cam = trafficCameraData.find(c => c.id === id);
+      if (cam) selectCamera(cam);
+    });
+  });
+}
+
+let cmThumbLoaded = new Set();
+function loadVisibleThumbnails() {
+  const listEl = document.getElementById('cm-list');
+  if (!listEl) return;
+  const thumbs = listEl.querySelectorAll('.cm-list-thumb[data-cam-id]');
+  thumbs.forEach(thumb => {
+    const id = thumb.dataset.camId;
+    if (cmThumbLoaded.has(id)) return;
+    const rect = thumb.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 200 && rect.bottom > -200) {
+      cmThumbLoaded.add(id);
+      const cam = trafficCameraData.find(c => c.id === id);
+      if (!cam) return;
+      const img = new Image();
+      img.onload = () => {
+        thumb.innerHTML = '';
+        thumb.appendChild(img);
+      };
+      img.onerror = () => { thumb.innerHTML = '<span class="cm-thumb-loading">—</span>'; };
+      img.src = LIVE_FEED_PROXY + '?source=camera-image&id=' + encodeURIComponent(cam.id);
+    }
+  });
+}
+
+function renderMapPins() {
+  const overlay = document.getElementById('cm-map-overlay');
+  if (!overlay) return;
+  const filtered = getFilteredCameras();
+  overlay.innerHTML = filtered.map(c => {
+    const x = ((c.lng - NYC_BOUNDS.west) / (NYC_BOUNDS.east - NYC_BOUNDS.west)) * 100;
+    const y = ((NYC_BOUNDS.north - c.lat) / (NYC_BOUNDS.north - NYC_BOUNDS.south)) * 100;
+    const sel = cmSelectedCamera && cmSelectedCamera.id === c.id ? ' selected' : '';
+    return `<div class="cm-pin${sel}" style="left:${x}%;top:${y}%" data-cam-id="${c.id}" title="${c.name || ''}"></div>`;
+  }).join('');
+  overlay.querySelectorAll('.cm-pin').forEach(pin => {
+    pin.addEventListener('click', () => {
+      const id = pin.dataset.camId;
+      const cam = trafficCameraData.find(c => c.id === id);
+      if (cam) selectCamera(cam);
+    });
+  });
+}
+
+function selectCamera(cam) {
+  cmSelectedCamera = cam;
+  // Update list selection
+  document.querySelectorAll('.cm-list-item').forEach(el => {
+    el.classList.toggle('selected', el.dataset.camId === cam.id);
+  });
+  // Update pins
+  document.querySelectorAll('.cm-pin').forEach(pin => {
+    pin.classList.toggle('selected', pin.dataset.camId === cam.id);
+  });
+  // Show preview
+  const preview = document.getElementById('cm-preview');
+  preview.classList.add('active');
+  document.getElementById('cm-preview-name').textContent = cam.name || 'Camera ' + cam.id;
+  document.getElementById('cm-preview-area').textContent = boroughFromArea(cam.area);
+  loadPreviewImage(cam);
+  // Auto-refresh every 30s
+  if (cmRefreshInterval) clearInterval(cmRefreshInterval);
+  cmRefreshInterval = setInterval(() => {
+    if (cmSelectedCamera && cmSelectedCamera.id === cam.id) {
+      loadPreviewImage(cam);
+    }
+  }, 30000);
+}
+
+function loadPreviewImage(cam) {
+  const wrap = document.getElementById('cm-preview-img');
+  const refreshEl = document.getElementById('cm-preview-refresh');
+  wrap.innerHTML = '<div class="cm-loading-msg">LOADING IMAGE...</div>';
+  refreshEl.textContent = 'Refreshing...';
+  const img = new Image();
+  img.onload = () => {
+    wrap.innerHTML = '';
+    wrap.appendChild(img);
+    refreshEl.textContent = 'Updated ' + new Date().toLocaleTimeString();
+  };
+  img.onerror = () => {
+    wrap.innerHTML = '<div class="cm-error-msg">FAILED TO LOAD IMAGE</div>';
+    refreshEl.textContent = 'Error';
+  };
+  // Cache-bust to force fresh image
+  img.src = LIVE_FEED_PROXY + '?source=camera-image&id=' + encodeURIComponent(cam.id) + '&_t=' + Date.now();
+}
+
+// Init modal event listeners (after DOM ready)
+function initCameraModal() {
+  // Browse button
+  const browseBtn = document.getElementById('camera-browse-btn');
+  if (browseBtn) {
+    browseBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openCameraModal();
+    });
+  }
+  // Close button
+  const closeBtn = document.getElementById('cm-close');
+  if (closeBtn) closeBtn.addEventListener('click', closeCameraModal);
+  // Click overlay to close
+  const overlay = document.getElementById('camera-modal-overlay');
+  if (overlay) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeCameraModal();
+    });
+  }
+  // Search input
+  const search = document.getElementById('cm-search');
+  if (search) {
+    search.addEventListener('input', () => {
+      cmSearchQuery = search.value.trim();
+      renderCameraList();
+      renderMapPins();
+    });
+  }
+  // Borough tabs
+  document.querySelectorAll('.cm-borough-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.cm-borough-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      cmCurrentBorough = tab.dataset.borough;
+      renderCameraList();
+      renderMapPins();
+    });
+  });
+  // Scroll listener for lazy thumbnails
+  const listEl = document.getElementById('cm-list');
+  if (listEl) {
+    listEl.addEventListener('scroll', () => {
+      clearTimeout(cmScrollTimer);
+      cmScrollTimer = setTimeout(() => loadVisibleThumbnails(), 150);
+    });
+  }
+  // Escape to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('camera-modal-overlay').classList.contains('active')) {
+      closeCameraModal();
+    }
+  });
+}
+
+let cmScrollTimer = null;
+
+// Update browse button state when cameras load
+function updateCameraBrowseBtn() {
+  const btn = document.getElementById('camera-browse-btn');
+  if (!btn) return;
+  if (trafficCameraData && trafficCameraData.length > 0) {
+    btn.disabled = false;
+  }
 }
 
 // Update the alerts feed panel with live NWS data
@@ -2982,6 +3559,7 @@ if (layers.daynight) updateDayNight();
 }
 
 init();
+initCameraModal();
 </script>
 
 <!-- Timeline Scrubber + Fires + Ships Layer Modules -->
