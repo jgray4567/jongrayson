@@ -3562,13 +3562,12 @@ init();
 initCameraModal();
 </script>
 
-<!-- Timeline Scrubber + Fires + Ships Layer Modules -->
+<!-- Timeline Scrubber + Fires Layer Modules -->
 <script src="timeline-engine.js"></script>
 <script src="fires-layer.js"></script>
-<script src="ships-layer.js"></script>
 <script>
   // Initialize extended layers after main globe loads
-  let timelineEngine, firesLayer, shipsLayer;
+  let timelineEngine, firesLayer;
   
   // Wait for globe to be ready
   setTimeout(() => {
@@ -3583,15 +3582,6 @@ initCameraModal();
         apiBase: '../../api'
       });
       firesLayer.init();
-    }
-    if (typeof ShipsLayer !== 'undefined') {
-      shipsLayer = new ShipsLayer({
-        scene: window._globeScene,
-        globeRadius: 100,
-        apiBase: '../../api',
-        aisstreamApiKey: '' // Add aisstream.io key here when available
-      });
-      shipsLayer.init();
     }
   }, 3000); // Wait 3s for globe to initialize first
 </script>
