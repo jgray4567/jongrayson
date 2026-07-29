@@ -2111,7 +2111,7 @@ function updateLiveAlertsFeed() {
       sev,
       text: a.event + (a.areaDesc ? ' — ' + a.areaDesc.substring(0, 60) : ''),
       loc: a.areaDesc ? a.areaDesc.split(';')[0].substring(0, 20) : 'US',
-      url: 'https://api.weather.gov/alerts/' + a.id
+      url: a.id.startsWith('http') ? a.id : 'https://api.weather.gov/alerts/' + a.id
     });
   }
 
@@ -2705,7 +2705,7 @@ function renderTicker() {
   for (const a of weatherAlertData.slice(0, 3)) {
     const time = a.sent ? new Date(a.sent).toISOString().slice(11, 16) : '--:--';
     const dot = a.severity === 'Extreme' ? '#ff2244' : a.severity === 'Severe' ? '#ff6622' : '#ffcc22';
-    items.push('<a class="tc-item" href="https://api.weather.gov/alerts/' + a.id + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit"><span class="tc-dot" style="background:' + dot + '"></span><span class="tc-time">' + time + '</span><span class="tc-text">' + a.event + ' — ' + (a.areaDesc || 'US').substring(0, 40) + '</span></a>');
+    items.push('<a class="tc-item" href="' + (a.id.startsWith('http') ? a.id : 'https://api.weather.gov/alerts/' + a.id) + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit"><span class="tc-dot" style="background:' + dot + '"></span><span class="tc-time">' + time + '</span><span class="tc-text">' + a.event + ' — ' + (a.areaDesc || 'US').substring(0, 40) + '</span></a>');
   }
   const joined = items.join('');
   content.innerHTML = joined + joined; // Duplicate for seamless loop
