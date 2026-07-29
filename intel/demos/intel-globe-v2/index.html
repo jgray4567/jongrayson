@@ -1998,7 +1998,8 @@ async function fetchTrafficCameras() {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     // Filter to online cameras only
-    trafficCameraData = (Array.isArray(data) ? data : (data.items || data.features || [])).filter(c => {
+    const camList = Array.isArray(data) ? data : (data.items || data.features || Object.values(data));
+    trafficCameraData = camList.filter(c => {
       const online = c.isOnline;
       // Handle both string and boolean values
       return online === true || online === 'true' || online === 1 || online === '1';
