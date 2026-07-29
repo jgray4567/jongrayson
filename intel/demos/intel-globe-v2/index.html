@@ -736,13 +736,13 @@
     font-family: 'JetBrains Mono', monospace;
   }
   .cm-preview-img-wrap {
-    width: 100%; max-height: 280px;
+    width: 100%; max-height: 480px;
     background: #0a0b10; display: flex;
     align-items: center; justify-content: center;
     overflow: hidden;
   }
   .cm-preview-img-wrap img {
-    width: 100%; max-height: 280px; object-fit: contain;
+    width: 100%; max-height: 480px; object-fit: contain;
   }
   .cm-preview-img-wrap .cm-loading-msg {
     color: #C4D600; font-size: 11px;
@@ -814,7 +814,7 @@
   .cm-list-item:hover { background: rgba(196,214,0,0.04); }
   .cm-list-item.selected { background: rgba(196,214,0,0.08); }
   .cm-list-thumb {
-    width: 48px; height: 36px; border-radius: 6px;
+    width: 80px; height: 60px; border-radius: 6px;
     background: #0a0b10;
     flex-shrink: 0; overflow: hidden;
     display: flex; align-items: center; justify-content: center;
@@ -854,8 +854,8 @@
       border-right: none;
       border-bottom: 1px solid rgba(196,214,0,0.08);
     }
-    .cm-preview-img-wrap { max-height: 200px; }
-    .cm-preview-img-wrap img { max-height: 200px; }
+    .cm-preview-img-wrap { max-height: 320px; }
+    .cm-preview-img-wrap img { max-height: 320px; }
   }
 </style>
 <link rel="stylesheet" href="extended-layers.css">
@@ -1155,7 +1155,7 @@
     <div class="cm-body">
       <!-- Left: Map -->
       <div class="cm-map-panel">
-        <iframe src="https://maps.google.com/maps?q=40.7128,-74.0060&z=11&output=embed" loading="lazy"></iframe>
+        <iframe src="https://maps.google.com/maps?q=40.7128,-74.0060&z=10&output=embed" loading="lazy"></iframe>
         <div class="cm-map-overlay" id="cm-map-overlay"></div>
         <div class="cm-map-hint">NYC DOT Camera Locations</div>
       </div>
