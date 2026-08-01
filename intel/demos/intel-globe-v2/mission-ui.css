@@ -685,3 +685,81 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
    #camera-modal-overlay at 100. The command palette (400) and keyboard map
    (420) stay above it deliberately — those are global and must always reach. */
 #camera-modal-overlay { z-index: 200 !important; }
+
+/* ══════════════════════════════════════════════════════════════
+   PANEL WINDOW CONTROLS
+   ══════════════════════════════════════════════════════════════ */
+
+@media (min-width: 851px) {
+
+  /* Header becomes a title bar with a control cluster. */
+  #layers-panel > h2,
+  #regions-panel > h2 {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .pw-title { flex: 1; min-width: 0; }
+
+  .pw-controls { display: flex; gap: 3px; flex-shrink: 0; }
+  .pw-btn {
+    width: 19px; height: 19px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--line-2);
+    border-radius: 4px; color: var(--txt-3); cursor: pointer;
+    font-family: var(--mono); font-size: 11px; padding: 0;
+    transition: all 0.13s;
+  }
+  .pw-btn:hover { color: var(--txt); background: rgba(196,214,0,0.16); border-color: rgba(196,214,0,0.35); }
+  .pw-close:hover { color: #ffb3bb; background: rgba(255,43,61,0.18); border-color: rgba(255,43,61,0.4); }
+
+  /* Collapsed: title bar only. */
+  .panel.pw-collapsed { max-height: none !important; min-height: 0 !important;
+                        overflow: hidden !important; padding-bottom: 6px; }
+  #layers-panel.pw-collapsed > *:not(h2),
+  #regions-panel.pw-collapsed > *:not(h2),
+  #alerts-panel.pw-collapsed > *:not(.ap-header) { display: none !important; }
+  #layers-panel.pw-collapsed > h2,
+  #regions-panel.pw-collapsed > h2 { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+  .panel.pw-collapsed h2, .panel.pw-collapsed .ap-header { cursor: pointer; }
+
+  .panel.pw-hidden { display: none !important; }
+
+  /* Alerts panel header carries the cluster alongside SUMMARY. */
+  #alerts-panel .ap-header { display: flex; align-items: center; gap: 8px; }
+  #alerts-panel .ap-header .ap-title { flex: 1; min-width: 0; }
+  #alerts-panel.pw-collapsed { height: auto !important; }
+
+  /* Reclaim the left rail when the alerts feed is not using it. */
+  body.no-alerts #layers-panel {
+    max-height: calc(100vh - 72px - var(--bottom-chrome) - 60px) !important;
+  }
+}
+
+/* ── Dock: the way back ────────────────────────────────────────── */
+#panel-dock {
+  position: fixed; left: 16px; bottom: 100px; z-index: 58;
+  display: none; align-items: center; gap: 6px;
+  padding: 6px 8px; border-radius: 9px;
+  background: rgba(9,11,16,0.94);
+  border: 1px solid rgba(196,214,0,0.18);
+  backdrop-filter: blur(14px);
+}
+#panel-dock.show { display: flex; }
+.pd-label {
+  font-family: var(--mono); font-size: 8.5px; letter-spacing: 1.2px;
+  color: var(--txt-3); padding-right: 2px;
+}
+.pd-chip {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 10px; color: var(--txt-2);
+  background: rgba(255,255,255,0.05); border: 1px solid var(--line-2);
+  border-radius: 6px; padding: 4px 8px; cursor: pointer; white-space: nowrap;
+  transition: all 0.13s;
+}
+.pd-chip:hover { color: var(--ink); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+.pd-chip:hover kbd { color: var(--ink); border-color: rgba(0,0,0,0.3); background: rgba(0,0,0,0.12); }
+
+@media (max-width: 850px) {
+  /* Mobile already has its own drawer system; window controls would fight it. */
+  .pw-controls { display: none; }
+  #panel-dock { display: none !important; }
+}

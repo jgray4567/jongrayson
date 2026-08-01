@@ -939,8 +939,14 @@
 </div>
 
 <!-- Left Sidebar — Layers -->
-<div id="layers-panel" class="glass">
-  <h2>Intel Layers</h2>
+<div id="layers-panel" class="glass panel" data-panel="layers">
+  <h2>
+    <span class="pw-title">Intel Layers</span>
+    <span class="pw-controls">
+      <button class="pw-btn pw-collapse" title="Collapse / expand" aria-label="Collapse panel">–</button>
+      <button class="pw-btn pw-close" title="Close (restore from the dock, or press I)" aria-label="Close panel">✕</button>
+    </span>
+  </h2>
   <button class="panel-close" id="layers-close" aria-label="Close">✕</button>
 
   <label class="layer-toggle">
@@ -1063,8 +1069,14 @@
 </div>
 
 <!-- Right Sidebar — Region Presets -->
-<div id="regions-panel" class="glass">
-  <h2>Region Presets</h2>
+<div id="regions-panel" class="glass panel" data-panel="regions">
+  <h2>
+    <span class="pw-title">Region Presets</span>
+    <span class="pw-controls">
+      <button class="pw-btn pw-collapse" title="Collapse / expand" aria-label="Collapse panel">–</button>
+      <button class="pw-btn pw-close" title="Close (restore from the dock, or press P)" aria-label="Close panel">✕</button>
+    </span>
+  </h2>
   <button class="region-btn" data-lat="48.38" data-lng="32.0" data-name="Ukraine">
     <span class="rb-icon">📍</span>
     <div><div>Ukraine</div><div class="rb-coords">48.4°N 32.0°E</div></div>
@@ -1092,10 +1104,14 @@
 </div>
 
 <!-- Bottom Panel — Alerts -->
-<div id="alerts-panel" class="glass">
+<div id="alerts-panel" class="glass panel" data-panel="alerts">
   <div class="ap-header">
     <div class="ap-title">Live Alerts Feed</div>
     <button class="ap-btn" id="btn-ai-summary">SUMMARY</button>
+    <span class="pw-controls">
+      <button class="pw-btn pw-collapse" title="Collapse / expand" aria-label="Collapse panel">–</button>
+      <button class="pw-btn pw-close" title="Close (restore from the dock, or press A)" aria-label="Close panel">✕</button>
+    </span>
   </div>
   <div class="ap-close-bar">
     <button class="ap-btn panel-close" id="alerts-close" aria-label="Close">✕ Close</button>
@@ -1111,6 +1127,13 @@
   </div>
   <div class="as-body" id="ai-body"></div>
 </div>
+
+<!-- Panel dock — the way back from a closed panel.
+     A close button with no restore path is a trap: the operator loses a
+     control surface and has no way to discover how to get it back. The dock
+     appears only when something is hidden, and every panel also has a key and
+     a command-palette entry. -->
+<div id="panel-dock"><span class="pd-label">CLOSED</span></div>
 
 <!-- Ticker -->
 <div id="ticker">
@@ -1637,6 +1660,7 @@ async function init() {
   setInterval(fetchNews, 300000); // 5 min
 
   initMissionUI();
+  initPanelControls();
   initExtendedLayers();
 }
 
@@ -3213,6 +3237,7 @@ document.getElementById('ai-close').addEventListener('click', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
     applyViewportFraming();
+    renderPanelDock();
   });
   applyViewportFraming();
 
@@ -3928,6 +3953,134 @@ function updateCameraTracking() {
 //  MISSION UI
 // ═══════════════════════════════════════════════════════════════════
 
+/* ═══════════════════════════════════════════════════════════════════
+   PANEL WINDOW MANAGER
+   ═══════════════════════════════════════════════════════════════════
+
+   Collapse and close for Intel Layers, Live Alerts Feed and Region Presets.
+
+   Two rules this has to honour:
+
+   1. A close button with no restore path is a trap. Every hidden panel gets
+      a chip in the dock, a keyboard shortcut, and a command-palette entry —
+      three independent ways back, so losing a panel is never permanent and
+      never requires a page reload to undo.
+
+   2. Layout budgets have to follow. The left rail sizes the layer list
+      against the alerts feed below it; when the alerts feed is closed or
+      collapsed the layer list should take the freed space rather than leave
+      a hole.
+   ═══════════════════════════════════════════════════════════════════ */
+
+const PANELS = {
+  layers:  { el: 'layers-panel',  label: 'Intel Layers',     key: 'I' },
+  alerts:  { el: 'alerts-panel',  label: 'Live Alerts Feed', key: 'A' },
+  regions: { el: 'regions-panel', label: 'Region Presets',   key: 'P' },
+};
+const PANEL_STORE = 'intel.panels.v1';
+let panelState = { layers: {}, alerts: {}, regions: {} };
+
+function loadPanelState() {
+  try {
+    const raw = localStorage.getItem(PANEL_STORE);
+    if (raw) panelState = Object.assign(panelState, JSON.parse(raw));
+  } catch { /* private mode / disabled storage — defaults are fine */ }
+}
+function savePanelState() {
+  try { localStorage.setItem(PANEL_STORE, JSON.stringify(panelState)); } catch {}
+}
+
+function setPanel(name, { closed, collapsed } = {}) {
+  const def = PANELS[name];
+  if (!def) return;
+  const el = document.getElementById(def.el);
+  if (!el) return;
+  const st = panelState[name] || (panelState[name] = {});
+  if (closed !== undefined) st.closed = !!closed;
+  if (collapsed !== undefined) st.collapsed = !!collapsed;
+
+  el.classList.toggle('pw-hidden', !!st.closed);
+  el.classList.toggle('pw-collapsed', !!st.collapsed);
+  const btn = el.querySelector('.pw-collapse');
+  if (btn) {
+    btn.textContent = st.collapsed ? '+' : '–';
+    btn.setAttribute('aria-label', st.collapsed ? 'Expand panel' : 'Collapse panel');
+  }
+
+  // Free space on the left rail when the alerts feed is not taking it.
+  document.body.classList.toggle('no-alerts',
+    !!(panelState.alerts.closed || panelState.alerts.collapsed));
+
+  savePanelState();
+  renderPanelDock();
+}
+
+function togglePanel(name) {
+  const st = panelState[name] || {};
+  // One key cycles the useful states: open -> collapsed -> closed -> open.
+  if (!st.closed && !st.collapsed) setPanel(name, { collapsed: true });
+  else if (st.collapsed && !st.closed) setPanel(name, { collapsed: false, closed: true });
+  else setPanel(name, { closed: false, collapsed: false });
+}
+
+function renderPanelDock() {
+  const dock = document.getElementById('panel-dock');
+  if (!dock) return;
+  const hidden = Object.entries(PANELS).filter(([n]) => panelState[n] && panelState[n].closed);
+  dock.classList.toggle('show', hidden.length > 0);
+  dock.innerHTML = '<span class="pd-label">CLOSED</span>' + hidden.map(([n, d]) =>
+    `<button class="pd-chip" data-panel="${n}" title="Reopen ${d.label} (${d.key})">`
+    + `${d.label}<kbd>${d.key}</kbd></button>`).join('');
+  dock.querySelectorAll('.pd-chip').forEach(b =>
+    b.addEventListener('click', () => setPanel(b.dataset.panel, { closed: false, collapsed: false })));
+
+  positionDock(dock, hidden.length > 0);
+}
+
+/**
+ * Sit the dock directly above whatever occupies the bottom of the left rail.
+ * The alerts panel's height varies with its state (open / collapsed / closed),
+ * so a fixed offset collides with it in at least one of those states — it did,
+ * over the collapsed title bar.
+ */
+function positionDock(dock, visible) {
+  if (!visible) return;
+  const alerts = document.getElementById('alerts-panel');
+  const shown = alerts && getComputedStyle(alerts).display !== 'none'
+             && !alerts.classList.contains('pw-hidden');
+  if (shown) {
+    const r = alerts.getBoundingClientRect();
+    dock.style.bottom = Math.round(window.innerHeight - r.top + 8) + 'px';
+  } else {
+    dock.style.bottom = '100px';
+  }
+}
+
+function initPanelControls() {
+  loadPanelState();
+  for (const [name, def] of Object.entries(PANELS)) {
+    const el = document.getElementById(def.el);
+    if (!el) continue;
+    el.querySelector('.pw-collapse')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setPanel(name, { collapsed: !(panelState[name] || {}).collapsed });
+    });
+    el.querySelector('.pw-close')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setPanel(name, { closed: true });
+      missionUI?.toast(def.label + ' closed — press ' + def.key + ' or use the dock to reopen');
+    });
+    // A collapsed panel's title bar is the affordance to expand it again.
+    const bar = el.querySelector('h2, .ap-header');
+    bar?.addEventListener('click', (e) => {
+      if (e.target.closest('.pw-btn, .ap-btn, button')) return;
+      if ((panelState[name] || {}).collapsed) setPanel(name, { collapsed: false });
+    });
+    setPanel(name, {});   // apply any persisted state
+  }
+  renderPanelDock();
+}
+
 function initMissionUI() {
   const toggle = (key) => () => {
     const cb = document.getElementById('layer-' + key);
@@ -3995,6 +4148,18 @@ function initMissionUI() {
       }},
     { id:'clear',   group:'Selection', keys:['Esc'], label:'Clear selection',
       run:() => selection.clear() },
+
+    { id:'p-layers',  group:'Panels', keys:['I'], label:'Intel Layers panel',
+      keywords:'panel layers sidebar show hide collapse close', run:() => togglePanel('layers') },
+    { id:'p-alerts',  group:'Panels', keys:['A'], label:'Live Alerts Feed panel',
+      keywords:'panel alerts feed show hide collapse close', run:() => togglePanel('alerts') },
+    { id:'p-regions', group:'Panels', keys:['P'], label:'Region Presets panel',
+      keywords:'panel regions presets show hide collapse close', run:() => togglePanel('regions') },
+    { id:'p-all',     group:'Panels', keys:['0'], label:'Reopen all panels',
+      keywords:'restore reset panels show all', run:() => {
+        for (const n of Object.keys(PANELS)) setPanel(n, { closed: false, collapsed: false });
+        missionUI.toast('All panels restored');
+      }},
 
     { id:'refresh', group:'Data',  keys:['F5'], label:'Force refresh all sources',
       keywords:'refresh reload poll fetch', run:() => {
