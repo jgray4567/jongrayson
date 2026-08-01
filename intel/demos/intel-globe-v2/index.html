@@ -1141,6 +1141,11 @@
   <div class="ticker-track"><div class="ticker-content" id="ticker-content"></div></div>
 </div>
 
+<!-- City name labels. A brighter dot is still an anonymous dot; a NAMED dot
+     is reference geography you can navigate by. This is the actual fix for
+     cities getting lost among live markers. -->
+<div id="city-labels"></div>
+
 <!-- Tooltip -->
 <div id="tooltip">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
@@ -1590,6 +1595,7 @@ async function init() {
   buildAircraft();
   setLoadProgress(75, 'Placing city markers...');
   buildCities();
+  buildCityLabels();
   setLoadProgress(82, 'Marking hotspots...');
   buildHotspots();
   setLoadProgress(88, 'Calculating day/night...');
@@ -1857,7 +1863,7 @@ function buildCities() {
     const pos = latLngTo3D(city.lat, city.lng, EARTH_RADIUS + 0.02);
 
     const ringMat = new THREE.MeshBasicMaterial({
-      color: PALETTE.reference.city, transparent: true, opacity: 0.34,
+      color: PALETTE.reference.cityBright, transparent: true, opacity: 0.62,
       side: THREE.DoubleSide, depthWrite: false, toneMapped: false,
     });
     const ring = new THREE.Mesh(ringGeo, ringMat);
@@ -1868,7 +1874,7 @@ function buildCities() {
     cityGroup.add(ring);
 
     const dotMat = new THREE.MeshBasicMaterial({
-      color: PALETTE.reference.city, transparent: true, opacity: 0.7,
+      color: PALETTE.reference.cityBright, transparent: true, opacity: 0.95,
       toneMapped: false,
     });
     const dot = new THREE.Mesh(innerDotGeo, dotMat);
@@ -3878,14 +3884,15 @@ function animate() {
   if (layers.cities) {
     for (const child of cityGroup.children) {
       if (child.userData.isRing) {
-        child.userData.pulse += 0.018;
-        child.material.opacity = 0.24 + Math.sin(child.userData.pulse) * 0.10;
-        const sc = 1.0 + Math.sin(child.userData.pulse) * 0.07;
+        child.userData.pulse += 0.02;
+        child.material.opacity = 0.48 + Math.sin(child.userData.pulse) * 0.16;
+        const sc = 1.0 + Math.sin(child.userData.pulse) * 0.10;
         child.scale.set(sc, sc, sc);
       }
     }
   }
 
+  updateCityLabels(nowMs);
   updateSelectionReticle(viewportH);
   updateCameraTracking();
 
@@ -3960,6 +3967,76 @@ let lastAircraftCount = -1;
  * an aircraft and the camera flew somewhere — which one is it?" Without a
  * persistent marker, a fly-to lands you in a field of identical glyphs.
  */
+/**
+ * City labels.
+ *
+ * DOM overlay rather than sprites: text stays crisp at any zoom, costs no
+ * texture memory, and inherits the UI font.
+ *
+ * Decluttered by population against camera distance. Showing all 51 at every
+ * zoom would trade one legibility problem for another — a wall of overlapping
+ * text is no more findable than an unlabelled dot.
+ */
+let cityLabelEls = null;
+const _lblV = new THREE.Vector3();
+
+function buildCityLabels() {
+  const host = document.getElementById('city-labels');
+  if (!host) return;
+  host.innerHTML = '';
+  cityLabelEls = CITIES.map(c => {
+    const el = document.createElement('div');
+    el.className = 'city-label';
+    el.textContent = c.name;
+    el.addEventListener('click', () => {
+      selection.select('city', c.name);
+      flyToEntity(registry.get('city', c.name));
+    });
+    host.appendChild(el);
+    return { el, city: c, shown: false };
+  });
+}
+
+let lastLabelUpdate = 0;
+function updateCityLabels(nowMs) {
+  if (!cityLabelEls) return;
+  const host = document.getElementById('city-labels');
+  if (!layers.cities) { if (host) host.style.display = 'none'; return; }
+  if (host) host.style.display = '';
+  if (nowMs - lastLabelUpdate < 60) return;   // ~16 Hz is plenty for text
+  lastLabelUpdate = nowMs;
+
+  const dist = camera.position.length();
+  // Population floor rises with distance so wide views stay readable.
+  const popFloor = dist > 22 ? 9e6 : dist > 16 ? 6e6 : dist > 11 ? 3e6 : dist > 8 ? 1e6 : 0;
+  const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight;
+
+  for (const rec of cityLabelEls) {
+    const c = rec.city;
+    if ((c.pop || 0) < popFloor) { if (rec.shown) { rec.el.style.display = 'none'; rec.shown = false; } continue; }
+
+    latLngTo3D(c.lat, c.lng, EARTH_RADIUS + 0.02, _lblV);
+    // Hide labels for cities on the far side of the planet.
+    const toCam = camera.position.clone().sub(_lblV);
+    if (_lblV.clone().normalize().dot(toCam.normalize()) < 0.06) {
+      if (rec.shown) { rec.el.style.display = 'none'; rec.shown = false; }
+      continue;
+    }
+    _lblV.project(camera);
+    if (_lblV.z > 1) { if (rec.shown) { rec.el.style.display = 'none'; rec.shown = false; } continue; }
+    const x = (_lblV.x * 0.5 + 0.5) * w;
+    const y = (-_lblV.y * 0.5 + 0.5) * h;
+    if (x < -60 || x > w + 60 || y < 40 || y > h - 20) {
+      if (rec.shown) { rec.el.style.display = 'none'; rec.shown = false; }
+      continue;
+    }
+    rec.el.style.transform = `translate(${Math.round(x) + 9}px, ${Math.round(y) - 8}px)`;
+    const sel = selection.is('city', c.name);
+    rec.el.classList.toggle('sel', sel);
+    if (!rec.shown) { rec.el.style.display = 'block'; rec.shown = true; }
+  }
+}
+
 function updateSelectionReticle(viewportH) {
   const sel = selection.selected;
   if (!sel) { highlightRing.visible = false; return; }

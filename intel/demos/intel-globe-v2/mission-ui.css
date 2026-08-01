@@ -859,3 +859,54 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
   }
   .ds-link:hover { border-bottom-color: var(--sel); }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   CITY LABELS
+   ══════════════════════════════════════════════════════════════
+   Cities kept getting lost among live markers. Raising their brightness
+   alone would just have them compete with signal; naming them makes them
+   reference geography you can navigate by, which is what they are for. */
+
+#city-labels {
+  position: absolute; inset: 0; z-index: 6;
+  pointer-events: none; overflow: hidden;
+}
+.city-label {
+  position: absolute; top: 0; left: 0; display: none;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.3px;
+  color: #cfe3d6; white-space: nowrap;
+  pointer-events: auto; cursor: pointer;
+  /* Outline rather than a filled plate: readable over ocean, ice, terrain and
+     city-light bloom without boxing in the map. */
+  text-shadow:
+    0 0 3px rgba(3,5,8,0.95), 0 0 6px rgba(3,5,8,0.85),
+    1px 1px 0 rgba(3,5,8,0.9), -1px -1px 0 rgba(3,5,8,0.9);
+  transition: color 0.15s;
+}
+.city-label:hover { color: var(--accent); }
+.city-label.sel { color: var(--sel); font-weight: 600; }
+
+/* ── City headlines in the dossier ─────────────────────────────── */
+.ds-citynews { display: block; margin-top: 4px; text-align: left; }
+.ds-news {
+  display: block; padding: 7px 0;
+  border-bottom: 1px solid var(--line-2); text-decoration: none;
+}
+.ds-news:last-of-type { border-bottom: none; }
+.ds-news-title {
+  font-family: var(--mono); font-size: 11.4px; line-height: 1.45;
+  color: var(--txt); word-break: break-word;
+}
+.ds-news:hover .ds-news-title { color: var(--accent); }
+.ds-news-meta {
+  display: flex; gap: 8px; margin-top: 3px;
+  font-family: var(--mono); font-size: 9.8px; color: var(--txt-3);
+}
+.ds-news-src { color: var(--txt-2); }
+.ds-news-loading, .ds-news-empty {
+  font-family: var(--mono); font-size: 11px; color: var(--txt-3); padding: 6px 0;
+}
+.ds-news-note {
+  margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--line-2);
+  font-family: var(--mono); font-size: 9.5px; line-height: 1.5; color: var(--txt-3);
+}

@@ -68,6 +68,12 @@ export const PALETTE = {
   // Reference geometry — must recede. Never competes with signal.
   reference: {
     city:    0x6f8a7a,
+    // Cities were toned down to stop them competing with live signal, but
+    // went too far — they became unfindable against terrain and city-light
+    // texture. This is brighter and cooler so they separate from the map
+    // without entering the threat (red), air (blue) or orbit (violet)
+    // families. Legibility comes mainly from the labels, not the brightness.
+    cityBright: 0xa8c8b4,
     border:  0x2a3a4a,
     graticule: 0x1a2836,
   },

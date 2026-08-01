@@ -345,6 +345,11 @@ export class MissionUI {
     if (this._identFor === key) return;
     this._identFor = key;
 
+    if (sel.kind === 'city') {
+      host.className = 'ds-ident'; host.innerHTML = '';
+      this._loadCityNews(entity, key);
+      return;
+    }
     if (sel.kind !== 'aircraft') { host.className = 'ds-ident'; host.innerHTML = ''; return; }
 
     const t = entity.data;
@@ -381,6 +386,52 @@ export class MissionUI {
       img.onerror = () => {};
       img.src = url;
     });
+  }
+
+  /**
+   * Headlines for a city.
+   *
+   * Deliberately a keyword search, and labelled as one. It returns articles
+   * MENTIONING the place, not a local wire — "Cairo" reliably surfaces both
+   * Cairo, Egypt and Cairo, Georgia. Saying "news in Cairo" would be a claim
+   * the data does not support.
+   *
+   * Fired only when the selection changes, never on the 250 ms value refresh,
+   * and every response is checked against the still-current selection before
+   * it is written — otherwise clicking through several cities quickly paints
+   * one city's headlines into another city's panel.
+   */
+  _loadCityNews(entity, key) {
+    const c = entity.data || {};
+    const url = '../../api/city-news.php?limit=5&city=' + encodeURIComponent(entity.label || '')
+              + '&country=' + encodeURIComponent(c.country || '');
+    fetch(url)
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (this._identFor !== key) return;          // selection moved on
+        const host = document.getElementById('ds-citynews');
+        if (!host) return;
+        const items = (d && d.items) || [];
+        if (!items.length) {
+          host.innerHTML = `<div class="ds-news-empty">No recent headlines found for this city.</div>`;
+          return;
+        }
+        host.innerHTML = items.map(n => `
+          <a class="ds-news" href="${n.url}" target="_blank" rel="noopener noreferrer">
+            <div class="ds-news-title">${escapeHtml(n.title)}</div>
+            <div class="ds-news-meta">
+              <span class="ds-news-src">${escapeHtml(n.source)}</span>
+              <span>${escapeHtml(relativeDay(n.ts))}</span>
+            </div>
+          </a>`).join('')
+          + `<div class="ds-news-note">Keyword search — articles mentioning "${escapeHtml(entity.label)}",`
+          + ` not necessarily reported from it.${d.stale ? ' Cached (source unreachable).' : ''}</div>`;
+      })
+      .catch(() => {
+        if (this._identFor !== key) return;
+        const host = document.getElementById('ds-citynews');
+        if (host) host.innerHTML = `<div class="ds-news-empty">Headline search unavailable.</div>`;
+      });
   }
 
   _dossierContent(kind, e) {
@@ -520,7 +571,10 @@ export class MissionUI {
       rows.push({ k: 'Population', v: (c.pop || 0).toLocaleString() });
       rows.push({ k: 'Country', v: c.country });
       rows.push({ k: 'Coordinates', v: formatCoord(e.lat, e.lng) });
-      provenance = `<span class="ds-prov-src">Static reference geography</span>`;
+      rows.push({ divider: 'Headlines' });
+      rows.push({ html: `<div class="ds-citynews" id="ds-citynews">
+        <div class="ds-news-loading">Searching…</div></div>`, k: '' });
+      provenance = `<span class="ds-prov-src">Geography: static reference · Headlines: Google News search</span>`;
     }
 
     return { rows, banner, provenance };
@@ -734,6 +788,14 @@ export class MissionUI {
     requestAnimationFrame(() => t.classList.add('in'));
     setTimeout(() => { t.classList.remove('in'); setTimeout(() => t.remove(), 300); }, ms);
   }
+}
+
+function relativeDay(ts) {
+  const ms = Date.now() - ts * 1000;
+  const h = ms / 3600000;
+  if (h < 1) return Math.max(1, Math.round(ms / 60000)) + 'm ago';
+  if (h < 24) return Math.round(h) + 'h ago';
+  return Math.round(h / 24) + 'd ago';
 }
 
 function escapeHtml(s) {
