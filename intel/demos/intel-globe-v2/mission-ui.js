@@ -401,36 +401,51 @@ export class MissionUI {
    * it is written — otherwise clicking through several cities quickly paints
    * one city's headlines into another city's panel.
    */
+  _cityNewsHtml(entity) {
+    const st = this._cityNews && this._cityNews.get(entity.id);
+    if (!st || st.state === 'loading') {
+      return `<div class="ds-citynews"><div class="ds-news-loading">Searching…</div></div>`;
+    }
+    if (st.state === 'error') {
+      return `<div class="ds-citynews"><div class="ds-news-empty">Headline search unavailable.</div></div>`;
+    }
+    if (!st.items.length) {
+      return `<div class="ds-citynews"><div class="ds-news-empty">No recent headlines found.</div></div>`;
+    }
+    return `<div class="ds-citynews">` + st.items.map(n => `
+      <a class="ds-news" href="${n.url}" target="_blank" rel="noopener noreferrer">
+        <div class="ds-news-title">${escapeHtml(n.title)}</div>
+        <div class="ds-news-meta">
+          <span class="ds-news-src">${escapeHtml(n.source)}</span>
+          <span>${escapeHtml(relativeDay(n.ts))}</span>
+        </div>
+      </a>`).join('')
+      + `<div class="ds-news-note">Keyword search — articles mentioning "${escapeHtml(entity.label)}",`
+      + ` not necessarily reported from it.${st.stale ? ' Cached (source unreachable).' : ''}</div></div>`;
+  }
+
   _loadCityNews(entity, key) {
+    this._cityNews = this._cityNews || new Map();
+    const cached = this._cityNews.get(entity.id);
+    if (cached && cached.state !== 'loading') { this.renderDossier(); return; }
+    if (cached && cached.state === 'loading') return;
+
+    this._cityNews.set(entity.id, { state: 'loading', items: [] });
     const c = entity.data || {};
     const url = '../../api/city-news.php?limit=5&city=' + encodeURIComponent(entity.label || '')
               + '&country=' + encodeURIComponent(c.country || '');
     fetch(url)
       .then(r => (r.ok ? r.json() : null))
       .then(d => {
-        if (this._identFor !== key) return;          // selection moved on
-        const host = document.getElementById('ds-citynews');
-        if (!host) return;
-        const items = (d && d.items) || [];
-        if (!items.length) {
-          host.innerHTML = `<div class="ds-news-empty">No recent headlines found for this city.</div>`;
-          return;
-        }
-        host.innerHTML = items.map(n => `
-          <a class="ds-news" href="${n.url}" target="_blank" rel="noopener noreferrer">
-            <div class="ds-news-title">${escapeHtml(n.title)}</div>
-            <div class="ds-news-meta">
-              <span class="ds-news-src">${escapeHtml(n.source)}</span>
-              <span>${escapeHtml(relativeDay(n.ts))}</span>
-            </div>
-          </a>`).join('')
-          + `<div class="ds-news-note">Keyword search — articles mentioning "${escapeHtml(entity.label)}",`
-          + ` not necessarily reported from it.${d.stale ? ' Cached (source unreachable).' : ''}</div>`;
+        this._cityNews.set(entity.id, {
+          state: 'ok', items: (d && d.items) || [], stale: !!(d && d.stale),
+        });
+        // Only repaint if this city is still the selection.
+        if (this._identFor === key) this.renderDossier();
       })
       .catch(() => {
-        if (this._identFor !== key) return;
-        const host = document.getElementById('ds-citynews');
-        if (host) host.innerHTML = `<div class="ds-news-empty">Headline search unavailable.</div>`;
+        this._cityNews.set(entity.id, { state: 'error', items: [] });
+        if (this._identFor === key) this.renderDossier();
       });
   }
 
@@ -572,8 +587,12 @@ export class MissionUI {
       rows.push({ k: 'Country', v: c.country });
       rows.push({ k: 'Coordinates', v: formatCoord(e.lat, e.lng) });
       rows.push({ divider: 'Headlines' });
-      rows.push({ html: `<div class="ds-citynews" id="ds-citynews">
-        <div class="ds-news-loading">Searching…</div></div>`, k: '' });
+      // Rendered from cache, not written into the DOM by the fetch callback.
+      // renderDossier() rewrites the body four times a second to keep
+      // positions and data ages live, which destroyed any element the fetch
+      // had just populated — the panel sat on "Searching…" forever even
+      // though the request had returned 200.
+      rows.push({ html: this._cityNewsHtml(e), k: '' });
       provenance = `<span class="ds-prov-src">Geography: static reference · Headlines: Google News search</span>`;
     }
 

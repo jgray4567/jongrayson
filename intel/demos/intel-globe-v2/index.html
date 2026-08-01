@@ -1496,15 +1496,23 @@ function getAirlineInfo(callsign) {
   return { name: callsign, color: '#333', code: callsign.substring(0, 2) };
 }
 
-function latLngTo3D(lat, lng, r) {
-
+/**
+ * Local copy of the scene's lat/lng projection.
+ *
+ * Signature MUST match intel-core.js's export, including the optional `out`
+ * target. This function shadows the imported one inside this module, and when
+ * it silently ignored a fourth argument the caller got a fresh vector while
+ * its own scratch vector stayed at the origin — every city label projected
+ * from (0,0,0) and was culled off-screen. Two same-named functions with
+ * different signatures in one codebase is a trap; keep them identical.
+ */
+function latLngTo3D(lat, lng, r, out) {
   const phi = (90 - lat) * DEG2RAD;
   const theta = (lng + 180) * DEG2RAD;
-  return new THREE.Vector3(
-    -r * Math.sin(phi) * Math.cos(theta),
-    r * Math.cos(phi),
-    r * Math.sin(phi) * Math.sin(theta)
-  );
+  const sp = Math.sin(phi), cp = Math.cos(phi);
+  const st = Math.sin(theta), ct = Math.cos(theta);
+  const v = out || new THREE.Vector3();
+  return v.set(-r * sp * ct, r * cp, r * sp * st);
 }
 
 function setLoadProgress(pct, msg) {
