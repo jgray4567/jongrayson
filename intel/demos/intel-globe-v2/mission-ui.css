@@ -910,3 +910,35 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
   margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--line-2);
   font-family: var(--mono); font-size: 9.5px; line-height: 1.5; color: var(--txt-3);
 }
+
+/* ── Google Trends in the city dossier ─────────────────────────── */
+.ds-trends { display: block; margin-top: 4px; text-align: left; }
+.ds-trend {
+  display: block; padding: 7px 0; text-decoration: none;
+  border-bottom: 1px solid var(--line-2);
+}
+.ds-trend:last-of-type { border-bottom: none; }
+.ds-trend-head { display: flex; align-items: baseline; gap: 8px; }
+.ds-trend-term {
+  font-family: var(--mono); font-size: 11.8px; color: var(--txt);
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ds-trend:hover .ds-trend-term { color: var(--accent); }
+.ds-trend-vol {
+  font-family: var(--mono); font-size: 9.8px; color: var(--accent);
+  flex-shrink: 0; font-weight: 600;
+}
+/* Relative volume bar. Google only publishes banded approximations
+   ("200+", "2K+"), so this is a comparison within the list, not a measure. */
+.ds-trend-bar {
+  height: 3px; margin-top: 4px; border-radius: 2px;
+  background: rgba(255,255,255,0.06); overflow: hidden;
+}
+.ds-trend-bar span {
+  display: block; height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, rgba(196,214,0,0.45), var(--accent));
+}
+.ds-trend-news {
+  font-family: var(--mono); font-size: 9.8px; line-height: 1.45;
+  color: var(--txt-3); margin-top: 4px;
+}

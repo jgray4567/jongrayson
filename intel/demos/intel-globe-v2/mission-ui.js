@@ -348,6 +348,7 @@ export class MissionUI {
     if (sel.kind === 'city') {
       host.className = 'ds-ident'; host.innerHTML = '';
       this._loadCityNews(entity, key);
+      this._loadTrends(entity, key);
       return;
     }
     if (sel.kind !== 'aircraft') { host.className = 'ds-ident'; host.innerHTML = ''; return; }
@@ -401,6 +402,67 @@ export class MissionUI {
    * it is written — otherwise clicking through several cities quickly paints
    * one city's headlines into another city's panel.
    */
+  _trendsHtml(entity) {
+    const st = this._trends && this._trends.get(entity.id);
+    if (!st || st.state === 'loading') {
+      return `<div class="ds-trends"><div class="ds-news-loading">Loading trends…</div></div>`;
+    }
+    if (st.state === 'error') {
+      return `<div class="ds-trends"><div class="ds-news-empty">Trends unavailable.</div></div>`;
+    }
+    // "No coverage" and "no activity" are completely different facts. Google
+    // is blocked in mainland China, so an empty result there means we cannot
+    // see, not that nothing is happening.
+    if (st.covered === false) {
+      return `<div class="ds-trends"><div class="ds-news-empty">${escapeHtml(st.reason || 'No Trends coverage for this country.')}</div></div>`;
+    }
+    if (!st.items.length) {
+      return `<div class="ds-trends"><div class="ds-news-empty">No trending searches returned.</div></div>`;
+    }
+    const peak = Math.max(...st.items.map(t => t.trafficNum || 0), 1);
+    return `<div class="ds-trends">` + st.items.map(t => {
+      const pct = Math.max(6, Math.round(((t.trafficNum || 0) / peak) * 100));
+      const link = t.newsUrl || t.url;
+      return `<a class="ds-trend" href="${link}" target="_blank" rel="noopener noreferrer">
+        <div class="ds-trend-head">
+          <span class="ds-trend-term">${escapeHtml(t.term)}</span>
+          <span class="ds-trend-vol">${escapeHtml(t.traffic || '')}</span>
+        </div>
+        <div class="ds-trend-bar"><span style="width:${pct}%"></span></div>
+        ${t.newsTitle ? `<div class="ds-trend-news">${escapeHtml(t.newsTitle)}${t.newsSource ? ` · <span class="ds-news-src">${escapeHtml(t.newsSource)}</span>` : ''}</div>` : ''}
+      </a>`;
+    }).join('')
+      + `<div class="ds-news-note">Country-level search interest, not city-level. Volumes are Google's own approximations.${st.stale ? ' Cached (source unreachable).' : ''}</div></div>`;
+  }
+
+  _loadTrends(entity, key) {
+    this._trends = this._trends || new Map();
+    const cached = this._trends.get(entity.id);
+    if (cached && cached.state !== 'loading') { this.renderDossier(); return; }
+    if (cached && cached.state === 'loading') return;
+
+    const c = entity.data || {};
+    if (!c.country) { this._trends.set(entity.id, { state: 'ok', covered: false, items: [], reason: 'No country on record.' }); return; }
+
+    this._trends.set(entity.id, { state: 'loading', items: [] });
+    fetch('../../api/trends-feed.php?limit=5&country=' + encodeURIComponent(c.country))
+      .then(r => (r.ok ? r.json() : r.json().catch(() => null)))
+      .then(d => {
+        this._trends.set(entity.id, {
+          state: 'ok',
+          covered: d ? d.covered !== false : false,
+          reason: d && d.reason,
+          items: (d && d.items) || [],
+          stale: !!(d && d.stale),
+        });
+        if (this._identFor === key) this.renderDossier();
+      })
+      .catch(() => {
+        this._trends.set(entity.id, { state: 'error', items: [] });
+        if (this._identFor === key) this.renderDossier();
+      });
+  }
+
   _cityNewsHtml(entity) {
     const st = this._cityNews && this._cityNews.get(entity.id);
     if (!st || st.state === 'loading') {
@@ -586,6 +648,8 @@ export class MissionUI {
       rows.push({ k: 'Population', v: (c.pop || 0).toLocaleString() });
       rows.push({ k: 'Country', v: c.country });
       rows.push({ k: 'Coordinates', v: formatCoord(e.lat, e.lng) });
+      rows.push({ divider: 'Search trends · ' + (c.country || '') });
+      rows.push({ html: this._trendsHtml(e), k: '' });
       rows.push({ divider: 'Headlines' });
       // Rendered from cache, not written into the DOM by the fetch callback.
       // renderDossier() rewrites the body four times a second to keep
@@ -593,7 +657,7 @@ export class MissionUI {
       // had just populated — the panel sat on "Searching…" forever even
       // though the request had returned 200.
       rows.push({ html: this._cityNewsHtml(e), k: '' });
-      provenance = `<span class="ds-prov-src">Geography: static reference · Headlines: Google News search</span>`;
+      provenance = `<span class="ds-prov-src">Geography: static reference · Headlines: Google News · Trends: Google Trends (country-level)</span>`;
     }
 
     return { rows, banner, provenance };
