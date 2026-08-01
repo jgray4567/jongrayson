@@ -782,3 +782,43 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
   #alerts-panel .ai-loc { max-width: 116px; }
   #alerts-panel .ai-text { min-width: 0; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   DRAGGABLE PANELS
+   ══════════════════════════════════════════════════════════════ */
+
+@media (min-width: 851px) {
+  .pw-handle { cursor: grab; user-select: none; -webkit-user-select: none; }
+  .pw-handle:active { cursor: grabbing; }
+  /* Buttons inside the handle keep their own cursor. */
+  .pw-handle button { cursor: pointer; }
+
+  /* Once dragged a panel is positioned by left/top only. The defaults mix
+     right- and bottom-anchoring, which would otherwise fight the drag. */
+  .panel.pw-moved {
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+  }
+
+  .panel.pw-dragging {
+    z-index: 90 !important;
+    box-shadow: 0 18px 60px rgba(0,0,0,0.75);
+    border-color: rgba(196,214,0,0.42) !important;
+    transition: none !important;
+    opacity: 0.97;
+  }
+
+  /* A moved panel is no longer bound by the left-rail budget. */
+  .panel.pw-moved#layers-panel { max-height: calc(100vh - 140px) !important; }
+  .panel.pw-moved#alerts-panel { max-height: 60vh !important; }
+
+  /* Faint grip marks so the title bar reads as draggable. */
+  .pw-handle::after {
+    content: ''; flex-shrink: 0; width: 9px; height: 12px; margin-left: 2px;
+    opacity: 0.28;
+    background-image: radial-gradient(currentColor 1px, transparent 1px);
+    background-size: 4px 4px; color: var(--txt-2);
+  }
+  #alerts-panel .ap-header { align-items: center; }
+}

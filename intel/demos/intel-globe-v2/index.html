@@ -4056,6 +4056,107 @@ function positionDock(dock, visible) {
   }
 }
 
+/**
+ * Drag a panel by its title bar.
+ *
+ * Notes that matter:
+ *  · Panels are anchored with a mix of right/bottom (regions, alerts) and
+ *    left/top (layers). Dragging converts a panel to left/top once, via
+ *    .pw-moved, so the two systems never fight.
+ *  · Position is clamped every time it is applied AND on window resize. A
+ *    panel dragged to the right edge of a wide window would otherwise be
+ *    stranded off-screen when the window narrows — unreachable, with no
+ *    indication it still exists.
+ *  · The header keeps its buttons working: a pointerdown on any control is
+ *    ignored by the drag handler.
+ *  · Positions persist, and "Reset panel layout" puts everything back.
+ */
+function clampPanel(el, x, y) {
+  const w = el.offsetWidth || 260;
+  const headerH = 44;
+  const maxX = Math.max(4, window.innerWidth - w - 4);
+  const maxY = Math.max(60, window.innerHeight - headerH - 8);
+  return {
+    x: Math.min(Math.max(4, x), maxX),
+    y: Math.min(Math.max(60, y), maxY),
+  };
+}
+
+function applyPanelPos(name) {
+  const def = PANELS[name];
+  const el = document.getElementById(def.el);
+  const pos = (panelState[name] || {}).pos;
+  if (!el) return;
+  if (!pos) { el.classList.remove('pw-moved'); el.style.left = el.style.top = ''; return; }
+  const c = clampPanel(el, pos.x, pos.y);
+  el.classList.add('pw-moved');
+  el.style.left = c.x + 'px';
+  el.style.top  = c.y + 'px';
+  if (c.x !== pos.x || c.y !== pos.y) { pos.x = c.x; pos.y = c.y; savePanelState(); }
+}
+
+function makeDraggable(name) {
+  const def = PANELS[name];
+  const el = document.getElementById(def.el);
+  if (!el) return;
+  const handle = el.querySelector('h2, .ap-header');
+  if (!handle) return;
+  handle.classList.add('pw-handle');
+
+  let startX = 0, startY = 0, originX = 0, originY = 0, dragging = false;
+
+  handle.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    if (window.innerWidth <= 850) return;              // mobile uses drawers
+    if (e.target.closest('button, input, a, select, .pw-btn, .ap-btn')) return;
+
+    const r = el.getBoundingClientRect();
+    originX = r.left; originY = r.top;
+    startX = e.clientX; startY = e.clientY;
+    dragging = false;
+    handle.setPointerCapture(e.pointerId);
+
+    const move = (ev) => {
+      const dx = ev.clientX - startX, dy = ev.clientY - startY;
+      // Small threshold so a click on the title bar (used to expand a
+      // collapsed panel) is not swallowed as a drag.
+      if (!dragging && Math.hypot(dx, dy) < 4) return;
+      if (!dragging) { dragging = true; el.classList.add('pw-dragging'); }
+      const c = clampPanel(el, originX + dx, originY + dy);
+      el.classList.add('pw-moved');
+      el.style.left = c.x + 'px';
+      el.style.top  = c.y + 'px';
+    };
+    const up = (ev) => {
+      handle.removeEventListener('pointermove', move);
+      handle.removeEventListener('pointerup', up);
+      handle.removeEventListener('pointercancel', up);
+      try { handle.releasePointerCapture(ev.pointerId); } catch {}
+      el.classList.remove('pw-dragging');
+      if (dragging) {
+        const r2 = el.getBoundingClientRect();
+        (panelState[name] || (panelState[name] = {})).pos = { x: Math.round(r2.left), y: Math.round(r2.top) };
+        savePanelState();
+        renderPanelDock();
+      }
+    };
+    handle.addEventListener('pointermove', move);
+    handle.addEventListener('pointerup', up);
+    handle.addEventListener('pointercancel', up);
+  });
+}
+
+function resetPanelLayout() {
+  for (const name of Object.keys(PANELS)) {
+    panelState[name] = {};
+    const el = document.getElementById(PANELS[name].el);
+    if (el) { el.classList.remove('pw-moved', 'pw-collapsed', 'pw-hidden'); el.style.left = el.style.top = ''; }
+    setPanel(name, { closed: false, collapsed: false });
+  }
+  savePanelState();
+  renderPanelDock();
+}
+
 function initPanelControls() {
   loadPanelState();
   for (const [name, def] of Object.entries(PANELS)) {
@@ -4076,9 +4177,18 @@ function initPanelControls() {
       if (e.target.closest('.pw-btn, .ap-btn, button')) return;
       if ((panelState[name] || {}).collapsed) setPanel(name, { collapsed: false });
     });
+    makeDraggable(name);
     setPanel(name, {});   // apply any persisted state
+    applyPanelPos(name);
   }
   renderPanelDock();
+
+  // Re-clamp on resize so nothing is stranded off-screen when the window
+  // narrows — an unreachable panel is the same failure as a lost one.
+  window.addEventListener('resize', () => {
+    for (const n of Object.keys(PANELS)) applyPanelPos(n);
+    renderPanelDock();
+  });
 }
 
 function initMissionUI() {
@@ -4156,9 +4266,14 @@ function initMissionUI() {
     { id:'p-regions', group:'Panels', keys:['P'], label:'Region Presets panel',
       keywords:'panel regions presets show hide collapse close', run:() => togglePanel('regions') },
     { id:'p-all',     group:'Panels', keys:['0'], label:'Reopen all panels',
-      keywords:'restore reset panels show all', run:() => {
+      keywords:'restore panels show all', run:() => {
         for (const n of Object.keys(PANELS)) setPanel(n, { closed: false, collapsed: false });
         missionUI.toast('All panels restored');
+      }},
+    { id:'p-reset',   group:'Panels', label:'Reset panel layout (positions too)',
+      keywords:'reset layout positions default move drag restore', run:() => {
+        resetPanelLayout();
+        missionUI.toast('Panel layout reset to defaults');
       }},
 
     { id:'refresh', group:'Data',  keys:['F5'], label:'Force refresh all sources',
@@ -4196,6 +4311,11 @@ function initMissionUI() {
   // one line.
   window.INTEL = {
     feeds, registry, selection, missionUI,
+    panels: {
+      get state() { return panelState; },
+      set: setPanel, toggle: togglePanel,
+      reset: resetPanelLayout, reposition: applyPanelPos,
+    },
     get aircraft() { return aircraftLayer; },
     get orbital() { return orbitalLayer; },
     get scene() { return scene; },
