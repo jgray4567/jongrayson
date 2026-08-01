@@ -321,7 +321,8 @@
   #ticker .ticker-content {
     position: absolute; white-space: nowrap; display: flex; align-items: center;
     height: 100%; font-size: 12.1px; color: #bbc;
-    animation: tickerScroll 60s linear infinite;
+    /* 60s -> 80s: 25% slower, for readability at a glance. */
+    animation: tickerScroll 80s linear infinite;
   }
   #ticker .ticker-content .tc-item { padding: 0 24px; cursor: pointer; transition: opacity 0.15s; }
   #ticker .ticker-content .tc-item:hover { opacity: 0.7; }
@@ -381,7 +382,7 @@
     position: absolute; z-index: 25; display: none;
     background: rgba(6,7,10,0.95); backdrop-filter: blur(24px) saturate(1.4);
     border: 1px solid rgba(196,214,0,0.15); border-radius: 12px;
-    padding: 12px 14px; min-width: 340px; max-width: 420px;
+    padding: 12px 14px; min-width: 460px; max-width: min(680px, 92vw);
     font-family: 'JetBrains Mono', monospace;
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
   }
@@ -404,7 +405,7 @@
   }
   #camera-popup .cp-meta .cp-area { color: #C4D600; }
   #camera-popup .cp-img-wrap {
-    width: 100%; min-height: 180px; border-radius: 8px; overflow: hidden;
+    width: 100%; min-height: 290px; border-radius: 8px; overflow: hidden;
     background: #0a0b10; display: flex; align-items: center; justify-content: center;
   }
   #camera-popup .cp-img-wrap img {
@@ -669,10 +670,28 @@
     width: 100%; height: 100%; border: 0;
     filter: invert(0.92) hue-rotate(180deg) brightness(0.85) contrast(0.9);
   }
-  .cm-map-overlay {
+  /* Leaflet map container. Replaces the old .cm-map-overlay pin layer. */
+  #cm-map {
     position: absolute; inset: 0;
-    pointer-events: none;
+    background: #0a0b10;
+    z-index: 1;
   }
+  #cm-map .leaflet-container { background: #0a0b10; font-family: 'JetBrains Mono', monospace; }
+  #cm-map .leaflet-control-attribution {
+    background: rgba(6,7,10,0.8); color: #5d6a7a; font-size: 8.5px;
+  }
+  #cm-map .leaflet-control-attribution a { color: #8a97a8; }
+  #cm-map .leaflet-bar a {
+    background: rgba(10,12,18,0.95); color: #C4D600;
+    border-bottom-color: rgba(196,214,0,0.15);
+  }
+  #cm-map .leaflet-bar a:hover { background: rgba(196,214,0,0.15); }
+  #cm-map .leaflet-tooltip {
+    background: rgba(6,7,10,0.95); border: 1px solid rgba(196,214,0,0.25);
+    color: #e8eaed; font-size: 10px; font-family: 'JetBrains Mono', monospace;
+    box-shadow: none;
+  }
+  #cm-map .leaflet-tooltip-top:before { border-top-color: rgba(196,214,0,0.25); }
   .cm-pin {
     position: absolute;
     width: 10px; height: 10px;
@@ -694,7 +713,7 @@
     background: #fff;
     box-shadow: 0 0 12px rgba(196,214,0,1);
   }
-  .cm-map-hint {
+  .cm-map-hint { z-index: 2;
     position: absolute; bottom: 8px; left: 50%;
     transform: translateX(-50%);
     font-family: 'JetBrains Mono', monospace;
@@ -736,7 +755,7 @@
     font-family: 'JetBrains Mono', monospace;
   }
   .cm-preview-img-wrap {
-    width: 100%; max-height: 480px;
+    width: 100%; max-height: 62vh; min-height: 300px;
     background: #0a0b10; display: flex;
     align-items: center; justify-content: center;
     overflow: hidden;
@@ -854,12 +873,16 @@
       border-right: none;
       border-bottom: 1px solid rgba(196,214,0,0.08);
     }
-    .cm-preview-img-wrap { max-height: 320px; }
+    .cm-preview-img-wrap { max-height: 42vh; min-height: 200px; }
     .cm-preview-img-wrap img { max-height: 320px; }
   }
 </style>
 <link rel="stylesheet" href="extended-layers.css">
 <link rel="stylesheet" href="mission-ui.css">
+<!-- Leaflet: real map for the NYC camera browser, so markers sit on their
+     actual coordinates instead of being painted over an opaque iframe. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -1168,24 +1191,44 @@
       <div class="cm-close" id="cm-close">✕</div>
     </div>
     <div class="cm-body">
-      <!-- Left: Map -->
-      <div class="cm-map-panel">
-        <iframe src="https://maps.google.com/maps?q=40.7128,-74.0060&z=10&output=embed" loading="lazy"></iframe>
-        <div class="cm-map-overlay" id="cm-map-overlay"></div>
-        <div class="cm-map-hint">NYC DOT Camera Locations</div>
-      </div>
-      <!-- Right: List + Preview -->
-      <div class="cm-list-panel">
+      <!-- LEFT COLUMN — "where, and what am I looking at".
+           The map and the live still belong together; the previous layout put
+           the preview in the right-hand column where it was display:none
+           until a click, leaving a large block of prime space idle on open,
+           while 970 single-column rows each used 830px to show ~250px of
+           text. -->
+      <div class="cm-left">
+        <div class="cm-map-panel">
+          <!-- Real slippy map, not a Google embed with dots painted on top.
+               The previous approach absolutely-positioned pins over an
+               <iframe> using linear lat/lng interpolation across a hardcoded
+               bounding box. That could never line up: Google renders Web
+               Mercator (so latitude is non-linear), the iframe's true visible
+               extent depends on its pixel size and zoom rather than on that
+               box, and the box and the iframe were centred on different
+               longitudes anyway. Above all, an embedded iframe's viewport is
+               unknowable from outside it, so no static overlay can be aligned
+               to it by construction. Leaflet places markers by true
+               coordinates and keeps them correct through pan and zoom. -->
+          <div id="cm-map"></div>
+          <div class="cm-map-hint">NYC DOT · <span id="cm-map-count">0</span> cameras</div>
+        </div>
+
         <div class="cm-preview" id="cm-preview">
           <div class="cm-preview-bar">
             <div class="cm-preview-name" id="cm-preview-name">—</div>
             <div class="cm-preview-area" id="cm-preview-area"></div>
+            <div class="cm-res" id="cm-preview-res"></div>
             <div class="cm-preview-refresh" id="cm-preview-refresh"></div>
           </div>
           <div class="cm-preview-img-wrap" id="cm-preview-img">
             <div class="cm-loading-msg">LOADING IMAGE...</div>
           </div>
         </div>
+      </div>
+
+      <!-- RIGHT COLUMN — browse -->
+      <div class="cm-list-panel">
         <div class="cm-controls">
           <input type="text" class="cm-search" id="cm-search" placeholder="Search by name or area...">
           <div class="cm-borough-tabs" id="cm-borough-tabs">
@@ -1195,6 +1238,12 @@
             <div class="cm-borough-tab" data-borough="Queens">Queens</div>
             <div class="cm-borough-tab" data-borough="Bronx">Bronx</div>
             <div class="cm-borough-tab" data-borough="Staten Island">Staten Island</div>
+          </div>
+          <div class="cm-sort-row">
+            <span id="cm-result-count">—</span>
+            <span style="flex:1"></span>
+            <button class="cm-sort-btn on" id="cm-sort-name">A–Z</button>
+            <button class="cm-sort-btn" id="cm-sort-res" title="Only ~13% of NYC cameras exceed 352x240">Higher resolution first</button>
           </div>
         </div>
         <div class="cm-list" id="cm-list"></div>
@@ -1336,37 +1385,14 @@ const HOTSPOTS = [
   {lat:15.0,lng:30.0,name:'Sudan Civil War',sev:3},
 ];
 
-// ─── Alerts ───
-const ALERTS = [
-  {time:'11:42 UTC',sev:3,text:'Artillery exchanges reported along eastern front line',loc:'Ukraine',url:'https://www.reuters.com/world/europe/'},
-  {time:'11:38 UTC',sev:3,text:'Airstrikes target infrastructure in Khan Younis',loc:'Gaza',url:'https://www.cnn.com/middle-east'},
-  {time:'11:35 UTC',sev:3,text:'RSF forces advance on El Fasher, humanitarian crisis deepening',loc:'Sudan',url:'https://www.aljazeera.com/where/sudan/'},
-  {time:'11:30 UTC',sev:2,text:'Merchant vessel reports drone sighting near Bab-el-Mandeb',loc:'Red Sea',url:'https://www.foxnews.com/category/world/conflicts'},
-  {time:'11:22 UTC',sev:2,text:'PLA Navy exercises observed near median line',loc:'Taiwan Strait',url:'https://www.cnn.com/asia'},
-  {time:'11:15 UTC',sev:2,text:'Gang violence escalates in Port-au-Prince, evacuation advised',loc:'Haiti',url:'https://www.foxnews.com/world'},
-  {time:'11:08 UTC',sev:2,text:'Syrian regime artillery fires on Idlib province',loc:'Syria',url:'https://www.aljazeera.com/where/syria/'},
-  {time:'10:55 UTC',sev:1,text:'Coup leaders delay elections to 2027',loc:'Sahel',url:'https://www.reuters.com/world/africa/'},
-  {time:'10:42 UTC',sev:1,text:'Hyperinflation reaches 450%, mass migration continues',loc:'Venezuela',url:'https://www.bbc.com/news/world/latin_america'},
-  {time:'10:30 UTC',sev:3,text:'5.2 magnitude earthquake strikes southern Japan',loc:'Japan',url:'https://earthquake.usgs.gov/earthquakes/map/'},
-  {time:'10:18 UTC',sev:2,text:'Critical CVE-2026-4419 patch released, active exploitation detected',loc:'Global',url:'https://nvd.nist.gov/vuln/detail/CVE-2026-4419'},
-  {time:'10:05 UTC',sev:2,text:'Oil prices surge 3.2% on supply disruption fears',loc:'Global Markets',url:'https://www.cnn.com/business'},
-  {time:'09:50 UTC',sev:2,text:'Senate blocks defense appropriations amendment',loc:'Washington DC',url:'https://www.foxnews.com/politics'},
-  {time:'09:42 UTC',sev:1,text:'AI chip export controls tightened to Gulf states',loc:'Global Tech',url:'https://www.cnn.com/politics'},
-];
-
-// ─── Ticker items ───
-const TICKER = [
-  {dot:'#ff2244',time:'11:42',text:'Ukraine: Artillery exchanges along eastern front',url:'https://www.reuters.com/world/europe/'},
-  {dot:'#ff2244',time:'11:38',text:'Gaza: Airstrikes target Khan Younis infrastructure',url:'https://www.cnn.com/middle-east'},
-  {dot:'#ff2244',time:'11:35',text:'Sudan: RSF advances on El Fasher',url:'https://www.aljazeera.com/where/sudan/'},
-  {dot:'#ffaa22',time:'11:30',text:'Red Sea: Drone sighting near Bab-el-Mandeb',url:'https://www.foxnews.com/category/world/conflicts'},
-  {dot:'#ffaa22',time:'11:22',text:'Taiwan Strait: PLA Navy exercises near median line',url:'https://www.cnn.com/asia'},
-  {dot:'#ffaa22',time:'11:15',text:'Haiti: Gang violence escalates in Port-au-Prince',url:'https://www.foxnews.com/world'},
-  {dot:'#22dd88',time:'10:55',text:'CVE-2026-4419: Critical patch released',url:'https://nvd.nist.gov/vuln/detail/CVE-2026-4419'},
-  {dot:'#C4D600',time:'10:42',text:'Markets: Oil +3.2%, Defense sector +1.1%',url:'https://www.cnn.com/business'},
-  {dot:'#C4D600',time:'09:50',text:'Senate blocks defense appropriations amendment',url:'https://www.foxnews.com/politics'},
-  {dot:'#22dd88',time:'09:42',text:'AI chip export controls tightened to Gulf states',url:'https://www.cnn.com/politics'},
-];
+// ─── Live news ───
+// The ALERTS and TICKER arrays that used to live here were hand-written copy
+// with fixed timestamps that never aged. They rendered under a "LIVE FEED"
+// banner, linked to real news domains, and sat visually identical to the
+// genuine USGS and NWS items beside them. One cited CVE-2026-4419, which
+// does not exist. They are replaced by api/news-feed.php — BBC World,
+// Al Jazeera, NPR World and ReliefWeb, merged and de-duplicated server-side.
+let newsItems = [];
 
 // ═══════════════════════════════════════════════════════════════════
 //  THREE.JS SCENE SETUP
@@ -1469,6 +1495,10 @@ async function init() {
   feeds.register('storms', {
     label: 'Storm Alerts', cadenceMs: 5 * 60 * 1000,
     source: 'NOAA / NWS · severe convective warnings (US only)',
+  });
+  feeds.register('news', {
+    label: 'Wire Services', cadenceMs: 5 * 60 * 1000,
+    source: 'BBC World · Al Jazeera · NPR World · ReliefWeb',
   });
   feeds.register('render', {
     label: 'Render (fps)', cadenceMs: 4 * 1000,
@@ -1598,6 +1628,9 @@ async function init() {
 
   fetchStormAlerts().catch(e => console.error('Storm load failed:', e));
   setInterval(fetchStormAlerts, 300000); // 5 min
+
+  fetchNews().catch(e => console.error('News load failed:', e));
+  setInterval(fetchNews, 300000); // 5 min
 
   initMissionUI();
   initExtendedLayers();
@@ -2442,16 +2475,32 @@ let cmCurrentBorough = 'All';
 let cmSearchQuery = '';
 
 // NYC bounds for simple mercator projection
-const NYC_BOUNDS = { north: 40.92, south: 40.50, east: -73.70, west: -74.25 };
 
 function openCameraModal() {
   if (!trafficCameraData || trafficCameraData.length === 0) return;
   const overlay = document.getElementById('camera-modal-overlay');
   overlay.classList.add('active');
   document.getElementById('cm-online-count').textContent = trafficCameraData.length;
+  // A transient popover left open behind a full-screen dialog is clutter.
+  missionUI?.toggleHealth(false);
+  missionUI?.toggleLegend(false);
+
   renderCameraList();
   renderMapPins();
-  // Close popup if open
+
+  // Populate the preview on open. Leaving it blank until the first click
+  // wasted the single largest block of space in the dialog.
+  if (!cmSelectedCamera) {
+    const first = getFilteredCameras()[0];
+    if (first) selectCamera(first);
+  } else {
+    focusMapOn(cmSelectedCamera);
+  }
+
+  // Leaflet cannot measure a display:none container; re-measure now that the
+  // modal is visible, otherwise the map renders into a 0x0 box.
+  setTimeout(() => { if (cmMap) cmMap.invalidateSize(); }, 60);
+
   hideCameraPopup();
 }
 
@@ -2463,8 +2512,10 @@ function closeCameraModal() {
   document.getElementById('cm-preview').classList.remove('active');
 }
 
+let cmSortMode = 'name';   // 'name' | 'res'
+
 function getFilteredCameras() {
-  return trafficCameraData.filter(c => {
+  const out = trafficCameraData.filter(c => {
     // Borough filter
     if (cmCurrentBorough !== 'All') {
       const area = (c.area || '').toLowerCase();
@@ -2481,6 +2532,21 @@ function getFilteredCameras() {
     }
     return true;
   });
+
+  if (cmSortMode === 'res') {
+    // Resolution is only known once an image has loaded, so unknowns sort
+    // after knowns rather than being guessed at. Browsing the list warms the
+    // map as thumbnails load.
+    out.sort((a, b) => {
+      const ra = cameraResolution.get(a.id) || 0;
+      const rb = cameraResolution.get(b.id) || 0;
+      if (ra !== rb) return rb - ra;
+      return (a.name || '').localeCompare(b.name || '');
+    });
+  } else {
+    out.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  }
+  return out;
 }
 
 function boroughFromArea(area) {
@@ -2519,6 +2585,9 @@ function renderCameraList() {
       <div class="cm-list-status"></div>
     </div>`;
   }).join('');
+  const rc = document.getElementById('cm-result-count');
+  if (rc) rc.textContent = filtered.length + ' of ' + trafficCameraData.length;
+
   // Load thumbnails lazily for visible items
   requestAnimationFrame(() => loadVisibleThumbnails());
   // Attach click handlers
@@ -2555,23 +2624,93 @@ function loadVisibleThumbnails() {
   });
 }
 
-function renderMapPins() {
-  const overlay = document.getElementById('cm-map-overlay');
-  if (!overlay) return;
-  const filtered = getFilteredCameras();
-  overlay.innerHTML = filtered.map(c => {
-    const x = ((c.lng - NYC_BOUNDS.west) / (NYC_BOUNDS.east - NYC_BOUNDS.west)) * 100;
-    const y = ((NYC_BOUNDS.north - c.lat) / (NYC_BOUNDS.north - NYC_BOUNDS.south)) * 100;
-    const sel = cmSelectedCamera && cmSelectedCamera.id === c.id ? ' selected' : '';
-    return `<div class="cm-pin${sel}" style="left:${x}%;top:${y}%" data-cam-id="${c.id}" title="${c.name || ''}"></div>`;
-  }).join('');
-  overlay.querySelectorAll('.cm-pin').forEach(pin => {
-    pin.addEventListener('click', () => {
-      const id = pin.dataset.camId;
-      const cam = trafficCameraData.find(c => c.id === id);
-      if (cam) selectCamera(cam);
-    });
+/**
+ * Camera map — Leaflet markers on true coordinates.
+ *
+ * Replaces a percentage-offset overlay that could not be made correct; see
+ * the note on #cm-map in the markup for why.
+ */
+let cmMap = null, cmMarkerLayer = null, cmMarkers = new Map();
+
+function initCameraMap() {
+  if (cmMap || typeof L === 'undefined') return;
+  const el = document.getElementById('cm-map');
+  if (!el) return;
+
+  cmMap = L.map(el, {
+    center: [40.7128, -73.96],
+    zoom: 11,
+    zoomControl: true,
+    attributionControl: true,
+    preferCanvas: true,           // hundreds of markers: canvas beats DOM
   });
+
+  // Dark basemap, to sit inside the existing UI rather than fight it.
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19,
+  }).addTo(cmMap);
+
+  cmMarkerLayer = L.layerGroup().addTo(cmMap);
+}
+
+function renderMapPins() {
+  initCameraMap();
+  if (!cmMap || !cmMarkerLayer) return;
+
+  const filtered = getFilteredCameras();
+  cmMarkerLayer.clearLayers();
+  cmMarkers.clear();
+
+  for (const c of filtered) {
+    if (!isFinite(c.lat) || !isFinite(c.lng)) continue;
+    const isSel = cmSelectedCamera && cmSelectedCamera.id === c.id;
+    const m = L.circleMarker([c.lat, c.lng], {
+      radius: isSel ? 7 : 4,
+      color: isSel ? '#88eeff' : '#C4D600',
+      weight: isSel ? 2 : 1,
+      fillColor: isSel ? '#88eeff' : '#C4D600',
+      fillOpacity: isSel ? 0.95 : 0.55,
+    });
+    m.bindTooltip(c.name || 'Camera', { direction: 'top', offset: [0, -4] });
+    m.on('click', () => selectCamera(c));
+    m.addTo(cmMarkerLayer);
+    cmMarkers.set(c.id, m);
+  }
+
+  const countEl = document.getElementById('cm-map-count');
+  if (countEl) countEl.textContent = filtered.length;
+
+  // Frame the current filter. Without this, choosing "Staten Island" leaves
+  // the view over Manhattan with the results off screen.
+  if (filtered.length) {
+    const pts = filtered.filter(c => isFinite(c.lat) && isFinite(c.lng))
+                        .map(c => [c.lat, c.lng]);
+    if (pts.length) cmMap.fitBounds(L.latLngBounds(pts).pad(0.12), { animate: false });
+  }
+  // Leaflet measures on init; the modal is display:none until opened, so the
+  // first measurement is zero. Re-measure once it is actually visible.
+  setTimeout(() => cmMap && cmMap.invalidateSize(), 0);
+}
+
+/** Centre and highlight a single camera without refitting the whole set. */
+function focusMapOn(cam) {
+  if (!cmMap || !cam) return;
+  cmMarkers.forEach((m, id) => {
+    const sel = id === cam.id;
+    m.setStyle({
+      radius: sel ? 7 : 4,
+      color: sel ? '#88eeff' : '#C4D600',
+      weight: sel ? 2 : 1,
+      fillColor: sel ? '#88eeff' : '#C4D600',
+      fillOpacity: sel ? 0.95 : 0.55,
+    });
+    if (sel) m.bringToFront();
+  });
+  if (isFinite(cam.lat) && isFinite(cam.lng)) {
+    cmMap.panTo([cam.lat, cam.lng], { animate: true, duration: 0.4 });
+  }
 }
 
 function selectCamera(cam) {
@@ -2580,10 +2719,8 @@ function selectCamera(cam) {
   document.querySelectorAll('.cm-list-item').forEach(el => {
     el.classList.toggle('selected', el.dataset.camId === cam.id);
   });
-  // Update pins
-  document.querySelectorAll('.cm-pin').forEach(pin => {
-    pin.classList.toggle('selected', pin.dataset.camId === cam.id);
-  });
+  // Highlight and centre the marker on the real map.
+  focusMapOn(cam);
   // Show preview
   const preview = document.getElementById('cm-preview');
   preview.classList.add('active');
@@ -2599,6 +2736,18 @@ function selectCamera(cam) {
   }, 30000);
 }
 
+/**
+ * Load a camera still.
+ *
+ * NYC DOT serves whatever resolution the individual camera produces and
+ * ignores every size hint — width/height/size/resolution/scale were all
+ * probed and all returned the identical bytes. Of ~970 online cameras roughly
+ * 87% are 352x240, ~10% are 720x480, and a small number are 1280x720 or
+ * 1920x1080. So the image cannot be made larger at the source; what we can do
+ * is give it far more room on screen, upscale it smoothly, and report the
+ * true native resolution so nobody mistakes an upscaled 352x240 for detail
+ * that is not there.
+ */
 function loadPreviewImage(cam) {
   const wrap = document.getElementById('cm-preview-img');
   const refreshEl = document.getElementById('cm-preview-refresh');
@@ -2608,18 +2757,45 @@ function loadPreviewImage(cam) {
   img.onload = () => {
     wrap.innerHTML = '';
     wrap.appendChild(img);
+    const w = img.naturalWidth, h = img.naturalHeight;
+    cameraResolution.set(cam.id, w * h);
+    const tag = document.getElementById('cm-preview-res');
+    if (tag) {
+      tag.textContent = w + '×' + h + (w >= 1280 ? '  HD' : w >= 640 ? '  SD+' : '');
+      tag.className = 'cm-res' + (w >= 1280 ? ' hd' : w >= 640 ? ' sd' : ' low');
+    }
     refreshEl.textContent = 'Updated ' + new Date().toLocaleTimeString();
   };
   img.onerror = () => {
     wrap.innerHTML = '<div class="cm-error-msg">FAILED TO LOAD IMAGE</div>';
     refreshEl.textContent = 'Error';
+    const tag = document.getElementById('cm-preview-res');
+    if (tag) { tag.textContent = ''; tag.className = 'cm-res'; }
   };
-  // Cache-bust to force fresh image
   img.src = LIVE_FEED_PROXY + '?source=camera-image&id=' + encodeURIComponent(cam.id) + '&_t=' + Date.now();
 }
 
-// Init modal event listeners (after DOM ready)
+// Native pixel count per camera, learned as images load. Used by the
+// "Higher resolution first" sort — the good cameras are a small minority and
+// are otherwise impossible to find among 970 identical-looking list rows.
+const cameraResolution = new Map();
+
 function initCameraModal() {
+  // Sort toggles. Resolution matters here because NYC DOT serves whatever
+  // each camera produces and ignores size hints — only ~13% exceed 352x240,
+  // and they are otherwise unfindable among 970 identical-looking rows.
+  const byName = document.getElementById('cm-sort-name');
+  const byRes  = document.getElementById('cm-sort-res');
+  const setSort = (mode) => {
+    cmSortMode = mode;
+    byName?.classList.toggle('on', mode === 'name');
+    byRes?.classList.toggle('on', mode === 'res');
+    renderCameraList();
+    renderMapPins();
+  };
+  byName?.addEventListener('click', () => setSort('name'));
+  byRes?.addEventListener('click', () => setSort('res'));
+
   // Browse button
   const browseBtn = document.getElementById('camera-browse-btn');
   if (browseBtn) {
@@ -2690,49 +2866,60 @@ function updateLiveAlertsFeed() {
   const list = document.getElementById('alerts-list');
   if (!list) return;
 
-  // Combine weather alerts and earthquakes into a unified live feed
   const liveItems = [];
 
-  // Add weather alerts
-  for (const a of weatherAlertData.slice(0, 8)) {
-    const sev = a.severity === 'Extreme' ? 3 : a.severity === 'Severe' ? 2 : 1;
-    const time = a.sent ? new Date(a.sent).toISOString().slice(11, 16) + ' UTC' : '--:--';
+  // Wire headlines, most recent first.
+  for (const n of newsItems.slice(0, 10)) {
     liveItems.push({
-      time,
-      sev,
+      ts: n.ts * 1000,
+      sev: n.category === 'conflict' ? 3 : n.category === 'crisis' ? 2 : 1,
+      text: n.title,
+      loc: n.source,
+      url: n.url,
+    });
+  }
+
+  for (const a of weatherAlertData.slice(0, 8)) {
+    liveItems.push({
+      ts: a.sent ? Date.parse(a.sent) : Date.now(),
+      sev: a.severity === 'Extreme' ? 3 : a.severity === 'Severe' ? 2 : 1,
       text: a.event + (a.areaDesc ? ' — ' + a.areaDesc.substring(0, 60) : ''),
       loc: a.areaDesc ? a.areaDesc.split(';')[0].substring(0, 20) : 'US',
-      url: 'https://www.weather.gov/'
+      url: 'https://www.weather.gov/',
     });
   }
 
-  // Add earthquakes (sorted by magnitude, top 5)
   const topQuakes = [...earthquakeData].sort((a, b) => (b.mag || 0) - (a.mag || 0)).slice(0, 5);
   for (const q of topQuakes) {
-    const sev = q.mag >= 4.5 ? 3 : q.mag >= 2.5 ? 2 : 1;
-    const time = q.time ? new Date(q.time).toISOString().slice(11, 16) + ' UTC' : '--:--';
     liveItems.push({
-      time,
-      sev,
-      text: 'M' + (q.mag || '?').toFixed(1) + ' earthquake — ' + (q.place || 'Unknown'),
-      loc: q.place ? q.place.split(',')[0].substring(0, 20) : '—',
-      url: 'https://earthquake.usgs.gov/earthquakes/map/'
+      ts: q.time || Date.now(),
+      sev: q.mag >= 6 ? 3 : q.mag >= 4.5 ? 2 : 1,
+      text: 'M' + (q.mag || 0).toFixed(1) + ' earthquake — ' + (q.place || 'Unknown'),
+      loc: q.place ? q.place.split(',').pop().trim().substring(0, 20) : '—',
+      url: 'https://earthquake.usgs.gov/earthquakes/map/',
     });
   }
 
-  if (liveItems.length === 0) {
-    // Fallback to static alerts if no live data yet
-    renderAlerts();
+  // No fabricated fallback. If nothing is live, say nothing is live — the
+  // previous build silently dropped back to a hand-written array here, so a
+  // total feed outage looked exactly like a busy news day.
+  if (!liveItems.length) {
+    list.innerHTML = '<div class="ai-empty">NO LIVE DATA — all sources unreachable.<br>'
+      + 'This panel shows only live feeds; nothing is substituted.</div>';
+    document.getElementById('stat-alerts').textContent = 0;
+    const b0 = document.getElementById('alerts-badge');
+    if (b0) b0.textContent = 0;
     return;
   }
 
-  const sevColors = ['#ffaa22', '#ff6644', '#ff2244'];
-  list.innerHTML = liveItems.map(a => `
+  liveItems.sort((a, b) => b.ts - a.ts);
+  const sevColors = [hex(PALETTE.weather.Severe), hex(PALETTE.threat.moderate), hex(PALETTE.threat.critical)];
+  list.innerHTML = liveItems.slice(0, 20).map(a => `
     <a class="alert-item" href="${a.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">
       <div class="ai-sev" style="background:${sevColors[a.sev-1]};box-shadow:0 0 6px ${sevColors[a.sev-1]};"></div>
-      <div class="ai-time">${a.time}</div>
-      <div class="ai-text">${a.text}</div>
-      <div class="ai-loc">${a.loc}</div>
+      <div class="ai-time">${new Date(a.ts).toISOString().slice(11,16)} UTC</div>
+      <div class="ai-text">${escapeText(a.text)}</div>
+      <div class="ai-loc">${escapeText(a.loc)}</div>
     </a>
   `).join('');
 
@@ -2740,6 +2927,7 @@ function updateLiveAlertsFeed() {
   const alertsBadge = document.getElementById('alerts-badge');
   if (alertsBadge) alertsBadge.textContent = liveItems.length;
 }
+
 
 // ═══════════════════════════════════════════════════════════════════
 //  SATELLITES (reuses v1 PHP proxy)
@@ -2974,11 +3162,10 @@ function setupUI() {
   document.getElementById('layers-close')?.addEventListener('click', closeAllPanels);
   document.getElementById('alerts-close')?.addEventListener('click', closeAllPanels);
 
-  // Alerts
-  renderAlerts();
-  document.getElementById('stat-alerts').textContent = ALERTS.length;
-  const alertsBadge = document.getElementById('alerts-badge');
-  if (alertsBadge) alertsBadge.textContent = ALERTS.length;
+  // Alerts panel is populated entirely by live feeds via
+  // updateLiveAlertsFeed(); it starts empty and stays empty until real data
+  // arrives, rather than being pre-filled with placeholder copy.
+  updateLiveAlertsFeed();
 
  // AI Summary
  document.getElementById('btn-ai-summary').addEventListener('click', () => {
@@ -3362,75 +3549,177 @@ function flyCameraTo(target) {
   step();
 }
 
-function renderAlerts() {
-  const list = document.getElementById('alerts-list');
-  const sevColors = ['#ffaa22', '#ff6644', '#ff2244'];
-  list.innerHTML = ALERTS.map(a => `
-    <a class="alert-item" href="${a.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">
-      <div class="ai-sev" style="background:${sevColors[a.sev-1]};box-shadow:0 0 6px ${sevColors[a.sev-1]};"></div>
-      <div class="ai-time">${a.time}</div>
-      <div class="ai-text">${a.text}</div>
-      <div class="ai-loc">${a.loc}</div>
-    </a>
-  `).join('');
-}
-
+/**
+ * Situation rollup.
+ *
+ * Every figure below is counted from data currently in memory. The previous
+ * version hardcoded its conclusions — "Active combat operations in Ukraine,
+ * Gaza, Sudan", "Recommend elevated alert posture for next 72 hours",
+ * "Confidence: HIGH" — as fixed prose, wrapped them in an "INTELLIGENCE
+ * BRIEF" header, and interleaved live earthquake counts so the whole thing
+ * read as analysis. It asserted the same three conflicts whatever the data
+ * said, and would have kept asserting them with every feed down.
+ *
+ * This states what is observed and attributes it. It does not forecast, and
+ * it does not claim confidence it cannot compute.
+ */
 function generateAISummary() {
-  // Incorporate live data into summary
-  const liveQuakes = earthquakeData.filter(q => (q.mag || 0) >= 4.5);
+  const q45 = earthquakeData.filter(q => (q.mag || 0) >= 4.5);
+  const q6  = earthquakeData.filter(q => (q.mag || 0) >= 6);
   const extremeWx = weatherAlertData.filter(a => a.severity === 'Extreme');
-  const severeWx = weatherAlertData.filter(a => a.severity === 'Severe');
+  const severeWx  = weatherAlertData.filter(a => a.severity === 'Severe');
   const storms = stormAlertData;
-  const totalInputs = ALERTS.length + earthquakeData.length + weatherAlertData.length + storms.length;
-  let quakeSummary = '';
-  if (liveQuakes.length > 0) {
-    const topQ = liveQuakes[0];
-    quakeSummary = `<span class="warn">SEISMIC:</span> ${liveQuakes.length} significant earthquake(s) detected. Largest: <span class="highlight">M${(topQ.mag || 0).toFixed(1)}</span> near ${topQ.place || 'unknown'}.<br><br>`;
+
+  const conflictNews = newsItems.filter(n => n.category === 'conflict');
+  const crisisNews   = newsItems.filter(n => n.category === 'crisis');
+  const secNews      = newsItems.filter(n => n.category === 'security');
+
+  const L = [];
+  L.push(`<span class="highlight">OBSERVED SITUATION — ${new Date().toISOString().slice(0,16).replace('T',' ')}Z</span><br><br>`);
+
+  // ── Sources first: everything below is only as good as this. ──
+  const bad = [...feeds.feeds.values()].filter(f =>
+    f.state === FEED_STATE.FAILED || f.state === FEED_STATE.STALE || f.state === FEED_STATE.DEGRADED);
+  if (bad.length) {
+    L.push(`<span class="danger">SOURCE INTEGRITY:</span> ${bad.length} of ${feeds.feeds.size} sources not nominal — `
+      + bad.map(f => `${f.label} (${f.state})`).join(', ')
+      + `. Figures below are incomplete.<br><br>`);
+  } else {
+    L.push(`<span class="warn">SOURCE INTEGRITY:</span> all ${feeds.feeds.size} sources nominal.<br><br>`);
   }
-  let wxSummary = '';
-  if (weatherAlertData.length > 0) {
-    wxSummary = `<span class="warn">WEATHER (${weatherAlertData.length}):</span> ${extremeWx.length} Extreme, ${severeWx.length} Severe alerts active. `;
-    if (storms.length > 0) {
-      const stormEvents = storms.map(s => s.event).filter((v, i, a) => a.indexOf(v) === i).join(', ');
-      wxSummary += `Storm alerts: <span class="danger">${stormEvents}</span>.<br><br>`;
-    } else {
-      wxSummary += 'No severe storm alerts currently active.<br><br>';
-    }
+
+  if (earthquakeData.length) {
+    const top = [...earthquakeData].sort((a,b)=>(b.mag||0)-(a.mag||0))[0];
+    L.push(`<span class="warn">SEISMIC:</span> ${earthquakeData.length} events in the last 24h — `
+      + `${q6.length} at M6.0+, ${q45.length} at M4.5+. Largest <span class="highlight">M${(top.mag||0).toFixed(1)}</span>`
+      + ` ${top.place ? 'near ' + top.place : ''}. <span class="meta">USGS</span><br><br>`);
   }
-  const sev3 = ALERTS.filter(a => a.sev === 3);
-  const sev2 = ALERTS.filter(a => a.sev === 2);
-  return `<span class="highlight">INTELLIGENCE BRIEF — ${new Date().toISOString().slice(0,10)}</span><br><br>
-  <span class="danger">CRITICAL (${sev3.length}):</span> Active combat operations in <span class="highlight">Ukraine, Gaza, Sudan</span>. Pattern indicates sustained escalation across three concurrent conflict zones.<br><br>
-  ${quakeSummary}${wxSummary}
-  <span class="warn">ELEVATED (${sev2.length}):</span> Maritime drone activity in <span class="highlight">Red Sea</span>. <span class="highlight">Taiwan Strait</span> exercises suggest readiness posturing. <span class="highlight">Haiti</span> security collapse accelerating.<br><br>
-  <span class="highlight">ASSESSMENT:</span> Three concurrent severity-3 events with geographic dispersion. ${liveQuakes.length > 0 ? 'Seismic activity adds natural disaster dimension. ' : ''}${weatherAlertData.length > 0 ? weatherAlertData.length + ' active weather alerts monitored. ' : ''}Recommend elevated alert posture for next 72 hours.
-  <div class="meta">${totalInputs} inputs correlated | ${earthquakeData.length} quakes | ${weatherAlertData.length} weather alerts | ${storms.length} storm alerts | Confidence: HIGH</div>`;
+
+  if (weatherAlertData.length || storms.length) {
+    const evts = [...new Set(storms.map(s => s.event))].slice(0, 4).join(', ');
+    L.push(`<span class="warn">WEATHER:</span> ${weatherAlertData.length} active alerts — `
+      + `${extremeWx.length} Extreme, ${severeWx.length} Severe. `
+      + (storms.length ? `${storms.length} storm warnings: <span class="danger">${evts}</span>.` : 'No severe storm warnings active.')
+      + ` <span class="meta">NOAA/NWS — US coverage only</span><br><br>`);
+  }
+
+  if (newsItems.length) {
+    L.push(`<span class="warn">REPORTING:</span> ${newsItems.length} headlines — `
+      + `${conflictNews.length} conflict, ${crisisNews.length} humanitarian/disaster, ${secNews.length} security.`);
+    const lead = conflictNews[0] || crisisNews[0] || newsItems[0];
+    if (lead) L.push(`<br>Most recent: "<span class="highlight">${escapeText(lead.title)}</span>" — ${escapeText(lead.source)}, ${lead.time}Z.`);
+    L.push(` <span class="meta">BBC · Al Jazeera · NPR · ReliefWeb</span><br><br>`);
+  }
+
+  const airCount = aircraftLayer ? aircraftLayer.count : 0;
+  const satCount = orbitalLayer ? orbitalLayer.active.length : 0;
+  const fireCount = window.firesLayer && window.firesLayer.fires ? window.firesLayer.fires.length : 0;
+  L.push(`<span class="warn">TRACKED:</span> ${airCount} aircraft, ${satCount} orbital assets, ${fireCount} thermal anomalies.<br><br>`);
+
+  L.push(`<span class="highlight">NOTE:</span> This is a count of what the connected sources are currently reporting. `
+    + `It is not an assessment, and it contains no forecast. Hotspot markers on the globe are a curated reference set, not a live feed.`);
+
+  const inputs = earthquakeData.length + weatherAlertData.length + storms.length
+               + newsItems.length + airCount + satCount;
+  L.push(`<div class="meta">${inputs.toLocaleString()} live records across ${feeds.feeds.size} sources`
+    + ` | generated client-side from observed data | no inference applied</div>`);
+
+  return L.join('');
 }
 
 function renderTicker() {
   const content = document.getElementById('ticker-content');
-  // Build ticker from static + live data
   const items = [];
-  // Static ticker items
-  for (const t of TICKER) {
-    items.push('<a class="tc-item" href="' + t.url + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit"><span class="tc-dot" style="background:' + t.dot + '"></span><span class="tc-time">' + t.time + '</span><span class="tc-text">' + t.text + '</span></a>');
+
+  // Colour by topic, using the reserved-red discipline: red only where the
+  // headline indicates armed conflict or a threat to life.
+  const CAT_DOT = {
+    conflict: hex(PALETTE.threat.critical),
+    crisis:   hex(PALETTE.threat.moderate),
+    security: hex(PALETTE.weather.Severe),
+    general:  hex(PALETTE.reference.city),
+  };
+
+  for (const n of newsItems) {
+    items.push('<a class="tc-item" href="' + n.url + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">'
+      + '<span class="tc-dot" style="background:' + (CAT_DOT[n.category] || CAT_DOT.general) + '"></span>'
+      + '<span class="tc-time">' + n.time + '</span>'
+      + '<span class="tc-text">' + escapeText(n.title) + '</span>'
+      + '<span class="tc-src">' + escapeText(n.source) + '</span></a>');
   }
-  // Live earthquake items (top 3 by magnitude)
+
+  // Live geophysical items alongside the wires.
   const topQ = [...earthquakeData].sort((a, b) => (b.mag || 0) - (a.mag || 0)).slice(0, 3);
   for (const q of topQ) {
     const time = q.time ? new Date(q.time).toISOString().slice(11, 16) : '--:--';
-    const dot = q.mag >= 4.5 ? '#ff2244' : q.mag >= 2.5 ? '#ff6622' : '#ff8844';
-    items.push('<a class="tc-item" href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit"><span class="tc-dot" style="background:' + dot + '"></span><span class="tc-time">' + time + '</span><span class="tc-text">M' + (q.mag || 0).toFixed(1) + ' earthquake — ' + (q.place || 'Unknown') + '</span></a>');
+    const dot = q.mag >= 6 ? hex(PALETTE.threat.critical)
+              : q.mag >= 4.5 ? hex(PALETTE.threat.moderate) : hex(PALETTE.seismic);
+    items.push('<a class="tc-item" href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">'
+      + '<span class="tc-dot" style="background:' + dot + '"></span>'
+      + '<span class="tc-time">' + time + '</span>'
+      + '<span class="tc-text">M' + (q.mag || 0).toFixed(1) + ' earthquake — ' + escapeText(q.place || 'Unknown') + '</span>'
+      + '<span class="tc-src">USGS</span></a>');
   }
-  // Live weather alert items (top 3)
   for (const a of weatherAlertData.slice(0, 3)) {
     const time = a.sent ? new Date(a.sent).toISOString().slice(11, 16) : '--:--';
-    const dot = a.severity === 'Extreme' ? '#ff2244' : a.severity === 'Severe' ? '#ff6622' : '#ffcc22';
-    items.push('<a class="tc-item" href="https://www.weather.gov/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit"><span class="tc-dot" style="background:' + dot + '"></span><span class="tc-time">' + time + '</span><span class="tc-text">' + a.event + ' — ' + (a.areaDesc || 'US').substring(0, 40) + '</span></a>');
+    items.push('<a class="tc-item" href="https://www.weather.gov/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">'
+      + '<span class="tc-dot" style="background:' + hex(PALETTE.weather[a.severity] || PALETTE.weather.Minor) + '"></span>'
+      + '<span class="tc-time">' + time + '</span>'
+      + '<span class="tc-text">' + escapeText(a.event + ' — ' + (a.areaDesc || 'US').substring(0, 40)) + '</span>'
+      + '<span class="tc-src">NWS</span></a>');
+  }
+
+  if (!items.length) {
+    // Say so rather than showing an empty strip that reads as "all quiet".
+    content.innerHTML = '<span class="tc-item tc-empty">NO FEED DATA — sources unreachable</span>';
+    return;
   }
   const joined = items.join('');
-  content.innerHTML = joined + joined; // Duplicate for seamless loop
+  content.innerHTML = joined + joined; // duplicated for a seamless loop
 }
+
+function escapeText(s) {
+  return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  NEWS FEED
+// ═══════════════════════════════════════════════════════════════════
+
+async function fetchNews() {
+  feeds.attempt('news');
+  try {
+    const res = await fetch('../../api/news-feed.php');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data.error && !(data.items || []).length) throw new Error(data.error);
+    newsItems = data.items || [];
+
+    // Report real provenance: which wires answered, and whether we are
+    // looking at cached data because they all failed.
+    const f = feeds.feeds.get('news');
+    if (f && data.sources) {
+      const ok = data.sources.ok || [];
+      f.source = ok.length ? ok.join(' · ') : 'no sources responding';
+      if ((data.sources.failed || []).length) {
+        f.source += '  (down: ' + data.sources.failed.join(', ') + ')';
+      }
+    }
+    if (data.stale) {
+      feeds.pin('news', FEED_STATE.STALE, (f ? f.source : '') + ' — serving last good data');
+    } else {
+      feeds.unpin('news');
+      feeds.success('news', newsItems.length);
+    }
+    renderTicker();
+    updateLiveAlertsFeed();
+  } catch (err) {
+    console.warn('[news] fetch failed:', err);
+    feeds.failure('news', err);
+    renderTicker();
+  }
+}
+
 
 function updateClock() {
   const now = new Date();

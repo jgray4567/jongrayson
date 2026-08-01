@@ -568,3 +568,120 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
   .cp-coord { display: none; }
   #search-trigger .st-hint { display: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   LIVE FEED TICKER / ALERTS — provenance
+   ══════════════════════════════════════════════════════════════
+   Every ticker item now carries its source. The previous build mixed
+   hand-written copy with real USGS and NWS items in identical styling, so
+   there was no way to tell reporting from invention. Attribution is the fix. */
+
+#ticker .tc-src {
+  font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.7px;
+  color: var(--txt-3); text-transform: uppercase;
+  border: 1px solid var(--line-2); border-radius: 3px;
+  padding: 1px 5px; margin-left: 9px; white-space: nowrap; flex-shrink: 0;
+}
+#ticker .tc-empty {
+  font-family: var(--mono); font-size: 11px; color: var(--warn);
+  letter-spacing: 1px; padding: 0 18px;
+}
+.ai-empty {
+  font-family: var(--mono); font-size: 11px; line-height: 1.7;
+  color: var(--warn); padding: 16px 4px; text-align: center;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   NYC CAMERA BROWSER
+   ══════════════════════════════════════════════════════════════ */
+
+/* Upscale smoothly. NYC DOT ignores every size hint, so ~87% of cameras are
+   352x240 and the only lever is display size — nearest-neighbour would make
+   an already soft image look broken. */
+#cm-preview-img img,
+#camera-popup .cp-img-wrap img {
+  width: 100%; height: auto; display: block;
+  image-rendering: auto;
+}
+
+/* Native resolution, stated. An upscaled 352x240 must not be mistaken for
+   detail that does not exist in the source. */
+.cm-res {
+  font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.7px;
+  padding: 2px 6px; border-radius: 3px; white-space: nowrap;
+  border: 1px solid var(--line-2); color: var(--txt-3);
+}
+.cm-res.hd  { color: var(--ok);    border-color: rgba(111,216,143,0.35); }
+.cm-res.sd  { color: var(--warn);  border-color: rgba(255,201,92,0.30); }
+.cm-res.low { color: var(--txt-3); }
+
+.cm-sort-row {
+  display: flex; align-items: center; gap: 8px; padding: 6px 0 2px;
+  font-family: var(--mono); font-size: 9.5px; color: var(--txt-3);
+}
+.cm-sort-btn {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.6px;
+  color: var(--txt-2); background: rgba(255,255,255,0.04);
+  border: 1px solid var(--line-2); border-radius: 4px;
+  padding: 3px 8px; cursor: pointer;
+}
+.cm-sort-btn.on { color: var(--ink); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+
+/* ── Camera browser layout ───────────────────────────────────────
+   Measured before this change at 1443x1197: map 600x1134 (a roughly square
+   city fitted into a 0.53-aspect box), preview display:none, and 970 rows of
+   830px each carrying ~250px of text. Now: left column pairs the map with
+   the live still; right column is a responsive grid so rows use the width. */
+
+.cm-body { display: flex; min-height: 0; }
+
+.cm-left {
+  flex: 0 0 42%; max-width: 640px; min-width: 320px;
+  display: flex; flex-direction: column; min-height: 0;
+  border-right: 1px solid rgba(196,214,0,0.08);
+}
+.cm-left .cm-map-panel {
+  flex: 1 1 auto; min-height: 240px;
+  max-width: none; border-right: none;
+}
+.cm-left .cm-preview {
+  flex: 0 0 auto; border-top: 1px solid rgba(196,214,0,0.10);
+  display: block !important;   /* populated on open, never an idle blank */
+}
+.cm-left .cm-preview-img-wrap { max-height: 46vh; min-height: 220px; }
+
+.cm-list-panel { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+
+/* Responsive grid: 2–4 columns depending on width, instead of one tall column. */
+.cm-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+  gap: 6px; align-content: start;
+  padding: 8px 10px; overflow-y: auto; min-height: 0;
+}
+.cm-list .cm-list-item {
+  width: auto; margin: 0;
+  border: 1px solid var(--line-2); border-radius: 8px;
+  padding: 6px; gap: 8px;
+}
+.cm-list .cm-list-item:hover { border-color: rgba(196,214,0,0.3); }
+.cm-list .cm-list-item.selected { border-color: var(--sel); background: rgba(136,238,255,0.07); }
+
+@media (max-width: 1100px) {
+  .cm-left { flex-basis: 46%; }
+  .cm-list { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+}
+@media (max-width: 860px) {
+  .cm-body { flex-direction: column; }
+  .cm-left { flex: 0 0 auto; max-width: none; border-right: none;
+             border-bottom: 1px solid rgba(196,214,0,0.10); }
+  .cm-left .cm-map-panel { min-height: 200px; height: 30vh; }
+  .cm-left .cm-preview-img-wrap { max-height: 32vh; min-height: 160px; }
+  .cm-list { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+}
+
+/* The camera browser is a full-screen dialog and must sit above transient
+   popovers. Measured conflict: #feed-health at z-index 120 was rendering over
+   #camera-modal-overlay at 100. The command palette (400) and keyboard map
+   (420) stay above it deliberately — those are global and must always reach. */
+#camera-modal-overlay { z-index: 200 !important; }
