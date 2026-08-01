@@ -456,6 +456,11 @@ export class MissionUI {
       rows.push({ k: 'Origin time', v: q.time ? new Date(q.time).toISOString().replace('T', ' ').slice(0, 19) + 'Z' : '—' });
       rows.push({ k: 'Elapsed', v: q.time ? formatAge(Date.now() - q.time) : '—' });
       if (q.place) rows.push({ k: 'Region', v: q.place });
+      if (q.felt) rows.push({ k: 'Felt reports', v: q.felt.toLocaleString() });
+      if (q.tsunami) rows.push({ k: 'Tsunami flag', html: `<span style="color:${hex(PALETTE.threat.critical)}">SET</span>` });
+      if (q.url) {
+        rows.push({ k: '', html: `<a class="ds-link" href="${q.url}" target="_blank" rel="noopener noreferrer">Open USGS event page ↗</a>` });
+      }
       provenance = this._provenance('earthquakes');
 
     } else if (kind === 'weather') {
@@ -468,6 +473,37 @@ export class MissionUI {
       if (a.urgency) rows.push({ k: 'Urgency', v: a.urgency });
       if (a.certainty) rows.push({ k: 'Certainty', v: a.certainty });
       rows.push({ k: 'Area', v: a.areaDesc || '—' });
+      if (a.effective) rows.push({ k: 'Effective', v: new Date(a.effective).toISOString().replace('T',' ').slice(0,16) + 'Z' });
+      if (a.expires) {
+        const ms = Date.parse(a.expires) - Date.now();
+        rows.push({
+          k: 'Expires',
+          html: ms > 0
+            ? `in ${formatAge(ms)}`
+            : `<span style="color:${hex(PALETTE.threat.moderate)}">expired ${formatAge(-ms)} ago</span>`,
+        });
+      }
+      if (a.senderName) rows.push({ k: 'Issued by', v: a.senderName });
+
+      // The full text, in the panel.
+      //
+      // NWS retired alerts.weather.gov and hardcodes properties.web to the
+      // bare homepage, so there is no per-alert page to link to — which is
+      // why every alert used to send you to weather.gov's front door. The
+      // actual content is in the feed, so show it rather than sending the
+      // operator away to search for what we already have.
+      if (a.headline) {
+        rows.push({ divider: 'Headline' });
+        rows.push({ html: `<span class="ds-alert-text">${escapeHtml(a.headline)}</span>`, k: '' });
+      }
+      if (a.description) {
+        rows.push({ divider: 'Detail' });
+        rows.push({ html: `<span class="ds-alert-text">${escapeHtml(a.description.trim())}</span>`, k: '' });
+      }
+      if (a.instruction) {
+        rows.push({ divider: 'Instruction' });
+        rows.push({ html: `<span class="ds-alert-text ds-alert-action">${escapeHtml(a.instruction.trim())}</span>`, k: '' });
+      }
       provenance = this._provenance('weather');
 
     } else if (kind === 'hotspot') {

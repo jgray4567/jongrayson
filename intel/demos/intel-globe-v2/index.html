@@ -2077,6 +2077,11 @@ async function fetchEarthquakes() {
       mag: f.properties.mag,
       place: f.properties.place,
       time: f.properties.time,
+      // USGS gives a real per-event page. Linking every quake to the generic
+      // map was throwing away the one identifier that matters.
+      url: f.properties.url || null,
+      felt: f.properties.felt,
+      tsunami: f.properties.tsunami,
       lng: f.geometry.coordinates[0],
       lat: f.geometry.coordinates[1],
       depth: f.geometry.coordinates[2]
@@ -2212,6 +2217,18 @@ async function fetchWeatherAlerts() {
       areaDesc: f.properties.areaDesc,
       headline: f.properties.headline,
       sent: f.properties.sent,
+      // NWS retired alerts.weather.gov, and properties.web is hardcoded to
+      // the bare homepage — which is exactly why every alert linked there.
+      // There is no per-alert human page any more, so carry the full text and
+      // present it in the dossier instead of sending the operator to a
+      // homepage to go hunting.
+      description: f.properties.description,
+      instruction: f.properties.instruction,
+      urgency: f.properties.urgency,
+      certainty: f.properties.certainty,
+      effective: f.properties.effective,
+      expires: f.properties.expires,
+      senderName: f.properties.senderName,
       geometry: f.geometry
     })).filter(a => a.geometry);
 
@@ -2890,6 +2907,29 @@ function updateCameraBrowseBtn() {
 }
 
 // Update the alerts feed panel with live NWS data
+/**
+ * Real destination for a weather alert.
+ *
+ * NWS has no per-alert human page (alerts.weather.gov is retired and returns
+ * nothing; properties.web is hardcoded to the bare homepage). The point
+ * forecast page for the alert's own centroid does resolve, and it lists the
+ * alerts active there — so it is at least specific to this alert's location
+ * rather than a homepage.
+ */
+function weatherAlertUrl(a) {
+  const c = a && a.geometry ? computeCentroid(a.geometry) : null;
+  if (c && isFinite(c.lat) && isFinite(c.lng)) {
+    return 'https://forecast.weather.gov/MapClick.php?lat=' + c.lat.toFixed(4)
+         + '&lon=' + c.lng.toFixed(4);
+  }
+  return 'https://www.weather.gov/';
+}
+
+/** USGS publishes a page per event; use it. */
+function quakeUrl(q) {
+  return (q && q.url) || 'https://earthquake.usgs.gov/earthquakes/map/';
+}
+
 function updateLiveAlertsFeed() {
   const list = document.getElementById('alerts-list');
   if (!list) return;
@@ -2913,7 +2953,7 @@ function updateLiveAlertsFeed() {
       sev: a.severity === 'Extreme' ? 3 : a.severity === 'Severe' ? 2 : 1,
       text: a.event + (a.areaDesc ? ' — ' + a.areaDesc.substring(0, 60) : ''),
       loc: a.areaDesc ? a.areaDesc.split(';')[0].substring(0, 20) : 'US',
-      url: 'https://www.weather.gov/',
+      url: weatherAlertUrl(a),
     });
   }
 
@@ -2924,7 +2964,7 @@ function updateLiveAlertsFeed() {
       sev: q.mag >= 6 ? 3 : q.mag >= 4.5 ? 2 : 1,
       text: 'M' + (q.mag || 0).toFixed(1) + ' earthquake — ' + (q.place || 'Unknown'),
       loc: q.place ? q.place.split(',').pop().trim().substring(0, 20) : '—',
-      url: 'https://earthquake.usgs.gov/earthquakes/map/',
+      url: quakeUrl(q),
     });
   }
 
@@ -3607,14 +3647,22 @@ function generateAISummary() {
   L.push(`<span class="highlight">OBSERVED SITUATION — ${new Date().toISOString().slice(0,16).replace('T',' ')}Z</span><br><br>`);
 
   // ── Sources first: everything below is only as good as this. ──
-  const bad = [...feeds.feeds.values()].filter(f =>
+  const all = [...feeds.feeds.values()];
+  const bad = all.filter(f =>
     f.state === FEED_STATE.FAILED || f.state === FEED_STATE.STALE || f.state === FEED_STATE.DEGRADED);
+  // A disabled source is not a nominal one. Counting OFF as nominal read as
+  // "all 9 sources contributing" while one was switched off and supplying
+  // nothing — a small claim, but the wrong one.
+  const off = all.filter(f => f.state === FEED_STATE.OFF);
+  const live = all.filter(f => f.state === FEED_STATE.LIVE);
   if (bad.length) {
-    L.push(`<span class="danger">SOURCE INTEGRITY:</span> ${bad.length} of ${feeds.feeds.size} sources not nominal — `
+    L.push(`<span class="danger">SOURCE INTEGRITY:</span> ${bad.length} of ${all.length} sources not nominal — `
       + bad.map(f => `${f.label} (${f.state})`).join(', ')
       + `. Figures below are incomplete.<br><br>`);
   } else {
-    L.push(`<span class="warn">SOURCE INTEGRITY:</span> all ${feeds.feeds.size} sources nominal.<br><br>`);
+    L.push(`<span class="warn">SOURCE INTEGRITY:</span> ${live.length} of ${all.length} sources live`
+      + (off.length ? `, ${off.length} off (${off.map(f => f.label).join(', ')}) — contributing nothing to the counts below` : '')
+      + `.<br><br>`);
   }
 
   if (earthquakeData.length) {
@@ -3642,14 +3690,21 @@ function generateAISummary() {
 
   const airCount = aircraftLayer ? aircraftLayer.count : 0;
   const satCount = orbitalLayer ? orbitalLayer.active.length : 0;
-  const fireCount = window.firesLayer && window.firesLayer.fires ? window.firesLayer.fires.length : 0;
-  L.push(`<span class="warn">TRACKED:</span> ${airCount} aircraft, ${satCount} orbital assets, ${fireCount} thermal anomalies.<br><br>`);
+  // Report what is PLOTTED, not what was fetched. The fires layer caps
+  // rendering at maxDots, so quoting the fetched 5,000 claimed three and a
+  // half thousand markers that are not on the globe.
+  const firesFetched = window.firesLayer && window.firesLayer.fires ? window.firesLayer.fires.length : 0;
+  const firesPlotted = window.firesLayer && window.firesLayer.meshes ? window.firesLayer.meshes.size : 0;
+  const fireStr = firesPlotted && firesFetched > firesPlotted
+    ? `${firesPlotted.toLocaleString()} of ${firesFetched.toLocaleString()} thermal anomalies plotted (display cap)`
+    : `${firesPlotted.toLocaleString()} thermal anomalies`;
+  L.push(`<span class="warn">TRACKED:</span> ${airCount} aircraft, ${satCount} orbital assets, ${fireStr}.<br><br>`);
 
   L.push(`<span class="highlight">NOTE:</span> This is a count of what the connected sources are currently reporting. `
     + `It is not an assessment, and it contains no forecast. Hotspot markers on the globe are a curated reference set, not a live feed.`);
 
   const inputs = earthquakeData.length + weatherAlertData.length + storms.length
-               + newsItems.length + airCount + satCount;
+               + newsItems.length + airCount + satCount + firesPlotted;
   L.push(`<div class="meta">${inputs.toLocaleString()} live records across ${feeds.feeds.size} sources`
     + ` | generated client-side from observed data | no inference applied</div>`);
 
@@ -3687,7 +3742,7 @@ function renderTicker() {
     const time = q.time ? new Date(q.time).toISOString().slice(11, 16) : '--:--';
     const dot = q.mag >= 6 ? hex(PALETTE.threat.critical)
               : q.mag >= 4.5 ? hex(PALETTE.threat.moderate) : hex(PALETTE.seismic);
-    items.push('<a class="tc-item" href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">'
+    items.push('<a class="tc-item" href="' + quakeUrl(q) + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">'
       + '<span class="tc-dot" style="background:' + dot + '"></span>'
       + '<span class="tc-time">' + time + '</span>'
       + '<span class="tc-text">M' + (q.mag || 0).toFixed(1) + ' earthquake — ' + escapeText(q.place || 'Unknown') + '</span>'
@@ -3695,7 +3750,7 @@ function renderTicker() {
   }
   for (const a of weatherAlertData.slice(0, 3)) {
     const time = a.sent ? new Date(a.sent).toISOString().slice(11, 16) : '--:--';
-    items.push('<a class="tc-item" href="https://www.weather.gov/" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">'
+    items.push('<a class="tc-item" href="' + weatherAlertUrl(a) + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">'
       + '<span class="tc-dot" style="background:' + hex(PALETTE.weather[a.severity] || PALETTE.weather.Minor) + '"></span>'
       + '<span class="tc-time">' + time + '</span>'
       + '<span class="tc-text">' + escapeText(a.event + ' — ' + (a.areaDesc || 'US').substring(0, 40)) + '</span>'
@@ -3977,8 +4032,17 @@ const PANELS = {
   alerts:  { el: 'alerts-panel',  label: 'Live Alerts Feed', key: 'A' },
   regions: { el: 'regions-panel', label: 'Region Presets',   key: 'P' },
 };
+
+/* Dossier and legend are draggable too, but they are not dock-managed: the
+   dossier opens on selection and closes with Esc, the legend toggles with L.
+   Giving them close-chips in the dock would imply a lifecycle they do not
+   have, so they get position persistence only. */
+const MOVABLE = {
+  dossier: { el: 'dossier', handle: '.ds-head' },
+  legend:  { el: 'legend',  handle: '.lg-head' },
+};
 const PANEL_STORE = 'intel.panels.v1';
-let panelState = { layers: {}, alerts: {}, regions: {} };
+let panelState = { layers: {}, alerts: {}, regions: {}, dossier: {}, legend: {} };
 
 function loadPanelState() {
   try {
@@ -4083,7 +4147,8 @@ function clampPanel(el, x, y) {
 }
 
 function applyPanelPos(name) {
-  const def = PANELS[name];
+  const def = PANELS[name] || MOVABLE[name];
+  if (!def) return;
   const el = document.getElementById(def.el);
   const pos = (panelState[name] || {}).pos;
   if (!el) return;
@@ -4095,11 +4160,11 @@ function applyPanelPos(name) {
   if (c.x !== pos.x || c.y !== pos.y) { pos.x = c.x; pos.y = c.y; savePanelState(); }
 }
 
-function makeDraggable(name) {
-  const def = PANELS[name];
+function makeDraggable(name, opts) {
+  const def = opts || PANELS[name];
   const el = document.getElementById(def.el);
   if (!el) return;
-  const handle = el.querySelector('h2, .ap-header');
+  const handle = el.querySelector(def.handle || 'h2, .ap-header');
   if (!handle) return;
   handle.classList.add('pw-handle');
 
@@ -4147,6 +4212,11 @@ function makeDraggable(name) {
 }
 
 function resetPanelLayout() {
+  for (const name of Object.keys(MOVABLE)) {
+    panelState[name] = {};
+    const el = document.getElementById(MOVABLE[name].el);
+    if (el) { el.classList.remove('pw-moved'); el.style.left = el.style.top = ''; }
+  }
   for (const name of Object.keys(PANELS)) {
     panelState[name] = {};
     const el = document.getElementById(PANELS[name].el);
@@ -4181,12 +4251,17 @@ function initPanelControls() {
     setPanel(name, {});   // apply any persisted state
     applyPanelPos(name);
   }
+  for (const [name, def] of Object.entries(MOVABLE)) {
+    makeDraggable(name, def);
+    applyPanelPos(name);
+  }
   renderPanelDock();
 
   // Re-clamp on resize so nothing is stranded off-screen when the window
   // narrows — an unreachable panel is the same failure as a lost one.
   window.addEventListener('resize', () => {
     for (const n of Object.keys(PANELS)) applyPanelPos(n);
+    for (const n of Object.keys(MOVABLE)) applyPanelPos(n);
     renderPanelDock();
   });
 }
