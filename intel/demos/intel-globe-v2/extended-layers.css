@@ -60,7 +60,7 @@
   color: #C4D600;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
+  font-size: 12.3px;
   font-weight: 600;
   letter-spacing: 0.8px;
   transition: all 0.2s ease;
@@ -228,7 +228,7 @@
 }
 
 .tl-ts-label {
-  font-size: 10px;
+  font-size: 12.0px;
   font-weight: 700;
   letter-spacing: 1.5px;
   color: #C4D600;
@@ -249,7 +249,7 @@
 }
 
 .tl-ts-time {
-  font-size: 12px;
+  font-size: 13.4px;
   color: #e8eaed;
   letter-spacing: 0.5px;
   min-width: 140px;
@@ -279,7 +279,7 @@
   color: #889;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
+  font-size: 12.3px;
   font-weight: 600;
   letter-spacing: 0.5px;
   transition: all 0.15s;
@@ -314,7 +314,7 @@
   border: 1px solid rgba(255, 107, 53, 0.25);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 107, 53, 0.08);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
+  font-size: 12.3px;
   color: #e8eaed;
   pointer-events: none;
   animation: ft-fade-in 0.15s ease-out;
@@ -335,11 +335,11 @@
 }
 
 .ft-icon {
-  font-size: 14px;
+  font-size: 14.8px;
 }
 
 .ft-title {
-  font-size: 12px;
+  font-size: 13.4px;
   font-weight: 600;
   color: #ff6b35;
   letter-spacing: 0.5px;
@@ -351,7 +351,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 3px 0;
-  font-size: 11px;
+  font-size: 12.3px;
 }
 
 .ft-lbl {
@@ -387,7 +387,7 @@
   border: 1px solid rgba(0, 212, 255, 0.25);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 212, 255, 0.08);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
+  font-size: 12.3px;
   color: #e8eaed;
   pointer-events: none;
   animation: st-fade-in 0.15s ease-out;
@@ -408,11 +408,11 @@
 }
 
 .st-icon {
-  font-size: 14px;
+  font-size: 14.8px;
 }
 
 .st-title {
-  font-size: 12px;
+  font-size: 13.4px;
   font-weight: 600;
   color: #00d4ff;
   letter-spacing: 0.5px;
@@ -428,7 +428,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 3px 0;
-  font-size: 11px;
+  font-size: 12.3px;
 }
 
 .st-lbl {
@@ -447,7 +447,7 @@
   padding-top: 8px;
   border-top: 1px solid rgba(0, 212, 255, 0.15);
   text-align: center;
-  font-size: 10px;
+  font-size: 12.0px;
   font-weight: 600;
   letter-spacing: 1px;
   color: #C4D600;
@@ -457,7 +457,7 @@
 .st-hint {
   margin-top: 6px;
   text-align: center;
-  font-size: 9px;
+  font-size: 10.8px;
   color: #667;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -474,7 +474,7 @@
    from the main globe CSS. These additions ensure proper icon colors. */
 
 .layer-toggle .lt-icon {
-  font-size: 15px;
+  font-size: 15.9px;
   transition: filter 0.2s;
 }
 
@@ -508,7 +508,7 @@
   .tl-btn {
     height: 32px;
     padding: 0 8px;
-    font-size: 10px;
+    font-size: 12.0px;
   }
 
   .tl-play-btn {
@@ -516,19 +516,19 @@
   }
 
   .tl-ts-time {
-    font-size: 10px;
+    font-size: 12.0px;
     min-width: 100px;
   }
 
   .tl-speed-btn {
     padding: 4px 6px;
-    font-size: 10px;
+    font-size: 12.0px;
   }
 
   .fire-tooltip,
   .ship-tooltip {
     max-width: 220px;
-    font-size: 10px;
+    font-size: 12.0px;
   }
 }
 
@@ -569,7 +569,7 @@
     max-width: none;
     width: auto;
     border-radius: 12px;
-    font-size: 10px;
+    font-size: 12.0px;
   }
 }
 

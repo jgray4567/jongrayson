@@ -48,14 +48,14 @@
   padding: 14px 16px;
   border-bottom: 1px solid var(--line);
 }
-.cp-prompt { color: var(--accent); font-family: var(--mono); font-size: 17px; line-height: 1; }
+.cp-prompt { color: var(--accent); font-family: var(--mono); font-size: 18.0px; line-height: 1; }
 #cp-input {
   flex: 1; background: none; border: none; outline: none;
-  color: var(--txt); font-family: var(--mono); font-size: 15px; letter-spacing: 0.3px;
+  color: var(--txt); font-family: var(--mono); font-size: 15.9px; letter-spacing: 0.3px;
 }
 #cp-input::placeholder { color: var(--txt-3); }
 .cp-esc {
-  font-family: var(--mono); font-size: 9.5px; color: var(--txt-3);
+  font-family: var(--mono); font-size: 11.4px; color: var(--txt-3);
   border: 1px solid var(--line-2); border-radius: 4px; padding: 2px 6px;
 }
 
@@ -67,26 +67,26 @@
   display: flex; align-items: center; gap: 10px;
   padding: 8px 16px; cursor: pointer;
   border-left: 2px solid transparent;
-  font-family: var(--mono); font-size: 12.5px;
+  font-family: var(--mono); font-size: 14.0px;
 }
 .cp-row.active { background: rgba(196,214,0,0.07); border-left-color: var(--accent); }
-.cp-icon { width: 14px; text-align: center; flex-shrink: 0; font-size: 12px; }
+.cp-icon { width: 14px; text-align: center; flex-shrink: 0; font-size: 13.4px; }
 .cp-label { color: var(--txt); font-weight: 500; flex-shrink: 0; }
-.cp-sub { color: var(--txt-3); font-size: 11px; flex: 1; overflow: hidden;
+.cp-sub { color: var(--txt-3); font-size: 12.3px; flex: 1; overflow: hidden;
           text-overflow: ellipsis; white-space: nowrap; }
-.cp-coord { color: var(--txt-2); font-size: 10.5px; flex-shrink: 0; }
+.cp-coord { color: var(--txt-2); font-size: 12.6px; flex-shrink: 0; }
 .cp-keys { display: flex; gap: 3px; flex-shrink: 0; }
-.cp-empty { padding: 22px 16px; color: var(--txt-3); font-size: 12px; font-family: var(--mono); line-height: 1.6; }
+.cp-empty { padding: 22px 16px; color: var(--txt-3); font-size: 13.4px; font-family: var(--mono); line-height: 1.6; }
 
 .cp-foot {
   display: flex; gap: 16px; align-items: center;
   padding: 8px 16px; border-top: 1px solid var(--line-2);
-  font-family: var(--mono); font-size: 10px; color: var(--txt-3);
+  font-family: var(--mono); font-size: 12.0px; color: var(--txt-3);
 }
 .cp-foot-right { margin-left: auto; color: var(--txt-2); }
 
 kbd {
-  font-family: var(--mono); font-size: 9.5px; color: var(--txt-2);
+  font-family: var(--mono); font-size: 11.4px; color: var(--txt-2);
   background: rgba(255,255,255,0.05); border: 1px solid var(--line-2);
   border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px;
   display: inline-block; line-height: 1.5;
@@ -110,10 +110,10 @@ kbd {
 #dossier::-webkit-scrollbar-thumb { background: #1a2233; border-radius: 2px; }
 
 .ds-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-.ds-kind { font-family: var(--mono); font-size: 9.5px; letter-spacing: 1.6px; color: var(--accent); }
+.ds-kind { font-family: var(--mono); font-size: 11.4px; letter-spacing: 1.6px; color: var(--accent); }
 .ds-actions { display: flex; gap: 6px; }
 .ds-btn {
-  font-family: var(--mono); font-size: 9.5px; letter-spacing: 1px;
+  font-family: var(--mono); font-size: 11.4px; letter-spacing: 1px;
   color: var(--txt-2); background: rgba(255,255,255,0.04);
   border: 1px solid var(--line-2); border-radius: 5px;
   padding: 3px 8px; cursor: pointer; transition: all 0.14s;
@@ -123,11 +123,11 @@ kbd {
 .ds-x { padding: 3px 7px; }
 
 .ds-title {
-  font-family: var(--mono); font-size: 17px; font-weight: 600;
+  font-family: var(--mono); font-size: 18.0px; font-weight: 600;
   color: var(--txt); letter-spacing: 0.4px; line-height: 1.25;
   word-break: break-word;
 }
-.ds-sub { font-family: var(--mono); font-size: 10.5px; color: var(--txt-3); margin-top: 2px; }
+.ds-sub { font-family: var(--mono); font-size: 12.6px; color: var(--txt-3); margin-top: 2px; }
 
 /* ── Operator identity: logo + airline, above the data ───────────── */
 
@@ -157,20 +157,20 @@ kbd {
 }
 /* Fallback shown until (or unless) a logo resolves. */
 .ds-logo-chip {
-  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  font-family: var(--mono); font-size: 12.0px; font-weight: 700;
   color: #06070a; letter-spacing: 0.5px;
   padding: 4px 8px; border-radius: 4px; white-space: nowrap;
 }
 .ds-operator { min-width: 0; }
 .ds-op-name {
-  font-family: var(--mono); font-size: 11.5px; color: var(--txt);
+  font-family: var(--mono); font-size: 12.9px; color: var(--txt);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.ds-op-reg { font-family: var(--mono); font-size: 9.5px; color: var(--txt-3); margin-top: 1px; }
+.ds-op-reg { font-family: var(--mono); font-size: 11.4px; color: var(--txt-3); margin-top: 1px; }
 
 .ds-extrap, .ds-note, .ds-warn {
   margin-top: 10px; padding: 8px 10px; border-radius: 7px;
-  font-size: 10.5px; line-height: 1.5; font-family: var(--mono);
+  font-size: 12.6px; line-height: 1.5; font-family: var(--mono);
 }
 .ds-extrap {
   background: rgba(255,201,92,0.09); border: 1px solid rgba(255,201,92,0.3);
@@ -194,7 +194,7 @@ kbd {
 
 .ds-body { margin-top: 10px; }
 .ds-div {
-  font-family: var(--mono); font-size: 9px; letter-spacing: 1.6px;
+  font-family: var(--mono); font-size: 10.8px; letter-spacing: 1.6px;
   color: var(--txt-3); text-transform: uppercase;
   margin: 12px 0 5px; padding-bottom: 4px;
   border-bottom: 1px solid var(--line-2);
@@ -202,20 +202,20 @@ kbd {
 .ds-div:first-child { margin-top: 4px; }
 .ds-row {
   display: flex; justify-content: space-between; gap: 12px;
-  padding: 3.5px 0; font-family: var(--mono); font-size: 11.5px;
+  padding: 3.5px 0; font-family: var(--mono); font-size: 12.9px;
   align-items: baseline;
 }
 .ds-k { color: var(--txt-3); flex-shrink: 0; }
 .ds-v { color: var(--txt); text-align: right; word-break: break-word; }
 .ds-tle {
-  font-size: 8.6px; color: var(--txt-2); line-height: 1.45;
+  font-size: 11.0px; color: var(--txt-2); line-height: 1.45;
   display: block; text-align: left; margin-top: 2px;
   word-break: break-all; letter-spacing: -0.2px;
 }
 
 .ds-prov {
   margin-top: 12px; padding-top: 9px; border-top: 1px solid var(--line-2);
-  font-family: var(--mono); font-size: 9.5px; line-height: 1.6;
+  font-family: var(--mono); font-size: 11.4px; line-height: 1.6;
   display: flex; flex-direction: column; gap: 2px;
 }
 .ds-prov-state { font-weight: 600; letter-spacing: 1px; }
@@ -273,19 +273,19 @@ kbd {
 
 .fh-head { display: flex; justify-content: space-between; align-items: baseline;
            margin-bottom: 7px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
-.fh-title { font-family: var(--mono); font-size: 9.5px; letter-spacing: 1.5px;
+.fh-title { font-family: var(--mono); font-size: 11.4px; letter-spacing: 1.5px;
             color: var(--accent); text-transform: uppercase; }
-.fh-posture { font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.8px; font-weight: 600; }
+.fh-posture { font-family: var(--mono); font-size: 10.9px; letter-spacing: 0.8px; font-weight: 600; }
 
 .fh-row {
   display: flex; align-items: center; gap: 7px;
-  padding: 3px 0; font-family: var(--mono); font-size: 10px;
+  padding: 3px 0; font-family: var(--mono); font-size: 12.0px;
 }
 .fh-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--txt-3); }
 .fh-label { color: var(--txt-2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fh-count { color: var(--txt); font-variant-numeric: tabular-nums; min-width: 30px; text-align: right; }
-.fh-age { color: var(--txt-3); min-width: 44px; text-align: right; font-size: 9px; }
-.fh-state { font-size: 8px; letter-spacing: 0.6px; min-width: 52px; text-align: right; font-weight: 600; }
+.fh-age { color: var(--txt-3); min-width: 44px; text-align: right; font-size: 10.8px; }
+.fh-state { font-size: 10.2px; letter-spacing: 0.6px; min-width: 52px; text-align: right; font-weight: 600; }
 
 .fh-LIVE .fh-dot { background: var(--ok); box-shadow: 0 0 5px var(--ok); }
 .fh-LIVE .fh-state { color: var(--ok); }
@@ -309,7 +309,7 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
 
 /* Top-bar posture mirror */
 .posture-mini {
-  font-family: var(--mono); font-size: 9px; letter-spacing: 1px; font-weight: 600;
+  font-family: var(--mono); font-size: 10.8px; letter-spacing: 1px; font-weight: 600;
   padding: 3px 8px; border-radius: 5px; white-space: nowrap;
   border: 1px solid currentColor; opacity: 0.9;
 }
@@ -333,31 +333,31 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
 #legend::-webkit-scrollbar-thumb { background: #1a2233; border-radius: 2px; }
 
 .lg-head { display: flex; justify-content: space-between; align-items: center;
-           font-family: var(--mono); font-size: 9.5px; letter-spacing: 1.6px;
+           font-family: var(--mono); font-size: 11.4px; letter-spacing: 1.6px;
            color: var(--accent); text-transform: uppercase;
            padding-bottom: 8px; border-bottom: 1px solid var(--line); }
 .lg-x { background: none; border: none; color: var(--txt-3); cursor: pointer;
-        font-size: 12px; padding: 0 2px; }
+        font-size: 13.4px; padding: 0 2px; }
 .lg-x:hover { color: var(--txt); }
 
 .lg-rule {
   margin: 9px 0; padding: 7px 9px; border-radius: 6px;
   background: rgba(255,43,61,0.07); border: 1px solid rgba(255,43,61,0.22);
-  font-family: var(--mono); font-size: 9.8px; line-height: 1.55; color: #ffc2c8;
+  font-family: var(--mono); font-size: 11.8px; line-height: 1.55; color: #ffc2c8;
 }
 .lg-rule-b { background: rgba(255,255,255,0.03); border-color: var(--line-2); color: var(--txt-2); }
 
 .lg-group {
-  font-family: var(--mono); font-size: 8.8px; letter-spacing: 1.4px;
+  font-family: var(--mono); font-size: 11.3px; letter-spacing: 1.4px;
   color: var(--txt-3); text-transform: uppercase;
   margin: 12px 0 5px; padding-bottom: 3px; border-bottom: 1px solid var(--line-2);
 }
 .lg-row { display: flex; align-items: center; gap: 8px; padding: 2.5px 0;
-          font-family: var(--mono); font-size: 10.5px; }
+          font-family: var(--mono); font-size: 12.6px; }
 .lg-sw { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
 .lg-sw-faded { background: linear-gradient(90deg, #54d6e8, #3f4a5c); }
 .lg-l { color: var(--txt); min-width: 74px; }
-.lg-n { color: var(--txt-3); font-size: 9.5px; flex: 1; }
+.lg-n { color: var(--txt-3); font-size: 11.4px; flex: 1; }
 
 /* ══════════════════════════════════════════════════════════════
    KEYBOARD MAP
@@ -371,17 +371,17 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
 #keymap.open { display: flex; }
 .km-shell { width: min(620px, calc(100vw - 32px)); padding: 16px 18px; }
 .km-head { display: flex; justify-content: space-between; align-items: center;
-           font-family: var(--mono); font-size: 10px; letter-spacing: 1.6px;
+           font-family: var(--mono); font-size: 12.0px; letter-spacing: 1.6px;
            color: var(--accent); text-transform: uppercase;
            padding-bottom: 9px; border-bottom: 1px solid var(--line); }
 .km-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; margin-top: 12px; }
-.km-gtitle { font-family: var(--mono); font-size: 8.8px; letter-spacing: 1.4px;
+.km-gtitle { font-family: var(--mono); font-size: 11.3px; letter-spacing: 1.4px;
              color: var(--txt-3); text-transform: uppercase; margin-bottom: 5px; }
 .km-row { display: flex; align-items: center; gap: 9px; padding: 2.5px 0; }
 .km-keys { display: flex; gap: 3px; min-width: 58px; }
-.km-label { font-family: var(--mono); font-size: 11px; color: var(--txt-2); }
+.km-label { font-family: var(--mono); font-size: 12.3px; color: var(--txt-2); }
 .km-note { margin-top: 14px; padding-top: 9px; border-top: 1px solid var(--line-2);
-           font-family: var(--mono); font-size: 9.5px; color: var(--txt-3); }
+           font-family: var(--mono); font-size: 11.4px; color: var(--txt-3); }
 
 /* ══════════════════════════════════════════════════════════════
    TOASTS
@@ -390,7 +390,7 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
 #toasts { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
           z-index: 500; display: flex; flex-direction: column; gap: 6px; align-items: center; }
 .toast {
-  font-family: var(--mono); font-size: 11px; letter-spacing: 0.4px;
+  font-family: var(--mono); font-size: 12.3px; letter-spacing: 0.4px;
   padding: 8px 14px; border-radius: 8px;
   background: rgba(9,11,16,0.96); border: 1px solid var(--line-2);
   color: var(--txt); opacity: 0; transform: translateY(8px);
@@ -409,7 +409,7 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
   display: flex; align-items: center; gap: 8px;
   padding: 5px 10px 5px 11px; border-radius: 7px;
   background: rgba(255,255,255,0.04); border: 1px solid var(--line-2);
-  color: var(--txt-3); font-family: var(--mono); font-size: 11px;
+  color: var(--txt-3); font-family: var(--mono); font-size: 12.3px;
   cursor: pointer; transition: all 0.15s; white-space: nowrap;
 }
 #search-trigger:hover { border-color: rgba(196,214,0,0.32); color: var(--txt-2); }
@@ -523,11 +523,11 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
   #top-bar { gap: 10px; padding: 0 12px; }
   #top-bar .stat-strip { gap: 12px; }
   .back-link { font-size: 0; padding: 4px 8px; }
-  .back-link::before { content: '←'; font-size: 13px; }
+  .back-link::before { content: '←'; font-size: 14.6px; }
 }
 @media (min-width: 851px) and (max-width: 1080px) {
   #search-trigger .st-txt { display: none; }
-  #top-bar .title { font-size: 13px; }
+  #top-bar .title { font-size: 14.6px; }
 }
 
 /* Mobile top bar: the existing ≤850px rules already compact this. Search
@@ -546,7 +546,7 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
   #top-bar .stat-strip::-webkit-scrollbar { display: none; }
   #top-bar .stat-strip .si { flex-shrink: 0; }
   #top-bar .title { flex-shrink: 0; }
-  #posture-mini { font-size: 8px; padding: 2px 5px; }
+  #posture-mini { font-size: 10.2px; padding: 2px 5px; }
   #feed-health { width: calc(100vw - 24px); max-width: 320px; }
   /* Dossier is a bottom sheet on mobile, clear of the ALERTS button. */
   #dossier { top: auto; bottom: 64px; left: 8px; right: 8px; width: auto; max-height: 52vh; }
@@ -577,17 +577,17 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
    there was no way to tell reporting from invention. Attribution is the fix. */
 
 #ticker .tc-src {
-  font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.7px;
+  font-family: var(--mono); font-size: 10.9px; letter-spacing: 0.7px;
   color: var(--txt-3); text-transform: uppercase;
   border: 1px solid var(--line-2); border-radius: 3px;
   padding: 1px 5px; margin-left: 9px; white-space: nowrap; flex-shrink: 0;
 }
 #ticker .tc-empty {
-  font-family: var(--mono); font-size: 11px; color: var(--warn);
+  font-family: var(--mono); font-size: 12.3px; color: var(--warn);
   letter-spacing: 1px; padding: 0 18px;
 }
 .ai-empty {
-  font-family: var(--mono); font-size: 11px; line-height: 1.7;
+  font-family: var(--mono); font-size: 12.3px; line-height: 1.7;
   color: var(--warn); padding: 16px 4px; text-align: center;
 }
 
@@ -607,7 +607,7 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
 /* Native resolution, stated. An upscaled 352x240 must not be mistaken for
    detail that does not exist in the source. */
 .cm-res {
-  font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.7px;
+  font-family: var(--mono); font-size: 10.9px; letter-spacing: 0.7px;
   padding: 2px 6px; border-radius: 3px; white-space: nowrap;
   border: 1px solid var(--line-2); color: var(--txt-3);
 }
@@ -617,10 +617,10 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
 
 .cm-sort-row {
   display: flex; align-items: center; gap: 8px; padding: 6px 0 2px;
-  font-family: var(--mono); font-size: 9.5px; color: var(--txt-3);
+  font-family: var(--mono); font-size: 11.4px; color: var(--txt-3);
 }
 .cm-sort-btn {
-  font-family: var(--mono); font-size: 9px; letter-spacing: 0.6px;
+  font-family: var(--mono); font-size: 10.8px; letter-spacing: 0.6px;
   color: var(--txt-2); background: rgba(255,255,255,0.04);
   border: 1px solid var(--line-2); border-radius: 4px;
   padding: 3px 8px; cursor: pointer;
@@ -705,7 +705,7 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
     display: flex; align-items: center; justify-content: center;
     background: rgba(255,255,255,0.05); border: 1px solid var(--line-2);
     border-radius: 4px; color: var(--txt-3); cursor: pointer;
-    font-family: var(--mono); font-size: 11px; padding: 0;
+    font-family: var(--mono); font-size: 12.3px; padding: 0;
     transition: all 0.13s;
   }
   .pw-btn:hover { color: var(--txt); background: rgba(196,214,0,0.16); border-color: rgba(196,214,0,0.35); }
@@ -745,12 +745,12 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
 }
 #panel-dock.show { display: flex; }
 .pd-label {
-  font-family: var(--mono); font-size: 8.5px; letter-spacing: 1.2px;
+  font-family: var(--mono); font-size: 10.9px; letter-spacing: 1.2px;
   color: var(--txt-3); padding-right: 2px;
 }
 .pd-chip {
   display: flex; align-items: center; gap: 6px;
-  font-family: var(--mono); font-size: 10px; color: var(--txt-2);
+  font-family: var(--mono); font-size: 12.0px; color: var(--txt-2);
   background: rgba(255,255,255,0.05); border: 1px solid var(--line-2);
   border-radius: 6px; padding: 4px 8px; cursor: pointer; white-space: nowrap;
   transition: all 0.13s;
@@ -762,4 +762,23 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
   /* Mobile already has its own drawer system; window controls would fight it. */
   .pw-controls { display: none; }
   #panel-dock { display: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TYPE SCALE ACCOMMODATION
+   ══════════════════════════════════════════════════════════════
+   Font sizes were raised across the board (52 of 150 declarations sat under
+   10px). Panel widths have to grow with the type or the extra size is spent
+   on wrapping rather than legibility — "Region Presets" broke onto two lines
+   and alert text collapsed into a narrow ribbon. */
+
+@media (min-width: 851px) {
+  #dossier { width: 392px; }
+  #legend  { width: 348px; }
+  #feed-health { width: 336px; }
+  .cp-shell { width: min(840px, calc(100vw - 32px)); }
+
+  /* The alerts feed's location column was taking width the headline needs. */
+  #alerts-panel .ai-loc { max-width: 116px; }
+  #alerts-panel .ai-text { min-width: 0; }
 }
