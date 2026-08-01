@@ -321,8 +321,12 @@
   #ticker .ticker-content {
     position: absolute; white-space: nowrap; display: flex; align-items: center;
     height: 100%; font-size: 12.1px; color: #bbc;
-    /* 60s -> 80s: 25% slower, for readability at a glance. */
-    animation: tickerScroll 80s linear infinite;
+    /* Duration is set in JS from the rendered content width so the scroll
+       runs at a constant pixels-per-second no matter how many items there
+       are. A fixed duration silently changes speed with item count — going
+       from 16 hardcoded entries to ~46 live ones tripled the apparent speed.
+       This value is only a pre-measurement fallback. */
+    animation: tickerScroll 140s linear infinite;
   }
   #ticker .ticker-content .tc-item { padding: 0 24px; cursor: pointer; transition: opacity 0.15s; }
   #ticker .ticker-content .tc-item:hover { opacity: 0.7; }
@@ -3640,7 +3644,11 @@ function renderTicker() {
     general:  hex(PALETTE.reference.city),
   };
 
-  for (const n of newsItems) {
+  // Capped: the ticker is ambient, and every extra item lengthens the loop.
+  // At 55 px/s all 40 headlines would take ~13 minutes to cycle, so an item
+  // at the tail would be effectively invisible. The alerts panel holds the
+  // full set.
+  for (const n of newsItems.slice(0, 18)) {
     items.push('<a class="tc-item" href="' + n.url + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">'
       + '<span class="tc-dot" style="background:' + (CAT_DOT[n.category] || CAT_DOT.general) + '"></span>'
       + '<span class="tc-time">' + n.time + '</span>'
@@ -3676,6 +3684,27 @@ function renderTicker() {
   }
   const joined = items.join('');
   content.innerHTML = joined + joined; // duplicated for a seamless loop
+  paceTicker(content);
+}
+
+/**
+ * Hold the ticker at a constant reading speed.
+ *
+ * The keyframe translates by -50% (one of the two duplicated copies), so a
+ * full cycle covers half the rendered width. Duration therefore has to track
+ * content width, or the speed changes every time the item count does.
+ */
+// Measured: the old fixed 80s duration worked out at 387 px/s with the live
+// feed's item count — roughly 2x the original 179 px/s and far too fast to
+// read. 55 px/s is a comfortable glance speed.
+const TICKER_PX_PER_SEC = 55;
+function paceTicker(content) {
+  requestAnimationFrame(() => {
+    const halfWidth = content.scrollWidth / 2;
+    if (!halfWidth) return;
+    const seconds = Math.max(30, halfWidth / TICKER_PX_PER_SEC);
+    content.style.animationDuration = seconds.toFixed(1) + 's';
+  });
 }
 
 function escapeText(s) {
