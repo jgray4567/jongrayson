@@ -130,8 +130,11 @@ function parse_feed(string $xml, string $sourceName): array {
 /** Crude topical tag, used only to colour the ticker dot. */
 function categorise(string $title): string {
     $t = strtolower($title);
+    // 'drone' deliberately excluded: commercial drone stories (delivery,
+    // racing, inspection) are common and tagging them conflict paints a
+    // reserved-red dot on a benign headline. Red is for threat to life.
     $conflict = ['strike','missile','troops','military','war','offensive','shelling',
-                 'airstrike','ceasefire','armed','rebel','insurg','drone','warplane','combat'];
+                 'airstrike','ceasefire','armed','rebel','insurg','warplane','combat'];
     $crisis   = ['refugee','famine','displaced','humanitarian','aid','flood','earthquake',
                  'cyclone','hurricane','wildfire','outbreak','epidemic','evacuat','disaster'];
     $security = ['cyber','hack','breach','ransomware','sanction','espionage','malware'];
