@@ -859,6 +859,7 @@
   }
 </style>
 <link rel="stylesheet" href="extended-layers.css">
+<link rel="stylesheet" href="mission-ui.css">
 </head>
 <body>
 
@@ -887,7 +888,17 @@
 <div id="top-bar">
   <div class="title">INTEL LAYER<span class="sep">—</span><span class="sub">GLOBAL SITUATION AWARENESS</span></div>
   <a class="back-link" href="https://www.jongrayson.com">← BACK TO BASE</a>
+
+  <!-- Primary findability affordance. Nothing on this globe should require
+       hunting by hand; this is the entry point to every entity on screen. -->
+  <button id="search-trigger" title="Search everything (⌘K)">
+    <span class="st-ico">⌕</span>
+    <span class="st-txt">Search</span>
+    <span class="st-hint"><kbd>⌘</kbd><kbd>K</kbd></span>
+  </button>
+
   <div class="spacer"></div>
+  <span class="posture-mini fh-LOADING" id="posture-mini" title="Aggregate source integrity">ACQUIRING</span>
   <div class="stat-strip">
     <div class="si"><div class="dot" style="background:#C4D600;box-shadow:0 0 6px #C4D600;"></div><span class="val" id="stat-flights">0</span><span class="lbl">FLIGHTS</span></div>
     <div class="si"><div class="dot" style="background:#22dd88;box-shadow:0 0 6px #22dd88;"></div><span class="val" id="stat-cities">52</span><span class="lbl">CITIES</span></div>
@@ -941,7 +952,7 @@
   <label class="layer-toggle">
     <input type="checkbox" class="lt-checkbox" id="layer-cities" checked>
     <div class="lt-icon">◉</div>
-    <div class="lt-info"><div class="lt-name">City Markers</div><div class="lt-desc">52 major cities</div></div>
+    <div class="lt-info"><div class="lt-name">City Markers</div><div class="lt-desc" id="cities-desc">Reference geography</div></div>
     <div class="lt-count" id="count-cities">52</div>
   </label>
 
@@ -1089,6 +1100,10 @@
       <div class="airline-name" id="tip-airline"></div>
     </div>
   </div>
+  <!-- Operator logo strip: sits above the data rows, so the identity of the
+       aircraft reads before any of its numbers. Hidden until a logo actually
+       resolves — an empty box would be worse than no box. -->
+  <div id="tip-logo-wrap"><img id="tip-logo" alt=""></div>
   <div id="tip-flight-info" style="display:none">
     <div class="tip-row"><span>Callsign</span><span class="tip-val" id="tip-callsign">—</span></div>
     <div class="tip-row"><span>Origin</span><span class="tip-val" id="tip-origin">—</span></div>
@@ -1188,6 +1203,21 @@
   </div>
 </div>
 
+<!-- Extended layer modules — classic scripts, declared BEFORE the inline
+     module below.
+
+     Ordering matters and is easy to get wrong: an inline `type="module"`
+     script is deferred, and deferred scripts run in document order. Placing
+     these after the module (as v2 did) means the module's init() runs first
+     and sees `typeof FiresLayer === "undefined"`. Declared here, they are
+     evaluated before the module and the globals are guaranteed present.
+
+     ships-layer.js is referenced here for the first time — 794 lines of it
+     shipped in v2 and were never loaded by any page. -->
+<script src="timeline-engine.js"></script>
+<script src="fires-layer.js"></script>
+<script src="ships-layer.js"></script>
+
 <script type="importmap">
 {
   "imports": {
@@ -1202,6 +1232,14 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import * as satellite from 'satellite.js';
+
+import {
+  PALETTE, hex, registry, selection, feeds, FEED_STATE,
+  formatAge, formatCoord, screenScale, vec3ToLatLng,
+} from './intel-core.js';
+import { AircraftLayer } from './aircraft-layer.js';
+import { OrbitalLayer } from './orbital-layer.js';
+import { MissionUI, airlineLogo } from './mission-ui.js';
 
 // ═══════════════════════════════════════════════════════════════════
 //  CONSTANTS & DATA
@@ -1336,23 +1374,18 @@ const TICKER = [
 
 let scene, camera, renderer, controls;
 let earth, atmosphere, starField, clouds;
-let flightGroup, cityGroup, hotspotGroup, borderGroup, nightGroup, dayNightMesh, satelliteGroup = null;
+let cityGroup, hotspotGroup, borderGroup, nightGroup, dayNightMesh;
 let earthquakeGroup = null, weatherGroup = null, stormGroup = null, cameraGroup = null;
 let earthquakeData = [], weatherAlertData = [], stormAlertData = [], trafficCameraData = [];
 let earthquakeInterval = null, weatherInterval = null, cameraInterval = null;
-let satelliteData = [];
-let satelliteOrbitInterval = null;
-let orbitPathsGroup = null;
-let activeOrbitFilters = { LEO: true, MEO: true, GEO: true };
-let showOrbitPaths = false;
 let raycaster, mouse;
-let hoveredCity = null;
-let flightPaths = [];
-let touchHoverActive = false;
-let touchTooltipTimer = null;
 let highlightRing = null;
-let highlightedObj = null;
 let activeCameraPopup = null;
+let missionUI = null;
+// Aircraft and satellites are owned by AircraftLayer / OrbitalLayer — they no
+// longer have module-level groups, data arrays, filter objects or hover state
+// scattered here. That fragmentation is why v2's flight and satellite state
+// could get out of sync with what was actually drawn.
 
 const layers = {
   flights: true, daynight: true, borders: true,
@@ -1392,6 +1425,10 @@ const AIRLINE_PREFIXES = {
   'NCA': {name:'Nippon Cargo', color:'#13448f'}, 'GT': {name:'Atlas Air', color:'#0033a0'}
 };
 
+// Exposed so mission-ui.js can label the operator in the dossier without
+// duplicating the prefix table.
+window.getAirlineInfo = (cs) => getAirlineInfo(cs);
+
 function getAirlineInfo(callsign) {
   if (!callsign) return { name: 'Unknown', color: '#333', code: '??' };
   const p3 = callsign.substring(0, 3);
@@ -1418,6 +1455,26 @@ function setLoadProgress(pct, msg) {
 }
 
 async function init() {
+  // Declare every source up front, before any of them is polled. The monitor
+  // then escalates on its own clock — a feed that hangs cannot report its own
+  // failure, so the health of a source must never depend on that source.
+  feeds.register('earthquakes', {
+    label: 'Seismic', cadenceMs: 5 * 60 * 1000,
+    source: 'USGS Earthquake Hazards Program · all-day feed',
+  });
+  feeds.register('weather', {
+    label: 'Weather Alerts', cadenceMs: 5 * 60 * 1000,
+    source: 'NOAA / National Weather Service · active alerts (US only)',
+  });
+  feeds.register('storms', {
+    label: 'Storm Alerts', cadenceMs: 5 * 60 * 1000,
+    source: 'NOAA / NWS · severe convective warnings (US only)',
+  });
+  feeds.register('render', {
+    label: 'Render (fps)', cadenceMs: 4 * 1000,
+    source: 'Local WebGL renderer · frames per second',
+  });
+
   setLoadProgress(10, 'Creating scene...');
   scene = new THREE.Scene();
   window._globeScene = scene; // expose for non-module scripts
@@ -1472,8 +1529,8 @@ async function init() {
   buildAtmosphere();
   setLoadProgress(55, 'Generating star field...');
   buildStars();
-  setLoadProgress(65, 'Plotting flight routes...');
-  buildFlights();
+  setLoadProgress(65, 'Building air picture...');
+  buildAircraft();
   setLoadProgress(75, 'Placing city markers...');
   buildCities();
   setLoadProgress(82, 'Marking hotspots...');
@@ -1481,15 +1538,18 @@ async function init() {
   setLoadProgress(88, 'Calculating day/night...');
   buildDayNight();
   setLoadProgress(94, 'Finalizing...');
-  // Defer borders (3.1MB geojson) — load after globe renders
-  buildBorders().then(() => { borderGroup.visible = false; });
-  // Satellites — load and enable by default
-  satelliteGroup = new THREE.Group();
-  satelliteGroup.visible = true;
-  scene.add(satelliteGroup);
-  orbitPathsGroup = new THREE.Group();
-  orbitPathsGroup.visible = false;
-  scene.add(orbitPathsGroup);
+  // Defer borders (3.1MB geojson) — load after globe renders.
+  // The checkbox for this layer ships checked, so the layer must come up
+  // visible. v2 forced visible=false here while leaving the box ticked, so
+  // the control panel asserted a state the globe did not have. A toggle that
+  // lies about what is drawn is worse than no toggle.
+  buildBorders().then(() => {
+    borderGroup.visible = layers.borders;
+    document.getElementById('count-borders').textContent = layers.borders ? 'ON' : 'OFF';
+  });
+
+  setLoadProgress(96, 'Acquiring orbital assets...');
+  buildOrbital();
 
   // Live data feed groups
   earthquakeGroup = new THREE.Group();
@@ -1529,12 +1589,7 @@ async function init() {
 
   animate();
 
-  // Load satellites after globe is visible — don't block initial render
-  fetchSatellites().then(() => {
-    satelliteOrbitInterval = setInterval(fetchSatellites, 30000);
-  }).catch(e => console.error('Satellite load failed:', e));
-
-  // Load live data feeds — earthquakes, weather, storms (non-blocking)
+  // Live data feeds — earthquakes, weather, storms (non-blocking)
   fetchEarthquakes().catch(e => console.error('Earthquake load failed:', e));
   earthquakeInterval = setInterval(fetchEarthquakes, 300000); // 5 min
 
@@ -1543,6 +1598,9 @@ async function init() {
 
   fetchStormAlerts().catch(e => console.error('Storm load failed:', e));
   setInterval(fetchStormAlerts, 300000); // 5 min
+
+  initMissionUI();
+  initExtendedLayers();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1659,21 +1717,17 @@ function buildStars() {
 //  FLIGHT TRAFFIC
 // ═══════════════════════════════════════════════════════════════════
 
-function buildFlights() {
-  flightGroup = new THREE.Group();
-  flightPaths = [];
-  scene.add(flightGroup);
-  document.getElementById('stat-flights').textContent = '...';
-  document.getElementById('count-flights').textContent = '...';
+// ═══════════════════════════════════════════════════════════════════
+//  AIR PICTURE  →  aircraft-layer.js
+// ═══════════════════════════════════════════════════════════════════
+//
+//  The previous implementation lived here: 150 lines that built 314
+//  individual Meshes with a shared additive material, at a fixed world-space
+//  size, frozen between five-minute polls, oriented by feeding a value in
+//  DEGREES into Math.cos()/Math.sin(). It has been replaced wholesale by
+//  AircraftLayer. See aircraft-layer.js for the full list of what was wrong.
 
-  // Fetch real flight data from OpenSky Network
-  fetchRealFlights();
-  // Refresh every 60 seconds
-  setInterval(fetchRealFlights, 300000); // Refresh every 5 min (OpenSky rate limits)
-}
-
-let planeIconGeo = null;
-let planeIconMat = null;
+let aircraftLayer = null;
 
 function getSelectedRegions() {
   const ids = ['north-america','mexico','europe','asia','middle-east','south-america','africa','oceania'];
@@ -1685,136 +1739,43 @@ function getSelectedRegions() {
   return selected.length ? selected : ['all'];
 }
 
-async function fetchRealFlights() {
-  try {
-    document.getElementById('count-flights').textContent = 'LOADING';
-    const regions = getSelectedRegions();
-    const res = await fetch('air-traffic.php?regions=' + regions.join(','));
-    if (!res.ok) throw new Error('Fetch failed: ' + res.status);
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    const states = data.items || [];
-
-    // Clear old flight objects
-    for (const fp of flightPaths) {
-      flightGroup.remove(fp.plane);
-    }
-    flightPaths = [];
-    // Clear stale flight highlight
-    if (highlightedObj && highlightedObj.userData.type === 'flight') {
-      highlightRing.visible = false;
-      highlightedObj = null;
-    }
-
-    // Create shared jet icon geometry (top-down silhouette)
-    if (!planeIconGeo) {
-      const shape = new THREE.Shape();
-      // Commercial airliner silhouette (top-down): wide fuselage, broad wings, tail
-      // Rounded nose (blunt, not pointy)
-      shape.moveTo(0.06, 0);
-      shape.quadraticCurveTo(0.055, 0.006, 0.04, 0.007);
-      // Right fuselage to wing root
-      shape.lineTo(0.02, 0.008);
-      // Right wing — broad, swept back, starting forward
-      shape.lineTo(-0.005, 0.06);
-      shape.lineTo(-0.022, 0.058);
-      shape.lineTo(-0.018, 0.008);
-      // Aft fuselage to tail
-      shape.lineTo(-0.05, 0.006);
-      // Right horizontal stabilizer (smaller than main wings)
-      shape.lineTo(-0.06, 0.018);
-      shape.lineTo(-0.07, 0.017);
-      shape.lineTo(-0.07, 0.003);
-      // Tail cone (blunt)
-      shape.lineTo(-0.072, 0.002);
-      shape.quadraticCurveTo(-0.073, 0, -0.072, -0.002);
-      // Left horizontal stabilizer
-      shape.lineTo(-0.07, -0.003);
-      shape.lineTo(-0.07, -0.017);
-      shape.lineTo(-0.06, -0.018);
-      shape.lineTo(-0.05, -0.006);
-      // Left aft fuselage to wing
-      shape.lineTo(-0.018, -0.008);
-      shape.lineTo(-0.022, -0.058);
-      shape.lineTo(-0.005, -0.06);
-      shape.lineTo(0.02, -0.008);
-      // Left fuselage to nose
-      shape.lineTo(0.04, -0.007);
-      shape.quadraticCurveTo(0.055, -0.006, 0.06, 0);
-      planeIconGeo = new THREE.ShapeGeometry(shape);
-      // Normalize to unit size and center
-      planeIconGeo.computeBoundingBox();
-      const bb = planeIconGeo.boundingBox;
-      const cx = (bb.min.x + bb.max.x) / 2;
-      const cy = (bb.min.y + bb.max.y) / 2;
-      const w = bb.max.x - bb.min.x;
-      const h = bb.max.y - bb.min.y;
-      const s = 0.025 / Math.max(w, h); // scale to ~0.025 units
-      planeIconGeo.translate(-cx, -cy, 0);
-      planeIconGeo.scale(s, s, 1);
-    }
-    if (!planeIconMat) {
-      planeIconMat = new THREE.MeshBasicMaterial({
-        color: 0x88eeff, transparent: true, opacity: 0.9,
-        blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
-      });
-    }
-
-    for (const s of states) {
-      const icao24 = s.icao24;
-      const callsign = (s.callsign || '').trim() || icao24;
-      const origin = s.origin || '';
-      const lng = s.lng;
-      const lat = s.lat;
-      const alt = s.alt; // meters
-      const velocity = s.velocity; // m/s
-      const heading = s.heading; // rad
-
-      // Skip if no valid lat/lng
-      if (lat == null || lng == null) continue;
-
-      // Altitude scaled to visual height (real cruise alt ~10-12km, Earth radius 6371km)
-      const altKm = Math.min(alt / 1000, 14); // cap at 14km
-      const visualAlt = (altKm / 6371) * EARTH_RADIUS * 8; // exaggerated for visibility
-      const pos = latLngTo3D(lat, lng, EARTH_RADIUS + visualAlt + 0.02);
-
-      const plane = new THREE.Mesh(planeIconGeo, planeIconMat);
-      plane.position.copy(pos);
-
-      // Orient plane to face heading direction
-      if (heading != null) {
-        const dir = new THREE.Vector3(
-          Math.cos(heading), 0, Math.sin(heading)
-        );
-        const up = pos.clone().normalize();
-        const right = new THREE.Vector3().crossVectors(up, dir).normalize();
-        const forward = new THREE.Vector3().crossVectors(right, up).normalize();
-        const m = new THREE.Matrix4().makeBasis(forward, up, right);
-        plane.quaternion.setFromRotationMatrix(m);
-      } else {
-        // Face along velocity vector
-        plane.lookAt(0, 0, 0);
-        plane.rotateY(Math.PI / 2);
-      }
-
-      plane.userData = { type: 'flight', callsign, origin, alt, velocity, lat, lng, heading: heading || 0 };
-      flightGroup.add(plane);
-      flightPaths.push({ plane, heading: heading || 0, lat, lng, alt });
-    }
-
-    document.getElementById('stat-flights').textContent = flightPaths.length;
-    document.getElementById('count-flights').textContent = flightPaths.length;
-  } catch (err) {
-    console.error('OpenSky fetch error:', err);
-    document.getElementById('count-flights').textContent = 'ERR';
-  }
+function buildAircraft() {
+  aircraftLayer = new AircraftLayer({ scene, camera, renderer, endpoint: 'air-traffic.php' });
+  aircraftLayer.regions = getSelectedRegions();
+  aircraftLayer.fetch().then(syncAircraftCounts);
+  setInterval(() => aircraftLayer.fetch().then(syncAircraftCounts), 5 * 60 * 1000);
 }
 
-function updateFlights() {
-  // Planes are static between fetches (real positions don't update every frame)
-  // Just subtle altitude bob for visual life
-  for (const fp of flightPaths) {
-    // No per-frame movement — real data refreshes every 60s
+function syncAircraftCounts() {
+  if (!aircraftLayer) return;
+  const n = aircraftLayer.count;
+  document.getElementById('stat-flights').textContent = n;
+  const el = document.getElementById('count-flights');
+  if (el) el.textContent = layers.flights ? n : 'OFF';
+
+  // Per-region tallies in the filter list. v2 had these span elements in the
+  // markup and never populated a single one of them.
+  const REGION_BOUNDS = {
+    'na': { lat: [24, 72],   lng: [-170, -52], el: 'fr-count-na' },
+    'mx': { lat: [14, 33],   lng: [-118, -86], el: 'fr-count-mx' },
+    'eu': { lat: [35, 72],   lng: [-25, 45],   el: 'fr-count-eu' },
+    'as': { lat: [0, 60],    lng: [60, 150],   el: 'fr-count-as' },
+    'me': { lat: [12, 42],   lng: [25, 63],    el: 'fr-count-me' },
+    'sa': { lat: [-56, 13],  lng: [-82, -34],  el: 'fr-count-sa' },
+    'af': { lat: [-35, 37],  lng: [-18, 52],   el: 'fr-count-af' },
+    'oc': { lat: [-48, -10], lng: [110, 180],  el: 'fr-count-oc' },
+  };
+  const tally = {};
+  for (const t of aircraftLayer.tracks.values()) {
+    for (const [k, b] of Object.entries(REGION_BOUNDS)) {
+      if (t.lat >= b.lat[0] && t.lat <= b.lat[1] && t.lng >= b.lng[0] && t.lng <= b.lng[1]) {
+        tally[k] = (tally[k] || 0) + 1;
+      }
+    }
+  }
+  for (const [k, b] of Object.entries(REGION_BOUNDS)) {
+    const el2 = document.getElementById(b.el);
+    if (el2) el2.textContent = tally[k] || 0;
   }
 }
 
@@ -1824,30 +1785,30 @@ function updateFlights() {
 
 function buildCities() {
   cityGroup = new THREE.Group();
-  // Use ring geometry for cities — distinct from satellite dots
-  const ringGeo = new THREE.RingGeometry(0.025, 0.045, 16);
-  const innerDotGeo = new THREE.SphereGeometry(0.012, 6, 4);
+  // Cities are REFERENCE geography, not signal. They exist to let an operator
+  // orient — "that contact is north of Chicago" — and nothing more. v2 drew
+  // them in the UI accent lime at 0.9 opacity with additive blending, which
+  // made 52 pieces of static context the brightest thing on the globe and put
+  // them in direct visual competition with live events. They now recede.
+  const ringGeo = new THREE.RingGeometry(0.025, 0.042, 16);
+  const innerDotGeo = new THREE.SphereGeometry(0.010, 6, 4);
   for (const city of CITIES) {
     const pos = latLngTo3D(city.lat, city.lng, EARTH_RADIUS + 0.02);
-    
-    // Outer ring — flat marker on globe surface
+
     const ringMat = new THREE.MeshBasicMaterial({
-      color: 0xC4D600, transparent: true, opacity: 0.6,
-      side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
-      depthWrite: false,
+      color: PALETTE.reference.city, transparent: true, opacity: 0.34,
+      side: THREE.DoubleSide, depthWrite: false, toneMapped: false,
     });
     const ring = new THREE.Mesh(ringGeo, ringMat);
     ring.position.copy(pos);
-    // Orient ring to face outward from globe center
     ring.lookAt(0, 0, 0);
     ring.rotateY(Math.PI);
     ring.userData = { type: 'city', city, isRing: true, pulse: Math.random() * Math.PI * 2 };
     cityGroup.add(ring);
-    
-    // Inner solid dot — small bright center
+
     const dotMat = new THREE.MeshBasicMaterial({
-      color: 0xC4D600, transparent: true, opacity: 0.9,
-      blending: THREE.AdditiveBlending,
+      color: PALETTE.reference.city, transparent: true, opacity: 0.7,
+      toneMapped: false,
     });
     const dot = new THREE.Mesh(innerDotGeo, dotMat);
     dot.position.copy(pos);
@@ -1855,6 +1816,13 @@ function buildCities() {
     cityGroup.add(dot);
   }
   scene.add(cityGroup);
+
+  registry.replace('city', CITIES.map(c => ({
+    id: c.name, kind: 'city', label: c.name,
+    sub: c.country + ' · ' + (c.pop / 1e6).toFixed(1) + 'M',
+    keywords: c.country + ' city',
+    lat: c.lat, lng: c.lng, data: c,
+  })));
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1909,6 +1877,13 @@ function buildHotspots() {
     hotspotGroup.add(pinSprite);
   }
   scene.add(hotspotGroup);
+
+  registry.replace('hotspot', HOTSPOTS.map(h => ({
+    id: h.name, kind: 'hotspot', label: h.name,
+    sub: ['Low', 'Moderate', 'High'][h.sev - 1] + ' severity · curated reference',
+    keywords: 'hotspot conflict zone threat area',
+    lat: h.lat, lng: h.lng, data: h,
+  })));
 }
 
 function updateHotspots(time) {
@@ -2029,6 +2004,7 @@ const LIVE_FEED_PROXY = '../../api/live-feeds.php';
 // ═══════════════════════════════════════════════════════════════════
 
 async function fetchEarthquakes() {
+  feeds.attempt('earthquakes');
   try {
     document.getElementById('count-earthquakes').textContent = 'LOADING...';
     const res = await fetch(LIVE_FEED_PROXY + '?source=earthquakes');
@@ -2036,13 +2012,23 @@ async function fetchEarthquakes() {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     earthquakeData = (data.features || []).map(f => ({
+      id: f.id || (f.properties.time + ':' + f.geometry.coordinates.join(',')),
       mag: f.properties.mag,
       place: f.properties.place,
       time: f.properties.time,
       lng: f.geometry.coordinates[0],
       lat: f.geometry.coordinates[1],
       depth: f.geometry.coordinates[2]
-    })).filter(q => q.lat != null && q.lng != null);
+    })).filter(q => q.lat != null && q.lng != null && q.mag != null);
+
+    registry.replace('quake', earthquakeData.map(q => ({
+      id: q.id, kind: 'quake',
+      label: 'M' + q.mag.toFixed(1) + ' — ' + (q.place || 'Unknown region'),
+      sub: (q.depth != null ? q.depth.toFixed(0) + ' km depth' : '') +
+           (q.time ? ' · ' + formatAge(Date.now() - q.time) + ' ago' : ''),
+      keywords: 'earthquake quake seismic magnitude ' + (q.place || ''),
+      lat: q.lat, lng: q.lng, data: q,
+    })));
 
     // Clear old markers
     if (earthquakeGroup) {
@@ -2051,11 +2037,15 @@ async function fetchEarthquakes() {
 
     for (const q of earthquakeData) {
       const pos = latLngTo3D(q.lat, q.lng, EARTH_RADIUS + 0.015);
-      // Color by magnitude: <2.5 dim orange, 2.5-4.5 orange, >4.5 red
+      // Seismic events sit on the amber ramp and escalate onto the reserved
+      // threat-red only at M6.0 — the point at which an event is reliably
+      // destructive to structures and life. Below that, red would be crying
+      // wolf, and a palette that cries wolf stops being read.
       let color, baseSize;
-      if (q.mag < 2.5) { color = 0xff8844; baseSize = 0.015; }
-      else if (q.mag < 4.5) { color = 0xff6622; baseSize = 0.025; }
-      else { color = 0xff2244; baseSize = 0.035 + Math.min((q.mag - 4.5) * 0.01, 0.02); }
+      if (q.mag < 2.5)      { color = PALETTE.seismic;        baseSize = 0.016; }
+      else if (q.mag < 4.5) { color = PALETTE.weather.Severe; baseSize = 0.026; }
+      else if (q.mag < 6.0) { color = PALETTE.threat.moderate;baseSize = 0.036; }
+      else                  { color = PALETTE.threat.critical;baseSize = 0.046 + Math.min((q.mag - 6) * 0.012, 0.028); }
 
       // Core dot
       const dotGeo = new THREE.SphereGeometry(baseSize, 6, 4);
@@ -2085,10 +2075,12 @@ async function fetchEarthquakes() {
 
     document.getElementById('count-earthquakes').textContent = earthquakeData.length;
     document.getElementById('stat-quakes').textContent = earthquakeData.length;
+    feeds.success('earthquakes', earthquakeData.length);
     renderTicker();
   } catch (err) {
     console.error('Earthquake fetch error:', err);
     document.getElementById('count-earthquakes').textContent = 'ERR';
+    feeds.failure('earthquakes', err);
   }
 }
 
@@ -2108,12 +2100,16 @@ function updateEarthquakes(time) {
 //  NWS WEATHER ALERTS
 // ═══════════════════════════════════════════════════════════════════
 
+// Drawn from the shared palette so the globe and the legend cannot drift
+// apart. v2 hardcoded these, and #ff6622 here was near-identical to the
+// #ff6644 used for GEO satellites and for M4.5+ earthquakes — three unrelated
+// meanings sharing one colour.
 const SEVERITY_COLORS = {
-  'Extreme': 0xff2244,
-  'Severe': 0xff6622,
-  'Moderate': 0xffcc22,
-  'Minor': 0x44aaff,
-  'Unknown': 0x888888
+  'Extreme':  PALETTE.weather.Extreme,
+  'Severe':   PALETTE.weather.Severe,
+  'Moderate': PALETTE.weather.Moderate,
+  'Minor':    PALETTE.weather.Minor,
+  'Unknown':  PALETTE.reference.city,
 };
 
 // Compute centroid of a GeoJSON polygon/multipolygon
@@ -2141,6 +2137,7 @@ function computeCentroid(geometry) {
 }
 
 async function fetchWeatherAlerts() {
+  feeds.attempt('weather');
   try {
     document.getElementById('count-weather').textContent = 'LOADING...';
     const res = await fetch(LIVE_FEED_PROXY + '?source=weather');
@@ -2156,6 +2153,17 @@ async function fetchWeatherAlerts() {
       sent: f.properties.sent,
       geometry: f.geometry
     })).filter(a => a.geometry);
+
+    registry.replace('weather', weatherAlertData.map(a => {
+      const c = computeCentroid(a.geometry) || { lat: 0, lng: 0 };
+      return {
+        id: a.id, kind: 'weather',
+        label: a.event || 'Weather Alert',
+        sub: (a.severity || '') + ' · ' + (a.areaDesc || '').slice(0, 60),
+        keywords: 'weather alert nws warning advisory ' + (a.areaDesc || '') + ' ' + (a.severity || ''),
+        lat: c.lat, lng: c.lng, data: a,
+      };
+    }));
 
     // Clear old markers
     if (weatherGroup) {
@@ -2198,6 +2206,7 @@ async function fetchWeatherAlerts() {
 
     document.getElementById('count-weather').textContent = weatherAlertData.length;
     document.getElementById('stat-wxalerts').textContent = weatherAlertData.length;
+    feeds.success('weather', weatherAlertData.length);
     renderTicker();
 
     // Update the alerts feed panel with live data
@@ -2205,6 +2214,7 @@ async function fetchWeatherAlerts() {
   } catch (err) {
     console.error('Weather alert fetch error:', err);
     document.getElementById('count-weather').textContent = 'ERR';
+    feeds.failure('weather', err);
   }
 }
 
@@ -2225,6 +2235,7 @@ function updateWeather(time) {
 // ═══════════════════════════════════════════════════════════════════
 
 async function fetchStormAlerts() {
+  feeds.attempt('storms');
   try {
     document.getElementById('count-storms').textContent = 'LOADING...';
     const res = await fetch(LIVE_FEED_PROXY + '?source=storms');
@@ -2290,9 +2301,11 @@ async function fetchStormAlerts() {
     }
 
     document.getElementById('count-storms').textContent = stormAlertData.length;
+    feeds.success('storms', stormAlertData.length);
   } catch (err) {
     console.error('Storm alert fetch error:', err);
     document.getElementById('count-storms').textContent = 'ERR';
+    feeds.failure('storms', err);
   }
 }
 
@@ -2732,112 +2745,35 @@ function updateLiveAlertsFeed() {
 //  SATELLITES (reuses v1 PHP proxy)
 // ═══════════════════════════════════════════════════════════════════
 
-async function buildSatellites() {
-  if (satelliteGroup) return;
-  satelliteGroup = new THREE.Group();
-  satelliteGroup.visible = false;
-  scene.add(satelliteGroup);
+// ═══════════════════════════════════════════════════════════════════
+//  SPACE PICTURE  →  orbital-layer.js
+// ═══════════════════════════════════════════════════════════════════
+//
+//  Replaced wholesale. The old code drew 0.03-unit additive spheres — about
+//  two pixels at default zoom, against a star field — plus a second invisible
+//  hit-sphere per satellite purely so that clicking would work, and crushed
+//  the entire LEO-to-GEO altitude range into a mapping that put a 550 km
+//  satellite visually on the terrain. See orbital-layer.js.
 
-  await fetchSatellites();
-  // Refresh positions every 30 seconds
-  satelliteOrbitInterval = setInterval(fetchSatellites, 30000);
+let orbitalLayer = null;
+
+function buildOrbital() {
+  orbitalLayer = new OrbitalLayer({
+    scene, camera, satellite,
+    endpoint: '../../api/satellite-tracker.php',
+  });
+  orbitalLayer.fetch().then(syncSatelliteCounts);
+  setInterval(() => orbitalLayer.fetch().then(syncSatelliteCounts), 60 * 1000);
 }
 
-async function fetchSatellites() {
-  try {
-    document.getElementById('count-satellites').textContent = 'LOADING';
-    const res = await fetch('../../api/satellite-tracker.php');
-    if (!res.ok) throw new Error('Sat fetch failed: ' + res.status);
-    const data = await res.json();
-    satelliteData = data.items || [];
-
-    // Clear old markers
-    while (satelliteGroup.children.length) satelliteGroup.remove(satelliteGroup.children[0]);
-    while (orbitPathsGroup.children.length) orbitPathsGroup.remove(orbitPathsGroup.children[0]);
-    // Clear stale highlight from old satellites
-    if (highlightedObj && highlightedObj.userData.type === 'sat') {
-      highlightRing.visible = false;
-      highlightedObj = null;
-    }
-
-    const dotGeo = new THREE.SphereGeometry(0.03, 6, 4);
-    const colorMap = { 'LEO': 0x22dd88, 'MEO': 0xffaa22, 'GEO': 0xff6644 };
-    const now = new Date();
-    let plotted = 0;
-    const counts = { LEO: 0, MEO: 0, GEO: 0 };
-
-    for (const sat of satelliteData) {
-      if (!sat.tle1 || !sat.tle2) continue;
-
-      const orbitClass = sat.orbitClass || 'LEO';
-      if (!activeOrbitFilters[orbitClass]) continue;
-      counts[orbitClass] = (counts[orbitClass] || 0) + 1;
-
-      // Propagate TLE to get current position
-      const satrec = satellite.twoline2satrec(sat.tle1, sat.tle2);
-      const pv = satellite.propagate(satrec, now);
-      if (!pv.position || typeof pv.position === 'boolean') continue;
-
-      // Convert ECI to geodetic lat/lng
-      const gmst = satellite.gstime(now);
-      const geo = satellite.eciToGeodetic(pv.position, gmst);
-
-      const altKm = sat.altitude || geo.height || 0;
-      const visualAlt = Math.min(altKm / 6371, 6) * EARTH_RADIUS * 0.15 + 0.08;
-      const pos = latLngTo3D(geo.latitude * 180/Math.PI, geo.longitude * 180/Math.PI, EARTH_RADIUS + visualAlt);
-
-      const color = colorMap[orbitClass] || 0x22dd88;
-      const mat = new THREE.MeshBasicMaterial({
-        color, transparent: true, opacity: 0.85,
-        blending: THREE.AdditiveBlending,
-      });
-      const dot = new THREE.Mesh(dotGeo, mat);
-      dot.position.copy(pos);
-      dot.userData = { type: 'sat', name: sat.name, orbitClass, network: sat.network, altitude: sat.altitudeKm, period: sat.periodMinutes, tle1: sat.tle1, tle2: sat.tle2 };
-      satelliteGroup.add(dot);
-
-     // Invisible larger hit sphere for easier touch/mouse targeting
-      // Smaller hit sphere — 0.35 was too large, swallowed city clicks
-      const hitGeo = new THREE.SphereGeometry(0.08, 8, 6);
-      const hitMat = new THREE.MeshBasicMaterial({ visible: false });
-      const hitSphere = new THREE.Mesh(hitGeo, hitMat);
-      hitSphere.position.copy(pos);
-      hitSphere.userData = { ...dot.userData, isHit: true };
-      satelliteGroup.add(hitSphere);
-      plotted++;
-
-      // Draw orbit path if enabled
-      if (showOrbitPaths) {
-        const orbitColor = colorMap[orbitClass] || 0x22dd88;
-        const points = [];
-        const period = (sat.periodMinutes || 90) * 60; // seconds
-        const steps = 60;
-        for (let i = 0; i <= steps; i++) {
-          const t = new Date(now.getTime() + (period * i / steps) * 1000);
-          const pv2 = satellite.propagate(satrec, t);
-          if (!pv2.position || typeof pv2.position === 'boolean') continue;
-          const gmst2 = satellite.gstime(t);
-          const geo2 = satellite.eciToGeodetic(pv2.position, gmst2);
-          const vAlt = Math.min((sat.altitude || geo2.height || 0) / 6371, 6) * EARTH_RADIUS * 0.15 + 0.08;
-          points.push(latLngTo3D(geo2.latitude * 180/Math.PI, geo2.longitude * 180/Math.PI, EARTH_RADIUS + vAlt));
-        }
-        if (points.length > 2) {
-          const orbitGeo = new THREE.BufferGeometry().setFromPoints(points);
-          const orbitMat = new THREE.LineBasicMaterial({ color: orbitColor, transparent: true, opacity: 0.15 });
-          const orbitLine = new THREE.Line(orbitGeo, orbitMat);
-          orbitPathsGroup.add(orbitLine);
-        }
-      }
-    }
-
-    document.getElementById('count-satellites').textContent = plotted;
-    document.getElementById('orbit-count-leo').textContent = counts.LEO;
-    document.getElementById('orbit-count-meo').textContent = counts.MEO;
-    document.getElementById('orbit-count-geo').textContent = counts.GEO;
-  } catch (err) {
-    console.error('Satellite fetch error:', err);
-    document.getElementById('count-satellites').textContent = 'ERR';
-  }
+function syncSatelliteCounts() {
+  if (!orbitalLayer) return;
+  const c = orbitalLayer.counts || { LEO: 0, MEO: 0, GEO: 0 };
+  document.getElementById('orbit-count-leo').textContent = c.LEO || 0;
+  document.getElementById('orbit-count-meo').textContent = c.MEO || 0;
+  document.getElementById('orbit-count-geo').textContent = c.GEO || 0;
+  const el = document.getElementById('count-satellites');
+  if (el) el.textContent = layers.satellites ? orbitalLayer.active.length : 'OFF';
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2845,55 +2781,111 @@ async function fetchSatellites() {
 // ═══════════════════════════════════════════════════════════════════
 
 function setupUI() {
-  // Layer toggles
+  // ─── Layer toggles ───────────────────────────────────────────────
+  // Every entry is a two-way binding: the control drives the layer AND is
+  // reconciled against actual layer state at boot by syncLayerControls().
+  // A checkbox that disagrees with what is drawn is a defect, not cosmetics.
   const toggleMap = {
-    'layer-flights': ['flights', flightGroup],
-    'layer-daynight': ['daynight', nightGroup],
-    'layer-borders': ['borders', borderGroup],
-    'layer-cities': ['cities', cityGroup],
-    'layer-hotspots': ['hotspots', hotspotGroup],
-    'layer-satellites': ['satellites', satelliteGroup],
-    'layer-earthquakes': ['earthquakes', earthquakeGroup],
-    'layer-weather': ['weather', weatherGroup],
-    'layer-storms': ['storms', stormGroup],
-    'layer-cameras': ['cameras', cameraGroup],
+    'layer-flights':     ['flights',     () => aircraftLayer?.group],
+    'layer-daynight':    ['daynight',    () => nightGroup],
+    'layer-borders':     ['borders',     () => borderGroup],
+    'layer-cities':      ['cities',      () => cityGroup],
+    'layer-hotspots':    ['hotspots',    () => hotspotGroup],
+    'layer-satellites':  ['satellites',  () => orbitalLayer?.group],
+    'layer-earthquakes': ['earthquakes', () => earthquakeGroup],
+    'layer-weather':     ['weather',     () => weatherGroup],
+    'layer-storms':      ['storms',      () => stormGroup],
+    'layer-cameras':     ['cameras',     () => cameraGroup],
   };
-  for (const [id, [key, group]] of Object.entries(toggleMap)) {
+  for (const [id, [key, getGroup]] of Object.entries(toggleMap)) {
     document.getElementById(id).addEventListener('change', e => {
-      layers[key] = e.target.checked;
-      if (group) group.visible = e.target.checked;
-      if (key === 'satellites' && e.target.checked && satelliteData.length === 0) {
-        buildSatellites();
-      }
-      if (key === 'satellites') {
-        orbitPathsGroup.visible = e.target.checked && showOrbitPaths;
-      }
-      if (key === 'cameras' && e.target.checked && trafficCameraData.length === 0) {
-        fetchTrafficCameras().catch(err => console.error('Camera load failed:', err));
-        cameraInterval = setInterval(fetchTrafficCameras, 600000); // 10 min
-      }
-      if (key === 'cameras' && !e.target.checked && cameraInterval) {
-        clearInterval(cameraInterval);
-        cameraInterval = null;
-      }
-      const countEl = document.getElementById('count-' + key);
-      if (countEl) {
-        if (!e.target.checked) {
-          countEl.textContent = 'OFF';
-        } else {
-          if (key === 'flights') countEl.textContent = flightPaths.length;
-          else if (key === 'cities') countEl.textContent = 52;
-          else if (key === 'hotspots') countEl.textContent = 10;
-          else if (key === 'satellites') countEl.textContent = satelliteData.length || '...';
-          else if (key === 'earthquakes') countEl.textContent = earthquakeData.length || '...';
-          else if (key === 'weather') countEl.textContent = weatherAlertData.length || '...';
-          else if (key === 'storms') countEl.textContent = stormAlertData.length || '...';
-          else if (key === 'cameras') countEl.textContent = trafficCameraData.length || '...';
-          else countEl.textContent = 'ON';
-        }
-      }
+      setLayer(key, e.target.checked, getGroup);
     });
   }
+
+  window.setLayer = setLayer;
+  function setLayer(key, on, getGroup) {
+    layers[key] = on;
+    const group = (getGroup || toggleGroupFor(key))?.();
+    if (group) group.visible = on;
+
+    if (key === 'flights') aircraftLayer?.setVisible(on);
+    if (key === 'satellites') orbitalLayer?.setVisible(on);
+
+    if (key === 'cameras' && on && trafficCameraData.length === 0) {
+      fetchTrafficCameras().catch(err => console.error('Camera load failed:', err));
+      cameraInterval = setInterval(fetchTrafficCameras, 600000);
+    }
+    if (key === 'cameras' && !on && cameraInterval) {
+      clearInterval(cameraInterval); cameraInterval = null;
+    }
+
+    // If the operator hides the layer their current selection lives in, the
+    // selection is no longer inspectable — clear it rather than leave a
+    // dossier describing something that is not on screen.
+    const selKind = selection.selected?.kind;
+    if (!on && ((key === 'flights' && selKind === 'aircraft') ||
+                (key === 'satellites' && selKind === 'satellite') ||
+                (key === 'cities' && selKind === 'city') ||
+                (key === 'hotspots' && selKind === 'hotspot') ||
+                (key === 'earthquakes' && selKind === 'quake') ||
+                ((key === 'weather' || key === 'storms') && selKind === 'weather'))) {
+      selection.clear();
+    }
+
+    const cb = document.getElementById('layer-' + key);
+    if (cb && cb.checked !== on) cb.checked = on;
+    updateLayerCount(key);
+  }
+
+  function toggleGroupFor(key) {
+    const entry = Object.values(toggleMap).find(([k]) => k === key);
+    return entry ? entry[1] : null;
+  }
+
+  function updateLayerCount(key) {
+    const el = document.getElementById('count-' + key);
+    if (!el) return;
+    if (!layers[key]) { el.textContent = 'OFF'; return; }
+    const counts = {
+      flights:     () => aircraftLayer?.count ?? '…',
+      cities:      () => CITIES.length,
+      hotspots:    () => HOTSPOTS.length,
+      satellites:  () => orbitalLayer?.active.length ?? '…',
+      earthquakes: () => earthquakeData.length || '…',
+      weather:     () => weatherAlertData.length || '…',
+      storms:      () => stormAlertData.length || '…',
+      cameras:     () => trafficCameraData.length || '…',
+      daynight:    () => 'LIVE',
+      borders:     () => 'ON',
+    };
+    el.textContent = counts[key] ? counts[key]() : 'ON';
+  }
+  window.updateLayerCount = updateLayerCount;
+
+  /**
+   * Reconcile every control with the layer it claims to control.
+   *
+   * Called once after all layers exist. This is the guard against the class
+   * of bug v2 shipped: `<input ... checked>` in the markup, `visible = false`
+   * in init, and a hardcoded "OFF" label — three sources of truth, none of
+   * them the actual scene graph.
+   */
+  function syncLayerControls() {
+    for (const [id, [key, getGroup]] of Object.entries(toggleMap)) {
+      const cb = document.getElementById(id);
+      if (!cb) continue;
+      layers[key] = cb.checked;
+      const group = getGroup();
+      if (group) group.visible = cb.checked;
+      if (key === 'flights') aircraftLayer?.setVisible(cb.checked);
+      if (key === 'satellites') orbitalLayer?.setVisible(cb.checked);
+      updateLayerCount(key);
+    }
+  }
+  // Layers are created asynchronously; reconcile once they exist.
+  setTimeout(syncLayerControls, 0);
+  window.syncLayerControls = syncLayerControls;
 
   // Globe control toggles
   document.getElementById('toggle-autorotate').addEventListener('change', e => {
@@ -2928,26 +2920,33 @@ function setupUI() {
     });
   });
 
-  // Flight region filter checkboxes — refetch on change
-  document.querySelectorAll('.fr-toggle input').forEach(cb => {
-    cb.addEventListener('change', () => fetchRealFlights());
-  });
-
-  // Satellite orbit filter checkboxes
-  ['orbit-leo', 'orbit-meo', 'orbit-geo'].forEach(id => {
-    const cb2 = document.getElementById(id);
-    if (cb2) cb2.addEventListener('change', () => {
-      const key = id.replace('orbit-', '').toUpperCase();
-      activeOrbitFilters[key] = cb2.checked;
-      fetchSatellites();
+  // Flight region filters — these change what the server returns, so they
+  // require a refetch. Debounced: ticking four regions in a row should be one
+  // request, not four.
+  let regionDebounce = null;
+  document.querySelectorAll('#flight-regions .fr-toggle input').forEach(cb => {
+    cb.addEventListener('change', () => {
+      clearTimeout(regionDebounce);
+      regionDebounce = setTimeout(() => {
+        aircraftLayer?.setRegions(getSelectedRegions());
+      }, 350);
     });
   });
-  // Orbit paths toggle
+
+  // Orbit class filters are a client-side view filter, not a query — no
+  // refetch, no network round trip, instant response.
+  ['orbit-leo', 'orbit-meo', 'orbit-geo'].forEach(id => {
+    const cb = document.getElementById(id);
+    if (!cb) return;
+    cb.addEventListener('change', () => {
+      orbitalLayer?.setFilter(id.replace('orbit-', '').toUpperCase(), cb.checked);
+      syncSatelliteCounts();
+    });
+  });
+
   const pathsCb = document.getElementById('orbit-paths');
   if (pathsCb) pathsCb.addEventListener('change', () => {
-    showOrbitPaths = pathsCb.checked;
-    orbitPathsGroup.visible = showOrbitPaths;
-    fetchSatellites();
+    orbitalLayer?.setShowPaths(pathsCb.checked);
   });
 
   // Collapsible Globe Controls — toggle open/close
@@ -3022,7 +3021,9 @@ document.getElementById('ai-close').addEventListener('click', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    applyViewportFraming();
   });
+  applyViewportFraming();
 
   // ─── Mobile Menu Toggles ───
   const backdrop = document.getElementById('mobile-backdrop');
@@ -3061,146 +3062,288 @@ document.getElementById('ai-close').addEventListener('click', () => {
   });
   backdrop.addEventListener('click', closeAllPanels);
 
-  // Mouse for hover
-  renderer.domElement.addEventListener('mousemove', e => {
-    const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-    const tip = document.getElementById('tooltip');
-    // Clamp tooltip to viewport — measure after making visible
-    if (tip.style.display === 'block' || tip.style.display === '') {
-      const tw = tip.offsetWidth || 200;
-      const th = tip.offsetHeight || 120;
-      let x = e.clientX + 16;
-      let y = e.clientY - 10;
-      if (x + tw > window.innerWidth - 8) x = e.clientX - tw - 16;
-      if (y < 8) y = 8;
-      if (y + th > window.innerHeight - 8) y = window.innerHeight - th - 8;
-      if (x < 8) x = 8;
-      tip.style.left = x + 'px';
-      tip.style.top = y + 'px';
+  // ═══════════════════════════════════════════════════════════════
+  //  POINTER INTERACTION
+  // ═══════════════════════════════════════════════════════════════
+  //
+  //  v2 had three separate, subtly different handlers — mousemove, touchend
+  //  and click — each rebuilding its own candidate array and running its own
+  //  raycast with its own tie-breaking rules. They disagreed with each other,
+  //  which is why a click could select something different from what the
+  //  tooltip under the cursor was describing.
+  //
+  //  One resolver now serves all input paths. Aircraft and satellites resolve
+  //  by screen-space distance (a pixel-denominated hit radius, so the target
+  //  is equally easy to hit at any zoom); everything else still raycasts,
+  //  because those markers are already large surface features.
+
+  const pointer = { x: -999, y: -999, clientX: 0, clientY: 0, inside: false };
+
+  function resolveAt(ndcX, ndcY) {
+    const w = renderer.domElement.clientWidth;
+    const h = renderer.domElement.clientHeight;
+
+    // Screen-space candidates first — they carry a pixel distance we can
+    // compare against, and they are the small targets that need the help.
+    const candidates = [];
+    if (layers.flights)    { const a = aircraftLayer?.pick(ndcX, ndcY, w, h); if (a) candidates.push(a); }
+    if (layers.satellites) { const o = orbitalLayer?.pick(ndcX, ndcY, w, h);  if (o) candidates.push(o); }
+    candidates.sort((a, b) => a.distPx - b.distPx);
+    const nearest = candidates[0];
+
+    // Raycast the surface markers.
+    mouse.set(ndcX, ndcY);
+    raycaster.setFromCamera(mouse, camera);
+    const meshes = [];
+    if (layers.cities)      meshes.push(...cityGroup.children);
+    if (layers.hotspots)    meshes.push(...hotspotGroup.children);
+    if (layers.earthquakes && earthquakeGroup.visible) meshes.push(...earthquakeGroup.children);
+    if (layers.weather && weatherGroup.visible)        meshes.push(...weatherGroup.children);
+    if (layers.storms && stormGroup.visible)           meshes.push(...stormGroup.children);
+    if (layers.cameras && cameraGroup.visible)         meshes.push(...cameraGroup.children);
+    const hits = raycaster.intersectObjects(meshes, false).filter(i => !i.object.userData.isHit);
+
+    // A screen-space hit within 9 px beats a raycast hit: if the pointer is
+    // effectively on top of an aircraft, that is what the operator meant,
+    // even when a city ring happens to lie behind it.
+    if (nearest && nearest.distPx < 9) return nearest;
+    if (hits.length) {
+      const ud = hits[0].object.userData;
+      if (ud.type === 'quake')   return { kind: 'quake',   id: ud.quake.id,  data: ud.quake, obj: hits[0].object };
+      if (ud.type === 'weather' || ud.type === 'storm')
+                                 return { kind: 'weather', id: ud.alert.id,  data: ud.alert, obj: hits[0].object };
+      if (ud.type === 'hotspot') return { kind: 'hotspot', id: ud.hotspot.name, data: ud.hotspot, obj: hits[0].object };
+      if (ud.type === 'camera')  return { kind: 'camera',  id: ud.camera.id, data: ud.camera, obj: hits[0].object };
+      if (ud.city)               return { kind: 'city',    id: ud.city.name, data: ud.city, obj: hits[0].object };
     }
+    return nearest || null;
+  }
+
+  function updatePointer(clientX, clientY) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    pointer.clientX = clientX; pointer.clientY = clientY;
+    pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+    pointer.inside = true;
+  }
+  window._pointer = pointer;
+  window._resolveAt = resolveAt;
+
+  renderer.domElement.addEventListener('mousemove', e => {
+    updatePointer(e.clientX, e.clientY);
+    const hit = resolveAt(pointer.x, pointer.y);
+    selection.hover(hit?.kind || null, hit?.id || null);
+    renderer.domElement.style.cursor = hit ? 'pointer' : 'grab';
+    positionTooltip(hit, e.clientX, e.clientY);
   });
+
   renderer.domElement.addEventListener('mouseleave', () => {
-    mouse.set(-999, -999);
+    pointer.inside = false;
+    selection.hover(null, null);
     document.getElementById('tooltip').style.display = 'none';
   });
 
-  // Touch handler for mobile — tap to inspect satellites/flights/cities
-  // (touchHoverActive declared at module scope above)
-  // Use tap-vs-drag: record start position, run raycast on touchend if finger didn't move much
-  let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
-  renderer.domElement.addEventListener('touchstart', e => {
-    if (e.touches.length !== 1) { touchHoverActive = false; return; }
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    touchStartTime = performance.now();
-  }, { passive: true });
+  // Click selects. Selection is sticky: it survives pointer movement, data
+  // refresh and camera motion, because an operator has to be able to read a
+  // value, look away, and still have it there.
+  let downX = 0, downY = 0, downT = 0;
+  renderer.domElement.addEventListener('pointerdown', e => {
+    downX = e.clientX; downY = e.clientY; downT = performance.now();
+  });
+  renderer.domElement.addEventListener('pointerup', e => {
+    // Distinguish a click from a globe drag.
+    const moved = Math.hypot(e.clientX - downX, e.clientY - downY);
+    if (moved > 8 || performance.now() - downT > 600) return;
 
-  renderer.domElement.addEventListener('touchend', e => {
-    // Must be a tap (short, minimal movement) — not a drag/pinch
-    const dt = performance.now() - touchStartTime;
-    if (dt > 500) return; // took too long, was a drag
-    if (e.changedTouches.length !== 1) return;
+    updatePointer(e.clientX, e.clientY);
+    const hit = resolveAt(pointer.x, pointer.y);
+    if (!hit) { selection.clear(); document.getElementById('tooltip').style.display = 'none'; return; }
 
-    const touch = e.changedTouches[0];
-    const dx = touch.clientX - touchStartX;
-    const dy = touch.clientY - touchStartY;
-    if (Math.sqrt(dx * dx + dy * dy) > 10) return; // moved too far, was a drag
+    if (hit.kind === 'camera') { showCameraPopup(hit.data, e.clientX, e.clientY); return; }
+    selection.select(hit.kind, hit.id);
 
-    const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
-
-    // Run raycast
-    raycaster.setFromCamera(mouse, camera);
-    const candidates = [];
-   if (layers.flights) candidates.push(...flightGroup.children);
-   if (layers.cities) candidates.push(...cityGroup.children);
-   if (layers.hotspots) candidates.push(...hotspotGroup.children);
-   if (layers.satellites && satelliteGroup.visible) candidates.push(...satelliteGroup.children);
-    if (layers.earthquakes && earthquakeGroup.visible) candidates.push(...earthquakeGroup.children);
-    if (layers.weather && weatherGroup.visible) candidates.push(...weatherGroup.children);
-    if (layers.storms && stormGroup.visible) candidates.push(...stormGroup.children);
-    if (layers.cameras && cameraGroup.visible) candidates.push(...cameraGroup.children);
-
-   // Sort intersects by distance — prefer satellites and hotspots over empty space
-   const intersects = raycaster.intersectObjects(candidates);
-    // Filter out invisible hit spheres — prefer the real visible object
-    const visibleHits = intersects.filter(i => !i.object.userData.isHit);
-    const realIntersects = visibleHits.length > 0 ? visibleHits : intersects;
-   const tip = document.getElementById('tooltip');
-
-    if (realIntersects.length > 0) {
-      const obj = realIntersects[0].object;
-      const ud = obj.userData;
-      if (ud.type === 'sat' || ud.type === 'flight' || ud.city || ud.type === 'hotspot' ||
-          ud.type === 'quake' || ud.type === 'weather' || ud.type === 'storm' || ud.type === 'camera') {
-        // Handle tap on camera markers — show live image popup
-        if (ud.type === 'camera') {
-          showCameraPopup(ud.camera, touch.clientX, touch.clientY);
-        }
-        // Position tooltip — measure actual size and clamp fully within viewport
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        const tw = tip.offsetWidth || 220;
-        const th = tip.offsetHeight || 140;
-        let tx = touch.clientX - tw / 2;
-        let ty = touch.clientY - th - 20; // above finger
-        if (tx < 8) tx = 8;
-        if (tx + tw > vw - 8) tx = vw - tw - 8;
-        if (ty < 8) ty = touch.clientY + 20; // flip below if no room above
-        if (ty + th > vh - 8) ty = vh - th - 8;
-        tip.style.left = tx + 'px';
-        tip.style.top = ty + 'px';
-        touchHoverActive = true;
-        // Auto-dismiss after 8 seconds if no new tap
-        clearTimeout(touchTooltipTimer);
-        touchTooltipTimer = setTimeout(() => { touchHoverActive = false; }, 8000);
-      }
-    } else {
-      tip.style.display = 'none';
-      touchHoverActive = false;
+    // Touch has no hover state, so a tap must also place the tooltip.
+    if (e.pointerType === 'touch') {
+      selection.hover(hit.kind, hit.id);
+      positionTooltip(hit, e.clientX, e.clientY);
     }
- }, { passive: true });
+  });
 
- // Click handler for camera markers — show live image popup
- renderer.domElement.addEventListener('click', e => {
-   if (touchHoverActive) return; // Don't fire on touch taps (handled separately)
-   const rect = renderer.domElement.getBoundingClientRect();
-   mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-   mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-   raycaster.setFromCamera(mouse, camera);
-   const candidates = [];
-   if (layers.cameras && cameraGroup.visible) candidates.push(...cameraGroup.children);
-   if (layers.flights) candidates.push(...flightGroup.children);
-   if (layers.cities) candidates.push(...cityGroup.children);
-   if (layers.hotspots) candidates.push(...hotspotGroup.children);
-   if (layers.satellites && satelliteGroup.visible) candidates.push(...satelliteGroup.children);
-   if (layers.earthquakes && earthquakeGroup.visible) candidates.push(...earthquakeGroup.children);
-   if (layers.weather && weatherGroup.visible) candidates.push(...weatherGroup.children);
-   if (layers.storms && stormGroup.visible) candidates.push(...stormGroup.children);
-   const intersects = raycaster.intersectObjects(candidates);
-   const visibleHits = intersects.filter(i => !i.object.userData.isHit);
-   const realIntersects = visibleHits.length > 0 ? visibleHits : intersects;
-   if (realIntersects.length > 0) {
-     const obj = realIntersects[0].object;
-     const ud = obj.userData;
-     if (ud.type === 'camera') {
-       showCameraPopup(ud.camera, e.clientX, e.clientY);
-     } else if (ud.type === 'quake') {
-       // Fly to earthquake location
-       const q = ud.quake;
-       const target = latLngTo3D(q.lat, q.lng, EARTH_RADIUS).multiplyScalar(2.5);
-       flyCameraTo(target);
-     } else if (ud.type === 'weather' || ud.type === 'storm') {
-       // Fly to alert location
-       const c = ud.centroid;
-       const target = latLngTo3D(c.lat, c.lng, EARTH_RADIUS).multiplyScalar(2.5);
-       flyCameraTo(target);
-     }
-   }
- });
+  function positionTooltip(hit, cx, cy) {
+    const tip = document.getElementById('tooltip');
+    if (!hit) { tip.style.display = 'none'; return; }
+    renderTooltip(hit);
+    tip.style.display = 'block';
+    const tw = tip.offsetWidth || 220, th = tip.offsetHeight || 130;
+    let x = cx + 18, y = cy - 12;
+    if (x + tw > window.innerWidth - 8) x = cx - tw - 18;
+    if (y + th > window.innerHeight - 8) y = window.innerHeight - th - 8;
+    if (x < 8) x = 8;
+    if (y < 8) y = 8;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  window._positionTooltip = positionTooltip;
+}
+
+/**
+ * Hover tooltip — deliberately brief.
+ *
+ * The tooltip answers "what is this?" in one glance. It is NOT the detail
+ * view; that is the dossier, which is pinned and persistent. v2 conflated the
+ * two, which meant the only way to read an aircraft's full state was to hold
+ * the mouse perfectly still.
+ */
+/**
+ * Show the operator logo in the tooltip.
+ *
+ * Guarded against two things that matter when the pointer is sweeping across
+ * a dense air picture at 8 Hz:
+ *
+ *  · A late response for an aircraft the pointer has already left must not
+ *    paint that operator's logo over the current one. The callsign is
+ *    re-checked against what is displayed before the image is applied.
+ *  · Reassigning img.src to the value it already holds makes the element
+ *    flicker on every hover tick, so it is only written when it changes.
+ *
+ * The coloured code chip stays visible underneath as the fallback, so an
+ * aircraft with no resolvable logo still reads as an operator, not a blank.
+ */
+function applyTooltipLogo(callsign) {
+  const wrap = document.getElementById('tip-logo-wrap');
+  const img = document.getElementById('tip-logo');
+  airlineLogo(callsign).then(url => {
+    if (document.getElementById('tip-title').textContent !== callsign) return;
+    if (!url) { wrap.classList.remove('shown'); return; }
+    if (img.getAttribute('src') !== url) img.setAttribute('src', url);
+    wrap.classList.add('shown');
+    // The coloured code chip exists as the fallback for exactly this case.
+    // Once a real logo resolves it is redundant — without this the tooltip
+    // states the operator three times over (chip, name, logo).
+    document.getElementById('tip-badge').style.display = 'none';
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const img = document.getElementById('tip-logo');
+  // A listed-but-missing local SVG (the API advertises nine, three exist)
+  // must collapse the strip, not leave a broken-image glyph in the tooltip.
+  img?.addEventListener('error', () => {
+    document.getElementById('tip-logo-wrap').classList.remove('shown');
+  });
+});
+
+function renderTooltip(hit) {
+  const tip = document.getElementById('tooltip');
+  const badge = document.getElementById('tip-badge');
+  const setBlock = (id, on) => { const el = document.getElementById(id); if (el) el.style.display = on ? 'block' : 'none'; };
+  ['tip-flight-info','tip-city-info','tip-sat-info','tip-hotspot-info',
+   'tip-quake-info','tip-wx-info','tip-camera-info'].forEach(id => setBlock(id, false));
+  badge.style.display = 'none';
+  document.getElementById('tip-airline').textContent = '';
+  document.getElementById('tip-logo-wrap').classList.remove('shown');
+
+  if (hit.kind === 'aircraft') {
+    const t = hit.data;
+    const airline = getAirlineInfo(t.callsign);
+    badge.style.display = 'flex';
+    badge.style.background = airline.color;
+    badge.textContent = airline.code;
+    applyTooltipLogo(t.callsign);
+    document.getElementById('tip-title').textContent = t.callsign;
+    document.getElementById('tip-airline').textContent =
+      airline.name + (t.extrapolated ? '  ·  DR' : '');
+    setBlock('tip-flight-info', true);
+    document.getElementById('tip-callsign').textContent = t.callsign;
+    document.getElementById('tip-origin').textContent = t.origin || 'Unknown';
+    document.getElementById('tip-alt').textContent =
+      'FL' + String(Math.round((t.altNow || 0) * 3.28084 / 100)).padStart(3, '0');
+    document.getElementById('tip-velocity').textContent =
+      t.velocity ? Math.round(t.velocity * 1.94384) + ' kt' : '—';
+    // Now correct: true track in degrees, three-digit aviation convention.
+    document.getElementById('tip-heading').textContent =
+      t.track != null ? String(Math.round(t.track)).padStart(3, '0') + '°T' : '—';
+
+  } else if (hit.kind === 'satellite') {
+    const s = hit.data;
+    document.getElementById('tip-title').textContent = s.name;
+    setBlock('tip-sat-info', true);
+    document.getElementById('tip-network').textContent = s.network || '—';
+    document.getElementById('tip-orbit').textContent = s.orbitClass || '—';
+    document.getElementById('tip-sat-alt').textContent =
+      Math.round(s.heightKm || s.altitudeKm) + ' km';
+    document.getElementById('tip-period').textContent =
+      s.periodMinutes ? s.periodMinutes.toFixed(1) + ' min' : '—';
+
+  } else if (hit.kind === 'city') {
+    const c = hit.data;
+    document.getElementById('tip-title').textContent = c.name;
+    setBlock('tip-city-info', true);
+    document.getElementById('tip-pop').textContent = c.pop.toLocaleString();
+    document.getElementById('tip-country').textContent = c.country;
+    document.getElementById('tip-coords').textContent = formatCoord(c.lat, c.lng);
+
+  } else if (hit.kind === 'hotspot') {
+    const h = hit.data;
+    document.getElementById('tip-title').textContent = h.name;
+    setBlock('tip-hotspot-info', true);
+    const labels = ['LOW', 'MODERATE', 'HIGH'];
+    const colors = [hex(PALETTE.threat.moderate), hex(PALETTE.threat.high), hex(PALETTE.threat.critical)];
+    const sev = document.getElementById('tip-severity');
+    sev.textContent = labels[h.sev - 1] || 'UNKNOWN';
+    sev.style.color = colors[h.sev - 1] || colors[2];
+    document.getElementById('tip-hs-coords').textContent = formatCoord(h.lat, h.lng);
+
+  } else if (hit.kind === 'quake') {
+    const q = hit.data;
+    document.getElementById('tip-title').textContent = 'M' + (q.mag || 0).toFixed(1) + ' Earthquake';
+    setBlock('tip-quake-info', true);
+    document.getElementById('tip-mag').textContent = (q.mag || 0).toFixed(1);
+    document.getElementById('tip-depth').textContent = q.depth != null ? q.depth.toFixed(1) + ' km' : '—';
+    document.getElementById('tip-quake-time').textContent =
+      q.time ? formatAge(Date.now() - q.time) + ' ago' : '—';
+
+  } else if (hit.kind === 'weather') {
+    const a = hit.data;
+    document.getElementById('tip-title').textContent = a.event || 'Weather Alert';
+    setBlock('tip-wx-info', true);
+    document.getElementById('tip-wx-event').textContent = a.event || '—';
+    const sv = document.getElementById('tip-wx-severity');
+    sv.textContent = a.severity || '—';
+    sv.style.color = hex(PALETTE.weather[a.severity] || PALETTE.weather.Minor);
+    document.getElementById('tip-wx-area').textContent =
+      a.areaDesc ? a.areaDesc.substring(0, 44) : '—';
+
+  } else if (hit.kind === 'camera') {
+    const c = hit.data;
+    document.getElementById('tip-title').textContent = c.name || 'Camera';
+    setBlock('tip-camera-info', true);
+    document.getElementById('tip-cam-area').textContent = c.area || 'NYC';
+    document.getElementById('tip-cam-status').textContent = 'Online';
+  }
+}
+
+/**
+ * Keep the whole globe in frame regardless of viewport aspect.
+ *
+ * The camera uses a fixed 45° VERTICAL fov, so on a portrait phone the
+ * horizontal field collapses and the globe overflows the screen — you end up
+ * looking at a patch of ocean with no idea where on Earth you are. Widening
+ * the fov on tall-narrow viewports restores the whole-globe view that makes
+ * this thing a situational-awareness tool rather than a texture viewer.
+ */
+function applyViewportFraming() {
+  const aspect = window.innerWidth / window.innerHeight;
+  // Solve for the vertical fov that yields the desired horizontal coverage.
+  const targetHorizontalFov = 46 * DEG2RAD;
+  let vFov = 45 * DEG2RAD;
+  if (aspect < 1) {
+    vFov = 2 * Math.atan(Math.tan(targetHorizontalFov / 2) / aspect);
+    vFov = Math.min(vFov, 88 * DEG2RAD);   // beyond this the distortion hurts
+  }
+  camera.fov = vFov / DEG2RAD;
+  camera.updateProjectionMatrix();
+  // Give narrow viewports more standoff room too.
+  controls.minDistance = aspect < 1 ? 6.6 : 6;
 }
 
 function flyCameraTo(target) {
@@ -3302,288 +3445,543 @@ function updateClock() {
 function animate() {
   requestAnimationFrame(animate);
   const time = performance.now() * 0.001;
+  const nowMs = Date.now();
+  const nowDate = new Date(nowMs);
+  const viewportH = renderer.domElement.clientHeight;
 
   controls.update();
 
- if (layers.flights) updateFlights();
- if (layers.hotspots) updateHotspots(time);
- if (layers.earthquakes) updateEarthquakes(time);
- if (layers.weather) updateWeather(time);
- if (layers.storms) updateStorms(time);
-if (layers.daynight) updateDayNight();
- if (clouds) clouds.rotation.y += 0.0003;
-  // Pulse city ring markers
+  if (layers.hotspots)    updateHotspots(time);
+  if (layers.earthquakes) updateEarthquakes(time);
+  if (layers.weather)     updateWeather(time);
+  if (layers.storms)      updateStorms(time);
+  if (layers.daynight)    updateDayNight();
+  if (clouds) clouds.rotation.y += 0.0003;
+
+  // Air and space pictures. Both are screen-space sized, so they must update
+  // every frame — their world scale is a function of camera distance.
+  aircraftLayer?.update(nowMs, viewportH);
+  orbitalLayer?.update(nowDate, viewportH);
+
+  // Track count changes between polls (aircraft age out), so the readout has
+  // to follow the layer rather than only the fetch.
+  if (nowMs - lastCountSync > 2000) {
+    lastCountSync = nowMs;
+    if (aircraftLayer && layers.flights) {
+      const n = aircraftLayer.count;
+      if (n !== lastAircraftCount) {
+        lastAircraftCount = n;
+        document.getElementById('stat-flights').textContent = n;
+        document.getElementById('count-flights').textContent = n;
+      }
+    }
+  }
+
   if (layers.cities) {
     for (const child of cityGroup.children) {
       if (child.userData.isRing) {
-        child.userData.pulse += 0.03;
-        child.material.opacity = 0.35 + Math.sin(child.userData.pulse) * 0.25;
-        const s = 1.0 + Math.sin(child.userData.pulse) * 0.15;
-        child.scale.set(s, s, s);
+        child.userData.pulse += 0.018;
+        child.material.opacity = 0.24 + Math.sin(child.userData.pulse) * 0.10;
+        const sc = 1.0 + Math.sin(child.userData.pulse) * 0.07;
+        child.scale.set(sc, sc, sc);
       }
     }
   }
 
-  // City / Flight / Satellite hover detection
-  const tip = document.getElementById('tooltip');
-  let hoveredObj = null;
+  updateSelectionReticle(viewportH);
+  updateCameraTracking();
 
-  // On mobile, only run hover detection via animate loop when touch tooltip is active
-  // (to populate content) or when not on mobile at all (mouse hover)
-  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-  const shouldRaycast = !isTouch || touchHoverActive;
-
-  if (shouldRaycast && (layers.cities || layers.flights || layers.satellites)) {
-    raycaster.setFromCamera(mouse, camera);
-    const candidates = [];
-   if (layers.flights) candidates.push(...flightGroup.children);
-   if (layers.cities) candidates.push(...cityGroup.children);
-   if (layers.hotspots) candidates.push(...hotspotGroup.children);
-   if (layers.satellites && satelliteGroup.visible) candidates.push(...satelliteGroup.children);
-    if (layers.earthquakes && earthquakeGroup.visible) candidates.push(...earthquakeGroup.children);
-    if (layers.weather && weatherGroup.visible) candidates.push(...weatherGroup.children);
-    if (layers.storms && stormGroup.visible) candidates.push(...stormGroup.children);
-    if (layers.cameras && cameraGroup.visible) candidates.push(...cameraGroup.children);
-
-   const intersects = raycaster.intersectObjects(candidates);
-    // Filter out invisible hit spheres — prefer the real visible object
-    const visibleHits2 = intersects.filter(i => !i.object.userData.isHit);
-    const realIntersects2 = visibleHits2.length > 0 ? visibleHits2 : intersects;
-
-    if (realIntersects2.length > 0) {
-      const obj = realIntersects2[0].object;
-      const ud = obj.userData;
-
-      if (ud.type === 'flight') {
-        // Flight tooltip
-        const airline = getAirlineInfo(ud.callsign);
-        const badge = document.getElementById('tip-badge');
-        badge.style.display = 'flex';
-        badge.style.background = airline.color;
-        badge.textContent = airline.code;
-        document.getElementById('tip-title').textContent = ud.callsign || 'Unknown';
-        document.getElementById('tip-airline').textContent = airline.name;
-        document.getElementById('tip-flight-info').style.display = 'block';
-        document.getElementById('tip-city-info').style.display = 'none';
-        document.getElementById('tip-sat-info').style.display = 'none';
-        document.getElementById('tip-hotspot-info').style.display = 'none';
-        document.getElementById('tip-quake-info').style.display = 'none';
-        document.getElementById('tip-wx-info').style.display = 'none';
-        document.getElementById('tip-camera-info').style.display = 'none';
-        document.getElementById('tip-callsign').textContent = ud.callsign || '—';
-        document.getElementById('tip-origin').textContent = (ud.origin || '—') + ' · ' + airline.name;
-        document.getElementById('tip-alt').textContent = ud.alt ? (ud.alt / 1000).toFixed(1) + ' km' : '—';
-        document.getElementById('tip-velocity').textContent = ud.velocity ? Math.round(ud.velocity * 3.6) + ' km/h' : '—';
-        document.getElementById('tip-heading').textContent = ud.heading != null ? Math.round(ud.heading) + '°' : '—';
-        tip.style.display = 'block';
-      } else if (ud.type === 'sat') {
-        // Satellite tooltip
-        document.getElementById('tip-badge').style.display = 'none';
-        document.getElementById('tip-airline').textContent = '';
-        document.getElementById('tip-title').textContent = ud.name || 'Satellite';
-        document.getElementById('tip-flight-info').style.display = 'none';
-        document.getElementById('tip-city-info').style.display = 'none';
-        document.getElementById('tip-sat-info').style.display = 'block';
-        document.getElementById('tip-hotspot-info').style.display = 'none';
-        document.getElementById('tip-quake-info').style.display = 'none';
-        document.getElementById('tip-wx-info').style.display = 'none';
-        document.getElementById('tip-camera-info').style.display = 'none';
-        document.getElementById('tip-network').textContent = ud.network || '—';
-        document.getElementById('tip-orbit').textContent = ud.orbitClass || '—';
-        document.getElementById('tip-sat-alt').textContent = ud.altitude ? ud.altitude + ' km' : '—';
-        document.getElementById('tip-period').textContent = ud.period ? ud.period + ' min' : '—';
-        tip.style.display = 'block';
-      } else if (ud.city) {
-        // City tooltip
-        document.getElementById('tip-badge').style.display = 'none';
-        document.getElementById('tip-airline').textContent = '';
-        const city = ud.city;
-        document.getElementById('tip-title').textContent = city.name;
-        document.getElementById('tip-flight-info').style.display = 'none';
-        document.getElementById('tip-city-info').style.display = 'block';
-        document.getElementById('tip-sat-info').style.display = 'none';
-        document.getElementById('tip-hotspot-info').style.display = 'none';
-        document.getElementById('tip-quake-info').style.display = 'none';
-        document.getElementById('tip-wx-info').style.display = 'none';
-        document.getElementById('tip-camera-info').style.display = 'none';
-        document.getElementById('tip-pop').textContent = city.pop.toLocaleString();
-        document.getElementById('tip-country').textContent = city.country;
-        document.getElementById('tip-coords').textContent = `${city.lat.toFixed(1)}°, ${city.lng.toFixed(1)}°`;
-        tip.style.display = 'block';
-      } else if (ud.type === 'hotspot') {
-        // Hotspot tooltip
-        document.getElementById('tip-badge').style.display = 'none';
-        document.getElementById('tip-airline').textContent = '';
-        const hs = ud.hotspot;
-        document.getElementById('tip-title').textContent = hs.name;
-        document.getElementById('tip-flight-info').style.display = 'none';
-        document.getElementById('tip-city-info').style.display = 'none';
-        document.getElementById('tip-sat-info').style.display = 'none';
-        document.getElementById('tip-hotspot-info').style.display = 'block';
-        const sevLabels = ['LOW', 'MODERATE', 'HIGH'];
-        const sevColors = ['#ffaa22', '#ff6644', '#ff2244'];
-        const sevEl = document.getElementById('tip-severity');
-        sevEl.textContent = sevLabels[hs.sev - 1] || 'UNKNOWN';
-        sevEl.style.color = sevColors[hs.sev - 1] || '#ff2244';
-       document.getElementById('tip-hs-coords').textContent = `${hs.lat.toFixed(1)}°, ${hs.lng.toFixed(1)}°`;
-       tip.style.display = 'block';
-     } else if (ud.type === 'quake') {
-       // Earthquake tooltip
-       document.getElementById('tip-badge').style.display = 'none';
-       document.getElementById('tip-airline').textContent = '';
-       const q = ud.quake;
-       document.getElementById('tip-title').textContent = 'M' + (q.mag || '?').toFixed(1) + ' Earthquake';
-       document.getElementById('tip-flight-info').style.display = 'none';
-       document.getElementById('tip-city-info').style.display = 'none';
-       document.getElementById('tip-sat-info').style.display = 'none';
-       document.getElementById('tip-hotspot-info').style.display = 'none';
-       document.getElementById('tip-quake-info').style.display = 'block';
-       document.getElementById('tip-wx-info').style.display = 'none';
-       document.getElementById('tip-camera-info').style.display = 'none';
-       document.getElementById('tip-mag').textContent = (q.mag || '?').toFixed(1);
-       document.getElementById('tip-depth').textContent = q.depth ? q.depth.toFixed(1) + ' km' : '—';
-       document.getElementById('tip-quake-time').textContent = q.time ? new Date(q.time).toISOString().slice(11, 19) + ' UTC' : '—';
-       tip.style.display = 'block';
-     } else if (ud.type === 'weather') {
-       // Weather alert tooltip
-       document.getElementById('tip-badge').style.display = 'none';
-       document.getElementById('tip-airline').textContent = '';
-       const a = ud.alert;
-       document.getElementById('tip-title').textContent = a.event || 'Weather Alert';
-       document.getElementById('tip-flight-info').style.display = 'none';
-       document.getElementById('tip-city-info').style.display = 'none';
-       document.getElementById('tip-sat-info').style.display = 'none';
-       document.getElementById('tip-hotspot-info').style.display = 'none';
-       document.getElementById('tip-quake-info').style.display = 'none';
-       document.getElementById('tip-wx-info').style.display = 'block';
-       document.getElementById('tip-camera-info').style.display = 'none';
-       document.getElementById('tip-wx-event').textContent = a.event || '—';
-       document.getElementById('tip-wx-severity').textContent = a.severity || '—';
-       document.getElementById('tip-wx-severity').style.color = a.severity === 'Extreme' ? '#ff2244' : a.severity === 'Severe' ? '#ff6622' : a.severity === 'Moderate' ? '#ffcc22' : '#44aaff';
-       document.getElementById('tip-wx-area').textContent = a.areaDesc ? a.areaDesc.substring(0, 40) : '—';
-       tip.style.display = 'block';
-     } else if (ud.type === 'storm') {
-       // Storm alert tooltip
-       document.getElementById('tip-badge').style.display = 'none';
-       document.getElementById('tip-airline').textContent = '';
-       const a = ud.alert;
-       document.getElementById('tip-title').textContent = '⛈ ' + (a.event || 'Storm Alert');
-       document.getElementById('tip-flight-info').style.display = 'none';
-       document.getElementById('tip-city-info').style.display = 'none';
-       document.getElementById('tip-sat-info').style.display = 'none';
-       document.getElementById('tip-hotspot-info').style.display = 'none';
-       document.getElementById('tip-quake-info').style.display = 'none';
-       document.getElementById('tip-wx-info').style.display = 'block';
-       document.getElementById('tip-camera-info').style.display = 'none';
-       document.getElementById('tip-wx-event').textContent = a.event || '—';
-       document.getElementById('tip-wx-severity').textContent = a.severity || '—';
-       document.getElementById('tip-wx-severity').style.color = a.severity === 'Extreme' ? '#ff2244' : a.severity === 'Severe' ? '#ff6622' : '#ffcc22';
-       document.getElementById('tip-wx-area').textContent = a.areaDesc ? a.areaDesc.substring(0, 40) : '—';
-       tip.style.display = 'block';
-     } else if (ud.type === 'camera') {
-       // Camera tooltip
-       document.getElementById('tip-badge').style.display = 'none';
-       document.getElementById('tip-airline').textContent = '';
-       const cam = ud.camera;
-       document.getElementById('tip-title').textContent = cam.name || 'Camera';
-       document.getElementById('tip-flight-info').style.display = 'none';
-       document.getElementById('tip-city-info').style.display = 'none';
-       document.getElementById('tip-sat-info').style.display = 'none';
-       document.getElementById('tip-hotspot-info').style.display = 'none';
-       document.getElementById('tip-quake-info').style.display = 'none';
-       document.getElementById('tip-wx-info').style.display = 'none';
-       document.getElementById('tip-camera-info').style.display = 'block';
-       document.getElementById('tip-cam-area').textContent = cam.area || 'NYC';
-       document.getElementById('tip-cam-status').textContent = 'Online';
-       tip.style.display = 'block';
-     } else {
-       if (!touchHoverActive) tip.style.display = 'none';
-     }
-      // ── Apply highlight to the intersected object ──
-      if (tip.style.display === 'block' && obj) {
-        // Clear old highlight if object changed
-        if (highlightedObj && highlightedObj !== obj) {
-          if (highlightedObj.userData.type === 'flight') {
-            highlightedObj.material = planeIconMat;
-          }
-          highlightRing.visible = false;
-        }
-        highlightedObj = obj;
-        if (ud.type === 'sat') {
-          // Show electric blue ring around satellite
-          highlightRing.position.copy(obj.position);
-          highlightRing.lookAt(camera.position);
-          highlightRing.visible = true;
-        } else if (ud.type === 'flight') {
-          // Turn plane electric blue
-          obj.material = new THREE.MeshBasicMaterial({
-            color: 0x88eeff, transparent: true, opacity: 0.95,
-            blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
-          });
-        }
-      }
-    } else {
-      if (!touchHoverActive) tip.style.display = 'none';
-    }
-  } else {
-    if (!touchHoverActive) tip.style.display = 'none';
-  }
-
-  // ── Highlight management ──
-  // Use the same intersect result from above — no need to raycast twice
-  // The `intersects` variable is scoped inside the if-block above,
-  // so we track the selected object via highlightedObj.
-  // Restore previous highlight if we lost the hover
-  if (highlightedObj) {
-    let stillSelected = false;
-    // Check if the tooltip is still showing (object still hovered/tapped)
-    if (tip.style.display === 'block') {
-      stillSelected = true;
-    }
-    if (!stillSelected) {
-      if (highlightedObj.userData.type === 'flight') {
-        highlightedObj.material = planeIconMat;
-      }
-      highlightRing.visible = false;
-      highlightedObj = null;
-    }
-  }
-
-  // Keep ring facing camera and at satellite position if active
-  if (highlightRing.visible && highlightedObj) {
-    highlightRing.position.copy(highlightedObj.position);
-    highlightRing.lookAt(camera.position);
+  // The hover result is recomputed on pointer movement, not per frame. v2
+  // re-raycast ~1600 objects and rewrote ~30 DOM nodes on every single frame,
+  // whether or not anything had moved. But a dead-reckoned aircraft slides
+  // out from under a stationary cursor, so re-resolve on a timer instead.
+  if (window._pointer?.inside && nowMs - lastHoverCheck > 120) {
+    lastHoverCheck = nowMs;
+    const hit = window._resolveAt(window._pointer.x, window._pointer.y);
+    selection.hover(hit?.kind || null, hit?.id || null);
+    window._positionTooltip(hit, window._pointer.clientX, window._pointer.clientY);
   }
 
   renderer.render(scene, camera);
+  sampleRenderHealth(nowMs);
+}
+let lastHoverCheck = 0;
+
+/**
+ * Render health.
+ *
+ * A stalled renderer and a quiet situation look exactly the same on screen —
+ * both are a still picture. Every data source on this page is monitored for
+ * staleness; the renderer that draws them has to be too, or the one failure
+ * that hides all the others goes unreported.
+ */
+let _frames = 0, _fpsWindow = 0, _fps = 0, _worstFrame = 0, _lastFrameAt = 0;
+
+// A backgrounded tab is not a renderer failure. Browsers suspend
+// requestAnimationFrame when the document is hidden, so sampling across a
+// hide/show boundary reports 0 fps and would raise a false SOURCE FAILURE the
+// moment the operator switched tabs. Discard the window instead.
+document.addEventListener('visibilitychange', () => {
+  _frames = 0; _fpsWindow = 0; _lastFrameAt = 0; _worstFrame = 0;
+  const f = feeds.feeds.get('render');
+  if (f) { f.state = document.hidden ? FEED_STATE.OFF : FEED_STATE.LOADING; }
+});
+
+function sampleRenderHealth(nowMs) {
+  if (document.hidden) { _fpsWindow = 0; _lastFrameAt = 0; return; }
+  if (_lastFrameAt) _worstFrame = Math.max(_worstFrame, nowMs - _lastFrameAt);
+  _lastFrameAt = nowMs;
+  _frames++;
+  if (!_fpsWindow) { _fpsWindow = nowMs; _frames = 0; return; }
+  const dt = nowMs - _fpsWindow;
+  if (dt < 1000) return;
+  _fps = Math.round((_frames * 1000) / dt);
+  _frames = 0; _fpsWindow = nowMs;
+  window.INTEL && (window.INTEL.fps = _fps, window.INTEL.worstFrameMs = Math.round(_worstFrame));
+
+  const f = feeds.feeds.get('render');
+  if (!f) return;
+  f.count = _fps;
+  f.lastSuccess = nowMs;
+  // Below 20 fps interaction stops feeling connected to input; below 10 the
+  // picture is effectively a slideshow and should be called out as degraded.
+  f.state = _fps >= 30 ? FEED_STATE.LIVE
+          : _fps >= 20 ? FEED_STATE.STALE
+          : _fps >= 8  ? FEED_STATE.DEGRADED
+          : FEED_STATE.FAILED;
+  _worstFrame = 0;
+}
+let lastCountSync = 0;
+let lastAircraftCount = -1;
+
+/**
+ * Selection reticle.
+ *
+ * A ring drawn around whatever is selected, sized in screen space so it is
+ * the same visual weight at every zoom. This is the answer to "I searched for
+ * an aircraft and the camera flew somewhere — which one is it?" Without a
+ * persistent marker, a fly-to lands you in a field of identical glyphs.
+ */
+function updateSelectionReticle(viewportH) {
+  const sel = selection.selected;
+  if (!sel) { highlightRing.visible = false; return; }
+
+  let pos = null;
+  if (sel.kind === 'aircraft') pos = aircraftLayer?.getTrack(sel.id)?.pos;
+  else if (sel.kind === 'satellite') { const s = orbitalLayer?.getSat(sel.id); pos = s?.valid ? s.pos : null; }
+  else {
+    const e = registry.get(sel.kind, sel.id);
+    if (e && e.lat != null) pos = latLngTo3D(e.lat, e.lng, EARTH_RADIUS + 0.06);
+  }
+  if (!pos) { highlightRing.visible = false; return; }
+
+  highlightRing.position.copy(pos);
+  highlightRing.lookAt(camera.position);
+  const sc = screenScale(pos, camera, 26, viewportH, 18, 60) / 0.08;
+  highlightRing.scale.setScalar(sc);
+  highlightRing.visible = true;
+  // Slow rotation so the reticle reads as an active lock rather than a static
+  // decoration — it should be findable in peripheral vision.
+  highlightRing.rotateZ(0.012);
+}
+
+/** Camera lock-follow for a tracked entity. */
+function updateCameraTracking() {
+  if (!selection.tracking || !selection.selected) return;
+  const sel = selection.selected;
+  let pos = null;
+  if (sel.kind === 'aircraft') pos = aircraftLayer?.getTrack(sel.id)?.pos;
+  else if (sel.kind === 'satellite') { const s = orbitalLayer?.getSat(sel.id); pos = s?.valid ? s.pos : null; }
+  else {
+    const e = registry.get(sel.kind, sel.id);
+    if (e && e.lat != null) pos = latLngTo3D(e.lat, e.lng, EARTH_RADIUS);
+  }
+  if (!pos) return;
+  // Hold the current standoff distance and swing the camera to keep the
+  // entity centred. Damped so a fast-moving LEO satellite does not whip the
+  // view around faster than the eye can follow.
+  const dist = camera.position.length();
+  const want = pos.clone().normalize().multiplyScalar(dist);
+  camera.position.lerp(want, 0.045);
+  controls.target.set(0, 0, 0);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  MISSION UI
+// ═══════════════════════════════════════════════════════════════════
+
+function initMissionUI() {
+  const toggle = (key) => () => {
+    const cb = document.getElementById('layer-' + key);
+    if (!cb) return;
+    cb.checked = !cb.checked;
+    window.setLayer(key, cb.checked);
+    missionUI.toast((key.toUpperCase()) + ' ' + (cb.checked ? 'ON' : 'OFF'));
+  };
+
+  const commands = [
+    { id:'legend',  group:'View',   keys:['L'], label:'Symbology legend',
+      keywords:'legend key colours colors symbology', run:() => missionUI.toggleLegend() },
+    { id:'health',  group:'View',   keys:['H'], label:'Source integrity panel',
+      keywords:'health feeds status staleness provenance',
+      run:() => missionUI.toggleHealth() },
+    { id:'keys',    group:'View',   keys:['?'], label:'Keyboard reference',
+      keywords:'help keys shortcuts', run:() => missionUI.toggleKeymap() },
+    { id:'reset',   group:'View',   keys:['R'], label:'Reset camera to global view',
+      keywords:'reset home zoom out', run:() => {
+        selection.setTracking(false);
+        flyCameraTo(new THREE.Vector3(-4.5, 2.8, 9));
+      }},
+    { id:'rotate',  group:'View',   keys:['Space'], label:'Toggle auto-rotate',
+      keywords:'spin rotate idle', run:() => {
+        const cb = document.getElementById('toggle-autorotate');
+        cb.checked = !cb.checked; cb.dispatchEvent(new Event('change'));
+      }},
+
+    { id:'t-air',   group:'Layers', keys:['1'], label:'Toggle aircraft',   run: toggle('flights') },
+    { id:'t-sat',   group:'Layers', keys:['2'], label:'Toggle satellites', run: toggle('satellites') },
+    { id:'t-quake', group:'Layers', keys:['3'], label:'Toggle earthquakes',run: toggle('earthquakes') },
+    { id:'t-wx',    group:'Layers', keys:['4'], label:'Toggle weather',    run: toggle('weather') },
+    { id:'t-hot',   group:'Layers', keys:['5'], label:'Toggle hotspots',   run: toggle('hotspots') },
+    { id:'t-city',  group:'Layers', keys:['6'], label:'Toggle cities',     run: toggle('cities') },
+    { id:'t-bord',  group:'Layers', keys:['7'], label:'Toggle borders',    run: toggle('borders') },
+    { id:'t-shell', group:'Layers', keys:['8'], label:'Toggle orbital shell rings',
+      keywords:'shells leo meo geo rings', run:() => {
+        if (!orbitalLayer) return;
+        orbitalLayer.setShowShells(!orbitalLayer.showShells);
+        missionUI.toast('Orbital shells ' + (orbitalLayer.showShells ? 'ON' : 'OFF'));
+      }},
+    { id:'t-paths', group:'Layers', keys:['9'], label:'Toggle orbit paths',
+      keywords:'orbit tracks paths', run:() => {
+        const cb = document.getElementById('orbit-paths');
+        cb.checked = !cb.checked; cb.dispatchEvent(new Event('change'));
+        missionUI.toast('Orbit paths ' + (cb.checked ? 'ON' : 'OFF'));
+      }},
+
+    { id:'track',   group:'Selection', keys:['T'], label:'Lock camera to selection',
+      keywords:'follow track lock', run:() => {
+        if (!selection.selected) { missionUI.toast('Nothing selected', 'warn'); return; }
+        selection.setTracking(!selection.tracking);
+        missionUI.renderDossier();
+        missionUI.toast(selection.tracking ? 'Camera locked to selection' : 'Camera unlocked');
+      }},
+    { id:'copy',    group:'Selection', keys:['C'], label:'Copy selection coordinates',
+      keywords:'copy coordinates clipboard', run:() => {
+        const sel = selection.selected;
+        const e = sel && registry.get(sel.kind, sel.id);
+        if (!e || e.lat == null) { missionUI.toast('Nothing selected', 'warn'); return; }
+        const txt = e.lat.toFixed(5) + ', ' + e.lng.toFixed(5);
+        navigator.clipboard?.writeText(txt)
+          .then(() => missionUI.toast('Copied  ' + txt))
+          .catch(() => missionUI.toast('Clipboard unavailable', 'warn'));
+      }},
+    { id:'clear',   group:'Selection', keys:['Esc'], label:'Clear selection',
+      run:() => selection.clear() },
+
+    { id:'refresh', group:'Data',  keys:['F5'], label:'Force refresh all sources',
+      keywords:'refresh reload poll fetch', run:() => {
+        aircraftLayer?.fetch();
+        orbitalLayer?.fetch().then(syncSatelliteCounts);
+        fetchEarthquakes(); fetchWeatherAlerts(); fetchStormAlerts();
+        missionUI.toast('Refreshing all sources…');
+      }},
+  ];
+
+  // Region presets belong in the palette too — a preset the operator can only
+  // reach by locating a button in a side panel is a preset they will not use
+  // under time pressure.
+  document.querySelectorAll('.region-btn').forEach(btn => {
+    commands.push({
+      id: 'region-' + btn.dataset.name,
+      group: 'Regions',
+      label: 'Fly to ' + btn.dataset.name,
+      sub: btn.querySelector('.rb-coords')?.textContent || '',
+      keywords: 'region preset goto fly ' + btn.dataset.name,
+      run: () => { selection.setTracking(false); btn.click(); },
+    });
+  });
+
+  missionUI = new MissionUI({
+    commands,
+    onNavigate: (entity) => flyToEntity(entity),
+  });
+  window.missionUI = missionUI;
+
+  // Inspection handle. Everything an operator can see should be reachable
+  // from the console for diagnosis — when a picture looks wrong at 03:00,
+  // "is the feed stale or is the renderer stuck?" has to be answerable in
+  // one line.
+  window.INTEL = {
+    feeds, registry, selection, missionUI,
+    get aircraft() { return aircraftLayer; },
+    get orbital() { return orbitalLayer; },
+    get scene() { return scene; },
+    get camera() { return camera; },
+  };
+
+  document.getElementById('search-trigger')
+    .addEventListener('click', () => missionUI.openPalette());
+
+  // Escalate a source failure into the operator's face once, rather than
+  // relying on them noticing a colour change in a corner panel.
+  let lastPosture = null;
+  feeds.on(() => {
+    const w = feeds.worst();
+    if (w === lastPosture) return;
+    if (w === 'FAILED' && lastPosture) {
+      const bad = [...feeds.feeds.values()].filter(f => f.state === 'FAILED').map(f => f.label);
+      missionUI.toast('SOURCE FAILURE — ' + bad.join(', '), 'bad', 8000);
+    } else if (w === 'STALE' && lastPosture === 'LIVE') {
+      missionUI.toast('Data going stale — check source integrity (H)', 'warn', 6000);
+    }
+    lastPosture = w;
+  });
+}
+
+/**
+ * Fly to an entity and frame it at a sensible standoff.
+ *
+ * The old flyCameraTo took a raw camera position, so every caller had to work
+ * out its own framing distance — and search results, which can be anything
+ * from a 300-metre-wide earthquake epicentre to a GEO satellite 36 000 km up,
+ * have no single correct distance.
+ */
+function flyToEntity(entity) {
+  if (!entity || entity.lat == null) return;
+  let standoff = 2.2;
+  if (entity.kind === 'aircraft') standoff = 1.55;
+  else if (entity.kind === 'satellite') {
+    const s = orbitalLayer?.getSat(entity.id);
+    const r = s?.pos?.length() || EARTH_RADIUS + 1;
+    standoff = Math.max(1.7, (r / EARTH_RADIUS) * 1.5);
+  } else if (entity.kind === 'quake' || entity.kind === 'weather') standoff = 1.9;
+
+  const target = latLngTo3D(entity.lat, entity.lng, EARTH_RADIUS)
+    .multiplyScalar(standoff);
+  flyCameraTo(target);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  EXTENDED LAYERS  (fires · ships · timeline)
+// ═══════════════════════════════════════════════════════════════════
+
+/**
+ * These three modules shipped in v2 but none of them actually worked:
+ *
+ *   · fires-layer.js was constructed with { scene, globeRadius } while the
+ *     module reads this.config.globe.scene and this.config.globe.radius.
+ *     this.config.globe was null, so the fire group was never added to the
+ *     scene. 514 lines of dead code, and a globeRadius of 100 against an
+ *     actual radius of 5 would have put every fire 20 Earth-radii out even if
+ *     it had been added.
+ *   · ships-layer.js (794 lines) was never referenced by the page at all.
+ *   · timeline-engine.js rendered a scrubber, animated a playhead and
+ *     displayed "LIVE" — with zero data sources registered. Scrubbing it
+ *     replayed nothing. A control that presents itself as functional and is
+ *     not is the single most dangerous thing in a tool like this, because an
+ *     operator will believe what it tells them.
+ */
+function initExtendedLayers() {
+  // fires-layer.js and ships-layer.js are classic scripts that reference a
+  // GLOBAL `THREE`, guarding every geometry call with
+  // `typeof THREE === 'undefined'`. This page imports three as an ES module,
+  // so no such global exists and both layers silently no-opped: their groups
+  // were never even constructed, which is why FiresLayer could report 5 000
+  // fetched fire detections and zero meshes at the same time.
+  window.THREE = THREE;
+  window.__globeScene = scene;   // the fallback handle both modules look for
+
+  // Both layers were written against globe.gl, whose sphere has radius 100 and
+  // which exposes getCoords(lat, lng, alt) with alt as a FRACTION of radius.
+  // This scene is plain three.js at radius 5. Supplying the adapter is what
+  // makes them work here; without it they fall through to their internal
+  // radius-100 fallback and place everything twenty Earth-radii out in space.
+  const globeHandle = {
+    scene, camera, controls, radius: EARTH_RADIUS,
+    // Returns a real Vector3, not a plain {x,y,z}. globe.gl hands back a bare
+    // object and fires-layer.js only reads the components, but
+    // ships-layer.js:422 calls pos.clone() — with a plain object that throws
+    // and kills the whole vessel ingest.
+    getCoords: (lat, lng, alt = 0.01) =>
+      latLngTo3D(lat, lng, EARTH_RADIUS * (1 + alt)),
+  };
+  // Marker geometry is authored for radius 100; rescale by the radius ratio.
+  const SCALE_TO_SCENE = EARTH_RADIUS / 100;
+
+  if (typeof FiresLayer !== 'undefined') {
+    try {
+      feeds.register('fires', {
+        label: 'Thermal Anomalies', cadenceMs: 30 * 60 * 1000,
+        source: 'NASA FIRMS · VIIRS active fire detections',
+      });
+      const fires = new FiresLayer({
+        globe: globeHandle,
+        apiBase: '../../api',
+        dotScale: 0.5 * SCALE_TO_SCENE,
+        maxDots: 1500,
+      });
+      fires.init?.();
+      window.firesLayer = fires;
+      // enable() is what actually adds the group to the scene — init() only
+      // builds it. v2 called init() alone, which is a second, independent
+      // reason nothing ever appeared.
+      fires.enable?.();
+      // The layer builds its own checkbox, defaulted to unchecked. Enabling
+      // the layer programmatically without ticking it reproduces exactly the
+      // defect this rebuild exists to remove: a control asserting a state the
+      // scene does not have.
+      const fireCb = document.getElementById('lt-fires');
+      if (fireCb) fireCb.checked = true;
+      trackExternalFeed('fires', () => fires.fires?.length || 0);
+    } catch (e) { console.warn('[fires] init failed:', e); feeds.failure('fires', e); }
+  }
+
+  if (typeof ShipsLayer !== 'undefined') {
+    try {
+      // Off by default, and deliberately so. The upstream endpoint currently
+      // answers with {"source":"synthetic-fallback"} — machine-generated
+      // vessels with placeholder MMSIs ("SIM100000") and names ("Vessel
+      // cfcd20"). Simulated tracks are legitimate for a demo; presenting them
+      // beside real ADS-B and real USGS data without saying so is not. The
+      // layer is wired and available, and it labels its own provenance.
+      feeds.register('ships', {
+        label: 'Maritime', cadenceMs: 5 * 60 * 1000,
+        source: 'Maritime AIS — verify provenance before use',
+      });
+      feeds.off('ships');
+      const ships = new ShipsLayer({
+        globe: globeHandle,
+        apiBase: '../../api',
+        dotScale: 0.5 * SCALE_TO_SCENE,
+      });
+      ships.init?.();
+      window.shipsLayer = ships;
+      // The layer owns its own checkbox and calls enable() directly, so hook
+      // the checkbox rather than replacing it — whichever way the operator
+      // turns this on, the provenance check runs and the SIMULATED label is
+      // applied before they can mistake it for live AIS.
+      document.getElementById('lt-ships')?.addEventListener('change', (e) => {
+        if (e.target.checked) verifyMaritimeProvenance();
+        else feeds.off('ships');
+      });
+    } catch (e) { console.warn('[ships] init failed:', e); }
+  }
+
+  if (typeof TimelineEngine !== 'undefined') {
+    try {
+      const tl = new TimelineEngine({ globe: globeHandle });
+      window.timelineEngine = tl;
+
+      // Register real sources. Without these the scrubber has nothing to
+      // replay, which is the state v2 shipped in.
+      tl.registerDataSource?.('aircraft', async () =>
+        aircraftLayer ? [...aircraftLayer.tracks.values()].map(t => ({
+          id: t.id, callsign: t.callsign, lat: t.obsLat, lng: t.obsLng,
+          alt: t.alt, velocity: t.velocity, track: t.track,
+        })) : []);
+      tl.registerDataSource?.('earthquakes', async () => earthquakeData.slice());
+      tl.registerDataSource?.('weather', async () => weatherAlertData.slice());
+      tl.registerDataSource?.('storms', async () => stormAlertData.slice());
+
+      tl.startCapture?.();
+      markTimelineHonestly(tl);
+    } catch (e) { console.warn('[timeline] init failed:', e); }
+  }
+}
+
+/**
+ * Poll a third-party layer that owns its own fetch loop and mirror its state
+ * into the shared feed monitor, so it appears in Source Integrity alongside
+ * everything else. A layer that reports its health only to its own console is
+ * a blind spot.
+ */
+function trackExternalFeed(key, getCount) {
+  let last = -1;
+  setInterval(() => {
+    const n = getCount();
+    if (n > 0 && n !== last) { last = n; feeds.success(key, n); }
+    else if (n === 0 && last === -1 && feeds.ageOf(key) == null) {
+      // Still empty well past first paint — the fetch is not landing.
+      feeds.failure(key, new Error('no data returned'));
+    }
+  }, 5000);
+}
+
+/**
+ * Read the maritime feed's own provenance field and reflect it honestly.
+ * If upstream says the data is synthetic, the panel says SIMULATED — it never
+ * says LIVE.
+ */
+async function verifyMaritimeProvenance() {
+  try {
+    const res = await fetch('../../api/extended-feeds.php?source=ships');
+    const d = await res.json();
+    const f = feeds.feeds.get('ships');
+    if (!f) return;
+    const synthetic = /synth|fallback|sim/i.test(d.source || '');
+    f.count = d.count || 0;
+    f.lastSuccess = Date.now();
+    if (synthetic) {
+      // Pinned, not merely set: the freshness tick would otherwise promote
+      // this back to LIVE within a second and erase the warning.
+      feeds.pin('ships', FEED_STATE.DEGRADED,
+        'SIMULATED — upstream reports "' + d.source + '", not live AIS');
+    } else {
+      feeds.unpin('ships');
+      feeds.success('ships', d.count || 0);
+      f.source = 'AIS · ' + d.source;
+    }
+    missionUI?.renderHealth();
+    if (synthetic) {
+      missionUI?.toast('Maritime layer is SIMULATED data, not live AIS', 'warn', 7000);
+    }
+  } catch (e) { feeds.failure('ships', e); }
+}
+
+/**
+ * The scrubber can only replay history it has actually captured, and capture
+ * starts when the page loads. Until enough snapshots exist, the control must
+ * say so rather than presenting an empty 24-hour track as if it were
+ * scrubbable history.
+ */
+function markTimelineHonestly(tl) {
+  const bar = document.getElementById('timeline-bar') ||
+              document.querySelector('.timeline-bar, #timeline-scrubber');
+  if (!bar) return;
+
+  // Mount the note INSIDE the bar.
+  //
+  // Do not touch the position of any ancestor. Every panel on this page is
+  // absolutely positioned, so <body> computes to zero height; promoting body
+  // to position:relative re-parents every `bottom: 0` element to a 0px-tall
+  // containing block and throws the timeline bar and the ticker clean off the
+  // top of the screen.
+  let note = document.getElementById('tl-capture-note');
+  if (!note) {
+    note = document.createElement('div');
+    note.id = 'tl-capture-note';
+    note.style.cssText =
+      'font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.7px;' +
+      'white-space:nowrap;pointer-events:none;margin-left:auto;padding-left:14px;' +
+      'flex-shrink:0;opacity:0.9;';
+    bar.appendChild(note);
+  }
+
+  const tick = () => {
+    const n = tl.snapshots?.length || 0;
+    note.textContent = n < 2
+      ? 'CAPTURING — no replayable history yet (snapshots build from page load)'
+      : `${n} snapshot${n === 1 ? '' : 's'} captured · ${formatAge(n * (tl.config?.snapshotIntervalMs || 300000))} of replayable history`;
+    note.style.color = n < 2 ? '#ffc95c' : '#5d6a7a';
+  };
+  tick();
+  setInterval(tick, 15000);
 }
 
 init();
 initCameraModal();
 </script>
 
-<!-- Timeline Scrubber + Fires Layer Modules -->
-<script src="timeline-engine.js"></script>
-<script src="fires-layer.js"></script>
-<script>
-  // Initialize extended layers after main globe loads
-  let timelineEngine, firesLayer;
-  
-  // Wait for globe to be ready
-  setTimeout(() => {
-    if (typeof TimelineEngine !== 'undefined') {
-      timelineEngine = new TimelineEngine();
-      timelineEngine.startCapture();
-    }
-    if (typeof FiresLayer !== 'undefined') {
-      firesLayer = new FiresLayer({
-        scene: window._globeScene,
-        globeRadius: 100,
-        apiBase: '../../api'
-      });
-      firesLayer.init();
-    }
-  }, 3000); // Wait 3s for globe to initialize first
-</script>
+
 </body>
 </html>

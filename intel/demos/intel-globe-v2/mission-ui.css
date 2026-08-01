@@ -1,0 +1,570 @@
+/* mission-ui.css — operator surface
+   Extends the existing v2 visual language (JetBrains Mono, #C4D600, #06070a)
+   rather than replacing it. */
+
+:root {
+  --ink:        #06070a;
+  --ink-2:      #0b0e14;
+  --line:       rgba(196,214,0,0.10);
+  --line-2:     rgba(255,255,255,0.06);
+  --accent:     #C4D600;
+  --sel:        #88eeff;
+  --txt:        #e8eaed;
+  --txt-2:      #8a97a8;
+  --txt-3:      #5d6a7a;
+  --ok:         #6fd88f;
+  --warn:       #ffc95c;
+  --bad:        #ff8a3d;
+  --crit:       #ff2b3d;
+  --mono:       'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   COMMAND PALETTE
+   ══════════════════════════════════════════════════════════════ */
+
+#cmd-palette {
+  position: fixed; inset: 0; z-index: 400;
+  display: none; justify-content: center; align-items: flex-start;
+  padding-top: 12vh;
+  background: rgba(3,4,7,0.72);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+#cmd-palette.open { display: flex; }
+
+.cp-shell {
+  width: min(760px, calc(100vw - 32px));
+  background: rgba(9,11,16,0.97);
+  border: 1px solid rgba(196,214,0,0.22);
+  border-radius: 14px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,0,0,0.6);
+  overflow: hidden;
+  animation: cpIn 0.13s ease-out;
+}
+@keyframes cpIn { from { opacity: 0; transform: translateY(-8px) scale(0.985); } }
+
+.cp-input-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.cp-prompt { color: var(--accent); font-family: var(--mono); font-size: 17px; line-height: 1; }
+#cp-input {
+  flex: 1; background: none; border: none; outline: none;
+  color: var(--txt); font-family: var(--mono); font-size: 15px; letter-spacing: 0.3px;
+}
+#cp-input::placeholder { color: var(--txt-3); }
+.cp-esc {
+  font-family: var(--mono); font-size: 9.5px; color: var(--txt-3);
+  border: 1px solid var(--line-2); border-radius: 4px; padding: 2px 6px;
+}
+
+.cp-results { max-height: min(52vh, 440px); overflow-y: auto; scrollbar-width: thin; }
+.cp-results::-webkit-scrollbar { width: 5px; }
+.cp-results::-webkit-scrollbar-thumb { background: #1e2836; border-radius: 3px; }
+
+.cp-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 16px; cursor: pointer;
+  border-left: 2px solid transparent;
+  font-family: var(--mono); font-size: 12.5px;
+}
+.cp-row.active { background: rgba(196,214,0,0.07); border-left-color: var(--accent); }
+.cp-icon { width: 14px; text-align: center; flex-shrink: 0; font-size: 12px; }
+.cp-label { color: var(--txt); font-weight: 500; flex-shrink: 0; }
+.cp-sub { color: var(--txt-3); font-size: 11px; flex: 1; overflow: hidden;
+          text-overflow: ellipsis; white-space: nowrap; }
+.cp-coord { color: var(--txt-2); font-size: 10.5px; flex-shrink: 0; }
+.cp-keys { display: flex; gap: 3px; flex-shrink: 0; }
+.cp-empty { padding: 22px 16px; color: var(--txt-3); font-size: 12px; font-family: var(--mono); line-height: 1.6; }
+
+.cp-foot {
+  display: flex; gap: 16px; align-items: center;
+  padding: 8px 16px; border-top: 1px solid var(--line-2);
+  font-family: var(--mono); font-size: 10px; color: var(--txt-3);
+}
+.cp-foot-right { margin-left: auto; color: var(--txt-2); }
+
+kbd {
+  font-family: var(--mono); font-size: 9.5px; color: var(--txt-2);
+  background: rgba(255,255,255,0.05); border: 1px solid var(--line-2);
+  border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px;
+  display: inline-block; line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DOSSIER
+   ══════════════════════════════════════════════════════════════ */
+
+#dossier {
+  position: fixed; top: 72px; right: 16px; z-index: 60;
+  width: 330px; max-height: calc(100vh - 190px);
+  overflow-y: auto; scrollbar-width: thin;
+  padding: 14px 16px 12px;
+  display: none;
+  animation: dsIn 0.16s ease-out;
+}
+#dossier.open { display: block; }
+@keyframes dsIn { from { opacity: 0; transform: translateX(12px); } }
+#dossier::-webkit-scrollbar { width: 4px; }
+#dossier::-webkit-scrollbar-thumb { background: #1a2233; border-radius: 2px; }
+
+.ds-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.ds-kind { font-family: var(--mono); font-size: 9.5px; letter-spacing: 1.6px; color: var(--accent); }
+.ds-actions { display: flex; gap: 6px; }
+.ds-btn {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 1px;
+  color: var(--txt-2); background: rgba(255,255,255,0.04);
+  border: 1px solid var(--line-2); border-radius: 5px;
+  padding: 3px 8px; cursor: pointer; transition: all 0.14s;
+}
+.ds-btn:hover { color: var(--txt); border-color: rgba(196,214,0,0.3); }
+.ds-btn.on { color: var(--ink); background: var(--sel); border-color: var(--sel); font-weight: 600; }
+.ds-x { padding: 3px 7px; }
+
+.ds-title {
+  font-family: var(--mono); font-size: 17px; font-weight: 600;
+  color: var(--txt); letter-spacing: 0.4px; line-height: 1.25;
+  word-break: break-word;
+}
+.ds-sub { font-family: var(--mono); font-size: 10.5px; color: var(--txt-3); margin-top: 2px; }
+
+/* ── Operator identity: logo + airline, above the data ───────────── */
+
+.ds-ident {
+  display: none;
+  align-items: center; gap: 11px;
+  margin-top: 10px; padding: 9px 11px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+}
+.ds-ident.shown { display: flex; }
+
+.ds-logo-slot {
+  width: 92px; min-height: 38px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Most carrier logos are dark-on-transparent or dark-on-white PNGs. On a
+   near-black panel they would read as a smudge, so give them a light plate
+   rather than inverting — inverting wrecks brand colour. */
+.ds-logo {
+  max-width: 92px; max-height: 38px;
+  width: auto; height: auto;
+  object-fit: contain; display: block;
+  background: #eef1f4; border-radius: 5px;
+  padding: 5px 6px;
+}
+/* Fallback shown until (or unless) a logo resolves. */
+.ds-logo-chip {
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  color: #06070a; letter-spacing: 0.5px;
+  padding: 4px 8px; border-radius: 4px; white-space: nowrap;
+}
+.ds-operator { min-width: 0; }
+.ds-op-name {
+  font-family: var(--mono); font-size: 11.5px; color: var(--txt);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ds-op-reg { font-family: var(--mono); font-size: 9.5px; color: var(--txt-3); margin-top: 1px; }
+
+.ds-extrap, .ds-note, .ds-warn {
+  margin-top: 10px; padding: 8px 10px; border-radius: 7px;
+  font-size: 10.5px; line-height: 1.5; font-family: var(--mono);
+}
+.ds-extrap {
+  background: rgba(255,201,92,0.09); border: 1px solid rgba(255,201,92,0.3);
+  color: #ffe0a0;
+}
+.ds-extrap-dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--warn); margin-right: 6px; vertical-align: middle;
+  animation: pulseDot 1.4s ease-in-out infinite;
+}
+@keyframes pulseDot { 50% { opacity: 0.25; } }
+.ds-warn {
+  background: rgba(255,43,61,0.10); border: 1px solid rgba(255,43,61,0.35);
+  color: #ffb3bb; font-weight: 500;
+}
+.ds-note {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--line-2);
+  color: var(--txt-2);
+}
+.ds-note b { color: var(--txt); font-weight: 600; }
+
+.ds-body { margin-top: 10px; }
+.ds-div {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 1.6px;
+  color: var(--txt-3); text-transform: uppercase;
+  margin: 12px 0 5px; padding-bottom: 4px;
+  border-bottom: 1px solid var(--line-2);
+}
+.ds-div:first-child { margin-top: 4px; }
+.ds-row {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 3.5px 0; font-family: var(--mono); font-size: 11.5px;
+  align-items: baseline;
+}
+.ds-k { color: var(--txt-3); flex-shrink: 0; }
+.ds-v { color: var(--txt); text-align: right; word-break: break-word; }
+.ds-tle {
+  font-size: 8.6px; color: var(--txt-2); line-height: 1.45;
+  display: block; text-align: left; margin-top: 2px;
+  word-break: break-all; letter-spacing: -0.2px;
+}
+
+.ds-prov {
+  margin-top: 12px; padding-top: 9px; border-top: 1px solid var(--line-2);
+  font-family: var(--mono); font-size: 9.5px; line-height: 1.6;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.ds-prov-state { font-weight: 600; letter-spacing: 1px; }
+.ds-prov-src { color: var(--txt-2); }
+.ds-prov-age { color: var(--txt-3); }
+.ds-LIVE { color: var(--ok); } .ds-STALE { color: var(--warn); }
+.ds-DEGRADED { color: var(--bad); } .ds-FAILED { color: var(--crit); }
+.ds-LOADING, .ds-OFF { color: var(--txt-3); }
+
+/* ══════════════════════════════════════════════════════════════
+   TOOLTIP OPERATOR LOGO
+   ══════════════════════════════════════════════════════════════
+   Sits between the callsign header and the data rows, so identity reads
+   before the numbers. Hidden by default and only revealed once an image has
+   actually decoded — a reserved-but-empty strip would push the data down and
+   jitter the tooltip on every hover. */
+
+#tip-logo-wrap {
+  display: none;
+  margin: 3px 0 8px;
+  padding: 6px 9px;
+  background: #eef1f4;
+  border-radius: 6px;
+  width: fit-content;
+}
+#tip-logo-wrap.shown { display: block; }
+#tip-logo {
+  display: block;
+  max-width: 132px; max-height: 36px;
+  width: auto; height: auto; object-fit: contain;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FEED HEALTH
+   ══════════════════════════════════════════════════════════════ */
+
+/* Popover anchored under the top-bar posture chip.
+   The chip is the always-visible summary; this is its detail. Making it a
+   popover rather than a permanent panel means source integrity costs no
+   screen real estate and cannot collide with the alerts feed — while the
+   chip itself still escalates colour, and a failure still fires a toast, so
+   nothing depends on the operator having this open. */
+#feed-health {
+  position: fixed; z-index: 120;
+  width: 288px; padding: 10px 12px 8px;
+  display: none;
+  animation: fhIn 0.13s ease-out;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+}
+#feed-health.open { display: block; }
+@keyframes fhIn { from { opacity: 0; transform: translateY(-6px); } }
+
+#posture-mini { cursor: pointer; }
+#posture-mini:hover { filter: brightness(1.3); }
+
+.fh-head { display: flex; justify-content: space-between; align-items: baseline;
+           margin-bottom: 7px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.fh-title { font-family: var(--mono); font-size: 9.5px; letter-spacing: 1.5px;
+            color: var(--accent); text-transform: uppercase; }
+.fh-posture { font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.8px; font-weight: 600; }
+
+.fh-row {
+  display: flex; align-items: center; gap: 7px;
+  padding: 3px 0; font-family: var(--mono); font-size: 10px;
+}
+.fh-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--txt-3); }
+.fh-label { color: var(--txt-2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fh-count { color: var(--txt); font-variant-numeric: tabular-nums; min-width: 30px; text-align: right; }
+.fh-age { color: var(--txt-3); min-width: 44px; text-align: right; font-size: 9px; }
+.fh-state { font-size: 8px; letter-spacing: 0.6px; min-width: 52px; text-align: right; font-weight: 600; }
+
+.fh-LIVE .fh-dot { background: var(--ok); box-shadow: 0 0 5px var(--ok); }
+.fh-LIVE .fh-state { color: var(--ok); }
+.fh-LOADING .fh-dot { background: var(--txt-3); animation: pulseDot 1s infinite; }
+.fh-LOADING .fh-state { color: var(--txt-3); }
+.fh-STALE .fh-dot { background: var(--warn); box-shadow: 0 0 5px var(--warn); }
+.fh-STALE .fh-state { color: var(--warn); }
+.fh-DEGRADED .fh-dot { background: var(--bad); box-shadow: 0 0 5px var(--bad); }
+.fh-DEGRADED .fh-state { color: var(--bad); }
+/* A failed source must be impossible to overlook. */
+.fh-FAILED .fh-dot { background: var(--crit); box-shadow: 0 0 8px var(--crit); animation: pulseDot 0.85s infinite; }
+.fh-FAILED .fh-state { color: var(--crit); }
+.fh-FAILED .fh-label { color: #ffb3bb; }
+.fh-OFF { opacity: 0.42; }
+
+span.fh-posture.fh-LIVE { color: var(--ok); }
+span.fh-posture.fh-STALE { color: var(--warn); }
+span.fh-posture.fh-DEGRADED { color: var(--bad); }
+span.fh-posture.fh-FAILED { color: var(--crit); animation: pulseDot 0.9s infinite; }
+span.fh-posture.fh-LOADING { color: var(--txt-3); }
+
+/* Top-bar posture mirror */
+.posture-mini {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 1px; font-weight: 600;
+  padding: 3px 8px; border-radius: 5px; white-space: nowrap;
+  border: 1px solid currentColor; opacity: 0.9;
+}
+.posture-mini.fh-LIVE { color: var(--ok); }
+.posture-mini.fh-STALE { color: var(--warn); }
+.posture-mini.fh-DEGRADED { color: var(--bad); }
+.posture-mini.fh-FAILED { color: var(--crit); animation: pulseDot 0.9s infinite; }
+.posture-mini.fh-LOADING { color: var(--txt-3); }
+
+/* ══════════════════════════════════════════════════════════════
+   LEGEND
+   ══════════════════════════════════════════════════════════════ */
+
+#legend {
+  position: fixed; right: 16px; bottom: 96px; z-index: 58;
+  width: 300px; max-height: calc(100vh - 200px); overflow-y: auto;
+  padding: 12px 14px; display: none; scrollbar-width: thin;
+}
+#legend.open { display: block; }
+#legend::-webkit-scrollbar { width: 4px; }
+#legend::-webkit-scrollbar-thumb { background: #1a2233; border-radius: 2px; }
+
+.lg-head { display: flex; justify-content: space-between; align-items: center;
+           font-family: var(--mono); font-size: 9.5px; letter-spacing: 1.6px;
+           color: var(--accent); text-transform: uppercase;
+           padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.lg-x { background: none; border: none; color: var(--txt-3); cursor: pointer;
+        font-size: 12px; padding: 0 2px; }
+.lg-x:hover { color: var(--txt); }
+
+.lg-rule {
+  margin: 9px 0; padding: 7px 9px; border-radius: 6px;
+  background: rgba(255,43,61,0.07); border: 1px solid rgba(255,43,61,0.22);
+  font-family: var(--mono); font-size: 9.8px; line-height: 1.55; color: #ffc2c8;
+}
+.lg-rule-b { background: rgba(255,255,255,0.03); border-color: var(--line-2); color: var(--txt-2); }
+
+.lg-group {
+  font-family: var(--mono); font-size: 8.8px; letter-spacing: 1.4px;
+  color: var(--txt-3); text-transform: uppercase;
+  margin: 12px 0 5px; padding-bottom: 3px; border-bottom: 1px solid var(--line-2);
+}
+.lg-row { display: flex; align-items: center; gap: 8px; padding: 2.5px 0;
+          font-family: var(--mono); font-size: 10.5px; }
+.lg-sw { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+.lg-sw-faded { background: linear-gradient(90deg, #54d6e8, #3f4a5c); }
+.lg-l { color: var(--txt); min-width: 74px; }
+.lg-n { color: var(--txt-3); font-size: 9.5px; flex: 1; }
+
+/* ══════════════════════════════════════════════════════════════
+   KEYBOARD MAP
+   ══════════════════════════════════════════════════════════════ */
+
+#keymap {
+  position: fixed; inset: 0; z-index: 420; display: none;
+  align-items: center; justify-content: center;
+  background: rgba(3,4,7,0.7); backdrop-filter: blur(5px);
+}
+#keymap.open { display: flex; }
+.km-shell { width: min(620px, calc(100vw - 32px)); padding: 16px 18px; }
+.km-head { display: flex; justify-content: space-between; align-items: center;
+           font-family: var(--mono); font-size: 10px; letter-spacing: 1.6px;
+           color: var(--accent); text-transform: uppercase;
+           padding-bottom: 9px; border-bottom: 1px solid var(--line); }
+.km-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; margin-top: 12px; }
+.km-gtitle { font-family: var(--mono); font-size: 8.8px; letter-spacing: 1.4px;
+             color: var(--txt-3); text-transform: uppercase; margin-bottom: 5px; }
+.km-row { display: flex; align-items: center; gap: 9px; padding: 2.5px 0; }
+.km-keys { display: flex; gap: 3px; min-width: 58px; }
+.km-label { font-family: var(--mono); font-size: 11px; color: var(--txt-2); }
+.km-note { margin-top: 14px; padding-top: 9px; border-top: 1px solid var(--line-2);
+           font-family: var(--mono); font-size: 9.5px; color: var(--txt-3); }
+
+/* ══════════════════════════════════════════════════════════════
+   TOASTS
+   ══════════════════════════════════════════════════════════════ */
+
+#toasts { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+          z-index: 500; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.toast {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.4px;
+  padding: 8px 14px; border-radius: 8px;
+  background: rgba(9,11,16,0.96); border: 1px solid var(--line-2);
+  color: var(--txt); opacity: 0; transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s; white-space: nowrap;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+}
+.toast.in { opacity: 1; transform: translateY(0); }
+.toast-warn { border-color: rgba(255,201,92,0.4); color: #ffe0a0; }
+.toast-bad  { border-color: rgba(255,43,61,0.45); color: #ffb3bb; }
+
+/* ══════════════════════════════════════════════════════════════
+   SEARCH AFFORDANCE IN TOP BAR
+   ══════════════════════════════════════════════════════════════ */
+
+#search-trigger {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 10px 5px 11px; border-radius: 7px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--line-2);
+  color: var(--txt-3); font-family: var(--mono); font-size: 11px;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+#search-trigger:hover { border-color: rgba(196,214,0,0.32); color: var(--txt-2); }
+#search-trigger .st-ico { color: var(--accent); }
+
+/* ══════════════════════════════════════════════════════════════
+   PANEL LAYOUT — no two panels may occupy the same pixels
+   ══════════════════════════════════════════════════════════════
+
+   Measured collisions at 1280×720 before this block:
+     · feed-health (y 483–624) sat on top of layers-panel (y 72–612),
+       burying the bottom third of the layer list including the Satellites
+       row and everything under it.
+     · legend (y 104–624) covered regions-panel (y 72–490) entirely.
+     · dossier occupies the same top-right slot as regions-panel, so opening
+       a dossier made the region presets unreachable.
+
+   Rule: the LEFT rail is a fixed stack — layers on top, source integrity
+   pinned to the bottom, layers scrolls to fit whatever is left. The RIGHT
+   rail shows exactly one context at a time: regions by default, replaced by
+   the dossier or the legend when either is active.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Left rail budget.
+   Chrome: 56px top bar + 60px timeline bar + 32px ticker.
+   The alerts feed is pinned to the bottom of the rail; the layer list takes
+   everything above it and scrolls. These two numbers must stay in sync —
+   in v2 they simply overlapped and the bottom of the layer list (Satellites
+   and every live-feed toggle below it) could not be reached at all. */
+:root { --alerts-h: 210px; --bottom-chrome: 100px; }
+
+/* Everything in this block is DESKTOP-ONLY.
+   Below 851px the page already has a complete off-canvas drawer system
+   (#layers-panel and #regions-panel slide in from the edges, #alerts-panel
+   becomes a bottom sheet). Applying desktop rail geometry there — especially
+   with !important — pins the drawers open and breaks the transforms. */
+@media (min-width: 851px) {
+  #alerts-panel {
+    bottom: var(--bottom-chrome) !important;
+    max-height: var(--alerts-h) !important;
+  }
+  #layers-panel {
+    max-height: calc(100vh - 72px - var(--alerts-h) - var(--bottom-chrome) - 16px) !important;
+    min-height: 160px;
+  }
+
+  /* Right rail: one context at a time. */
+  body.ctx-dossier #regions-panel,
+  body.ctx-legend  #regions-panel { display: none; }
+  body.ctx-dossier #legend { display: none; }
+
+  #legend, #dossier { bottom: auto; top: 72px; max-height: calc(100vh - 160px); }
+}
+
+/* Tall displays: give the alerts feed more room once the layer list fits. */
+@media (min-width: 851px) and (min-height: 1000px) {
+  :root { --alerts-h: 320px; }
+}
+
+/* Bottom chrome: the timeline bar and ticker both anchor to bottom:0 and
+   would stack on each other. Give the ticker the strip above the bar. */
+#ticker { bottom: 60px !important; }
+
+/* ══════════════════════════════════════════════════════════════
+   TOP BAR — explicit degradation order
+   ══════════════════════════════════════════════════════════════
+
+   The bar was overflowing by ~340px at 1280px wide, which pushed the UTC
+   clock entirely off screen. On a situational-awareness tool the time
+   reference is not decoration: every timestamp in every panel is relative to
+   it. It must be the last thing to go, not the first.
+
+   Priority, most protected first:
+     1. UTC clock          — never drops
+     2. Source posture     — never drops
+     3. Search             — collapses to an icon
+     4. Title              — subtitle drops, then the rule
+     5. Stat strip         — the flexible element; shrinks and scrolls
+   ══════════════════════════════════════════════════════════════ */
+
+@media (min-width: 851px) {
+
+#top-bar { gap: 14px; }
+
+#top-bar .stat-strip {
+  min-width: 0;
+  flex-shrink: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Fade the cut edge so a truncated strip reads as "there is more" rather
+     than as a hard end. */
+  mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent 100%);
+}
+#top-bar .stat-strip::-webkit-scrollbar { display: none; }
+#top-bar .stat-strip .si { flex-shrink: 0; }
+
+#top-bar .utc-clock,
+#top-bar .posture-mini,
+#top-bar #search-trigger { flex-shrink: 0; }
+
+#top-bar .title { flex-shrink: 1; min-width: 0; overflow: hidden; }
+
+}  /* end min-width: 851px */
+
+@media (min-width: 851px) and (max-width: 1500px) {
+  #top-bar .title .sub, #top-bar .title .sep { display: none; }
+}
+@media (min-width: 851px) and (max-width: 1240px) {
+  #top-bar { gap: 10px; padding: 0 12px; }
+  #top-bar .stat-strip { gap: 12px; }
+  .back-link { font-size: 0; padding: 4px 8px; }
+  .back-link::before { content: '←'; font-size: 13px; }
+}
+@media (min-width: 851px) and (max-width: 1080px) {
+  #search-trigger .st-txt { display: none; }
+  #top-bar .title { font-size: 13px; }
+}
+
+/* Mobile top bar: the existing ≤850px rules already compact this. Search
+   collapses to its icon and sits with the other controls. */
+@media (max-width: 850px) {
+  #search-trigger .st-txt, #search-trigger .st-hint { display: none; }
+  #search-trigger { padding: 4px 8px; }
+  /* The strip runs off the edge on a phone. Let it scroll, and fade the cut
+     so it reads as "more to the right" rather than as a clipped bug. */
+  #top-bar .stat-strip {
+    min-width: 0; flex-shrink: 1; overflow-x: auto;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(90deg, #000 calc(100% - 20px), transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 20px), transparent 100%);
+  }
+  #top-bar .stat-strip::-webkit-scrollbar { display: none; }
+  #top-bar .stat-strip .si { flex-shrink: 0; }
+  #top-bar .title { flex-shrink: 0; }
+  #posture-mini { font-size: 8px; padding: 2px 5px; }
+  #feed-health { width: calc(100vw - 24px); max-width: 320px; }
+  /* Dossier is a bottom sheet on mobile, clear of the ALERTS button. */
+  #dossier { top: auto; bottom: 64px; left: 8px; right: 8px; width: auto; max-height: 52vh; }
+  #legend  { top: auto; bottom: 64px; left: 8px; right: 8px; width: auto; max-height: 52vh; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  #dossier { top: auto; bottom: 96px; right: 8px; left: 8px; width: auto;
+             max-height: 46vh; }
+  #feed-health { display: none; }
+  #legend { right: 8px; left: 8px; width: auto; bottom: 96px; max-height: 52vh; }
+  .km-grid { grid-template-columns: 1fr; }
+  .cp-shell { padding-bottom: env(safe-area-inset-bottom); }
+  #cmd-palette { padding-top: 6vh; }
+  .cp-coord { display: none; }
+  #search-trigger .st-hint { display: none; }
+}

@@ -79,30 +79,45 @@ class ShipsLayer {
     // Create layer toggle
     this._createLayerToggle();
 
-    // Get coordinate conversion from globe
+    // Get coordinate conversion from globe.
+    //
+    // Every branch below MUST return a THREE.Vector3, not a plain {x, y, z}.
+    // _upsertShip() calls pos.clone() on the result, which throws on a bare
+    // object — so the previous destructuring form ("return {x: c.x, ...}")
+    // broke vessel ingest on the very first ship, every time, against any
+    // host including globe.gl itself. The symptom was a silent
+    // "[ShipsLayer] REST fetch failed: pos.clone is not a function" and an
+    // empty ships map despite a successful fetch.
+    const V = (x, y, z) => new THREE.Vector3(x, y, z);
+
     if (this.config.globe) {
       const globe = this.config.globe;
       if (globe.getCoords) {
         this._lat2point = (lat, lng, alt = 0.01) => {
           const c = globe.getCoords(lat, lng, alt);
-          return { x: c.x, y: c.y, z: c.z };
+          return c.isVector3 ? c.clone() : V(c.x, c.y, c.z);
         };
       } else if (globe.toGeoCoords) {
-        this._lat2point = (lat, lng, alt = 0.01) => globe.toGeoCoords(lat, lng, alt);
+        this._lat2point = (lat, lng, alt = 0.01) => {
+          const c = globe.toGeoCoords(lat, lng, alt);
+          return c.isVector3 ? c.clone() : V(c.x, c.y, c.z);
+        };
       }
     }
 
-    // Fallback
+    // Fallback: radius taken from the host when it declares one, so this does
+    // not hardcode globe.gl's radius of 100 onto a scene of a different size.
     if (!this._lat2point) {
+      const R = this.config.globe?.radius || this.config.globeRadius || 100;
       this._lat2point = (lat, lng, alt = 0.01) => {
         const phi = (90 - lat) * (Math.PI / 180);
         const theta = (lng + 180) * (Math.PI / 180);
-        const radius = 100 + alt * 10;
-        return {
-          x: -radius * Math.sin(phi) * Math.cos(theta),
-          y: radius * Math.cos(phi),
-          z: radius * Math.sin(phi) * Math.sin(theta),
-        };
+        const radius = R * (1 + alt);
+        return V(
+          -radius * Math.sin(phi) * Math.cos(theta),
+          radius * Math.cos(phi),
+          radius * Math.sin(phi) * Math.sin(theta)
+        );
       };
     }
   }

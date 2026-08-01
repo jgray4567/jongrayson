@@ -7,37 +7,82 @@ header('Cache-Control: public, max-age=86400');
 
 $icaoToIata = [
   // US Major
-  'AAL'=>'AA','UAL'=>'UA','DAL'=>'DL','SWA'=>'WN','JBU'=>'B6','AAY'=>'G4','ALK'=>'AS','SKW'=>'OO',
-  'ENY'=>'MQ','JIA'=>'EV','RPA'=>'YX','FFT'=>'F9','NKS'=>'NK','SPI'=>'SY','ALG'=>'KG',
+  'AAL'=>'AA','UAL'=>'UA','DAL'=>'DL','SWA'=>'WN','JBU'=>'B6','AAY'=>'G4','ASA'=>'AS','SKW'=>'OO',
+  'ENY'=>'MQ','JIA'=>'OH','RPA'=>'YX','FFT'=>'F9','NKS'=>'NK','SPI'=>'SY','ALG'=>'KG',
   // US Cargo/Regional
-  'FDX'=>'FX','UPS'=>'5X','ATN'=>'T8','PAA'=>'MI','BOE'=>'BA',
+  'FDX'=>'FX','UPS'=>'5X','ATN'=>'T8',
   // Canada
   'ACA'=>'AC','WJA'=>'WS','JZA'=>'9M','CFC'=>'7F','KFA'=>'K2',
   // Europe
   'BAW'=>'BA','DLH'=>'LH','AFR'=>'AF','KLM'=>'KL','AZA'=>'AZ','IBE'=>'IB','SAS'=>'SK',
   'BCS'=>'U2','EZY'=>'U2','RYR'=>'FR','VLG'=>'VY','TAP'=>'TP','FIN'=>'AY','LOT'=>'LO',
   'AUA'=>'OS','SWR'=>'LX','THA'=>'TG','MSR'=>'MS','RAM'=>'AT','TCS'=>'3V','ETH'=>'ET',
-  'BEL'=>'SN','CFE'=>'BE','EIN'=>'EI','CLH'=>'LH','BCY'=>'BC','AEE'=>'A3','OA'=>'OA',
+  'BEL'=>'SN','CFE'=>'BE','EIN'=>'EI','CLH'=>'LH','BCY'=>'BC','AEE'=>'A3','OAL'=>'OA',
   'ROU'=>'V7','TAR'=>'TA','ADW'=>'6A','PGT'=>'PC','SXS'=>'DI',
   // UK/Ireland
-  'EZY'=>'U2','RYR'=>'FR','TOM'=>'BY','EXS'=>'LS','MON'=>'ZB','BMI'=>'BD','BEE'=>'BA',
+  'EZY'=>'U2','RYR'=>'FR','TOM'=>'BY','EXS'=>'LS','MON'=>'ZB','BMI'=>'BD','BEE'=>'BE',
   // Asia
   'CPA'=>'CX','ANA'=>'NH','JAL'=>'JL','KAL'=>'KE','CSN'=>'CZ','CCA'=>'CA','CSH'=>'MU',
-  'AMU'=>'MF','CQH'=>'9C','CDG'=>'CZ','JSA'=>'9W','AIC'=>'AI','IGA'=>'6E','THA'=>'TG',
+  'AMU'=>'MF','CQH'=>'9C','CDG'=>'CZ','JSA'=>'3K','AIC'=>'AI','IGA'=>'6E','THA'=>'TG',
   'MAS'=>'MH','SIA'=>'SQ','GIA'=>'GA','PAL'=>'PR','VNL'=>'VN','APJ'=>'3K','SBI'=>'S7',
   // Middle East
   'UAE'=>'EK','ETD'=>'EY','QTR'=>'QR','SVA'=>'SV','RJA'=>'RJ','MEA'=>'ME','KAC'=>'KU',
   'OMA'=>'WY','IRA'=>'IA',
   // Latin America
-  'LAN'=>'LA','TAM'=>'JJ','AVA'=>'AV','AMX'=>'AM','COPA'=>'CM','AAL'=>'AA',
+  'LAN'=>'LA','TAM'=>'JJ','AVA'=>'AV','AMX'=>'AM','CMP'=>'CM','AAL'=>'AA',
   'IBE'=>'IB','ONE'=>'1O','ACA'=>'AC',
   // Oceania
   'QFA'=>'QF','ANZ'=>'NZ','VAU'=>'VA','TNT'=>'TT','JST'=>'JQ',
   // Africa
-  'SAA'=>'SA','ETH'=>'ET','KQ'=>'KQ','RAM'=>'AT','MSR'=>'MS','DTA'=>'DT',
+  'SAA'=>'SA','ETH'=>'ET','KQA'=>'KQ','RAM'=>'AT','MSR'=>'MS','DTA'=>'DT',
   // Charter/LCC
   'RYR'=>'FR','EZY'=>'U2','WZZ'=>'W6','SXS'=>'DI','TUI'=>'BY','ENT'=>'E5',
-  'CFG'=>'DE','NRN'=>'N4','VOE'=>'V5','SCX'=>'SQ',
+  // ── US regional carriers ──
+  // These operate in mainline livery (Delta Connection, American Eagle,
+  // Alaska Horizon) but hold their own IATA designators. Mapped to their own
+  // codes rather than the mainline's: if no logo exists upstream the panel
+  // simply shows none, which is the correct failure. Guessing the mainline
+  // would put the wrong brand on the aircraft.
+  'EDV'=>'9E',  // Endeavor Air
+  'QXE'=>'QX',  // Horizon Air
+  'PDT'=>'PT',  // Piedmont Airlines
+  'AWI'=>'ZW',  // Air Wisconsin
+  'GJS'=>'G7',  // GoJet
+  'ASH'=>'YV',  // Mesa Airlines
+  'CPZ'=>'CP',  // Compass
+
+  // ── Added: operators seen in live traffic that had no mapping ──
+  // Verified against ICAO/IATA designators. An absent mapping shows no logo,
+  // which is fine; a WRONG mapping shows another airline's brand on someone
+  // else's aircraft, which is not.
+  'VOI'=>'Y4',  // Volaris
+  'VIV'=>'VB',  // Viva Aerobus
+  'VIR'=>'VS',  // Virgin Atlantic
+  'ICE'=>'FI',  // Icelandair
+  'CJT'=>'W8',  // Cargojet
+  'ABX'=>'GB',  // ABX Air
+  'KFS'=>'K4',  // Kalitta Air
+  'TAI'=>'TA',  // TACA / Avianca Central America
+  'POE'=>'PD',  // Porter Airlines
+  'WEN'=>'WR',  // WestJet Encore
+  'AJT'=>'M6',  // Amerijet
+  'CAO'=>'CA',  // Air China Cargo
+  'SLI'=>'5D',  // Aeromexico Connect
+  'FLE'=>'F8',  // Flair Airlines
+  'SWG'=>'WG',  // Sunwing
+  'GLO'=>'G3',  // GOL
+  'AZU'=>'AD',  // Azul
+  'ARG'=>'AR',  // Aerolineas Argentinas
+  'TVF'=>'TO',  // Transavia France
+  'NAX'=>'DY',  // Norwegian
+  'NSZ'=>'DY',  // Norwegian
+  'JAF'=>'TB',  // TUI fly Belgium
+  'EWG'=>'EW',  // Eurowings
+  'CND'=>'9Q',  // Corendon
+  'TSC'=>'TS',  // Air Transat
+  'ETH'=>'ET',  // Ethiopian
+  'UAL'=>'UA',
+  'CFG'=>'DE','NRN'=>'N4','VOE'=>'V5','SCX'=>'SY',
 ];
 
 $nameToIata = [

@@ -113,8 +113,12 @@ if ($raw && $raw !== '') {
         $velocity = $s[9] ?? 0;
         $lat = $s[6];
         $lng = $s[5];
+        $onGround = $s[8] ?? false;
 
-        if ($alt < 3000 || $velocity <= 25) continue;
+        // Airborne only. The previous 3000 m floor discarded everything on
+        // climbout and approach — i.e. the aircraft closest to populated
+        // ground, which is exactly the traffic you least want missing.
+        if ($onGround || $velocity <= 25) continue;
         if (!preg_match('/^[A-Z]{3}[0-9]{1,4}[A-Z]?$/i', $callsign)) continue;
 
         $items[] = [
@@ -125,7 +129,15 @@ if ($raw && $raw !== '') {
             'lat' => $lat,
             'alt' => $alt,
             'velocity' => $velocity,
+            // OpenSky index 10 is true_track: DEGREES clockwise from north.
             'heading' => $s[10] ?? null,
+            // index 11 is vertical_rate in m/s (+ climbing). Needed for
+            // dead reckoning in the vertical and for climb/descent state.
+            'verticalRate' => $s[11] ?? 0,
+            'squawk' => $s[14] ?? null,
+            // index 4 is last_contact — how old this specific fix is at the
+            // source, independent of how old our poll is.
+            'lastContact' => $s[4] ?? null,
         ];
     }
 
