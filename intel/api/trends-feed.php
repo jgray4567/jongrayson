@@ -32,6 +32,16 @@ $GEO = [
   'Israel'=>'IL','Kenya'=>'KE','Netherlands'=>'NL','Pakistan'=>'PK',
   'Philippines'=>'PH','Portugal'=>'PT','S.Arabia'=>'SA','Singapore'=>'SG',
   'Sweden'=>'SE','Taiwan'=>'TW','Thailand'=>'TH','UAE'=>'AE','Vietnam'=>'VN',
+  // Beyond the CITIES table — hotspots, search results and future cities can
+  // reference these, and an unmapped country reports "unknown" rather than
+  // simply having no trends.
+  'Ukraine'=>'UA','Poland'=>'PL','Belgium'=>'BE','Switzerland'=>'CH',
+  'Norway'=>'NO','Denmark'=>'DK','Finland'=>'FI','Czechia'=>'CZ',
+  'Romania'=>'RO','Hungary'=>'HU','Colombia'=>'CO','Chile'=>'CL',
+  'Peru'=>'PE','Venezuela'=>'VE','Malaysia'=>'MY','Bangladesh'=>'BD',
+  'Morocco'=>'MA','Ethiopia'=>'ET','Ghana'=>'GH','Tanzania'=>'TZ',
+  'New Zealand'=>'NZ','Sudan'=>'SD','Syria'=>'SY','Jordan'=>'JO',
+  'Lebanon'=>'LB','Qatar'=>'QA','Kuwait'=>'KW','Kazakhstan'=>'KZ',
 ];
 
 // Verified as returning nothing. Reported honestly rather than as silence.
