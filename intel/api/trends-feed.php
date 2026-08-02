@@ -74,23 +74,8 @@ if (!is_dir($cacheDir)) @mkdir($cacheDir, 0775, true);
 $cachePath = $cacheDir . '/' . $geo . '.json';
 $cacheTtl = 900; // 15 min — Google refreshes these on roughly that cadence
 
-$cached = file_exists($cachePath) ? file_get_contents($cachePath) : null;
-$cacheAge = $cached !== null ? (time() - filemtime($cachePath)) : null;
-if ($cached !== null) {
-    $out = json_decode($cached, true) ?: [];
-    $out['ageSeconds'] = $cacheAge;
-    $out['stale'] = $cacheAge >= $cacheTtl;
-    echo json_encode($out, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    if ($cacheAge < $cacheTtl) exit;
-    // Expired: respond first, refresh after. A client must never wait on an
-    // upstream fetch — see the note in news-feed.php.
-    if (function_exists('fastcgi_finish_request')) { fastcgi_finish_request(); }
-    else { ignore_user_abort(true); @ob_end_flush(); @flush(); }
-    $lock = $cachePath . '.lock';
-    if (file_exists($lock) && (time() - filemtime($lock)) < 120) exit;
-    @touch($lock);
-    $REFRESH_ONLY = true;
-}
+require_once __DIR__ . '/swr.php';
+if (!swr_serve($cachePath, $cacheTtl)) exit;   // cache served; done
 
 $xml = null;
 if (function_exists('curl_init')) {
@@ -112,6 +97,7 @@ if (!$xml) {
     if (file_exists($cachePath)) {
         $old = json_decode(file_get_contents($cachePath), true) ?: [];
         $old['stale'] = true;
+        swr_release_lock($cachePath);
         echo json_encode($old, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         exit;
     }
@@ -175,9 +161,6 @@ $payload = [
     'stale'     => false,
     'items'     => $items,
 ];
-$payload['ageSeconds'] = 0;
-$json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-@file_put_contents($cachePath, $json);
-@unlink($cachePath . '.lock');
-if (!empty($REFRESH_ONLY)) exit;
+$json = swr_store($cachePath, $payload);
+if (swr_is_refresh_run()) exit;
 echo $json;

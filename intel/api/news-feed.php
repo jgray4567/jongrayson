@@ -40,32 +40,8 @@ $cacheTtl  = 300; // 5 minutes
  * nothing after 30 seconds — and the payload carries `ageSeconds` so the UI
  * can say exactly how old it is.
  */
-$cached = file_exists($cachePath) ? file_get_contents($cachePath) : null;
-$cacheAge = $cached !== null ? (time() - filemtime($cachePath)) : null;
-
-if ($cached !== null) {
-    $out = json_decode($cached, true) ?: [];
-    $out['ageSeconds'] = $cacheAge;
-    $out['stale'] = $cacheAge >= $cacheTtl;
-    echo json_encode($out, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-
-    if ($cacheAge < $cacheTtl) exit;          // still fresh: nothing to do
-
-    // Expired. Hand the response to the client, THEN refresh in the
-    // background so the next caller gets fresh data.
-    if (function_exists('fastcgi_finish_request')) {
-        fastcgi_finish_request();
-    } else {
-        ignore_user_abort(true);
-        @ob_end_flush();
-        @flush();
-    }
-    // A refresh already in flight from another request: don't pile on.
-    $lock = $cachePath . '.lock';
-    if (file_exists($lock) && (time() - filemtime($lock)) < 120) exit;
-    @touch($lock);
-    $REFRESH_ONLY = true;
-}
+require_once __DIR__ . '/swr.php';
+if (!swr_serve($cachePath, $cacheTtl)) exit;   // cache served; done
 
 $FEEDS = [
     ['name' => 'BBC World',   'url' => 'https://feeds.bbci.co.uk/news/world/rss.xml'],
@@ -244,12 +220,9 @@ $payload = [
     'items'     => $unique,
 ];
 
-$payload['ageSeconds'] = 0;
 $payload['parallel'] = function_exists('curl_multi_init');
-$json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-@file_put_contents($cachePath, $json);
-@unlink($cachePath . '.lock');
+$json = swr_store($cachePath, $payload);
 
-// When this pass was a background refresh the response is already sent.
-if (!empty($REFRESH_ONLY)) exit;
+// A refresh run has no caller waiting on it — the cache is the product.
+if (swr_is_refresh_run()) exit;
 echo $json;
