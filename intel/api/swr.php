@@ -48,9 +48,21 @@ function swr_lock_held(string $cachePath, int $ttl = 120): bool {
 function swr_take_lock(string $cachePath): void { @touch(swr_lock_path($cachePath)); }
 function swr_release_lock(string $cachePath): void { @unlink(swr_lock_path($cachePath)); }
 
-/** Fire-and-forget request back to this same script to do the real work. */
-function swr_trigger_refresh(string $cachePath): void {
-    if (swr_lock_held($cachePath)) return;      // one refresh at a time
+/**
+ * DISABLED — kept only so the ?__refresh=1 path stays documented.
+ *
+ * This used to fire a detached self-request whenever the cache was stale.
+ * It made things far worse: each trigger spawned another PHP worker that ran
+ * for up to 60s doing slow upstream fetches, and this host has a small worker
+ * pool. Measured during the incident, signal-feed.php — a local file read with
+ * no outbound calls at all — took 20s and then 12s to respond purely from
+ * queueing. Client requests must not spawn work on this host.
+ *
+ * Refreshes now come from exactly two places: a cold cache (once), and an
+ * explicit ?__refresh=1 request, which is what a cron job should call.
+ */
+function swr_trigger_refresh_DISABLED(string $cachePath): void {
+    if (swr_lock_held($cachePath)) return;
     swr_take_lock($cachePath);
 
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
@@ -90,7 +102,9 @@ function swr_serve(string $cachePath, int $cacheTtl): bool {
     $out['stale']      = $age >= $cacheTtl;
     echo json_encode($out, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-    if ($age >= $cacheTtl) swr_trigger_refresh($cachePath);
+    // Deliberately NO refresh here. Serving slightly stale data instantly is
+    // the correct trade; spawning work per request took the whole site down.
+    // `stale: true` is already on the payload, and the UI reports the age.
     return false;                                 // response already sent
 }
 
