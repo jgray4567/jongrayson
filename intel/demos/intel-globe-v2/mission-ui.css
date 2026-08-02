@@ -644,8 +644,10 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
   flex: 1 1 auto; min-height: 240px;
   max-width: none; border-right: none;
 }
+/* Preview sits ABOVE the map: the live image is the thing you came to look
+   at, so it takes the top of the column and the map reads as its context. */
 .cm-left .cm-preview {
-  flex: 0 0 auto; border-top: 1px solid rgba(196,214,0,0.10);
+  flex: 0 0 auto; border-bottom: 1px solid rgba(196,214,0,0.10);
   display: block !important;   /* populated on open, never an idle blank */
 }
 .cm-left .cm-preview-img-wrap { max-height: 46vh; min-height: 220px; }

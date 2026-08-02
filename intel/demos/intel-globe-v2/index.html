@@ -1230,6 +1230,18 @@
            while 970 single-column rows each used 830px to show ~250px of
            text. -->
       <div class="cm-left">
+        <div class="cm-preview" id="cm-preview">
+          <div class="cm-preview-bar">
+            <div class="cm-preview-name" id="cm-preview-name">—</div>
+            <div class="cm-preview-area" id="cm-preview-area"></div>
+            <div class="cm-res" id="cm-preview-res"></div>
+            <div class="cm-preview-refresh" id="cm-preview-refresh"></div>
+          </div>
+          <div class="cm-preview-img-wrap" id="cm-preview-img">
+            <div class="cm-loading-msg">LOADING IMAGE...</div>
+          </div>
+        </div>
+
         <div class="cm-map-panel">
           <!-- Real slippy map, not a Google embed with dots painted on top.
                The previous approach absolutely-positioned pins over an
@@ -1244,18 +1256,6 @@
                coordinates and keeps them correct through pan and zoom. -->
           <div id="cm-map"></div>
           <div class="cm-map-hint">NYC DOT · <span id="cm-map-count">0</span> cameras</div>
-        </div>
-
-        <div class="cm-preview" id="cm-preview">
-          <div class="cm-preview-bar">
-            <div class="cm-preview-name" id="cm-preview-name">—</div>
-            <div class="cm-preview-area" id="cm-preview-area"></div>
-            <div class="cm-res" id="cm-preview-res"></div>
-            <div class="cm-preview-refresh" id="cm-preview-refresh"></div>
-          </div>
-          <div class="cm-preview-img-wrap" id="cm-preview-img">
-            <div class="cm-loading-msg">LOADING IMAGE...</div>
-          </div>
         </div>
       </div>
 
