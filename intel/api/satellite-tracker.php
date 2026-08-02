@@ -16,6 +16,9 @@ $groups = [
 ];
 
 $emit = function ($payload) {
+    // Deliberately does NOT touch the lock: this is also called by requests
+    // that never took one (fresh cache, or serving stale while another
+    // request refreshes). Releasing here would hand away a live lock.
     echo json_encode($payload, JSON_UNESCAPED_SLASHES);
     exit;
 };
@@ -41,7 +44,7 @@ $fetch = function ($url) {
     curl_setopt_array($curl, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT => 30,
+        CURLOPT_TIMEOUT => 8,   // was 30; see the budget note below
         CURLOPT_USERAGENT => 'Mozilla/5.0 (Intel Satellite Tracker)',
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2
@@ -59,12 +62,49 @@ if (!$bypassCache && $cached && isset($cached['fetchedAt']) && (time() - intval(
     $emit($cached);
 }
 
+/*
+ * Worker protection.
+ *
+ * This endpoint walks SEVEN CelesTrak groups sequentially. At the previous
+ * 30s per-request timeout a single cache miss could hold one PHP worker for
+ * up to 3.5 minutes, and on this shared host a couple of those starve the
+ * pool for everything else — including endpoints that only read a local file.
+ * That is what took the dashboard down.
+ *
+ * Three guards, in order of importance:
+ *   1. Single flight — only one request at a time may refresh. Everyone else
+ *      is served the stale cache immediately, flagged.
+ *   2. Wall-clock budget — stop fetching further groups once the budget is
+ *      spent and fall back to cached entries for the rest, so the request can
+ *      never run long no matter how slow CelesTrak is.
+ *   3. Per-request timeout cut from 30s to 8s.
+ */
+$lockPath = $cachePath . '.lock';
+$lockHeld = file_exists($lockPath) && (time() - filemtime($lockPath)) < 180;
+if (!$bypassCache && $lockHeld && $cached) {
+    $cached['stale'] = true;
+    $cached['note'] = 'refresh in progress; serving last good element sets';
+    $emit($cached);
+}
+@touch($lockPath);
+$fetchBudgetUntil = microtime(true) + 25.0;   // hard ceiling for the whole walk
+
 $mu = 398600.4418;
 $earthRadiusKm = 6378.137;
 $items = [];
 $errors = [];
 
 foreach ($groups as $group) {
+    // Budget spent: reuse whatever this group had in cache rather than
+    // continuing to fetch. Partial-but-fast beats complete-but-hung.
+    if (microtime(true) > $fetchBudgetUntil) {
+        $errors[] = $group['slug'] . ': skipped (time budget)';
+        if ($cached && isset($cached['items'])) {
+            $prev = array_filter($cached['items'], fn($i) => ($i['network'] ?? '') === $group['network']);
+            if ($prev) $items = array_merge($items, array_slice(array_values($prev), 0, intval($group['limit'])));
+        }
+        continue;
+    }
     $url = isset($group['query'])
         ? 'https://celestrak.org/NORAD/elements/gp.php?' . $group['query'] . '&FORMAT=tle'
         : 'https://celestrak.org/NORAD/elements/gp.php?GROUP=' . rawurlencode($group['slug']) . '&FORMAT=tle';
@@ -147,6 +187,7 @@ if (!$items) {
     if ($cached) {
         $cached['stale'] = true;
         $cached['errors'] = $errors;
+        @unlink($lockPath);          // we own it on this path
         $emit($cached);
     }
     http_response_code(502);
@@ -162,4 +203,5 @@ $payload = [
 ];
 
 $writeCache($payload);
+@unlink($lockPath);
 $emit($payload);
