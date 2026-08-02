@@ -1660,18 +1660,22 @@ async function init() {
 
   animate();
 
-  // Live data feeds — earthquakes, weather, storms (non-blocking)
-  fetchEarthquakes().catch(e => console.error('Earthquake load failed:', e));
-  earthquakeInterval = setInterval(fetchEarthquakes, 300000); // 5 min
-
-  fetchWeatherAlerts().catch(e => console.error('Weather load failed:', e));
-  weatherInterval = setInterval(fetchWeatherAlerts, 300000); // 5 min
-
-  fetchStormAlerts().catch(e => console.error('Storm load failed:', e));
-  setInterval(fetchStormAlerts, 300000); // 5 min
-
-  fetchNews().catch(e => console.error('News load failed:', e));
-  setInterval(fetchNews, 300000); // 5 min
+  // Live data feeds — staggered.
+  //
+  // Firing every source at once put ~8 simultaneous PHP requests on a shared
+  // host with a small worker pool, and each one that had to go upstream held
+  // a worker for the duration. Spreading the first hit and the subsequent
+  // cadence keeps concurrency at roughly one request at a time.
+  const stagger = (fn, delayMs, everyMs, label) => {
+    setTimeout(() => {
+      fn().catch(e => console.error(label + ' load failed:', e));
+      setInterval(() => fn().catch(e => console.error(label + ' refresh failed:', e)), everyMs);
+    }, delayMs);
+  };
+  stagger(fetchEarthquakes,   300,  5 * 60 * 1000, 'Earthquake');
+  stagger(fetchWeatherAlerts, 1800, 5 * 60 * 1000, 'Weather');
+  stagger(fetchStormAlerts,   3300, 5 * 60 * 1000, 'Storm');
+  stagger(fetchNews,          4800, 10 * 60 * 1000, 'News');
 
   initMissionUI();
   initPanelControls();
@@ -3033,7 +3037,13 @@ function buildOrbital() {
     endpoint: '../../api/satellite-tracker.php',
   });
   orbitalLayer.fetch().then(syncSatelliteCounts);
-  setInterval(() => orbitalLayer.fetch().then(syncSatelliteCounts), 60 * 1000);
+  // Every 30 minutes, not every 60 seconds.
+  //
+  // The payload is TLE element sets, which the issuing agencies update on the
+  // order of once a day. Positions on screen come from SGP4 propagating those
+  // elements locally on every frame — refetching them each minute produced
+  // identical data and was the single heaviest recurring load on the host.
+  setInterval(() => orbitalLayer.fetch().then(syncSatelliteCounts), 30 * 60 * 1000);
 }
 
 function syncSatelliteCounts() {
