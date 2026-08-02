@@ -44,7 +44,7 @@ $fetch = function ($url) {
     curl_setopt_array($curl, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT => 8,   // was 30; see the budget note below
+        CURLOPT_TIMEOUT => 12,  // was 30; the 25s wall-clock budget is the real guard
         CURLOPT_USERAGENT => 'Mozilla/5.0 (Intel Satellite Tracker)',
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2
@@ -136,6 +136,17 @@ foreach ($groups as $group) {
             'httpCode' => $httpCode,
             'error' => $error !== '' ? $error : 'fetch_failed'
         ];
+        // Fall back to this group's cached element sets. Only the 403 branch
+        // used to do this, so a connection timeout silently dropped the whole
+        // group — and because the result is then written back to cache, one
+        // bad minute permanently destroyed good data. Observed live: a
+        // 294-satellite cache was replaced by 72.
+        if ($cached && isset($cached['items'])) {
+            $prev = array_filter($cached['items'], fn($i) => ($i['network'] ?? '') === $group['network']);
+            if ($prev) {
+                $items = array_merge($items, array_slice(array_values($prev), 0, intval($group['limit'])));
+            }
+        }
         continue;
     }
 
@@ -201,6 +212,25 @@ $payload = [
     'items' => $items,
     'errors' => $errors
 ];
+
+/*
+ * Never let a worse result overwrite a better one.
+ *
+ * Even with per-group fallbacks, a run where several groups fail can end up
+ * materially smaller than what is already cached. Writing that back turns a
+ * transient upstream problem into permanent data loss, and the next request
+ * inherits the damage.
+ */
+$prevCount = ($cached && isset($cached['items'])) ? count($cached['items']) : 0;
+$newCount  = count($items);
+if ($prevCount > 0 && $newCount < $prevCount * 0.8) {
+    $payload['degraded'] = true;
+    $payload['note'] = sprintf('kept cached set (%d) — this fetch returned only %d', $prevCount, $newCount);
+    $cached['stale'] = true;
+    $cached['errors'] = $errors;
+    @unlink($lockPath);
+    $emit($cached);
+}
 
 $writeCache($payload);
 @unlink($lockPath);
