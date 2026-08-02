@@ -24,7 +24,7 @@
 
 import {
   registry, selection, feeds, FEED_STATE, formatAge, formatCoord,
-  PALETTE, hex, ALTITUDE_BANDS,
+  PALETTE, hex, ALTITUDE_BANDS, fetchWithTimeout,
 } from './intel-core.js';
 
 /* ══════════════════════════════════════════════════════════════
@@ -70,8 +70,8 @@ export function airlineLogo(callsign) {
   // Request well above the CSS display size so the bitmap stays crisp when
   // scaled down and on high-DPI displays. The endpoint caches for 24h, so the
   // extra bytes are paid once per operator.
-  const p = fetch('../../api/airline-logos.php?callsign=' +
-                  encodeURIComponent(callsign) + '&w=240&h=88')
+  const p = fetchWithTimeout('../../api/airline-logos.php?callsign=' +
+                  encodeURIComponent(callsign) + '&w=240&h=88', { timeoutMs: 10000 })
     .then(r => (r.ok ? r.json() : null))
     .then(d => {
       const url = reboneLogoUrl(d && d.logoUrl);
@@ -445,7 +445,7 @@ export class MissionUI {
     if (!c.country) { this._trends.set(entity.id, { state: 'ok', covered: false, items: [], reason: 'No country on record.' }); return; }
 
     this._trends.set(entity.id, { state: 'loading', items: [] });
-    fetch('../../api/trends-feed.php?limit=5&country=' + encodeURIComponent(c.country))
+    fetchWithTimeout('../../api/trends-feed.php?limit=5&country=' + encodeURIComponent(c.country), { timeoutMs: 12000 })
       .then(r => (r.ok ? r.json() : r.json().catch(() => null)))
       .then(d => {
         this._trends.set(entity.id, {
@@ -496,7 +496,7 @@ export class MissionUI {
     const c = entity.data || {};
     const url = '../../api/city-news.php?limit=5&city=' + encodeURIComponent(entity.label || '')
               + '&country=' + encodeURIComponent(c.country || '');
-    fetch(url)
+    fetchWithTimeout(url, { timeoutMs: 12000 })
       .then(r => (r.ok ? r.json() : null))
       .then(d => {
         this._cityNews.set(entity.id, {

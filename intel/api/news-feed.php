@@ -26,10 +26,45 @@ header('Cache-Control: public, max-age=300');
 $cachePath = dirname(__DIR__) . '/data/news-feed-cache.json';
 $cacheTtl  = 300; // 5 minutes
 
-// ── Serve fresh cache ──
-if (file_exists($cachePath) && (time() - filemtime($cachePath)) < $cacheTtl) {
-    echo file_get_contents($cachePath);
-    exit;
+/**
+ * Stale-while-revalidate.
+ *
+ * Any cached copy is served IMMEDIATELY, fresh or not, and the refresh then
+ * happens after the response has been flushed to the client. A client request
+ * must never block on an upstream fetch.
+ *
+ * This is not theoretical: outbound HTTP from this host degraded badly and a
+ * single USGS fetch took 36 seconds, which made every endpoint that fetched
+ * synchronously time out and took the whole dashboard's layers down with it.
+ * Serving 5-minute-old headlines instantly is strictly better than serving
+ * nothing after 30 seconds — and the payload carries `ageSeconds` so the UI
+ * can say exactly how old it is.
+ */
+$cached = file_exists($cachePath) ? file_get_contents($cachePath) : null;
+$cacheAge = $cached !== null ? (time() - filemtime($cachePath)) : null;
+
+if ($cached !== null) {
+    $out = json_decode($cached, true) ?: [];
+    $out['ageSeconds'] = $cacheAge;
+    $out['stale'] = $cacheAge >= $cacheTtl;
+    echo json_encode($out, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+    if ($cacheAge < $cacheTtl) exit;          // still fresh: nothing to do
+
+    // Expired. Hand the response to the client, THEN refresh in the
+    // background so the next caller gets fresh data.
+    if (function_exists('fastcgi_finish_request')) {
+        fastcgi_finish_request();
+    } else {
+        ignore_user_abort(true);
+        @ob_end_flush();
+        @flush();
+    }
+    // A refresh already in flight from another request: don't pile on.
+    $lock = $cachePath . '.lock';
+    if (file_exists($lock) && (time() - filemtime($lock)) < 120) exit;
+    @touch($lock);
+    $REFRESH_ONLY = true;
 }
 
 $FEEDS = [
@@ -46,8 +81,11 @@ function fetch_all(array $feeds, string $ua): array {
     $out = [];
     if (!function_exists('curl_multi_init')) {
         foreach ($feeds as $f) {
+            // Sequential fallback: 4 feeds x 8s could reach 32s on its own,
+            // which is longer than most client timeouts. Keep the whole pass
+            // bounded well under that.
             $ctx = stream_context_create(['http' => [
-                'timeout' => 8, 'header' => "User-Agent: {$ua}\r\n", 'ignore_errors' => true,
+                'timeout' => 4, 'header' => "User-Agent: {$ua}\r\n", 'ignore_errors' => true,
             ]]);
             $out[$f['name']] = @file_get_contents($f['url'], false, $ctx) ?: null;
         }
@@ -61,8 +99,8 @@ function fetch_all(array $feeds, string $ua): array {
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_TIMEOUT        => 10,
-            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT        => 6,
+            CURLOPT_CONNECTTIMEOUT => 3,
             CURLOPT_USERAGENT      => $ua,
             CURLOPT_ENCODING       => '',
         ]);
@@ -206,6 +244,12 @@ $payload = [
     'items'     => $unique,
 ];
 
+$payload['ageSeconds'] = 0;
+$payload['parallel'] = function_exists('curl_multi_init');
 $json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 @file_put_contents($cachePath, $json);
+@unlink($cachePath . '.lock');
+
+// When this pass was a background refresh the response is already sent.
+if (!empty($REFRESH_ONLY)) exit;
 echo $json;

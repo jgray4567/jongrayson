@@ -469,6 +469,33 @@ export class FeedMonitor {
   _emit() { for (const fn of this.listeners) fn(this, false); }
 }
 
+/**
+ * fetch() with a hard deadline.
+ *
+ * Browser fetch has NO default timeout: a request to a hung endpoint stays
+ * pending indefinitely, so the layer never resolves, never rejects, and the
+ * feed monitor sits on LOADING forever showing neither data nor a failure.
+ * That is the worst of both — the operator cannot tell whether the picture is
+ * empty or broken.
+ *
+ * Observed live: outbound HTTP on the host degraded to 36s for a single USGS
+ * fetch and one endpoint stopped responding entirely; the dashboard's layers
+ * simply never populated and nothing said why.
+ */
+export function fetchWithTimeout(url, { timeoutMs = 12000, ...opts } = {}) {
+  if (typeof AbortController === 'undefined') return fetch(url, opts);
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), timeoutMs);
+  return fetch(url, { ...opts, signal: ctl.signal })
+    .catch(err => {
+      if (err && err.name === 'AbortError') {
+        throw new Error(`timed out after ${Math.round(timeoutMs / 1000)}s`);
+      }
+      throw err;
+    })
+    .finally(() => clearTimeout(t));
+}
+
 /** "12s" / "4m 20s" / "1h 03m" — compact enough for a status chip. */
 export function formatAge(ms) {
   if (ms == null) return '—';

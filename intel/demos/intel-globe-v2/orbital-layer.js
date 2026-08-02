@@ -28,7 +28,7 @@
 import * as THREE from 'three';
 import {
   EARTH_RADIUS, DEG2RAD, RAD2DEG, PALETTE, latLngTo3D, vec3ToLatLng,
-  screenScale, registry, selection, feeds,
+  screenScale, registry, selection, feeds, fetchWithTimeout,
 } from './intel-core.js';
 
 const DOT_PX = 8;
@@ -176,7 +176,7 @@ export class OrbitalLayer {
   async fetch() {
     feeds.attempt('satellites');
     try {
-      const res = await fetch(this.endpoint);
+      const res = await fetchWithTimeout(this.endpoint, { timeoutMs: 15000 });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       const items = data.items || [];

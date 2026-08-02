@@ -35,7 +35,7 @@
 import * as THREE from 'three';
 import {
   EARTH_RADIUS, DEG2RAD, PALETTE, altitudeColor, latLngTo3D, tangentQuaternion,
-  deadReckon, screenScale, registry, selection, feeds, FEED_STATE,
+  deadReckon, screenScale, registry, selection, feeds, FEED_STATE, fetchWithTimeout,
 } from './intel-core.js';
 
 const TRAIL_POINTS = 10;          // observed history samples retained per track
@@ -203,7 +203,7 @@ export class AircraftLayer {
   async fetch() {
     feeds.attempt('aircraft');
     try {
-      const res = await fetch(this.endpoint + '?regions=' + this.regions.join(','));
+      const res = await fetchWithTimeout(this.endpoint + '?regions=' + this.regions.join(','), { timeoutMs: 15000 });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       if (data.error) throw new Error(data.error);

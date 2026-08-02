@@ -1316,7 +1316,7 @@ import * as satellite from 'satellite.js';
 
 import {
   PALETTE, hex, registry, selection, feeds, FEED_STATE,
-  formatAge, formatCoord, screenScale, vec3ToLatLng,
+  formatAge, formatCoord, screenScale, vec3ToLatLng, fetchWithTimeout,
 } from './intel-core.js';
 import { AircraftLayer } from './aircraft-layer.js';
 import { OrbitalLayer } from './orbital-layer.js';
@@ -2082,7 +2082,7 @@ async function fetchEarthquakes() {
   feeds.attempt('earthquakes');
   try {
     document.getElementById('count-earthquakes').textContent = 'LOADING...';
-    const res = await fetch(LIVE_FEED_PROXY + '?source=earthquakes');
+    const res = await fetchWithTimeout(LIVE_FEED_PROXY + '?source=earthquakes', { timeoutMs: 20000 });
     if (!res.ok) throw new Error('USGS fetch failed: ' + res.status);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
@@ -2220,7 +2220,7 @@ async function fetchWeatherAlerts() {
   feeds.attempt('weather');
   try {
     document.getElementById('count-weather').textContent = 'LOADING...';
-    const res = await fetch(LIVE_FEED_PROXY + '?source=weather');
+    const res = await fetchWithTimeout(LIVE_FEED_PROXY + '?source=weather', { timeoutMs: 20000 });
     if (!res.ok) throw new Error('NWS fetch failed: ' + res.status);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
@@ -2330,7 +2330,7 @@ async function fetchStormAlerts() {
   feeds.attempt('storms');
   try {
     document.getElementById('count-storms').textContent = 'LOADING...';
-    const res = await fetch(LIVE_FEED_PROXY + '?source=storms');
+    const res = await fetchWithTimeout(LIVE_FEED_PROXY + '?source=storms', { timeoutMs: 20000 });
     if (!res.ok) throw new Error('Storm fetch failed: ' + res.status);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
@@ -2421,7 +2421,7 @@ function updateStorms(time) {
 async function fetchTrafficCameras() {
   try {
     document.getElementById('count-cameras').textContent = 'LOADING...';
-    const res = await fetch(LIVE_FEED_PROXY + '?source=cameras');
+    const res = await fetchWithTimeout(LIVE_FEED_PROXY + '?source=cameras', { timeoutMs: 20000 });
     if (!res.ok) throw new Error('Cameras fetch failed: ' + res.status);
     const data = await res.json();
     if (data.error) throw new Error(data.error);
@@ -3812,7 +3812,7 @@ function escapeText(s) {
 async function fetchNews() {
   feeds.attempt('news');
   try {
-    const res = await fetch('../../api/news-feed.php');
+    const res = await fetchWithTimeout('../../api/news-feed.php', { timeoutMs: 15000 });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (data.error && !(data.items || []).length) throw new Error(data.error);

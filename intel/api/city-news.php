@@ -34,9 +34,22 @@ $key = preg_replace('/[^a-z0-9]+/', '-', strtolower($city . '-' . $country));
 $cachePath = $cacheDir . '/' . $key . '.json';
 $cacheTtl = 900; // 15 min — city news moves slowly and this is per-city fan-out
 
-if (file_exists($cachePath) && (time() - filemtime($cachePath)) < $cacheTtl) {
-    echo file_get_contents($cachePath);
-    exit;
+$cached = file_exists($cachePath) ? file_get_contents($cachePath) : null;
+$cacheAge = $cached !== null ? (time() - filemtime($cachePath)) : null;
+if ($cached !== null) {
+    $out = json_decode($cached, true) ?: [];
+    $out['ageSeconds'] = $cacheAge;
+    $out['stale'] = $cacheAge >= $cacheTtl;
+    echo json_encode($out, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    if ($cacheAge < $cacheTtl) exit;
+    // Expired: respond first, refresh after. A client must never wait on an
+    // upstream fetch — see the note in news-feed.php.
+    if (function_exists('fastcgi_finish_request')) { fastcgi_finish_request(); }
+    else { ignore_user_abort(true); @ob_end_flush(); @flush(); }
+    $lock = $cachePath . '.lock';
+    if (file_exists($lock) && (time() - filemtime($lock)) < 120) exit;
+    @touch($lock);
+    $REFRESH_ONLY = true;
 }
 
 // Pair the city with its country to disambiguate. Not a cure — "Cairo Egypt"
@@ -51,8 +64,8 @@ if (function_exists('curl_init')) {
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT        => 9,
-        CURLOPT_CONNECTTIMEOUT => 4,
+        CURLOPT_TIMEOUT        => 6,
+        CURLOPT_CONNECTTIMEOUT => 3,
         CURLOPT_ENCODING       => '',
         CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; intel-globe/2.0; +https://www.jongrayson.com)',
     ]);
@@ -115,6 +128,9 @@ $payload = [
     'stale'     => false,
     'items'     => $items,
 ];
+$payload['ageSeconds'] = 0;
 $json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 @file_put_contents($cachePath, $json);
+@unlink($cachePath . '.lock');
+if (!empty($REFRESH_ONLY)) exit;
 echo $json;
