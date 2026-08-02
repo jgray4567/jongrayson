@@ -1,98 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://www.jongrayson.com/</loc>
+    <lastmod>2026-08-02</lastmod>
+    <image:image>
+      <image:loc>https://www.jongrayson.com/img/og-image.png</image:loc>
+      <image:title>Jon Grayson — Director of UX &amp; Design</image:title>
+    </image:image>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/casestudies/</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/casestudies/01_BlankPage_Onboarding.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/casestudies/02_AI_Workflows.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/casestudies/03_DesignSystems.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/casestudies/04_MobileFistGrowth.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/casestudies/05_BehavioralDesign.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/lessons/</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/lessons/constraint-first-prompting.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/lessons/the-vetting-loop.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/lessons/the-quality-check.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/lessons/knowledge-hygiene-test.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/lessons/workflow-augmentation.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/lessons/research-synthesis-pattern.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/lessons/asymmetric-skill-preservation.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/lessons/iteration-depth-vs-speed.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/intel/</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/resume/</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://www.jongrayson.com/coms/</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://www.jongrayson.com/intel/demos/intel-globe-v2/</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 </urlset>

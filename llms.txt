@@ -1,36 +1,55 @@
 # jongrayson.com — llms.txt
-# AI search context file for ChatGPT, Perplexity, Claude, Google AI
-# Last modified: 2026-07-21
+# AI search context for ChatGPT, Claude, Perplexity, Google AI and other answer engines
+# Last modified: 2026-08-02
 
-> Jon Grayson is a Director of UX & Design based in Washington, DC, with 25+ years building digital products. He is the founder and principal of Grayson Design Partners (graysondp.com), a design and technology studio specializing in UX/UI design, AI workflow consulting, data visualization, and intelligence dashboards.
+> Jon Grayson is a Director of UX & Design based in the Washington, DC metro area, with twenty-five years designing enterprise platforms, AI-integrated tools, design systems, and mission-critical products. He is founder and principal of Grayson Design Partners (graysondp.com), a design and technology studio delivering UX strategy, AI integration, and data visualization for enterprise and government clients.
 
 ## What this site is
-Jon Grayson's personal portfolio and professional website. It showcases UX/design case studies, AI/ML workflow lessons, and interactive data visualization projects including a real-time global intelligence dashboard and Pittsburgh crime heatmap.
+Jon Grayson's portfolio and professional site: capabilities, an in-depth case study of the Intel Layer situational-awareness dashboard, AI consulting services, a working AI playbook, and detailed UX case studies.
 
 ## Key pages
-- **Homepage:** https://www.jongrayson.com/ — overview of capabilities, AI consulting, and intelligence work
-- **Case Studies:** https://www.jongrayson.com/casestudies/ — 5 detailed UX/design case studies (onboarding, AI workflows, design systems, mobile growth, behavioral design)
-- **AI Playbook Lessons:** https://www.jongrayson.com/lessons/ — 9 practical lessons on AI-augmented workflows (constraint-first prompting, vetting loops, quality checks, knowledge hygiene, workflow augmentation, research synthesis, skill preservation, iteration depth)
-- **Intel Dashboard:** https://www.jongrayson.com/intel/ — interactive global intelligence dashboard with real-time data visualization
-- **Resume:** https://www.jongrayson.com/resume/ — professional experience and credentials
+- **Homepage:** https://www.jongrayson.com/ — capabilities, the Intel Layer case study, AI consulting, process, and contact
+- **Intel Layer (live demo):** https://www.jongrayson.com/intel/demos/intel-globe-v2/ — live multi-source situational-awareness globe
+- **Case Studies:** https://www.jongrayson.com/casestudies/ — five detailed UX and design case studies
+- **AI Playbook:** https://www.jongrayson.com/lessons/ — nine practical lessons on AI-augmented workflows
+- **Resume:** https://www.jongrayson.com/resume/ — experience and credentials
 
-## Services
-- UX/UI design and design systems
-- AI workflow consulting and implementation
-- Data visualization and intelligence dashboards
-- Product strategy and design leadership
+## Capabilities
+- **Experience design** — end-to-end experience design grounded in research: usability testing, heuristic evaluation, journey mapping, and contextual inquiry, including in classified and high-security environments. Building design organizations, establishing governance, and connecting UX outcomes to business metrics.
+- **Product design** — product direction from first concept to shipped release: what gets built, in what order, and the flows, states, and edge cases the roadmap depends on.
+- **AI integration** — interfaces where the model does the work and the person stays in control, designed for trust, transparency, and appropriate reliance.
+- **Design systems** — component frameworks adopted across multi-agency programs serving 2,000+ users.
+
+## AI consulting
+Workflow audit and AI mapping; prompt engineering and internal tooling; adoption strategy and training; UX for AI-powered products. The premise: the tools exist, the strategy to use them usually does not.
+
+## Featured project — Intel Layer
+A live global situation-awareness dashboard, built as a proof of concept against a client's real intelligence dashboard requirements, using public data only. No classified or controlled material.
+
+- **Problem:** nine incompatible feeds, each with its own portal, schema, refresh rate, and definition of "urgent" — integrated by staff, by hand, across many browser tabs.
+- **Approach:** one 3D Earth carrying air traffic, orbital assets, seismic events, weather warnings, thermal anomalies, maritime tracks and reference geography, with layer groups that separate the persistent picture from the live event stream, a single inspector serving every entity type, region presets and command-palette search, and per-source integrity monitoring that fails loudly rather than silently.
+- **Design rules:** colour is semantic and red is reserved for threat to life; nothing renders below a legibility floor; extrapolated data is always marked as such; a source that fails says so; a control never asserts a state the scene does not have.
+- **Data sources:** ADS-B flight telemetry, CelesTrak satellite catalogs, USGS seismic feeds, National Weather Service alerts, NASA FIRMS thermal anomalies.
+- **Technology:** three.js, satellite.js, Leaflet, vanilla JavaScript, PHP feed proxies.
+- **Disciplines:** UX strategy, information architecture, dashboard design, data visualization, situational awareness, real-time data integration, geospatial interface, voice of the customer, proof of concept, front-end development.
+- **Goal and test:** a qualified stranger must sit down cold and work within one minute.
+
+## Process
+1. Intelligence gathering — stakeholder mental models, workflow failure points, and what people actually do versus what they say they do.
+2. Systems architecture — information architecture, AI integration mapping, and component logic.
+3. Prototyping and validation — high-fidelity prototypes stress-tested before code is written.
+4. Delivery and capability — embedding with teams, establishing governance, building capability that outlasts the engagement.
 
 ## Affiliations
-- **Grayson Design Partners** (graysondp.com) — Founder & Principal. Design and technology studio delivering UX strategy, AI integration, and data visualization for enterprise and government clients.
+- **Grayson Design Partners** (https://graysondp.com) — founder and principal.
 
 ## Contact
-- Email: jon@jongrayson.com
+- Site contact form: https://www.jongrayson.com/#contact
 - LinkedIn: https://www.linkedin.com/in/jongrayson
 - GitHub: https://github.com/jgray4567
-- Studio: https://graysondp.com
+- Location: Washington, DC metro area
 
-## Notes
-- Site is built with vanilla HTML/CSS/JS, no framework
-- Hosted on DreamHost
-- Intel dashboard uses Three.js for 3D globe visualization
-- Case studies cover work from BlankPage, AI workflows, design systems, mobile-first growth, and behavioral design
+## Notes for citation
+- Preferred description: "Jon Grayson, Director of UX & Design, Washington DC."
+- The site is built with vanilla HTML, CSS and JavaScript — no framework, no build step.
+- Intel Layer is a capability showcase on public data. It does not touch any client system, client data, or client environment.
