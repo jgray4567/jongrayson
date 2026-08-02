@@ -34,7 +34,7 @@ if (!is_dir($cacheDir)) {
 /**
  * Fetch URL with cURL, return body + status code.
  */
-function fetchUrl($url, $timeout = 15) {
+function fetchUrl($url, $timeout = 10) {   // was 15; bound worker hold time
     $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
@@ -54,27 +54,57 @@ function fetchUrl($url, $timeout = 15) {
 /**
  * Get cached data or fetch fresh. Cache for N seconds.
  */
-function getCachedOrFetch($url, $cacheFile, $maxAge, $timeout = 15) {
+function getCachedOrFetch($url, $cacheFile, $maxAge, $timeout = 10) {
     $cachePath = $GLOBALS['cacheDir'] . '/' . $cacheFile;
     
     // Check cache
+    $haveCache = false;
+    $cachedData = null;
+    $age = null;
     if (file_exists($cachePath)) {
         $age = time() - filemtime($cachePath);
-        if ($age < $maxAge) {
-            $cached = file_get_contents($cachePath);
-            if ($cached !== false) {
-                $data = json_decode($cached, true);
-                if ($data !== null) {
-                    $data['_cached'] = true;
-                    $data['_cache_age'] = $age;
-                    return $data;
-                }
-            }
+        $cached = file_get_contents($cachePath);
+        if ($cached !== false) {
+            $decoded = json_decode($cached, true);
+            if ($decoded !== null) { $haveCache = true; $cachedData = $decoded; }
+        }
+        if ($haveCache && $age < $maxAge) {
+            $cachedData['_cached'] = true;
+            $cachedData['_cache_age'] = $age;
+            return $cachedData;
         }
     }
-    
+
+    /*
+     * Stale cache: only ONE request at a time is allowed to go upstream.
+     *
+     * This function previously blocked every caller on a 15s fetch the moment
+     * the cache expired. With four sources polled from the page, a slow
+     * upstream held several PHP workers at once and this host's pool ran out —
+     * during the incident even signal-feed.php, a local file read with no
+     * network at all, took 20s purely from queueing.
+     *
+     * Now: whoever wins the lock refreshes (with a much shorter deadline);
+     * everyone else is served the stale copy instantly, flagged. Serving data
+     * a few minutes old is vastly better than not serving the site.
+     */
+    $lockPath = $cachePath . '.lock';
+    $lockHeld = file_exists($lockPath) && (time() - filemtime($lockPath)) < 90;
+
+    if ($haveCache && $lockHeld) {
+        $cachedData['_cached'] = true;
+        $cachedData['_stale'] = true;
+        $cachedData['_cache_age'] = $age;
+        return $cachedData;
+    }
+    if ($haveCache) {
+        @touch($lockPath);
+        $timeout = min($timeout, 8);   // bound the worst case we can hold a worker
+    }
+
     // Fetch fresh
     list($body, $status, $err) = fetchUrl($url, $timeout);
+    @unlink($lockPath);
     
     if ($err || $status >= 400 || $body === false) {
         // Return cached data if available, even if stale
