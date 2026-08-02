@@ -39,6 +39,21 @@ $orbitClassForAltitude = function ($altitudeKm) {
     return 'LEO';
 };
 
+/**
+ * Shipped catalogue used as the floor when live fetch and cache both fail.
+ * Built offline (CelesTrak answers normally from other networks) and
+ * deployed with the site; see scripts note in the repo.
+ */
+$seedCache = null;
+$loadSeed = function () use (&$seedCache) {
+    if ($seedCache !== null) return $seedCache;
+    $path = __DIR__ . '/../data/satellite-seed.json';
+    if (!file_exists($path)) { $seedCache = []; return $seedCache; }
+    $d = json_decode(file_get_contents($path), true);
+    $seedCache = (is_array($d) && isset($d['items'])) ? $d['items'] : [];
+    return $seedCache;
+};
+
 $fetch = function ($url) {
     $curl = curl_init($url);
     curl_setopt_array($curl, [
@@ -99,10 +114,14 @@ foreach ($groups as $group) {
     // continuing to fetch. Partial-but-fast beats complete-but-hung.
     if (microtime(true) > $fetchBudgetUntil) {
         $errors[] = $group['slug'] . ': skipped (time budget)';
-        if ($cached && isset($cached['items'])) {
-            $prev = array_filter($cached['items'], fn($i) => ($i['network'] ?? '') === $group['network']);
-            if ($prev) $items = array_merge($items, array_slice(array_values($prev), 0, intval($group['limit'])));
+        $prev = ($cached && isset($cached['items']))
+            ? array_values(array_filter($cached['items'], fn($i) => ($i['network'] ?? '') === $group['network']))
+            : [];
+        if (!$prev) {
+            $seed = $loadSeed();
+            if ($seed) $prev = array_values(array_filter($seed, fn($i) => ($i['network'] ?? '') === $group['network']));
         }
+        if ($prev) $items = array_merge($items, array_slice($prev, 0, intval($group['limit'])));
         continue;
     }
     $url = isset($group['query'])
@@ -141,10 +160,25 @@ foreach ($groups as $group) {
         // group — and because the result is then written back to cache, one
         // bad minute permanently destroyed good data. Observed live: a
         // 294-satellite cache was replaced by 72.
+        $recovered = false;
         if ($cached && isset($cached['items'])) {
             $prev = array_filter($cached['items'], fn($i) => ($i['network'] ?? '') === $group['network']);
             if ($prev) {
                 $items = array_merge($items, array_slice(array_values($prev), 0, intval($group['limit'])));
+                $recovered = true;
+            }
+        }
+        // Last resort: the shipped seed catalogue. Without this, a host that
+        // CelesTrak refuses AND a cache that has already been degraded leaves
+        // nothing to serve — which is how the satellite layer went from 294
+        // objects to 72 with no way back.
+        if (!$recovered) {
+            $seed = $loadSeed();
+            if ($seed) {
+                $seedGroup = array_filter($seed, fn($i) => ($i['network'] ?? '') === $group['network']);
+                if ($seedGroup) {
+                    $items = array_merge($items, array_slice(array_values($seedGroup), 0, intval($group['limit'])));
+                }
             }
         }
         continue;
