@@ -1044,3 +1044,28 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
   .cm-title { font-size: 12px; }
   .cm-count { display: none; }   /* count is in the map hint and the sort row */
 }
+
+/* Header fit on phones.
+   Measured at 390px: title 205px + toggle squeezed to 80px while its buttons
+   needed 122px, so MAP was clipped by the container's overflow:hidden and the
+   toggle looked like a single dead label. The toggle is the control; the
+   title is decoration. */
+@media (max-width: 850px) {
+  .cm-header { gap: 8px; align-items: center; }
+  .cm-title {
+    flex: 0 1 auto; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-size: 11px;
+  }
+  .cm-viewtoggle { flex: 0 0 auto; margin-left: auto; margin-right: 8px; }
+  .cm-vt { padding: 5px 10px; font-size: 10.5px; }
+  .cm-close { flex: 0 0 auto; }
+}
+@media (max-width: 430px) {
+  /* Below this the full name simply will not coexist with the control. */
+  .cm-title { font-size: 0; }
+  .cm-title::after {
+    content: 'NYC CAMS';
+    font-size: 11px; letter-spacing: 1px;
+  }
+}
