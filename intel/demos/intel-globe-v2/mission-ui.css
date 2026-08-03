@@ -456,12 +456,35 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
     min-height: 160px;
   }
 
-  /* Right rail: one context at a time. */
+  /* Right rail: region presets step aside for either context. */
   body.ctx-dossier #regions-panel,
   body.ctx-legend  #regions-panel { display: none; }
-  body.ctx-dossier #legend { display: none; }
 
   #legend, #dossier { bottom: auto; top: 72px; max-height: calc(100vh - 160px); }
+
+  /*
+   * The legend and the dossier COEXIST.
+   *
+   * Hiding the legend whenever a dossier opened left it display:none while
+   * still carrying .open — its state and what was drawn disagreed. The
+   * consequences were exactly what you would expect from that: its ✕ was
+   * unreachable while anything was selected, so it could not be dismissed,
+   * and it reappeared by itself the moment you deselected. From the outside
+   * it looked like the legend was popping up on its own whenever you clicked
+   * a satellite.
+   *
+   * A panel the operator opened stays open until the operator closes it.
+   * Heights below are derived so the two cannot overlap at any viewport:
+   * the legend gets whatever is left after the dossier and the bottom chrome.
+   */
+  body.ctx-dossier #dossier { max-height: 46vh; }
+  body.ctx-dossier #legend {
+    top: auto;
+    bottom: 100px;
+    max-height: calc(100vh - 46vh - 72px - 100px - 24px);
+  }
+  /* A legend the operator has dragged stays exactly where they put it. */
+  body.ctx-dossier #legend.pw-moved { top: auto; bottom: auto; max-height: calc(100vh - 160px); }
 }
 
 /* Tall displays: give the alerts feed more room once the layer list fits. */
@@ -845,7 +868,10 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
      the operator has explicitly placed it somewhere, so let it coexist. */
   body.ctx-dossier #regions-panel.pw-moved,
   body.ctx-legend  #regions-panel.pw-moved { display: block !important; }
-  body.ctx-dossier #legend.pw-moved { display: block !important; }
+  /* (Removed: a `display:block !important` here used to force a MOVED legend
+     visible even when it was closed, because the base rule only hides it via
+     `#legend { display:none }`. It existed to defeat the old
+     "hide the legend when a dossier opens" rule, which is gone.) */
 
   /* Full alert text needs to wrap and breathe. */
   .ds-alert-text {
