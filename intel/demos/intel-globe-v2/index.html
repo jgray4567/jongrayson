@@ -914,7 +914,7 @@
 <!-- Top Bar -->
 <div id="top-bar">
   <div class="title">INTEL LAYER<span class="sep">—</span><span class="sub">GLOBAL SITUATION AWARENESS</span></div>
-  <a class="back-link" href="https://www.jongrayson.com">← BACK TO BASE</a>
+  <a class="back-link" href="https://www.jongrayson.com" title="Back to jongrayson.com">← BACK</a>
 
   <!-- Primary findability affordance. Nothing on this globe should require
        hunting by hand; this is the entry point to every entity on screen. -->
@@ -1537,7 +1537,10 @@ async function init() {
     source: 'NOAA / NWS · severe convective warnings (US only)',
   });
   feeds.register('news', {
-    label: 'Wire Services', cadenceMs: 5 * 60 * 1000,
+    // Matches the 10-minute poll below. Same class of bug as the satellite
+    // cadence: a declared cadence that disagrees with the real interval makes
+    // the monitor report failures that are not happening.
+    label: 'Wire Services', cadenceMs: 10 * 60 * 1000,
     source: 'BBC World · Al Jazeera · NPR World · ReliefWeb',
   });
   feeds.register('render', {

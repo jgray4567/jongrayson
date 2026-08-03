@@ -74,9 +74,14 @@ export class OrbitalLayer {
     this.active = [];                  // filtered, in instance order
 
     this._build();
+    // cadenceMs MUST match the actual poll interval in index.html.
+    // It was left at 60s after the poll moved to 30 minutes, so FeedMonitor —
+    // which flags STALE at 1.5x cadence and FAILED at 3x — declared "Orbital
+    // Assets FAILURE" after three minutes while the layer was working
+    // perfectly. A monitor that cries wolf is worse than no monitor.
     feeds.register('satellites', {
       label: 'Orbital Assets',
-      cadenceMs: 60 * 1000,
+      cadenceMs: 30 * 60 * 1000,
       source: 'CelesTrak TLE · SGP4 propagation (satellite.js)',
     });
 
@@ -204,6 +209,21 @@ export class OrbitalLayer {
       this.sats = out;
       this._applyFilters();
       feeds.success('satellites', this.active.length);
+
+      // The endpoint only ever serves cache on a normal request, so nothing
+      // upstream happens unless we ask. Fire the refresh AFTER we already have
+      // a picture on screen and never wait on it — the result lands in the
+      // server cache for the next load. A failure here is not a layer failure,
+      // so it deliberately does not touch feed state.
+      const age = data.ageSeconds;
+      if (data.stale || (typeof age === 'number' && age > 21600)) {
+        if (!this._refreshInFlight) {
+          this._refreshInFlight = true;
+          fetch(this.endpoint + '?refresh=1', { cache: 'no-store' })
+            .catch(() => {})
+            .finally(() => { this._refreshInFlight = false; });
+        }
+      }
     } catch (err) {
       feeds.failure('satellites', err);
       console.warn('[orbital] fetch failed:', err);

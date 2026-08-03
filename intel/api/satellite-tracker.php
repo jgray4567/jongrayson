@@ -3,7 +3,8 @@ header('Content-Type: application/json');
 header('Cache-Control: no-store');
 
 $cachePath = __DIR__ . '/../data/satellite-tracker-cache.json';
-$cacheTtlSeconds = 1800;
+$cacheTtlSeconds = 21600;   // 6h — TLEs are republished ~daily, so a 30-min
+                            // TTL just meant paying the slow path 48x a day
 $maxItems = 500;
 $groups = [
     ['slug' => 'stations', 'network' => 'Crewed / Stations', 'limit' => 20],
@@ -96,9 +97,25 @@ if (!$bypassCache && $cached && isset($cached['fetchedAt']) && (time() - intval(
  */
 $lockPath = $cachePath . '.lock';
 $lockHeld = file_exists($lockPath) && (time() - filemtime($lockPath)) < 180;
-if (!$bypassCache && $lockHeld && $cached) {
-    $cached['stale'] = true;
-    $cached['note'] = 'refresh in progress; serving last good element sets';
+
+/*
+ * A normal request never goes upstream when a cache exists — not even the
+ * first one after expiry.
+ *
+ * Previously whichever request happened to arrive after the TTL lapsed paid
+ * the entire CelesTrak walk. From the browser that request just hung and the
+ * satellite layer failed to populate; reloading worked because the lock was
+ * then held and the reload got the cache instantly. That is exactly the
+ * "sometimes I have to refresh a few times" symptom.
+ *
+ * Refreshing is now driven by an explicit ?refresh=1 call, which the page
+ * fires after it has already rendered and never waits on.
+ */
+if (!$bypassCache && $cached) {
+    $age = time() - intval($cached['fetchedAt'] ?? 0);
+    $cached['stale'] = $age >= $cacheTtlSeconds;
+    $cached['ageSeconds'] = $age;
+    if ($lockHeld) $cached['note'] = 'refresh in progress';
     $emit($cached);
 }
 @touch($lockPath);
