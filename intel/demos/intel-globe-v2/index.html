@@ -1220,6 +1220,13 @@
     <div class="cm-header">
       <div class="cm-title">NYC TRAFFIC CAMERAS</div>
       <div class="cm-count"><span class="cm-online" id="cm-online-count">0</span> online</div>
+      <!-- Mobile only. Stacking map + preview + list vertically left the list
+           a few unusable rows, so on a phone the map and the list take turns
+           at full height instead of competing. -->
+      <div class="cm-viewtoggle" id="cm-viewtoggle" role="tablist">
+        <button class="cm-vt active" data-view="list" role="tab">CAMERAS</button>
+        <button class="cm-vt" data-view="map" role="tab">MAP</button>
+      </div>
       <div class="cm-close" id="cm-close">✕</div>
     </div>
     <div class="cm-body">
@@ -2740,7 +2747,12 @@ function renderMapPins() {
       fillOpacity: isSel ? 0.95 : 0.55,
     });
     m.bindTooltip(c.name || 'Camera', { direction: 'top', offset: [0, -4] });
-    m.on('click', () => selectCamera(c));
+    m.on('click', () => {
+      selectCamera(c);
+      // On mobile the preview lives above the toggle, so switching back to
+      // the list makes the newly selected camera visible in context.
+      if (window.matchMedia('(max-width: 850px)').matches) window.setCamView?.('list');
+    });
     m.addTo(cmMarkerLayer);
     cmMarkers.set(c.id, m);
   }
@@ -2847,6 +2859,23 @@ function loadPreviewImage(cam) {
 const cameraResolution = new Map();
 
 function initCameraModal() {
+  // Mobile map/list toggle.
+  const modalEl = document.getElementById('camera-modal');
+  const setCamView = (view) => {
+    if (!modalEl) return;
+    modalEl.classList.toggle('view-map', view === 'map');
+    modalEl.classList.toggle('view-list', view !== 'map');
+    document.querySelectorAll('#cm-viewtoggle .cm-vt').forEach(b =>
+      b.classList.toggle('active', b.dataset.view === view));
+    // Leaflet cannot measure a hidden container; re-measure the moment the
+    // map becomes visible or it renders into a zero-size box.
+    if (view === 'map') setTimeout(() => { if (cmMap) cmMap.invalidateSize(); }, 30);
+  };
+  document.querySelectorAll('#cm-viewtoggle .cm-vt').forEach(b =>
+    b.addEventListener('click', () => setCamView(b.dataset.view)));
+  setCamView('list');       // selecting a camera is the primary task
+  window.setCamView = setCamView;
+
   // Sort toggles. Resolution matters here because NYC DOT serves whatever
   // each camera produces and ignores size hints — only ~13% exceed 352x240,
   // and they are otherwise unfindable among 970 identical-looking rows.

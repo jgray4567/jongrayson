@@ -991,3 +991,56 @@ span.fh-posture.fh-LOADING { color: var(--txt-3); }
   #dossier, #legend { bottom: 68px !important; }
   .back-link { bottom: 36px !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   CAMERA BROWSER — MOBILE MAP / LIST TOGGLE
+   ══════════════════════════════════════════════════════════════
+   On a phone the vertical stack (map + preview + list) left the list two or
+   three rows tall — you could not actually browse or pick a camera, which is
+   the entire purpose of the dialog. The preview stays pinned at the top
+   because it is the payoff; below it the map and the list take turns at full
+   height rather than competing for the same pixels. */
+
+.cm-viewtoggle { display: none; }
+
+@media (max-width: 850px) {
+  .cm-viewtoggle {
+    display: flex; gap: 0; margin-left: auto; margin-right: 10px;
+    border: 1px solid rgba(196,214,0,0.25); border-radius: 7px; overflow: hidden;
+  }
+  .cm-vt {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.8px;
+    padding: 5px 12px; border: none; cursor: pointer;
+    background: transparent; color: var(--txt-2);
+  }
+  .cm-vt.active { background: var(--accent); color: var(--ink); font-weight: 700; }
+
+  .cm-body { flex-direction: column; }
+  .cm-left {
+    flex: 0 0 auto; max-width: none; min-width: 0;
+    border-right: none; display: contents;   /* let preview and map size independently */
+  }
+
+  /* Preview: always visible, compact. */
+  #cm-preview {
+    order: 1; flex: 0 0 auto;
+    border-bottom: 1px solid rgba(196,214,0,0.12);
+  }
+  .cm-left .cm-preview-img-wrap { max-height: 30vh !important; min-height: 150px; }
+
+  /* Map and list occupy the same slot; the toggle decides which is shown. */
+  .cm-map-panel  { order: 2; flex: 1 1 auto; min-height: 0; }
+  .cm-list-panel { order: 2; flex: 1 1 auto; min-height: 0; }
+
+  #camera-modal.view-list .cm-map-panel  { display: none; }
+  #camera-modal.view-map  .cm-list-panel { display: none; }
+  #camera-modal.view-map  .cm-map-panel  { display: block; height: auto; }
+
+  /* Two columns of cards still fit comfortably at phone widths. */
+  .cm-list { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 5px; padding: 6px; }
+  .cm-list .cm-list-item { padding: 5px; gap: 6px; }
+
+  .cm-header { flex-wrap: nowrap; }
+  .cm-title { font-size: 12px; }
+  .cm-count { display: none; }   /* count is in the map hint and the sort row */
+}
