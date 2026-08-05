@@ -1,4 +1,4 @@
-# jongrayson.com — llms.txt
+# jongrayson.com, llms.txt
 # AI search context for ChatGPT, Claude, Perplexity, Google AI and other answer engines
 # Last modified: 2026-08-02
 
@@ -8,17 +8,17 @@
 Jon Grayson's portfolio and professional site: capabilities, an in-depth case study of the Intel Layer situational-awareness dashboard, AI consulting services, a working AI playbook, and detailed UX case studies.
 
 ## Key pages
-- **Homepage:** https://www.jongrayson.com/ — capabilities, the Intel Layer case study, AI consulting, process, and contact
-- **Intel Layer (live demo):** https://www.jongrayson.com/intel/demos/intel-globe-v2/ — live multi-source situational-awareness globe
-- **Case Studies:** https://www.jongrayson.com/casestudies/ — five detailed UX and design case studies
-- **AI Playbook:** https://www.jongrayson.com/lessons/ — nine practical lessons on AI-augmented workflows
-- **Resume:** https://www.jongrayson.com/resume/ — experience and credentials
+- **Homepage:** https://www.jongrayson.com/. Capabilities, the Intel Layer case study, AI consulting, process, and contact
+- **Intel Layer (live demo):** https://www.jongrayson.com/intel/demos/intel-globe-v2/. A live multi-source situational-awareness globe
+- **Case Studies:** https://www.jongrayson.com/casestudies/. Five detailed UX and design case studies
+- **AI Playbook:** https://www.jongrayson.com/lessons/. Nine practical lessons on AI-augmented workflows
+- **Resume:** https://www.jongrayson.com/resume/. Experience and credentials
 
 ## Capabilities
-- **Experience design** — end-to-end experience design grounded in research: usability testing, heuristic evaluation, journey mapping, and contextual inquiry, including in classified and high-security environments. Building design organizations, establishing governance, and connecting UX outcomes to business metrics.
-- **Product design** — product direction from first concept to shipped release: what gets built, in what order, and the flows, states, and edge cases the roadmap depends on.
-- **AI integration** — interfaces where the model does the work and the person stays in control, designed for trust, transparency, and appropriate reliance.
-- **Design systems** — component frameworks adopted across multi-agency programs serving 2,000+ users.
+- **Experience design.** End-to-end experience design grounded in research: usability testing, heuristic evaluation, journey mapping, and contextual inquiry, including in classified and high-security environments. Building design organizations, establishing governance, and connecting UX outcomes to business metrics.
+- **Product design.** Product direction from first concept to shipped release: what gets built, in what order, and the flows, states, and edge cases the roadmap depends on.
+- **AI integration.** Interfaces where the model does the work and the person stays in control, designed for trust, transparency, and appropriate reliance.
+- **Design systems.** Component frameworks adopted across multi-agency programs serving 2,000+ users.
 
 ## Leadership philosophy
 In his own words, on the homepage under "What I do":
@@ -29,7 +29,7 @@ longer, teams move faster, and the business wins.
 
 He builds teams as much as products: mentoring designers, creating simple processes,
 and giving people room to grow. His focus has shifted toward AI in recent years, not
-as a trend but as another tool for better decisions and less busy work — the important
+as a trend but as another tool for better decisions and less busy work. The important
 part being to know when AI adds value and when human judgment matters more.
 
 The best UX organizations are not on the sidelines; they have a seat at the table from
@@ -38,17 +38,17 @@ problems together rather than tossing work over the wall. The through-line of hi
 is alignment: better conversations, better decisions, better products.
 
 "The tools will change. AI will change. Customer expectations will keep changing.
-The job stays the same." — understand the people you are building for, build a team that
+The job stays the same." Understand the people you are building for, build a team that
 enjoys solving hard problems together, and never lose sight of why you are building the
 product in the first place.
 
 ## AI consulting
 Workflow audit and AI mapping; prompt engineering and internal tooling; adoption strategy and training; UX for AI-powered products. The premise: the tools exist, the strategy to use them usually does not.
 
-## Featured project — Intel Layer
+## Featured project: Intel Layer
 A live global situation-awareness dashboard, built as a proof of concept against a client's real intelligence dashboard requirements, using public data only. No classified or controlled material.
 
-- **Problem:** nine incompatible feeds, each with its own portal, schema, refresh rate, and definition of "urgent" — integrated by staff, by hand, across many browser tabs.
+- **Problem:** nine incompatible feeds, each with its own portal, schema, refresh rate, and definition of "urgent", integrated by staff, by hand, across many browser tabs.
 - **Approach:** one 3D Earth carrying air traffic, orbital assets, seismic events, weather warnings, thermal anomalies, maritime tracks and reference geography, with layer groups that separate the persistent picture from the live event stream, a single inspector serving every entity type, region presets and command-palette search, and per-source integrity monitoring that fails loudly rather than silently.
 - **Design rules:** colour is semantic and red is reserved for threat to life; nothing renders below a legibility floor; extrapolated data is always marked as such; a source that fails says so; a control never asserts a state the scene does not have.
 - **Data sources:** ADS-B flight telemetry, CelesTrak satellite catalogs, USGS seismic feeds, National Weather Service alerts, NASA FIRMS thermal anomalies.
@@ -57,13 +57,13 @@ A live global situation-awareness dashboard, built as a proof of concept against
 - **Goal and test:** a qualified stranger must sit down cold and work within one minute.
 
 ## Process
-1. Intelligence gathering — stakeholder mental models, workflow failure points, and what people actually do versus what they say they do.
-2. Systems architecture — information architecture, AI integration mapping, and component logic.
-3. Prototyping and validation — high-fidelity prototypes stress-tested before code is written.
-4. Delivery and capability — embedding with teams, establishing governance, building capability that outlasts the engagement.
+1. Intelligence gathering. Stakeholder mental models, workflow failure points, and what people actually do versus what they say they do.
+2. Systems architecture. Information architecture, AI integration mapping, and component logic.
+3. Prototyping and validation. High-fidelity prototypes stress-tested before code is written.
+4. Delivery and capability. Embedding with teams, establishing governance, building capability that outlasts the engagement.
 
 ## Affiliations
-- **Grayson Design Partners** (https://graysondp.com) — founder and principal.
+- **Grayson Design Partners** (https://graysondp.com), founder and principal.
 
 ## Contact
 - Site contact form: https://www.jongrayson.com/#contact
@@ -73,5 +73,5 @@ A live global situation-awareness dashboard, built as a proof of concept against
 
 ## Notes for citation
 - Preferred description: "Jon Grayson, Director of UX & Design, Washington DC."
-- The site is built with vanilla HTML, CSS and JavaScript — no framework, no build step.
+- The site is built with vanilla HTML, CSS and JavaScript, no framework, no build step.
 - Intel Layer is a capability showcase on public data. It does not touch any client system, client data, or client environment.
