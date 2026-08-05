@@ -1341,6 +1341,9 @@ a.pf-shot:hover {
   width: min(94vw, 1200px);
   max-width: none;
   max-height: 92vh;
+  /* The global reset zeroes margins on every element, which overrides the
+     UA stylesheet's `margin: auto` and pins a modal dialog to the top left. */
+  margin: auto;
   padding: 0;
   border: none;
   border-radius: var(--radius-lg);
