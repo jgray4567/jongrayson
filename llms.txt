@@ -20,6 +20,28 @@ Jon Grayson's portfolio and professional site: capabilities, an in-depth case st
 - **AI integration** — interfaces where the model does the work and the person stays in control, designed for trust, transparency, and appropriate reliance.
 - **Design systems** — component frameworks adopted across multi-agency programs serving 2,000+ users.
 
+## Leadership philosophy
+In his own words, on the homepage under "What I do":
+
+Good UX is not about making screens prettier. It is about making products easier to
+understand, easier to trust, and easier to use. When that is right, customers stay
+longer, teams move faster, and the business wins.
+
+He builds teams as much as products: mentoring designers, creating simple processes,
+and giving people room to grow. His focus has shifted toward AI in recent years, not
+as a trend but as another tool for better decisions and less busy work — the important
+part being to know when AI adds value and when human judgment matters more.
+
+The best UX organizations are not on the sidelines; they have a seat at the table from
+the beginning, with Product, Engineering, Design, Research and Content thinking through
+problems together rather than tossing work over the wall. The through-line of his career
+is alignment: better conversations, better decisions, better products.
+
+"The tools will change. AI will change. Customer expectations will keep changing.
+The job stays the same." — understand the people you are building for, build a team that
+enjoys solving hard problems together, and never lose sight of why you are building the
+product in the first place.
+
 ## AI consulting
 Workflow audit and AI mapping; prompt engineering and internal tooling; adoption strategy and training; UX for AI-powered products. The premise: the tools exist, the strategy to use them usually does not.
 

@@ -737,6 +737,75 @@ h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.015em; line-heigh
 .tile p { color: var(--gray-600); }
 @media (max-width: 760px) { .tiles { grid-template-columns: 1fr; gap: 16px; } }
 
+/* ── Leadership philosophy — excerpt visible, rest on request ─ */
+.philosophy {
+  margin-top: var(--sp-block);
+  padding-top: var(--sp-block);
+  border-top: 1px solid var(--gray-200);
+  max-width: 38rem;
+}
+.philosophy-title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+.philosophy p {
+  font-size: var(--fs-body);
+  line-height: 1.65;
+  color: var(--gray-600);
+}
+.philosophy p + p { margin-top: 1.125rem; }
+
+.philosophy-more { margin-top: 1.5rem; }
+.philosophy-more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--lime-dark);
+  cursor: pointer;
+  list-style: none;
+  padding: 0.25rem 0;
+  transition: color 0.2s;
+}
+.philosophy-more > summary::-webkit-details-marker { display: none; }
+.philosophy-more > summary:hover { color: var(--near-black); }
+.phi-chevron {
+  width: 8px; height: 8px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.25s var(--ease);
+}
+.philosophy-more[open] .phi-chevron { transform: translateY(1px) rotate(-135deg); }
+.phi-label-open { display: none; }
+.philosophy-more[open] .phi-label-closed { display: none; }
+.philosophy-more[open] .phi-label-open { display: inline; }
+
+.philosophy-rest { padding-top: 1.125rem; }
+.philosophy-rest p:first-child { margin-top: 0; }
+.philosophy-punch {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--near-black);
+}
+.philosophy .philosophy-punch + p { margin-top: 1.125rem; }
+
+/* Ease the reveal where the browser can animate to a keyword height */
+@supports (interpolate-size: allow-keywords) {
+  :root { interpolate-size: allow-keywords; }
+  .philosophy-more::details-content {
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: height 0.4s var(--ease), opacity 0.3s var(--ease), content-visibility 0.4s allow-discrete;
+  }
+  .philosophy-more[open]::details-content { height: auto; opacity: 1; }
+}
+
 /* ════════════════════════════════════════════════════════════
    INTEL LAYER — CASE STUDY
    ════════════════════════════════════════════════════════════ */
