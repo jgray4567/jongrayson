@@ -1311,3 +1311,98 @@ a.pf-shot:hover {
 @media (max-width: 480px) {
   .nav-minimal .nav-cta .full { display: none; }
 }
+
+/* ── ORION lightbox ──────────────────────────────────────── */
+.pf-shot-gallery {
+  position: relative;
+  padding: 0;
+  font: inherit;
+  cursor: zoom-in;
+  text-align: left;
+  width: 100%;
+}
+.pf-shot-hint {
+  position: absolute;
+  right: 14px; bottom: 14px;
+  display: inline-flex; align-items: center;
+  padding: 0.4375rem 0.875rem;
+  border-radius: 980px;
+  background: rgba(17,17,19,0.82);
+  color: #fff;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.2s var(--ease);
+}
+.pf-shot-gallery:hover .pf-shot-hint { background: var(--lime); color: var(--near-black); }
+
+.lb {
+  width: min(94vw, 1200px);
+  max-width: none;
+  max-height: 92vh;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--black);
+  color: #fff;
+  overflow: visible;
+}
+.lb::backdrop { background: rgba(10,12,10,0.86); backdrop-filter: blur(4px); }
+.lb-figure { margin: 0; }
+/* Fixed frame height: the three shots have different proportions, and
+   letting the dialog resize between them moved the next button out from
+   under the pointer mid-click. */
+.lb-img {
+  display: block;
+  width: 100%;
+  height: min(68vh, 680px);
+  object-fit: contain;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: #05070a;
+}
+.lb-caption {
+  padding: 18px 24px 22px;
+  font-size: var(--fs-meta);
+  line-height: 1.5;
+  color: var(--text-dark);
+  max-width: 62ch;
+}
+.lb-count {
+  position: absolute;
+  right: 24px; bottom: 22px;
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: var(--fs-meta);
+  color: var(--text-dark-2);
+}
+.lb-close, .lb-nav {
+  position: absolute;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line-dark);
+  border-radius: 50%;
+  background: rgba(17,17,19,0.86);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s;
+}
+.lb-close:hover, .lb-nav:hover { background: var(--lime); color: var(--near-black); border-color: var(--lime); }
+/* Controls sit inside the frame: hung outside, they clipped against the
+   viewport edge whenever the dialog approached its max width or height. */
+.lb-close {
+  top: 12px; right: 12px;
+  width: 40px; height: 40px;
+  font-size: 1.5rem; line-height: 1;
+}
+.lb-nav {
+  top: calc(min(68vh, 680px) / 2 - 24px);
+  width: 48px; height: 48px;
+  font-size: 1.75rem; line-height: 1;
+}
+.lb-prev { left: 12px; }
+.lb-next { right: 12px; }
+
+@media (max-width: 760px) {
+  .lb { width: 96vw; }
+  .lb-count { position: static; display: block; padding: 0 24px 20px; }
+  .lb-caption { padding-bottom: 12px; }
+}

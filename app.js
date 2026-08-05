@@ -344,3 +344,44 @@ setInterval(() => {
   }
   requestAnimationFrame(frame);
 })();
+
+/* ── ORION lightbox (portfolio page only) ─────────────────── */
+(function () {
+  const dialog = $('orionLightbox');
+  const opener = $('orionOpen');
+  if (!dialog || !opener || typeof dialog.showModal !== 'function') return;
+
+  const shots = [
+    { src: 'img/orion-1.jpg', caption: 'The common operating picture on the watch floor: contingency planning, regional map and travel advisories.' },
+    { src: 'img/orion-2.jpg', caption: 'Non-combatant tracking: evacuee status, demographics and per-person detail.' },
+    { src: 'img/orion-3.jpg', caption: 'Post-level view: current conditions, cables and reporting against a live storm track.' }
+  ];
+
+  const img = $('lbImg'), caption = $('lbCaption'), count = $('lbCount');
+  const prev = $('lbPrev'), next = $('lbNext'), close = $('lbClose');
+  let i = 0;
+
+  const show = (n) => {
+    i = (n + shots.length) % shots.length;
+    img.src = shots[i].src;
+    img.alt = shots[i].caption;
+    caption.textContent = shots[i].caption;
+    count.textContent = (i + 1) + ' of ' + shots.length;
+  };
+
+  opener.addEventListener('click', () => { show(0); dialog.showModal(); });
+  prev.addEventListener('click', () => show(i - 1));
+  next.addEventListener('click', () => show(i + 1));
+  close.addEventListener('click', () => dialog.close());
+
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); show(i + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); show(i - 1); }
+  });
+
+  // Clicking the backdrop closes; clicking the picture itself does not.
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+
+  // Return focus to the thumbnail so the keyboard user is not dropped at the top.
+  dialog.addEventListener('close', () => opener.focus());
+})();
