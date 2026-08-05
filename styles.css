@@ -1215,3 +1215,99 @@ h3 { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.015em; line-heigh
   .tile:hover { transform: none; }
   .pr-fill { transition-duration: 0.001s; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   PORTFOLIO (/portfolio/)
+   ════════════════════════════════════════════════════════════ */
+.nav-minimal .nav-inner { justify-content: space-between; }
+
+.pf-head {
+  position: relative; z-index: 1;
+  padding: calc(56px + var(--sp-section)) 0 var(--sp-block);
+  background: var(--white);
+}
+.pf-head .display { max-width: 14ch; }
+.pf-lead {
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+  color: var(--gray-600);
+  max-width: 36rem;
+  margin-top: 1.75rem;
+}
+.pf-section { padding-top: 0; }
+
+.pf-list { list-style: none; display: flex; flex-direction: column; gap: var(--sp-section); }
+.pf-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 5vw, 72px);
+  align-items: center;
+}
+/* Alternate which side the shot sits on, so the eye moves down the page */
+.pf-item:nth-child(even) .pf-shot { order: 2; }
+
+.pf-shot {
+  display: block;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--off-white);
+  transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
+}
+a.pf-shot:hover {
+  border-color: var(--gray-400);
+  box-shadow: 0 20px 50px -26px rgba(0,0,0,0.28);
+  transform: translateY(-3px);
+}
+/* Screenshots keep their own proportions. Cropping to a uniform tile cut
+   through the logos and headlines the shots exist to show. */
+.pf-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pf-copy h2 {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin-bottom: 0.625rem;
+}
+.pf-meta {
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: var(--fs-meta);
+  color: var(--gray-600);
+  margin-bottom: 1.25rem;
+}
+.pf-copy p { font-size: var(--fs-body); line-height: 1.65; color: var(--gray-600); }
+.pf-copy p + p { margin-top: 1rem; }
+.pf-copy .btn-text { margin-top: 1.5rem; }
+.pf-note { font-size: var(--fs-meta); color: var(--gray-400); margin-top: 1.5rem; }
+
+/* Draft copy still to be replaced — visible on purpose */
+.pf-todo {
+  border-left: 2px solid var(--lime);
+  padding-left: 1rem;
+}
+.pf-meta.pf-todo { border-left-width: 2px; }
+
+.pf-end { text-align: center; }
+.pf-end .lead { margin: 1.25rem auto 0; }
+.pf-end-actions {
+  display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem;
+  margin-top: 2.5rem;
+}
+
+@media (max-width: 860px) {
+  .pf-item { grid-template-columns: 1fr; gap: 28px; }
+  .pf-item:nth-child(even) .pf-shot { order: 0; }
+  .pf-list { gap: var(--sp-block); }
+}
+
+/* The minimal nav has no hamburger, so its one link must survive the
+   breakpoint where the homepage hides .nav-cta behind the menu button. */
+.nav-minimal .nav-cta { display: inline-flex; }
+@media (max-width: 480px) {
+  .nav-minimal .nav-cta .full { display: none; }
+}
