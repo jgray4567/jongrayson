@@ -4,6 +4,146 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Intel Layer — Global Situation Awareness</title>
+
+<!-- SEO + AI Optimization -->
+<meta name="description" content="Intel Layer is a real-time global situational awareness dashboard combining live air traffic, satellite tracking, seismic data, weather alerts, and thermal anomalies on an interactive 3D globe. Built as a proof of concept for intelligence community dashboard requirements using public data only.">
+<meta name="keywords" content="situational awareness, intelligence dashboard, 3D globe, real-time visualization, air traffic tracking, satellite tracking, seismic monitoring, weather alerts, thermal anomalies, OSINT, geospatial, three.js, defense technology, mission-critical UI, dashboard design">
+<link rel="canonical" href="https://www.jongrayson.com/intel/demos/intel-globe-v2/">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Jon Grayson">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jon Grayson">
+<meta property="og:title" content="Intel Layer — Global Situation Awareness">
+<meta property="og:description" content="A real-time global situational awareness dashboard combining live air traffic, satellite tracking, seismic data, weather alerts, and thermal anomalies on an interactive 3D globe. Built as a proof of concept for intelligence community dashboard requirements using public data only.">
+<meta property="og:url" content="https://www.jongrayson.com/intel/demos/intel-globe-v2/">
+<meta property="og:image" content="https://www.jongrayson.com/img/intel-layer-preview.png">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@jongrayson">
+<meta name="twitter:title" content="Intel Layer — Global Situation Awareness">
+<meta name="twitter:description" content="A real-time global situational awareness dashboard combining live air traffic, satellite tracking, seismic data, weather alerts, and thermal anomalies on an interactive 3D globe.">
+<meta name="twitter:image" content="https://www.jongrayson.com/img/intel-layer-preview.png">
+
+<!-- JSON-LD: WebApplication -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Intel Layer — Global Situation Awareness",
+  "url": "https://www.jongrayson.com/intel/demos/intel-globe-v2/",
+  "description": "A real-time global situational awareness dashboard combining live air traffic, satellite tracking, seismic data, weather alerts, and thermal anomalies on an interactive 3D globe. Built as a proof of concept for intelligence community dashboard requirements using public data only.",
+  "applicationCategory": "VisualizationApplication",
+  "operatingSystem": "Web",
+  "browserRequirements": "Requires WebGL",
+  "author": {
+    "@type": "Person",
+    "name": "Jon Grayson",
+    "url": "https://www.jongrayson.com"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Jon Grayson",
+    "url": "https://www.jongrayson.com"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "Real-time commercial air traffic tracking (ADS-B)",
+    "Live satellite orbit tracking (CelesTrak)",
+    "USGS seismic event monitoring",
+    "National Weather Service active alerts",
+    "NASA FIRMS thermal anomaly detection",
+    "Day/night terminator with city lights",
+    "Active conflict zone hotspots",
+    "Region presets for rapid navigation",
+    "Command-palette search",
+    "Per-source integrity monitoring",
+    "Traffic camera integration",
+    "Auto-rotate idle mode"
+  ],
+  "keywords": "situational awareness, intelligence dashboard, 3D globe, real-time visualization, air traffic, satellite tracking, seismic, weather alerts, thermal anomalies, OSINT, geospatial"
+}
+</script>
+
+<!-- JSON-LD: FAQPage -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the Intel Layer situational awareness dashboard?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Intel Layer is a real-time global situational awareness dashboard that combines multiple live intelligence feeds on an interactive 3D globe. It displays commercial air traffic, satellite orbits, seismic events, weather alerts, and thermal anomalies in a single integrated view. Built as a proof of concept against a client's real intelligence dashboard requirements, it uses only public data sources and does not touch any classified or controlled material."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What data sources does the Intel Layer use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Intel Layer uses five public data sources: ADS-B flight telemetry for commercial air traffic, CelesTrak satellite catalogs for orbital asset tracking, USGS seismic feeds for earthquake monitoring, National Weather Service alerts for severe weather warnings, and NASA FIRMS for thermal anomaly detection. All sources are public, unclassified, and freely available."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the Intel Layer handle data source failures?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Intel Layer implements per-source integrity monitoring that fails loudly rather than silently. When a data source goes down, the interface explicitly shows the failure state rather than displaying stale or missing data without warning. This is a core design rule: a source that fails says so. The system never asserts a state the scene does not have."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What design principles guide the Intel Layer interface?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Intel Layer follows four design rules. Color is semantic and red is reserved for threat to life. Nothing renders below a legibility floor. Extrapolated data is always marked as such. A control never asserts a state the scene does not have. The overarching goal is that a qualified stranger must sit down cold and work within one minute."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What technology does the Intel Layer use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Intel Layer is built with three.js for 3D globe rendering, satellite.js for orbital calculations, and vanilla JavaScript for application logic. PHP feed proxies handle CORS for external data sources. The interface uses no framework and no build step, keeping the system lightweight and maintainable."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- JSON-LD: BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.jongrayson.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Intel Layer",
+      "item": "https://www.jongrayson.com/intel/demos/intel-globe-v2/"
+    }
+  ]
+}
+</script>
+<!-- End SEO + AI Optimization -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
