@@ -1409,3 +1409,45 @@ a.pf-shot:hover {
   .lb-count { position: static; display: block; padding: 0 24px 20px; }
   .lb-caption { padding-bottom: 12px; }
 }
+
+/* ── Portfolio band (2026-09-02) — Brands item above the Intelligence Layer, same black field ── */
+.pfh-item {
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lime);
+  margin-top: 28px;
+}
+.pfh-item + .lead { margin-top: 12px; }
+.pfh-frame {
+  display: block;
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--white);
+}
+.pfh-slide { display: none; margin: 0; }
+.pfh-slide.is-active { display: block; animation: pfh-in 0.4s var(--ease); }
+.pfh-slide img { display: block; width: 100%; height: auto; }
+.pfh-dots { display: flex; gap: 12px; margin-top: 16px; }
+.pfh-dot {
+  width: 12px; height: 12px;
+  border: none; border-radius: 999px;
+  padding: 0;
+  background: rgba(255,255,255,0.25);
+  cursor: pointer;
+  transition: background 0.25s var(--ease);
+}
+.pfh-dot:hover { background: rgba(255,255,255,0.45); }
+.pfh-dot.is-active { background: var(--lime); }
+@keyframes pfh-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .pfh-slide.is-active { animation: none; }
+}
+
+/* ── Portfolio band: GDP item (2026-09-02) — static single figure + spacing between stacked band items ── */
+.pfh-figure { margin: 0; }
+.pfh-figure img { display: block; width: 100%; height: auto; }
+.pfh-frame a { display: block; }
+.case-split + .case-split { margin-top: calc(2 * var(--sp-section)); }
