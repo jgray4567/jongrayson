@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+  <title>AVOID — Automated Vertical Obstruction Identification &amp; Detection</title>
+  <meta name="description" content="AVOID — Geospatial intelligence platform for automated vertical obstruction detection. Grayson Design Partners.">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <link rel="stylesheet" href="styles2x.css">
+  <link rel="stylesheet" href="palantir-theme.css?v=3">
+  <link rel="stylesheet" href="hud.css?v=3">
+  <!-- CesiumJS 1.143.0 -->
+  <link rel="stylesheet" href="https://unpkg.com/cesium@1.143.0/Build/Cesium/Widgets/widgets.css">
+  <script src="https://unpkg.com/cesium@1.143.0/Build/Cesium/Cesium.js"></script>
+  <style>
+    /* Cesium container fills the stage card */
+    #cesium-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+    }
+    /* Override Cesium default credit box for dark theme */
+    .cesium-widget-credits {
+      background: rgba(6,8,10,0.85) !important;
+      color: var(--muted) !important;
+      font-family: var(--font-mono) !important;
+      font-size: 9px !important;
+    }
+    .cesium-widget-credits a {
+      color: var(--lime) !important;
+    }
+    /* Cesium toolbar dark overrides */
+    .cesium-viewer-toolbar {
+      display: none;
+    }
+    .cesium-viewer-bottom {
+      background: rgba(6,8,10,0.7) !important;
+      border-top: 1px solid var(--border) !important;
+    }
+    /* Hide Cesium infobox default */
+    .cesium-infoBox {
+      display: none;
+    }
+    /* Selection indicator */
+    .cesium-selection-wrapper {
+      display: none;
+    }
+    /* Loading overlay */
+    #avoid-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      z-index: 100;
+      transition: opacity 0.5s ease;
+    }
+    #avoid-loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #avoid-loading .loader-text {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      text-align: center;
+    }
+    #avoid-loading .loader-bar {
+      width: 140px;
+      height: 2px;
+      background: var(--chip);
+      border-radius: 2px;
+      margin: 14px auto 0;
+      overflow: hidden;
+    }
+    #avoid-loading .loader-fill {
+      width: 40%;
+      height: 100%;
+      background: var(--lime);
+      border-radius: 2px;
+      animation: loadbar 1.2s ease-in-out infinite;
+    }
+    @keyframes loadbar {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(350%); }
+    }
+
+    /* Mobile left panel slide-out drawer */
+    .avoid-panel-tab {
+      display: none;
+      position: fixed;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 540;
+      width: 32px;
+      height: 60px;
+      background: rgba(6,8,10,0.8);
+      border: 1px solid var(--border);
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      pointer-events: auto;
+      align-items: center;
+      justify-content: center;
+      transition: left 0.3s ease;
+    }
+    .avoid-panel-tab svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--lime);
+      transition: transform 0.3s;
+    }
+    .avoid-panel-tab.open svg {
+      transform: rotate(180deg);
+    }
+    .avoid-mobile-panel {
+      display: none;
+      position: fixed;
+      left: -320px;
+      top: 0;
+      bottom: 0;
+      width: 300px;
+      z-index: 545;
+      background: rgba(8,10,14,0.97);
+      border-right: 1px solid var(--border-strong);
+      box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+      overflow-y: auto;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .avoid-mobile-panel.open {
+      left: 0;
+    }
+    .avoid-mobile-panel .panel {
+      margin-bottom: 18px;
+    }
+    .avoid-mobile-panel-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--chip);
+      color: var(--lime);
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Mobile hamburger menu for map controls */
+    .avoid-hamburger {
+      display: none;
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 526;
+      width: 44px;
+      height: 44px;
+      background: rgba(6,8,10,0.7);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      flex-direction: column;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .avoid-hamburger span {
+      display: block !important;
+      width: 22px !important;
+      height: 3px !important;
+      background: var(--lime) !important;
+      margin: 4px 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      font-size: 0 !important;
+      line-height: 0 !important;
+      transition: 0.3s;
+    }
+    .avoid-hamburger.open span:nth-child(1) {
+      transform: rotate(45deg) translate(4px, 4px);
+    }
+    .avoid-hamburger.open span:nth-child(2) {
+      opacity: 0;
+    }
+    .avoid-hamburger.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(4px, -4px);
+    }
+    .avoid-map-controls-mobile {
+      display: none;
+      position: absolute;
+      top: 96px;
+      left: 8px;
+      z-index: 525;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px;
+      background: rgba(6,8,10,0.8);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      backdrop-filter: blur(8px);
+      pointer-events: auto;
+    }
+    .avoid-map-controls-mobile .ghost-btn {
+      padding: 8px 14px;
+      font-size: 12px;
+      width: 100%;
+      text-align: left;
+    }
+    .avoid-map-controls-mobile.show {
+      display: flex;
+    }
+
+    /* Search bar */
+    .avoid-search-bar {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 525;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(6,8,10,0.6);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      backdrop-filter: blur(8px);
+      padding: 8px 16px;
+      pointer-events: auto;
+    }
+    .avoid-search-bar input {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 16px;
+      width: 300px;
+      outline: none;
+      pointer-events: auto;
+    }
+    .avoid-search-bar input::placeholder {
+      color: var(--muted);
+    }
+    .avoid-search-bar .search-btn {
+      background: var(--lime-dim);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--lime);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      padding: 6px 14px;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .avoid-search-bar .search-btn:hover {
+      background: rgba(0,229,255,0.2);
+      border-color: var(--border-strong);
+    }
+    .avoid-search-bar .search-icon {
+      color: var(--lime);
+      font-size: 18px;
+      pointer-events: none;
+    }
+    /* Bookmark buttons */
+    .avoid-bookmarks {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 524;
+      display: flex;
+      gap: 6px;
+      pointer-events: auto;
+    }
+    .avoid-bookmarks .bookmark-btn {
+      padding: 4px 12px;
+      background: rgba(6,8,10,0.5);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+    .avoid-bookmarks .bookmark-btn:hover {
+      color: var(--lime);
+      border-color: var(--border-strong);
+    }
+
+    /* AVOID HUD telemetry strip — bottom right */
+    .avoid-telemetry {
+      position: absolute;
+      bottom: 60px;
+      right: 18px;
+      z-index: 520;
+      display: flex;
+      gap: 1px;
+      background: rgba(6,8,10,0.5);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      backdrop-filter: blur(4px);
+      pointer-events: auto;
+      cursor: move;
+      user-select: none;
+    }
+    .avoid-telemetry .tel-cell {
+      padding: 24px 42px;
+      background: rgba(6,8,10,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 270px;
+    }
+    .avoid-telemetry .tel-label {
+      font-family: var(--font-mono);
+      font-size: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+    .avoid-telemetry .tel-value {
+      font-family: var(--font-mono);
+      font-size: 39px;
+      color: var(--lime);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+    .avoid-telemetry .tel-value.muted {
+      color: var(--text);
+    }
+    /* Crosshair overlay (center of globe) */
+    .avoid-crosshair {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 510;
+      pointer-events: none;
+      opacity: 0.3;
+    }
+    .avoid-crosshair::before,
+    .avoid-crosshair::after {
+      content: '';
+      position: absolute;
+      background: var(--lime);
+    }
+    .avoid-crosshair::before {
+      width: 1px;
+      height: 20px;
+      top: -10px;
+      left: 0;
+    }
+    .avoid-crosshair::after {
+      width: 20px;
+      height: 1px;
+      top: 0;
+      left: -10px;
+    }
+    /* AVOID Minimap / Scene Overview — top right */
+    .avoid-minimap {
+      position: absolute;
+      top: 60px;
+      right: 18px;
+      z-index: 515;
+      width: 480px;
+      background: rgba(6,8,10,0.92);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      backdrop-filter: blur(8px);
+      overflow: hidden;
+      transition: opacity 0.2s, transform 0.2s;
+      cursor: move;
+      user-select: none;
+    }
+    .avoid-minimap-header {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .avoid-minimap-title {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--lime);
+    }
+    .avoid-minimap-toggle {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0 4px;
+    }
+    .avoid-minimap-toggle:hover {
+      color: var(--lime);
+    }
+    .avoid-minimap-canvas-wrap {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      overflow: hidden;
+      background: #0a0c10;
+    }
+    .avoid-minimap-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0.9;
+    }
+    .avoid-minimap-viewport {
+      position: absolute;
+      border: 2px solid var(--lime);
+      background: rgba(0,255,68,0.08);
+      pointer-events: none;
+      transition: all 0.1s linear;
+      box-shadow: 0 0 8px rgba(0,255,68,0.3);
+    }
+    .avoid-minimap-footer {
+      padding: 6px 12px;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+    .avoid-minimap-footer .mm-coord {
+      color: var(--text);
+    }
+    .avoid-minimap.collapsed .avoid-minimap-canvas-wrap,
+    .avoid-minimap.collapsed .avoid-minimap-footer {
+      display: none;
+    }
+    @media (max-width: 900px) {
+      .avoid-minimap {
+        width: 320px;
+        top: calc(52px + env(safe-area-inset-top, 0px));
+        right: 8px;
+      }
+      .avoid-minimap-canvas-wrap {
+        height: 260px;
+      }
+    }
+    /* AVOID detection legend */
+    .avoid-legend {
+      position: absolute;
+      bottom: 60px;
+      left: 380px;
+      z-index: 520;
+      padding: 10px 14px;
+      background: rgba(6,8,10,0.88);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: auto;
+      cursor: move;
+      user-select: none;
+    }
+    .avoid-legend-title {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--lime);
+      margin-bottom: 4px;
+    }
+    .avoid-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text);
+    }
+    .avoid-legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    /* AVOID detail drawer — right side */
+    #avoid-detail-panel {
+      position: absolute;
+      top: 60px;
+      right: 0;
+      width: 420px;
+      max-width: 100%;
+      max-height: calc(100% - 120px);
+      background: rgba(8,10,14,0.75);
+      border-left: 1px solid var(--border-strong);
+      box-shadow: -8px 0 24px rgba(0,0,0,0.4);
+      z-index: 500;
+      backdrop-filter: blur(12px);
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+    #avoid-detail-panel.open {
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+    .avoid-detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .avoid-detail-title {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .avoid-detail-close {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--chip);
+      color: var(--lime);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .avoid-detail-close:hover {
+      border-color: var(--border-strong);
+      background: var(--lime-dim);
+    }
+    .avoid-detail-body {
+      padding: 20px;
+    }
+    .avoid-detail-section {
+      margin-bottom: 20px;
+    }
+    .avoid-detail-section:last-child {
+      margin-bottom: 0;
+    }
+    .avoid-detail-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--lime);
+      margin-bottom: 4px;
+    }
+    .avoid-detail-value {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .avoid-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .avoid-detail-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      background: var(--chip);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .avoid-detail-badge .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    /* Height category color classes */
+    .cat-red    { color: #ff453a; }
+    .cat-orange { color: #ff9100; }
+    .cat-yellow { color: #fbbf24; }
+    .cat-gray   { color: #6e6e73; }
+    /* Scan stats grid */
+    .avoid-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .avoid-stat-box {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--chip);
+    }
+    .avoid-stat-label {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .avoid-stat-value {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .avoid-stat-value.lime { color: var(--lime); }
+    /* Export buttons */
+    .avoid-export-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .avoid-export-btn {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--chip);
+      color: var(--lime);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-start;
+    }
+    .avoid-export-btn:hover {
+      border-color: var(--border-strong);
+      background: var(--lime-dim);
+    }
+    .avoid-export-btn .export-icon {
+      font-size: 14px;
+    }
+    /* Map control bar */
+    .avoid-map-controls {
+      position: absolute;
+      top: 18px;
+      left: 380px;
+      z-index: 520;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      cursor: move;
+      user-select: none;
+    }
+    .avoid-map-controls .ghost-btn {
+      padding: 6px 12px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .avoid-map-controls .ghost-btn.active {
+      border-color: var(--border-strong);
+      background: var(--lime-dim);
+      color: var(--lime);
+    }
+    /* AOI coordinate display */
+    .avoid-aoi-coords {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text);
+      margin-top: 6px;
+    }
+    .avoid-aoi-coords .coord-label {
+      color: var(--muted);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    /* Mobile responsive — optimized for phone screens */
+    /* Only apply to actual touch devices, not narrow desktop windows */
+    @media (max-width: 920px) and (hover: none) and (pointer: coarse) {
+      .app-shell {
+        display: block !important;
+      }
+      .left-rail {
+        display: none !important;
+      }
+      .center-stage {
+        padding: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        position: relative !important;
+        overflow: hidden !important;
+      }
+      #cesium-container {
+        width: 100% !important;
+        height: 100% !important;
+        position: absolute !important;
+        inset: 0 !important;
+      }
+
+      /* Search bar — compact, right of hamburger */
+      .avoid-search-bar {
+        top: 8px;
+        left: 56px;
+        right: 8px;
+        transform: none;
+        width: auto;
+        padding: 6px 12px;
+        border-radius: 20px;
+      }
+      .avoid-search-bar input {
+        width: 100%;
+        font-size: 13px;
+      }
+      .avoid-search-bar .search-btn {
+        padding: 4px 10px;
+        font-size: 12px;
+      }
+      .avoid-search-bar .search-icon {
+        font-size: 14px;
+      }
+
+      /* Bookmarks — horizontal scroll, smaller */
+      .avoid-bookmarks {
+        top: 56px;
+        left: 8px;
+        transform: none;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+        max-width: calc(100vw - 16px);
+        scrollbar-width: none;
+      }
+      .avoid-bookmarks::-webkit-scrollbar {
+        display: none;
+      }
+      .avoid-bookmarks .bookmark-btn {
+        font-size: 10px;
+        padding: 3px 10px;
+        flex-shrink: 0;
+      }
+
+      /* Hide Scene Overview by default on mobile */
+      .avoid-minimap {
+        display: none;
+      }
+
+      /* Left panel slide-out drawer on mobile */
+      .avoid-panel-tab {
+        display: flex;
+      }
+      .avoid-mobile-panel {
+        display: block;
+      }
+      .left-rail {
+        display: flex !important;
+      }
+
+      /* Map controls — hamburger menu on mobile */
+      .avoid-hamburger {
+        display: flex;
+      }
+      .avoid-map-controls {
+        display: none !important;
+      }
+      .avoid-map-controls-mobile.show {
+        display: flex;
+      }
+
+      /* Minimap — smaller, collapsible, top-right */
+      .avoid-minimap {
+        width: 130px;
+        top: 115px;
+        right: 8px;
+        cursor: default;
+      }
+      .avoid-minimap-canvas-wrap {
+        height: 100px;
+      }
+      .avoid-minimap-header {
+        padding: 4px 8px;
+      }
+      .avoid-minimap-title {
+        font-size: 7px;
+      }
+      .avoid-minimap-footer {
+        padding: 3px 8px;
+        font-size: 7px;
+      }
+
+      /* Telemetry — compact 2x2 grid, above browser bar */
+      .avoid-telemetry {
+        bottom: calc(60px + env(safe-area-inset-bottom, 20px));
+        right: 4px;
+        left: 4px;
+        flex-wrap: wrap;
+        gap: 1px;
+      }
+      .avoid-telemetry .tel-cell {
+        padding: 6px 10px;
+        min-width: 0;
+        flex: 1 1 45%;
+      }
+      .avoid-telemetry .tel-label {
+        font-size: 10px;
+      }
+      .avoid-telemetry .tel-value {
+        font-size: 14px;
+      }
+
+      /* Legend hidden on mobile — use left panel (accessible via toggle) */
+      .avoid-legend {
+        display: none;
+      }
+
+      /* Detail panel — full width, below controls, semi-transparent */
+      #avoid-detail-panel {
+        width: 100%;
+        max-width: 100% !important;
+        top: 120px !important;
+        right: 0 !important;
+        left: 0 !important;
+        max-height: calc(100% - 180px) !important;
+        background: rgba(8,10,14,0.8) !important;
+        backdrop-filter: blur(12px);
+      }
+
+      /* Crosshair smaller */
+      .avoid-crosshair::before {
+        height: 12px;
+        top: -6px;
+      }
+      .avoid-crosshair::after {
+        width: 12px;
+        left: -6px;
+      }
+    }
+  </style>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-L9JD3QE0J0"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-L9JD3QE0J0');</script>
+
+</head>
+<body>
+  <!-- Mobile Left Panel Drawer (outside app-shell grid to avoid column pollution) -->
+  <div class="avoid-panel-tab" id="avoid-panel-tab">
+    <svg viewBox="0 0 24 24"><path d="M8 5l8 7-8 7z"/></svg>
+  </div>
+  <div class="avoid-mobile-panel" id="avoid-mobile-panel">
+    <button class="avoid-mobile-panel-close" id="avoid-mobile-panel-close">✕</button>
+    <div id="avoid-mobile-panel-content" style="margin-top: 8px;"></div>
+  </div>
+
+  <div class="app-shell">
+    <!-- LEFT RAIL -->
+    <aside class="rail left-rail" style="display: flex; flex-direction: column;">
+      <!-- Brand Block -->
+      <div class="brand-block">
+
+        <h1 style="margin-bottom: 4px; font-size: 1.8rem; letter-spacing: -0.03em;">AVOID</h1>
+        <div class="muted" style="font-size: 11px; line-height: 1.5;">Automated Vertical Obstruction Identification &amp; Detection — Geospatial Intelligence Platform</div>
+      </div>
+
+      <!-- AOI Panel -->
+      <div class="panel" style="margin-top: 18px;">
+        <div class="panel-kicker">Active View</div>
+        <div style="margin-top: 8px;">
+          <div style="font-family: var(--font-mono); font-size: 14px; color: var(--text); font-weight: 600;" id="active-location">Global View</div>
+          <div class="avoid-aoi-coords">
+            <span class="coord-label">Center:</span> <span id="active-coords">39.5°N 98.5°W</span><br>
+            <span class="coord-label">Altitude:</span> <span id="active-alt">5000 km</span><br>
+            <span class="coord-label">Sources:</span> FAA DOF + OSM
+          </div>
+        </div>
+      </div>
+
+      <!-- Obstruction Stats Panel -->
+      <div class="panel">
+        <div class="panel-kicker">Obstruction Database</div>
+        <div class="avoid-stats-grid">
+          <div class="avoid-stat-box">
+            <div class="avoid-stat-label">Total</div>
+            <div class="avoid-stat-value lime" id="stat-total">5,376</div>
+          </div>
+          <div class="avoid-stat-box">
+            <div class="avoid-stat-label">FAA Verified</div>
+            <div class="avoid-stat-value" id="stat-faa">3,687</div>
+          </div>
+          <div class="avoid-stat-box">
+            <div class="avoid-stat-label">OSM</div>
+            <div class="avoid-stat-value" id="stat-osm">1,689</div>
+          </div>
+          <div class="avoid-stat-box">
+            <div class="avoid-stat-label">Critical (≥50ft)</div>
+            <div class="avoid-stat-value" id="stat-critical">—</div>
+          </div>
+        </div>
+        <div style="margin-top: 12px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); line-height: 1.6;" id="data-sources">
+          <div><span style="color: var(--lime);">Imagery:</span> Google 3D Tiles + Bing Aerial</div>
+          <div><span style="color: var(--lime);">Terrain:</span> Cesium World Terrain</div>
+          <div><span style="color: var(--lime);">Model:</span> YOLOv8n (Phase 2 — training)</div>
+          <div><span style="color: var(--lime);">Synced:</span> 2026-08-14 UTC</div>
+        </div>
+      </div>
+
+      <!-- Height Categories Legend -->
+      <div class="panel">
+        <div class="panel-kicker">Height Categories</div>
+        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 14px; height: 14px; border-radius: 2px; background: #ff453a; flex-shrink: 0;"></div>
+            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text);">≥ 50 ft <span style="color: var(--muted); margin-left: 6px;">Critical</span></div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 14px; height: 14px; border-radius: 2px; background: #ff9100; flex-shrink: 0;"></div>
+            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text);">≥ 25 ft <span style="color: var(--muted); margin-left: 6px;">Moderate</span></div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 14px; height: 14px; border-radius: 2px; background: #fbbf24; flex-shrink: 0;"></div>
+            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text);">≥ 10 ft <span style="color: var(--muted); margin-left: 6px;">Low</span></div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 14px; height: 14px; border-radius: 2px; background: #6e6e73; flex-shrink: 0;"></div>
+            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text);">&lt; 10 ft <span style="color: var(--muted); margin-left: 6px;">Negligible</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Display Options -->
+      <div class="panel">
+        <div class="panel-kicker">Display Options</div>
+        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" id="toggle-minimap" checked style="width: 18px; height: 18px; accent-color: var(--lime); cursor: pointer;">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text);">Scene Overview</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" id="toggle-telemetry" checked style="width: 18px; height: 18px; accent-color: var(--lime); cursor: pointer;">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text);">Telemetry HUD</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" id="toggle-crosshair" checked style="width: 18px; height: 18px; accent-color: var(--lime); cursor: pointer;">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text);">Crosshair</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" id="toggle-search" checked style="width: 18px; height: 18px; accent-color: var(--lime); cursor: pointer;">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text);">Search Bar</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" id="toggle-streets" checked style="width: 18px; height: 18px; accent-color: var(--lime); cursor: pointer;">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text);">Street Labels</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" id="toggle-osm-buildings" style="width: 18px; height: 18px; accent-color: var(--lime); cursor: pointer;">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text);">3D Buildings (OSM)</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" id="toggle-flight-mode" style="width: 18px; height: 18px; accent-color: var(--lime); cursor: pointer;">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text);">Flight Controls (WASD)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Camera Angle Control -->
+      <div class="panel">
+        <div class="panel-kicker">Camera Angle</div>
+        <div style="margin-top: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--muted);">Top</span>
+            <input type="range" id="camera-pitch-slider" min="-90" max="0" value="-1" step="1" style="flex:1;accent-color: var(--lime);cursor:pointer;height:24px;">
+            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--muted);">Flight</span>
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text); text-align: center;" id="pitch-display">-1° near top-down</div>
+        </div>
+      </div>
+
+      <!-- QA/QC Dashboard Panel -->
+      <div class="panel">
+        <div class="panel-kicker">Quality Control</div>
+        <div class="avoid-export-row">
+          <button class="avoid-export-btn" id="show-qaqc" style="color: var(--lime);">
+            <span class="export-icon">📊</span> QA/QC Dashboard
+          </button>
+        </div>
+      </div>
+
+      <!-- Export Panel -->
+      <div class="panel" style="margin-bottom: 24px;">
+        <div class="panel-kicker">Data Export</div>
+        <div class="avoid-export-row">
+          <button class="avoid-export-btn" id="export-csv">
+            <span class="export-icon">⬇</span> Download CSV
+          </button>
+          <button class="avoid-export-btn" id="export-kml">
+            <span class="export-icon">⬇</span> Download KML
+          </button>
+          <button class="avoid-export-btn" id="export-pdf">
+            <span class="export-icon">⬇</span> Mission Brief PDF
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER STAGE -->
+    <main class="center-stage" style="padding: 0; position: relative; overflow: hidden;">
+      <!-- Search Bar -->
+      <div class="avoid-search-bar" id="avoid-search-bar">
+        <span class="search-icon">⌖</span>
+        <input type="text" id="location-search" placeholder="Search location or enter coordinates..." />
+        <button class="search-btn" id="search-btn">GO</button>
+      </div>
+
+      <!-- Bookmarks -->
+      <div class="avoid-bookmarks" id="avoid-bookmarks">
+        <button class="bookmark-btn" data-lat="36.92" data-lon="-76.21" data-name="Norfolk, VA">Norfolk</button>
+        <button class="bookmark-btn" data-lat="40.71" data-lon="-74.01" data-name="New York, NY">New York</button>
+        <button class="bookmark-btn" data-lat="38.90" data-lon="-77.04" data-name="Washington, DC">DC</button>
+        <button class="bookmark-btn" data-lat="37.77" data-lon="-122.42" data-name="San Francisco, CA">San Francisco</button>
+        <button class="bookmark-btn" data-lat="34.05" data-lon="-118.24" data-name="Los Angeles, CA">Los Angeles</button>
+      </div>
+
+      <!-- Mobile Hamburger Menu -->
+      <div class="avoid-hamburger" id="avoid-hamburger">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="avoid-map-controls-mobile" id="avoid-map-controls-mobile">
+        <button id="toggle-detections-m" class="ghost-btn map-control-btn active">Detections</button>
+        <button id="toggle-ground-truth-m" class="ghost-btn map-control-btn">Ground Truth (FAA)</button>
+        <button id="toggle-before-after-m" class="ghost-btn map-control-btn">Before/After</button>
+        <button id="toggle-flight-corridor-m" class="ghost-btn map-control-btn">Flight Corridor</button>
+        <button id="toggle-heatmap-m" class="ghost-btn map-control-btn">Heatmap</button>
+      </div>
+
+      <!-- Map Control Buttons (desktop only) -->
+
+      <div class="avoid-map-controls">
+        <button id="toggle-detections" class="ghost-btn map-control-btn active">Detections</button>
+        <button id="toggle-ground-truth" class="ghost-btn map-control-btn">Ground Truth (FAA)</button>
+        <button id="toggle-before-after" class="ghost-btn map-control-btn">Before/After</button>
+        <button id="toggle-flight-corridor" class="ghost-btn map-control-btn">Flight Corridor</button>
+        <button id="toggle-heatmap" class="ghost-btn map-control-btn">Heatmap</button>
+      </div>
+
+      <!-- Cesium Container -->
+      <div id="cesium-container"></div>
+
+      <!-- Loading Overlay -->
+      <div id="avoid-loading">
+        <div>
+          <div class="loader-text">Initializing AVOID — CesiumJS Globe</div>
+          <div class="loader-bar"><div class="loader-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- Minimap / Scene Overview (top-right) -->
+      <div class="avoid-minimap" id="avoid-minimap">
+        <div class="avoid-minimap-header">
+          <div class="avoid-minimap-title">Scene Overview</div>
+          <button class="avoid-minimap-toggle" id="minimap-toggle">–</button>
+        </div>
+        <div class="avoid-minimap-canvas-wrap">
+          <img class="avoid-minimap-img" id="minimap-img" src="data/norfolk_sentinel2_rgb.png" alt="Sentinel-2 scene overview" onerror="this.style.display='none'">
+          <div class="avoid-minimap-viewport" id="minimap-viewport" style="left:40%;top:40%;width:20%;height:20%;"></div>
+        </div>
+        <div class="avoid-minimap-footer">
+          <span>Sentinel-2 · 18SVE</span>
+          <span class="mm-coord" id="mm-center">36.92°N 76.21°W</span>
+        </div>
+      </div>
+
+      <!-- Crosshair (center reticle) -->
+      <!-- Crosshair removed -->
+
+      <!-- Telemetry HUD (bottom-right) -->
+      <div class="avoid-telemetry" id="avoid-telemetry">
+        <div class="tel-cell">
+          <div class="tel-label">Latitude</div>
+          <div class="tel-value" id="tel-lat">--</div>
+        </div>
+        <div class="tel-cell">
+          <div class="tel-label">Longitude</div>
+          <div class="tel-value" id="tel-lon">--</div>
+        </div>
+        <div class="tel-cell">
+          <div class="tel-label">Altitude</div>
+          <div class="tel-value" id="tel-alt">--</div>
+        </div>
+        <div class="tel-cell">
+          <div class="tel-label">Heading</div>
+          <div class="tel-value" id="tel-heading">--</div>
+        </div>
+      </div>
+
+      <!-- Detection Detail Panel (right drawer) -->
+      <div id="avoid-detail-panel">
+        <div class="avoid-detail-header">
+          <div>
+            <div class="panel-kicker" id="detail-panel-kicker">Detection Detail</div>
+            <div class="avoid-detail-title" id="detail-title">—</div>
+          </div>
+          <button class="avoid-detail-close" id="detail-close">✕</button>
+        </div>
+        <div class="avoid-detail-body" id="detail-body">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-align: center; padding: 40px 0;">
+            Click a detection pillar on the globe to view details.
+          </div>
+        </div>
+      </div>
+    </main>
+
+  <script src="avoid.js?v=0.001.33"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Explorer — Jon Grayson</title>
+  <meta name="description" content="A 3D exploration window. Scroll through photorealistic 3D tiles of the Earth, search any location, spin and tilt the camera.">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/cesium@1.143.0/Build/Cesium/Widgets/widgets.css">
+  <link rel="stylesheet" href="explorer.css">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-L9JD3QE0J0"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-L9JD3QE0J0');</script>
+
+</head>
+<body>
+
+  <!-- Cesium Container -->
+  <div id="cesium-container"></div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loader-text">Initializing Explorer — CesiumJS Globe</div>
+  </div>
+
+  <!-- Control bar: search row + orbit pad row -->
+  <div class="control-bar" id="control-bar">
+    <div class="search-row">
+      <span class="search-icon">⌖</span>
+      <input type="text" id="location-search" placeholder="Search location or coordinates…" autocomplete="off" spellcheck="false">
+      <button class="search-btn" id="search-btn">GO</button>
+    </div>
+    <div class="pad-row">
+      <div class="readout readout-heading" id="readout-heading">N 0°</div>
+      <div class="orbit-pad" id="orbit-pad" title="Drag horizontally to spin · vertically to tilt">
+        <div class="pad-tick pad-tick-n">N</div>
+        <div class="pad-tick pad-tick-e">E</div>
+        <div class="pad-tick pad-tick-s">S</div>
+        <div class="pad-tick pad-tick-w">W</div>
+        <div class="pad-thumb" id="pad-thumb"></div>
+      </div>
+      <div class="readout readout-pitch" id="readout-pitch">-90° top-down</div>
+    </div>
+  </div>
+
+  <!-- CesiumJS 1.143.0 -->
+  <script src="https://unpkg.com/cesium@1.143.0/Build/Cesium/Cesium.js"></script>
+  <script src="explorer.js?v=20260902a"></script>
+</body>
+</html>

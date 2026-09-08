@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Pittsburgh Crime Intelligence — Jon Grayson</title>
+  <meta name="description" content="A Palantir-style crime intelligence dashboard for Pittsburgh, PA. Photorealistic 3D tiles, incident mapping by type, predictive hot zones, and Pittsburgh Police zone indicators.">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://unpkg.com/cesium@1.143.0/Build/Cesium/Widgets/widgets.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="crime.css?v=20260904c">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-L9JD3QE0J0"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-L9JD3QE0J0');</script>
+
+</head>
+<body>
+
+  <!-- Cesium Container -->
+  <div id="cesium-container"></div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loader-text">Initializing crime intelligence · CesiumJS globe</div>
+  </div>
+
+  <!-- ══ TOP RIBBON: identity + live stats ══ -->
+  <header class="ribbon" id="ribbon">
+    <div class="ribbon-left">
+      <div class="ribbon-title">PGH&nbsp;CRIME&nbsp;INTEL</div>
+      <div class="ribbon-sub" id="ribbon-sub">PITTSBURGH · PA</div>
+    </div>
+    <div class="ribbon-stats" id="ribbon-stats">
+      <div class="rstat"><span class="rstat-label">INCIDENTS</span><span class="rstat-value" id="stat-total">—</span></div>
+      <div class="rstat"><span class="rstat-label">VIOLENT</span><span class="rstat-value c-violent" id="stat-violent">—</span></div>
+      <div class="rstat"><span class="rstat-label">PROPERTY</span><span class="rstat-value c-property" id="stat-property">—</span></div>
+      <div class="rstat"><span class="rstat-label">DRUG</span><span class="rstat-value c-drug" id="stat-drug">—</span></div>
+      <div class="rstat"><span class="rstat-label">OTHER</span><span class="rstat-value c-other" id="stat-other">—</span></div>
+      <div class="rstat"><span class="rstat-label">HOT&nbsp;CELLS</span><span class="rstat-value c-hot" id="stat-hot">—</span></div>
+      <div class="rstat rstat-src"><span class="rstat-label">SOURCE</span><span class="rstat-value" id="stat-range">90D</span></div>
+    </div>
+  </header>
+
+  <!-- ══ LEFT RAIL: layer control ══ -->
+  <aside class="rail" id="rail">
+
+    <div class="sheet-head" id="sheet-head">
+      <span class="sheet-handle"></span>
+      <span class="sheet-title">LAYERS</span>
+      <button class="sheet-close" id="sheet-close" aria-label="Close layers">✕</button>
+    </div>
+
+    <div class="rail-section">
+      <div class="rail-head">
+        <span class="rail-title">CRIME&nbsp;TYPE</span>
+        <div class="sort-chips" id="sort-chips">
+          <button class="sort-chip" data-sort="count" title="Sort by volume">N</button>
+          <button class="sort-chip" data-sort="severity" title="Sort by severity">S</button>
+          <button class="sort-chip" data-sort="alpha" title="Sort alphabetically">A–Z</button>
+        </div>
+      </div>
+      <div class="type-list" id="type-list"></div>
+    </div>
+
+    <div class="rail-section">
+      <div class="rail-head">
+        <span class="rail-title">POLICE&nbsp;ZONES</span>
+        <button class="zone-all-btn" id="zone-all-btn" title="Show all zones">ALL</button>
+      </div>
+      <div class="zone-list" id="zone-list"></div>
+    </div>
+
+    <div class="rail-section">
+      <div class="rail-head">
+        <span class="rail-title">PREDICTED&nbsp;HOT&nbsp;ZONES</span>
+        <label class="switch" title="Toggle the historical-density hot zone model">
+          <input type="checkbox" id="hot-toggle" checked>
+          <span class="switch-track"></span>
+        </label>
+      </div>
+      <div class="hot-legend">
+        <span class="hot-leg high"><i></i>HIGH</span>
+        <span class="hot-leg med"><i></i>MEDIUM</span>
+        <span class="hot-leg low"><i></i>LOW</span>
+      </div>
+      <div class="hot-meta" id="hot-meta">Density model · 219 cells</div>
+    </div>
+
+    <div class="rail-section rail-footer">
+      <div class="foot-note" id="foot-note">WPRDC blotter · Nov 2025 – Jul 2026</div>
+    </div>
+  </aside>
+
+  <!-- ══ MOBILE: layers sheet toggle ══ -->
+  <button class="layers-fab" id="layers-fab" aria-label="Toggle layers panel">◈ LAYERS</button>
+
+  <!-- ══ CONTROL BAR: search + orbit pad ══ -->
+  <div class="control-bar" id="control-bar">
+    <div class="search-row">
+      <span class="search-icon">⌖</span>
+      <input type="text" id="location-search" placeholder="Search location or coordinates…" autocomplete="off" spellcheck="false">
+      <button class="search-btn" id="search-btn">GO</button>
+    </div>
+    <div class="pad-row">
+      <div class="readout readout-heading" id="readout-heading">N 0°</div>
+      <div class="orbit-pad" id="orbit-pad" title="Drag horizontally to spin · vertically to tilt">
+        <div class="pad-tick pad-tick-n">N</div>
+        <div class="pad-tick pad-tick-e">E</div>
+        <div class="pad-tick pad-tick-s">S</div>
+        <div class="pad-tick pad-tick-w">W</div>
+        <div class="pad-thumb" id="pad-thumb"></div>
+      </div>
+      <div class="readout readout-pitch" id="readout-pitch">-90° top-down</div>
+    </div>
+  </div>
+
+  <!-- ══ BOTTOM TIME BAR: range chips + hour histogram ══ -->
+  <div class="time-bar" id="time-bar">
+    <div class="range-chips" id="range-chips">
+      <button class="range-chip" data-range="7">7D</button>
+      <button class="range-chip active" data-range="30">30D</button>
+      <button class="range-chip" data-range="90">90D</button>
+    </div>
+    <div class="hour-histogram" id="hour-histogram" title="Incidents by hour of day · click to isolate"></div>
+    <div class="time-label" id="time-label">MAY 03 – JUL 31 2026</div>
+  </div>
+
+  <!-- ══ INCIDENT DRAWER (right) ══ -->
+  <div class="drawer" id="incident-drawer">
+    <button class="drawer-close" id="drawer-close">×</button>
+    <div class="drawer-body" id="drawer-body"></div>
+  </div>
+
+  <!-- ══ ZONE CARD (right, below drawer) ══ -->
+  <div class="zone-card" id="zone-card">
+    <button class="drawer-close" id="zone-card-close">×</button>
+    <div class="zone-card-body" id="zone-card-body"></div>
+  </div>
+
+  <!-- CesiumJS 1.143.0 -->
+  <script src="https://unpkg.com/cesium@1.143.0/Build/Cesium/Cesium.js"></script>
+
+  <!-- City data (city-scoped: swap the set for another city) -->
+  <script src="data/pgh-incidents.js"></script>
+  <script src="data/pgh-stats.js"></script>
+  <script src="data/pgh-hot.js"></script>
+  <script src="data/pgh-zstats.js"></script>
+  <script src="data/pgh-zones.js"></script>
+
+  <script src="crime.js?v=20260904c"></script>
+</body>
+</html>
