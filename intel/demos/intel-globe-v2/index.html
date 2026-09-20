@@ -480,12 +480,13 @@
 
   /* ─── Tooltip ─── */
   #tooltip {
-    position: absolute; z-index: 20; pointer-events: none;
+    position: absolute; z-index: 20; pointer-events: auto;
     background: rgba(6,7,10,0.96); backdrop-filter: blur(20px);
     border: 1px solid rgba(196,214,0,0.15); border-radius: 8px;
     padding: 10px 14px; display: none; min-width: 160px;
     font-family: 'JetBrains Mono', monospace;
   }
+  #tooltip:hover { /* keep tooltip alive when pointer moves onto it */ }
   #tooltip .tip-title { font-size: 14.0px; color: #C4D600; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
   #tooltip .tip-row { display: flex; justify-content: space-between; font-size: 12.3px; color: #bbc; padding: 1px 0; }
   #tooltip .tip-row .tip-val { color: #e8eaed; font-weight: 500; }
@@ -1776,7 +1777,7 @@ async function init() {
   });
 
   setLoadProgress(96, 'Acquiring orbital assets...');
-  buildOrbital();
+  try { buildOrbital(); } catch (e) { console.warn('[orbital] init failed:', e); }
 
   // Live data feed groups
   earthquakeGroup = new THREE.Group();
@@ -1814,7 +1815,7 @@ async function init() {
     setTimeout(() => l.style.display = 'none', 600);
   }, 300);
 
-  animate();
+  animate(); // start render loop immediately — satellites load async
 
   // Live data feeds — staggered.
   //
@@ -2597,7 +2598,8 @@ async function fetchTrafficCameras() {
       lat: parseFloat(c.latitude || c.lat),
       lng: parseFloat(c.longitude || c.lng),
       area: c.area || c.borough || '',
-      isOnline: true
+      isOnline: true,
+      imageUrl: c.imageUrl || ('https://webcams.nyctmc.org/api/cameras/' + encodeURIComponent(c.id) + '/image')
     })).filter(c => !isNaN(c.lat) && !isNaN(c.lng) && c.lat !== 0);
 
     // Clear old markers
@@ -2665,7 +2667,7 @@ function showCameraPopup(camera, clickX, clickY) {
   popup.style.display = 'block';
 
   // Fetch the live image
-  const imgUrl = LIVE_FEED_PROXY + '?source=camera-image&id=' + encodeURIComponent(camera.id);
+  const imgUrl = camera.imageUrl || LIVE_FEED_PROXY + '?source=camera-image&id=' + encodeURIComponent(camera.id);
   const img = new Image();
   img.onload = () => {
     imgWrap.innerHTML = '';
@@ -2838,7 +2840,7 @@ function loadVisibleThumbnails() {
         thumb.appendChild(img);
       };
       img.onerror = () => { thumb.innerHTML = '<span class="cm-thumb-loading">—</span>'; };
-      img.src = LIVE_FEED_PROXY + '?source=camera-image&id=' + encodeURIComponent(cam.id);
+      img.src = cam.imageUrl || LIVE_FEED_PROXY + '?source=camera-image&id=' + encodeURIComponent(cam.id);
     }
   });
 }
@@ -2865,7 +2867,7 @@ function initCameraMap() {
   });
 
   // Dark basemap, to sit inside the existing UI rather than fight it.
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2u1l_1_f85df591a809b18323e98999', {
     attribution: '&copy; OpenStreetMap &copy; CARTO',
     subdomains: 'abcd',
     maxZoom: 19,
@@ -2996,7 +2998,7 @@ function loadPreviewImage(cam) {
     const tag = document.getElementById('cm-preview-res');
     if (tag) { tag.textContent = ''; tag.className = 'cm-res'; }
   };
-  img.src = LIVE_FEED_PROXY + '?source=camera-image&id=' + encodeURIComponent(cam.id) + '&_t=' + Date.now();
+  img.src = (cam.imageUrl || LIVE_FEED_PROXY + '?source=camera-image&id=' + encodeURIComponent(cam.id)) + (cam.imageUrl ? '?_t=' : '&_t=') + Date.now();
 }
 
 // Native pixel count per camera, learned as images load. Used by the
@@ -3642,6 +3644,18 @@ document.getElementById('ai-close').addEventListener('click', () => {
     tip.style.top = y + 'px';
   }
   window._positionTooltip = positionTooltip;
+
+  // Click on tooltip opens the dossier for the current hover/selection.
+  // Previously pointer-events:none made the tooltip unclickable — clicks
+  // fell through to the canvas, which saw empty space and cleared everything.
+  const tipEl = document.getElementById('tooltip');
+  if (tipEl) {
+    tipEl.addEventListener('click', e => {
+      e.stopPropagation();
+      const hov = selection.hovered;
+      if (hov) selection.select(hov.kind, hov.id);
+    });
+  }
 }
 
 /**
