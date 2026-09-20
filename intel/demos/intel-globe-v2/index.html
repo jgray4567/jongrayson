@@ -1021,6 +1021,68 @@
     .cm-preview-img-wrap { max-height: 42vh; min-height: 200px; }
     .cm-preview-img-wrap img { max-height: 320px; }
   }
+
+  /* Camera lightbox — fullscreen live viewer over the modal/popup */
+  #camera-lightbox {
+    display: none; position: fixed; inset: 0; z-index: 210;
+    background: rgba(1, 6, 16, 0.93);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  }
+  #camera-lightbox.active { display: flex; align-items: center; justify-content: center; animation: cl-fade 0.15s ease-out; }
+  @keyframes cl-fade { from { opacity: 0; } to { opacity: 1; } }
+  #camera-lightbox .cl-zone {
+    position: absolute; top: 0; bottom: 0; width: 30%; z-index: 2;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.15s;
+  }
+  #camera-lightbox .cl-zone[data-cl="prev"] { left: 0; }
+  #camera-lightbox .cl-zone[data-cl="next"] { right: 0; }
+  #camera-lightbox .cl-zone[data-cl="prev"]:hover { background: linear-gradient(90deg, rgba(0,229,255,0.08), transparent 75%); }
+  #camera-lightbox .cl-zone[data-cl="next"]:hover { background: linear-gradient(270deg, rgba(0,229,255,0.08), transparent 75%); }
+  #camera-lightbox .cl-zone span {
+    font-size: 60px; color: rgba(232,234,237,0.22); font-family: 'JetBrains Mono', monospace;
+    user-select: none; transition: color 0.15s;
+  }
+  #camera-lightbox .cl-zone:hover span { color: rgba(0,229,255,0.85); }
+  #camera-lightbox .cl-stage {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    max-width: 92vw;
+  }
+  #cl-img {
+    display: block; height: 66vh; width: auto;
+    max-width: 92vw; max-height: 66vh;
+    object-fit: contain;
+    border: 1px solid rgba(0,229,255,0.28); border-radius: 4px;
+    box-shadow: 0 0 80px rgba(0,229,255,0.10), 0 18px 60px rgba(0,0,0,0.6);
+    background: #000; cursor: zoom-out;
+    transition: opacity 0.15s ease;
+  }
+  @media (max-width: 768px) {
+    #cl-img { height: auto; width: 92vw; max-height: 60vh; }
+  }
+  #camera-lightbox .cl-details { text-align: center; max-width: 92vw; }
+  #cl-name {
+    font-family: 'JetBrains Mono', monospace; font-size: 15px;
+    letter-spacing: 0.5px; color: #e8eaed; text-transform: uppercase;
+  }
+  #cl-meta {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px;
+    color: rgba(0,229,255,0.75); margin-top: 4px; text-transform: uppercase;
+  }
+  #cl-close {
+    position: absolute; top: 14px; right: 18px; z-index: 3;
+    font-size: 26px; line-height: 1; color: rgba(232,234,237,0.5); cursor: pointer;
+    padding: 6px 10px; border-radius: 6px; font-family: 'JetBrains Mono', monospace;
+    transition: color 0.15s, background 0.15s;
+  }
+  #cl-close:hover { color: #e8eaed; background: rgba(255,255,255,0.06); }
+  #cl-hint {
+    position: absolute; bottom: 14px; left: 0; right: 0; z-index: 1; text-align: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px;
+    color: rgba(232,234,237,0.28); text-transform: uppercase; pointer-events: none;
+  }
+  .cm-preview-img-wrap img { cursor: zoom-in; }
 </style>
 <link rel="stylesheet" href="extended-layers.css">
 <link rel="stylesheet" href="mission-ui.css">
@@ -1362,6 +1424,20 @@
 </div>
 
 <!-- NYC Camera Browser Modal -->
+<div id="camera-lightbox" role="dialog" aria-label="Live camera viewer">
+  <div class="cl-zone" data-cl="prev" title="Previous camera"><span>‹</span></div>
+  <div class="cl-zone" data-cl="next" title="Next camera"><span>›</span></div>
+  <div class="cl-stage">
+    <img id="cl-img" alt="Live traffic camera still" draggable="false">
+    <div class="cl-details">
+      <div id="cl-name">CAMERA</div>
+      <div id="cl-meta">STANDBY</div>
+    </div>
+  </div>
+  <div id="cl-close" title="Close (ESC)">✕</div>
+  <div id="cl-hint">CLICK SIDES TO BROWSE · ESC TO CLOSE</div>
+</div>
+
 <div id="camera-modal-overlay">
   <div id="camera-modal">
     <div class="cm-header">
@@ -2672,6 +2748,10 @@ function showCameraPopup(camera, clickX, clickY) {
   img.onload = () => {
     imgWrap.innerHTML = '';
     imgWrap.appendChild(img);
+    // Live photo opens the fullscreen lightbox viewer
+    img.style.cursor = 'zoom-in';
+    img.title = 'Click to enlarge';
+    img.addEventListener('click', ev => { ev.stopPropagation(); openCameraLightbox(camera); });
   };
   img.onerror = () => {
     imgWrap.innerHTML = '<div class="cp-error">FAILED TO LOAD IMAGE</div>';
@@ -3006,6 +3086,82 @@ function loadPreviewImage(cam) {
 // are otherwise impossible to find among 970 identical-looking list rows.
 const cameraResolution = new Map();
 
+// ═══════════════════════════════════════════════════════════════════
+//  CAMERA LIGHTBOX — fullscreen live viewer with prev/next browsing.
+//  Opened by clicking the live photo in the globe popup or the modal
+//  preview. Side click zones / arrow keys flip through the camera list;
+//  the photo itself, the ✕, or ESC dismiss it. Under the photo: borough ·
+//  area · native resolution · last update. Live-refreshes every 30s.
+// ═══════════════════════════════════════════════════════════════════
+
+const clLightboxEl = document.getElementById('camera-lightbox');
+const clImgEl = document.getElementById('cl-img');
+const clNameEl = document.getElementById('cl-name');
+const clMetaEl = document.getElementById('cl-meta');
+let clList = [];
+let clIndex = -1;
+let clRefreshTimer = null;
+
+function clImageUrl(cam) {
+  return cam.imageUrl || LIVE_FEED_PROXY + '?source=camera-image&id=' + encodeURIComponent(cam.id);
+}
+
+function clLoadImage(cam) {
+  clNameEl.textContent = cam.name || 'Camera ' + cam.id;
+  clMetaEl.textContent = 'CONNECTING...';
+  clImgEl.style.opacity = '0.35';
+  const src = clImageUrl(cam) + (cam.imageUrl ? '?_t=' : '&_t=') + Date.now();
+  clImgEl.onload = () => {
+    clImgEl.style.opacity = '1';
+    cameraResolution.set(cam.id, clImgEl.naturalWidth * clImgEl.naturalHeight);
+    const borough = (typeof boroughFromArea === 'function') ? boroughFromArea(cam.area) : '';
+    const area = (cam.area && cam.area !== borough) ? cam.area : '';
+    const bits = [borough, area, clImgEl.naturalWidth + '×' + clImgEl.naturalHeight, 'UPDATED ' + new Date().toLocaleTimeString()].filter(Boolean);
+    clMetaEl.textContent = bits.join(' · ');
+  };
+  clImgEl.onerror = () => {
+    clImgEl.style.opacity = '1';
+    clMetaEl.textContent = 'SIGNAL LOST — CLICK SIDES TO BROWSE';
+  };
+  clImgEl.src = src;
+}
+
+function openCameraLightbox(cam) {
+  if (!cam) return;
+  // Browse within whatever list is on screen (respects search/borough/sort);
+  // fall back to the full online roster when the camera isn't in it.
+  let candidates = (typeof getFilteredCameras === 'function') ? getFilteredCameras() : [];
+  if (!candidates.some(c => c.id === cam.id)) candidates = trafficCameraData || [];
+  clList = candidates.length ? candidates : [cam];
+  clIndex = Math.max(0, clList.findIndex(c => c.id === cam.id));
+  // The modal overlay carries z-index 200 !important (mission-ui.css) — a tie
+  // goes to the later DOM sibling, so always stack dynamically above it.
+  const mdEl = document.getElementById('camera-modal-overlay');
+  const mdZ = parseInt(getComputedStyle(mdEl).zIndex, 10);
+  clLightboxEl.style.zIndex = (isFinite(mdZ) ? mdZ : 200) + 50;
+  clLightboxEl.classList.add('active');
+  clLoadImage(cam);
+  if (clRefreshTimer) clearInterval(clRefreshTimer);
+  clRefreshTimer = setInterval(() => { const c = clList[clIndex]; if (c) clLoadImage(c); }, 30000);
+}
+
+function clNav(dir) {
+  if (!clList.length) return;
+  clIndex = (clIndex + dir + clList.length) % clList.length;
+  clLoadImage(clList[clIndex]);
+}
+
+function closeCameraLightbox() {
+  clLightboxEl.classList.remove('active');
+  if (clRefreshTimer) { clearInterval(clRefreshTimer); clRefreshTimer = null; }
+}
+
+document.querySelector('#camera-lightbox .cl-zone[data-cl="prev"]')?.addEventListener('click', e => { e.stopPropagation(); clNav(-1); });
+document.querySelector('#camera-lightbox .cl-zone[data-cl="next"]')?.addEventListener('click', e => { e.stopPropagation(); clNav(1); });
+document.getElementById('cl-close')?.addEventListener('click', closeCameraLightbox);
+clImgEl?.addEventListener('click', closeCameraLightbox);
+clLightboxEl?.addEventListener('click', e => { if (e.target === clLightboxEl) closeCameraLightbox(); });
+
 function initCameraModal() {
   // Mobile map/list toggle.
   const modalEl = document.getElementById('camera-modal');
@@ -3058,6 +3214,13 @@ function initCameraModal() {
       if (e.target === overlay) closeCameraModal();
     });
   }
+  // Click the preview photo to open the fullscreen lightbox viewer
+  const previewImgWrap = document.getElementById('cm-preview-img');
+  if (previewImgWrap) {
+    previewImgWrap.addEventListener('click', e => {
+      if (e.target.closest('img') && cmSelectedCamera) openCameraLightbox(cmSelectedCamera);
+    });
+  }
   // Search input
   const search = document.getElementById('cm-search');
   if (search) {
@@ -3085,8 +3248,14 @@ function initCameraModal() {
       cmScrollTimer = setTimeout(() => loadVisibleThumbnails(), 150);
     });
   }
-  // Escape to close
+  // Escape / arrow keys — the lightbox takes priority over the modal
   document.addEventListener('keydown', (e) => {
+    if (clLightboxEl && clLightboxEl.classList.contains('active')) {
+      if (e.key === 'Escape') closeCameraLightbox();
+      else if (e.key === 'ArrowLeft') clNav(-1);
+      else if (e.key === 'ArrowRight') clNav(1);
+      return;
+    }
     if (e.key === 'Escape' && document.getElementById('camera-modal-overlay').classList.contains('active')) {
       closeCameraModal();
     }
