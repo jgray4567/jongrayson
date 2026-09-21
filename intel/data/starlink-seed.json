@@ -1322,6 +1322,6 @@
       "tle2": "2 45695  53.0356 136.1620 0004809 126.1972 216.6214 15.87478378  5725"
     }
   ],
-  "source": "CelesTrak NAME=starlink via satvisor-data GitHub mirror (celestrak.org 503 at fetch time)",
-  "updatedAt": 1789985165.003529
+  "source": "CelesTrak NAME=starlink (local refresh)",
+  "updatedAt": 1789985456.608336
 }
